@@ -1,113 +1,111 @@
-import { Heart, Github, Linkedin, Mail } from 'lucide-react'
+import { Github, Linkedin, Mail, ArrowUpRight } from 'lucide-react'
+import ScrollReveal from './ScrollReveal'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gray-900 text-white py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
-          {/* About Section */}
-          <div>
-            <h3 className="text-2xl font-bold mb-4 text-gradient">CJ Abejo</h3>
-            <p className="text-gray-400 mb-4">
-              Full Stack Developer passionate about creating innovative web solutions 
-              and building user-friendly applications.
+    <footer className="bg-gray-950 text-white">
+      {/* CTA Banner */}
+      <div className="border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <ScrollReveal animation="fade-up">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2">Let's work together</h3>
+              <p className="text-gray-400 text-sm sm:text-base">
+                Available for remote full-time roles and freelance projects.
+              </p>
+            </div>
+            <a
+              href="mailto:capstonee2@gmail.com"
+              className="group flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 text-sm sm:text-base flex-shrink-0"
+            >
+              capstonee2@gmail.com
+              <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          </div>
+          </ScrollReveal>
+        </div>
+      </div>
+
+      {/* Footer Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+          {/* Brand */}
+          <div className="lg:col-span-2">
+            <h3 className="text-xl font-bold mb-3">Charlie James Abejo</h3>
+            <p className="text-gray-500 text-sm leading-relaxed max-w-md mb-4">
+              Full Stack Developer with professional experience building fintech platforms,
+              serverless APIs, and scalable web applications for international clients using
+              Go, .NET, Node.js, and React.
             </p>
-            <div className="flex gap-4">
-              <a
-                href="https://github.com/CharlieJamesGwapo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-full hover:bg-primary transition-colors duration-300"
-                title="GitHub"
-              >
-                <Github size={20} />
+            <div className="flex gap-2">
+              <a href="https://github.com/CharlieJamesGwapo" target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300" title="GitHub">
+                <Github size={16} />
               </a>
-              <a
-                href="https://www.linkedin.com/in/charlie-james-abejo-26362638a/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 bg-gray-800 rounded-full hover:bg-primary transition-colors duration-300"
-                title="LinkedIn"
-              >
-                <Linkedin size={20} />
+              <a href="https://www.linkedin.com/in/charlie-james-abejo-26362638a/" target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300" title="LinkedIn">
+                <Linkedin size={16} />
               </a>
-              <a
-                href="mailto:capstonee2@gmail.com"
-                className="p-2 bg-gray-800 rounded-full hover:bg-primary transition-colors duration-300"
-                title="Email"
-              >
-                <Mail size={20} />
+              <a href="mailto:capstonee2@gmail.com" className="p-2 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300" title="Email">
+                <Mail size={16} />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Navigation */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-3">Navigation</h4>
             <ul className="space-y-2">
-              <li>
-                <a href="#home" className="text-gray-400 hover:text-primary transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="#about" className="text-gray-400 hover:text-primary transition-colors">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="#projects" className="text-gray-400 hover:text-primary transition-colors">
-                  Projects
-                </a>
-              </li>
-              <li>
-                <a href="#skills" className="text-gray-400 hover:text-primary transition-colors">
-                  Skills
-                </a>
-              </li>
-              <li>
-                <a href="#contact" className="text-gray-400 hover:text-primary transition-colors">
-                  Contact
-                </a>
-              </li>
+              {[
+                { name: 'About', href: '#about' },
+                { name: 'Experience', href: '#experience' },
+                { name: 'Projects', href: '#projects' },
+                { name: 'Skills', href: '#skills' },
+                { name: 'Contact', href: '#contact' }
+              ].map((link) => (
+                <li key={link.name}>
+                  <a href={link.href} className="text-gray-500 hover:text-white transition-colors text-sm">
+                    {link.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
-            <ul className="space-y-2 text-gray-400">
-              <li>Waterfall, Balingasag</li>
-              <li>Misamis Oriental</li>
+            <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-3">Contact</h4>
+            <ul className="space-y-2 text-sm">
               <li>
-                <a href="tel:09856122843" className="hover:text-primary transition-colors">
-                  09856122843
+                <a href="mailto:capstonee2@gmail.com" className="text-gray-500 hover:text-white transition-colors break-all">
+                  capstonee2@gmail.com
                 </a>
               </li>
               <li>
-                <a
-                  href="mailto:capstonee2@gmail.com"
-                  className="hover:text-primary transition-colors break-all"
-                >
-                  capstonee2@gmail.com
+                <a href="tel:09856122843" className="text-gray-500 hover:text-white transition-colors">
+                  0985-612-2843
                 </a>
+              </li>
+              <li className="text-gray-500">Misamis Oriental, Philippines</li>
+              <li className="pt-1">
+                <span className="inline-flex items-center gap-1.5 text-green-500 text-xs">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500"></span>
+                  </span>
+                  Available for work
+                </span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm text-center md:text-left">
-              © {currentYear} Charlie James Z. Abejo. All rights reserved.
-            </p>
-            <p className="text-gray-400 text-sm flex items-center gap-1">
-              Made with <Heart size={16} className="text-red-500 fill-current" /> using React & Tailwind CSS
-            </p>
-          </div>
+        {/* Bottom */}
+        <div className="border-t border-gray-800/50 pt-6">
+          <p className="text-gray-600 text-xs text-center">
+            &copy; {currentYear} Charlie James Z. Abejo
+          </p>
         </div>
       </div>
     </footer>
