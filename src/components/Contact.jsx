@@ -50,15 +50,29 @@ const Contact = () => {
     setIsSubmitting(true)
     setStatus('sending')
 
-    const mailtoLink = `mailto:capstonee2@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`)}`
-    window.open(mailtoLink, '_blank')
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
 
-    setTimeout(() => {
-      setStatus('success')
-      setIsSubmitting(false)
-      setFormData({ name: '', email: '', subject: '', message: '' })
+      const data = await response.json()
+
+      if (response.ok) {
+        setStatus('success')
+        setFormData({ name: '', email: '', subject: '', message: '' })
+        setTimeout(() => setStatus(''), 5000)
+      } else {
+        setStatus('failed')
+        setTimeout(() => setStatus(''), 5000)
+      }
+    } catch (error) {
+      setStatus('failed')
       setTimeout(() => setStatus(''), 5000)
-    }, 1000)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactInfo = [
@@ -306,7 +320,7 @@ const Contact = () => {
                 {status === 'success' && (
                   <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-center gap-2 text-sm">
                     <CheckCircle size={16} />
-                    <span>Message opened in your email client!</span>
+                    <span>Message sent successfully! I'll get back to you soon.</span>
                   </div>
                 )}
 
@@ -314,6 +328,13 @@ const Contact = () => {
                   <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-center gap-2 text-sm">
                     <AlertCircle size={16} />
                     <span>Please fix the errors above and try again.</span>
+                  </div>
+                )}
+
+                {status === 'failed' && (
+                  <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-center gap-2 text-sm">
+                    <AlertCircle size={16} />
+                    <span>Failed to send message. Please try again or email me directly.</span>
                   </div>
                 )}
               </form>
