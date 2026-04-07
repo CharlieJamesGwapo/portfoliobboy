@@ -56,7 +56,7 @@ const About = () => {
               <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
                 At <span className="font-semibold">Robustech IT / SocietyOne (Australia)</span>, I rewrote
                 legacy Go services into .NET, built AWS Lambda functions, and optimized APIs for a personal
-                loan platform. Currently at <span className="font-semibold">Rooche Digital</span>, I develop
+                loan platform. At <span className="font-semibold">Rooche Digital</span>, I developed
                 web apps and client dashboards with secure authentication and CI/CD pipelines.
               </p>
               <p className="text-base sm:text-lg text-gray-700 leading-relaxed">

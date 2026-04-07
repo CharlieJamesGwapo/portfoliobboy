@@ -69,7 +69,7 @@ const Hero = () => {
               <p className="text-sm sm:text-base lg:text-lg text-gray-300 mb-6 sm:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
                 Full Stack Developer with professional experience building fintech platforms,
                 serverless APIs, and scalable web applications using Go, .NET, Node.js, and React.
-                Currently working with international teams delivering production-grade software.
+                Experienced working with international teams delivering production-grade software.
               </p>
 
               {/* Quick Stats */}
