@@ -217,7 +217,7 @@ const Contact = () => {
                       className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm bg-white ${
                         errors.name ? 'border-red-500' : 'border-gray-300'
                       }`}
-                      placeholder="John Doe"
+                      placeholder="Charlie James"
                     />
                     {errors.name && (
                       <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
@@ -240,7 +240,7 @@ const Contact = () => {
                       className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm bg-white ${
                         errors.email ? 'border-red-500' : 'border-gray-300'
                       }`}
-                      placeholder="john@example.com"
+                      placeholder="charlie@example.com"
                     />
                     {errors.email && (
                       <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
