@@ -116,6 +116,12 @@ export default function ArcadeLobby({ onClose }) {
     return () => { try { AudioManager.stopMusic() } catch { /* noop */ } }
   }, [])
 
+  // Mark the body so the floating MusicPlayer hides while the arcade is open.
+  useEffect(() => {
+    document.body.classList.add('game-open')
+    return () => document.body.classList.remove('game-open')
+  }, [])
+
   // ESC handling — game → lobby, modals close, lobby → portfolio.
   useEffect(() => {
     const onKey = (e) => {

@@ -134,3 +134,9 @@ html {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
+
+/* Marquee for the music player track name */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}

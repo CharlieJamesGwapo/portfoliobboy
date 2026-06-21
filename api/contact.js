@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer'
-
+// Contact form handler — sends via Resend's REST API (no SDK, zero imports,
+// so Vercel's bundler never hangs).
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -22,20 +22,10 @@ export default async function handler(req, res) {
     }
 
     // Check environment variables
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error('Missing EMAIL_USER or EMAIL_PASS environment variables')
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Missing RESEND_API_KEY environment variable')
       return res.status(500).json({ error: 'Server configuration error' })
     }
-
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    })
 
     // Sanitize inputs for HTML
     const sanitize = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -45,12 +35,7 @@ export default async function handler(req, res) {
     const safeSubject = sanitize(subject)
     const safeMessage = sanitize(message)
 
-    const mailOptions = {
-      from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      replyTo: email,
-      subject: `Portfolio: ${subject}`,
-      html: `
+    const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 20px; border-radius: 12px 12px 0 0;">
             <h2 style="color: white; margin: 0;">New Contact Form Message</h2>
@@ -65,9 +50,28 @@ export default async function handler(req, res) {
           </div>
         </div>
       `
+
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + process.env.RESEND_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'Portfolio Contact <onboarding@resend.dev>',
+        to: ['capstonee2@gmail.com'],
+        reply_to: email,
+        subject: 'Portfolio: ' + sanitize(subject),
+        html,
+      }),
+    })
+
+    if (!response.ok) {
+      const errorBody = await response.text()
+      console.error('Resend API error:', response.status, errorBody)
+      return res.status(500).json({ error: 'Failed to send email' })
     }
 
-    await transporter.sendMail(mailOptions)
     return res.status(200).json({ success: true, message: 'Email sent successfully' })
   } catch (error) {
     console.error('Contact form error:', error.message, error.stack)

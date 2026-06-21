@@ -7,8 +7,10 @@ import Projects from './components/Projects'
 import Skills from './components/Skills'
 import Education from './components/Education'
 import Certificates from './components/Certificates'
+import Tutorials from './components/Tutorials'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import MusicPlayer from './components/MusicPlayer'
 
 function App() {
   const [isVisible, setIsVisible] = useState(false)
@@ -36,6 +38,7 @@ function App() {
       <Skills />
       <Education />
       <Certificates />
+      <Tutorials />
       <Contact />
       <Footer />
 
@@ -51,6 +54,9 @@ function App() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
         </svg>
       </button>
+
+      {/* Floating music player (hides while the arcade is open) */}
+      <MusicPlayer />
     </div>
   )
 }

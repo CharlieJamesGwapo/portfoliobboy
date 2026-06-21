@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Menu, X, Home, User, Briefcase, Code, Mail, FolderOpen } from 'lucide-react'
+import { Menu, X, Home, User, Briefcase, Code, Mail, FolderOpen, BookOpen } from 'lucide-react'
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -51,6 +51,7 @@ const Navbar = () => {
     { name: 'Experience', href: '#experience', icon: Briefcase },
     { name: 'Projects', href: '#projects', icon: FolderOpen },
     { name: 'Skills', href: '#skills', icon: Code },
+    { name: 'Tutorials', href: '#tutorials', icon: BookOpen },
     { name: 'Contact', href: '#contact', icon: Mail },
   ]
 
