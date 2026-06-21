@@ -1,10 +1,30 @@
 // ============================================================================
 // MobileControls — touch D-pad (bottom-left) + Attack/Interact (bottom-right).
-// Visible on small screens only (md:hidden). Drives the engine via its ref.
+// Rendered only on touch-capable devices (coarse pointer / touch points),
+// regardless of viewport width. Drives the engine via its ref.
 // ============================================================================
+import { useEffect, useState } from 'react'
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Sword, Hand } from 'lucide-react'
 
 export default function MobileControls({ engineRef }) {
+  const [isTouch, setIsTouch] = useState(false)
+  useEffect(() => {
+    const check = () => {
+      try {
+        const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches
+        setIsTouch(Boolean(coarse) || 'ontouchstart' in window || navigator.maxTouchPoints > 0)
+      } catch {
+        setIsTouch('ontouchstart' in window)
+      }
+    }
+    check()
+    const onTouch = () => setIsTouch(true)
+    window.addEventListener('touchstart', onTouch, { once: true, passive: true })
+    return () => window.removeEventListener('touchstart', onTouch)
+  }, [])
+
+  if (!isTouch) return null
+
   const press = (dir, down) => (e) => {
     e.preventDefault()
     engineRef.current?.pressDir(dir, down)
@@ -22,7 +42,7 @@ export default function MobileControls({ engineRef }) {
     'pointer-events-auto flex items-center justify-center w-14 h-14 rounded-xl bg-white/10 border border-white/20 text-white active:bg-cyan-500/40 active:scale-95 transition-all backdrop-blur-sm'
 
   return (
-    <div className="md:hidden absolute inset-0 z-30 pointer-events-none">
+    <div className="absolute inset-0 z-30 pointer-events-none">
       {/* D-pad bottom-left */}
       <div className="absolute bottom-6 left-5 grid grid-cols-3 grid-rows-3 gap-1 w-44 h-44">
         <div />

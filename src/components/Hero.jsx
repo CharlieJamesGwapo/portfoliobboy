@@ -147,11 +147,18 @@ const Hero = () => {
                 <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-full animate-spin-slow"></div>
                   <div className="absolute inset-1.5 sm:inset-2 bg-gray-900 rounded-full overflow-hidden">
-                    <img
-                      src="/profile.png"
-                      alt="Charlie James Z. Abejo"
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
-                    />
+                    <picture>
+                      <source srcSet="/profile.webp" type="image/webp" />
+                      <img
+                        src="/profile.png"
+                        alt="Charlie James Z. Abejo"
+                        width="413"
+                        height="531"
+                        fetchPriority="high"
+                        decoding="async"
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </picture>
                   </div>
 
                   {/* Floating Badges */}

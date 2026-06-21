@@ -9,13 +9,13 @@ import { X, Play, Loader2, Trophy } from 'lucide-react'
 import { Background3D } from './Starfield3D'
 import AudioManager from './AudioManager'
 import SettingsPanel from './SettingsPanel'
-import AvatarCustomizer from './AvatarCustomizer'
 import Leaderboard from './Leaderboard'
 import { getAvatar, makeSprite, getPlayerName } from '../../lib/avatar'
 import { getKeybindings, getAudioSettings, getDisplaySettings } from '../../lib/gameStorage'
 import { OWNER } from '../../data/gameData'
 
 const GameOverlay = lazy(() => import('./GameOverlay'))
+const AvatarCustomizer = lazy(() => import('./AvatarCustomizer'))
 const SpaceShooter = lazy(() => import('./SpaceShooter'))
 const CodeRacer = lazy(() => import('./CodeRacer'))
 const BlockBlast = lazy(() => import('./BlockBlast'))
@@ -259,7 +259,11 @@ export default function ArcadeLobby({ onClose }) {
         <p className="mt-8 text-[11px] text-gray-600">Press ESC to exit · ⚙ in-game for settings</p>
       </div>
 
-      {avatarOpen && <AvatarCustomizer onClose={() => setAvatarOpen(false)} />}
+      {avatarOpen && (
+        <Suspense fallback={<Loading />}>
+          <AvatarCustomizer onClose={() => setAvatarOpen(false)} />
+        </Suspense>
+      )}
       {lbOpen && <LeaderboardModal onClose={() => setLbOpen(false)} />}
     </div>
   )

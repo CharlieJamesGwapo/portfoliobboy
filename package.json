@@ -14,7 +14,6 @@
     "@supabase/supabase-js": "^2.108.2",
     "howler": "^2.2.4",
     "lucide-react": "^0.294.0",
-    "nodemailer": "^8.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "three": "^0.169.0",

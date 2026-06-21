@@ -27,7 +27,7 @@ function App() {
   }
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 overflow-x-hidden">
       <Navbar />
       <Hero />
       <About />
