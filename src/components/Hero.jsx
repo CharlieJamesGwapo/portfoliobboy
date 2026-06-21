@@ -1,14 +1,19 @@
-import { useState, useEffect } from 'react'
-import { Github, Linkedin, Mail, Phone, MapPin, ExternalLink, Award, Code, ChevronDown, Briefcase } from 'lucide-react'
+import { useState, useEffect, lazy, Suspense } from 'react'
+import { Github, Linkedin, Mail, Phone, MapPin, ExternalLink, Award, Code, ChevronDown, Briefcase, Gamepad2, Loader2 } from 'lucide-react'
+
+// Lazy-loaded so the arcade (Three.js, Supabase, game code) is only downloaded
+// when the player actually opens it — keeps the portfolio bundle lean.
+const ArcadeLobby = lazy(() => import('./game/ArcadeLobby'))
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false)
+  const [gameOpen, setGameOpen] = useState(false)
 
   useEffect(() => {
     setIsVisible(true)
   }, [])
 
-  const roles = ['Full Stack Developer', 'Backend Engineer', 'Go & .NET Developer', 'Cloud & Serverless']
+  const roles = ['Full Stack Developer', 'Backend Engineer', 'Python & Go Developer', 'Cloud & DevOps']
   const [currentRole, setCurrentRole] = useState(0)
   const [isTyping, setIsTyping] = useState(true)
 
@@ -75,11 +80,11 @@ const Hero = () => {
               {/* Quick Stats */}
               <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0">
                 <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/10 hover:border-blue-500/50 transition-all duration-300">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-400 mb-1">12+</div>
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-400 mb-1">14+</div>
                   <div className="text-xxs sm:text-xs text-gray-400">Projects Built</div>
                 </div>
                 <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/10 hover:border-purple-500/50 transition-all duration-300">
-                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-400 mb-1">2+</div>
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-400 mb-1">5+</div>
                   <div className="text-xxs sm:text-xs text-gray-400">Years Experience</div>
                 </div>
                 <div className="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white/10 hover:border-cyan-500/50 transition-all duration-300">
@@ -105,6 +110,14 @@ const Hero = () => {
                   <Briefcase size={18} />
                   <span>View Projects</span>
                 </a>
+                <button
+                  type="button"
+                  onClick={() => setGameOpen(true)}
+                  className="group px-5 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-emerald-600 text-white rounded-full font-semibold hover:shadow-2xl hover:shadow-cyan-500/25 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base"
+                >
+                  <Gamepad2 size={18} />
+                  <span>🕹 Play Games</span>
+                </button>
               </div>
 
               {/* Contact Info */}
@@ -175,6 +188,20 @@ const Hero = () => {
           </div>
         </div>
       </div>
+
+      {/* Game Arcade — additive, full-screen overlay (lazy-loaded) */}
+      {gameOpen && (
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black text-cyan-300 gap-3">
+              <Loader2 size={22} className="animate-spin" />
+              <span className="font-semibold">Loading the arcade…</span>
+            </div>
+          }
+        >
+          <ArcadeLobby onClose={() => setGameOpen(false)} />
+        </Suspense>
+      )}
     </section>
   )
 }

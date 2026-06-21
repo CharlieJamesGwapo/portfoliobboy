@@ -46,12 +46,14 @@ const About = () => {
           <ScrollReveal animation="fade-right" className="lg:col-span-3">
             <div className="space-y-4 sm:space-y-6">
               <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                Full Stack Developer with hands-on professional experience building production applications
-                for international clients. I specialize in <span className="font-semibold text-blue-600">Go (Golang)</span>,{' '}
-                <span className="font-semibold text-purple-600">.NET (C#)</span>,{' '}
-                <span className="font-semibold text-green-600">Node.js</span>, and{' '}
-                <span className="font-semibold text-cyan-600">React</span> — from fintech platforms to
-                POS systems and mobile apps.
+                Full Stack Developer and Backend Engineer with <span className="font-semibold text-blue-600">5+ years of experience</span> designing
+                and shipping secure, scalable web, API, and mobile applications. Fluent across{' '}
+                <span className="font-semibold text-purple-600">Python (FastAPI, Django, Flask)</span>,{' '}
+                <span className="font-semibold text-green-600">.NET (C#)</span>,{' '}
+                <span className="font-semibold text-cyan-600">Go (Golang)</span>, Node.js, and PHP (Laravel, CodeIgniter, Symfony) — and modern
+                frontends including React.js, Next.js, Vue.js, Nuxt.js, Angular, and Ember.js. Strong track record in RESTful APIs,
+                GraphQL, SOAP, WebSocket, and webhooks. Cloud delivery on AWS Lambda, Vercel, Netlify, Render, and Railway with Docker
+                and CI/CD via Buddy, GitLab, and Jenkins.
               </p>
               <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
                 At <span className="font-semibold">Robustech IT / SocietyOne (Australia)</span>, I rewrote
@@ -60,7 +62,7 @@ const About = () => {
                 web apps and client dashboards with secure authentication and CI/CD pipelines.
               </p>
               <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                Dean's Lister (Ranked 2) in BSIT, with 12+ completed projects and a track record of
+                Dean's Lister (Ranked 2) in BSIT, with 14+ completed projects and a track record of
                 delivering clean, scalable code. Ready to contribute to remote development teams.
               </p>
 
@@ -91,7 +93,7 @@ const About = () => {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 mt-2 flex-shrink-0"></span>
-                  <span className="text-gray-300 text-sm sm:text-base">12+ projects including fintech, POS, mobile apps</span>
+                  <span className="text-gray-300 text-sm sm:text-base">14+ projects including fintech, POS, mobile apps</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="w-2 h-2 rounded-full bg-green-400 mt-2 flex-shrink-0"></span>

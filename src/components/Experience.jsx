@@ -9,38 +9,133 @@ const Experience = () => {
     {
       company: 'Rooche Digital Company',
       role: 'Full Stack Developer',
-      period: '2024',
+      period: 'Jan 2026 — Mar 2026',
       location: 'Remote',
       type: 'Full-time',
-      description: 'Developed web applications and client dashboards for multiple clients across different industries.',
+      description: 'Built Python microservices and full-stack tooling powering internal systems and customer dashboards.',
       achievements: [
-        'Built web apps and client dashboards using Node.js (backend) and React.js (frontend)',
-        'Wrote RESTful APIs and integrated third-party services for payments, messaging, and analytics',
-        'Implemented secure authentication systems and role-based access control',
-        'Optimized frontend and backend performance for faster load times',
-        'Participated in code reviews, Agile sprints, and CI/CD pipeline management using Buddy'
+        'Built Python FastAPI microservices with Pydantic validation and OpenAPI docs',
+        'Shipped REST and GraphQL APIs for internal tooling and customer dashboards',
+        'Integrated Firebase and Supabase for auth and real-time sync',
+        'Maintained CI/CD on GitLab, Buddy, Bitbucket with pytest gates',
+        'Built WebSocket and webhook integrations for live dashboard updates'
       ],
-      technologies: ['Node.js', 'React.js', 'PostgreSQL', 'Firebase', 'Supabase', 'AWS Lambda', 'Buddy CI/CD']
+      technologies: ['Python (FastAPI, Pydantic, pytest)', 'Node.js', 'React.js', 'Next.js', 'Angular', 'PostgreSQL', 'Firebase', 'Supabase', 'Docker', 'GitLab CI']
     },
     {
       company: 'Robustech IT / SocietyOne',
       role: 'Full Stack Developer',
-      period: '2023 — 2024',
+      period: 'Jan 2024 — Dec 2025',
       location: 'Australia (Remote)',
       type: 'Contract',
-      description: 'Developed an online personal loan platform serving Australian clients and broker support systems.',
+      description: 'Modernized fintech backend services and serverless workflows for an Australian personal-loan platform.',
       achievements: [
-        'Rewrote legacy Golang services into C# .NET for improved maintainability and scalability',
-        'Migrated Node.js services to .NET to standardize backend architecture',
-        'Developed AWS Lambda functions for event-driven serverless processes',
-        'Optimized APIs for performance, security, and reliability',
-        'Collaborated in Agile environment with international development teams'
+        'Re-platformed Golang services to .NET (C#) for maintainability',
+        'Migrated Node.js microservices to .NET standardizing logging and deployment',
+        'Built AWS Lambda serverless functions (Python and .NET) for event-driven workflows',
+        'Wrote Python automation scripts (Pandas, httpx) for reconciliation and reporting',
+        'Owned JSON-RPC, WebSocket, and webhook integrations with partner banking systems'
       ],
-      technologies: ['C# (.NET)', 'Go (Golang)', 'Node.js', 'AWS Lambda', 'PostgreSQL', 'REST APIs']
+      technologies: ['C# / ASP.NET Core', 'Go', 'Node.js', 'Python', 'AWS Lambda', 'REST', 'GraphQL', 'PostgreSQL', 'Buddy CI/CD']
+    },
+    {
+      company: 'Filtra Coffee POS System',
+      role: 'Full Stack Developer',
+      period: 'Jun 2023 — Dec 2023',
+      location: 'Freelance',
+      type: 'Freelance',
+      description: 'Delivered a production point-of-sale platform used daily by store staff.',
+      achievements: [
+        'Built production POS platform with Go backend and Next.js/Vue.js frontends',
+        'Shipped sales, inventory, and reporting modules used daily by store staff',
+        'Containerized with Docker and deployed via Render'
+      ],
+      technologies: ['Go', 'Next.js', 'Vue.js', 'PostgreSQL', 'Docker', 'Render']
+    },
+    {
+      company: 'MOIST Alumni Online Tracking System',
+      role: 'Full Stack Developer',
+      period: 'Jan 2023 — May 2023',
+      location: 'Freelance',
+      type: 'Freelance',
+      description: 'Built a secure alumni management platform with role-based access and analytics.',
+      achievements: [
+        'Developed secure alumni management platform with role-based access and audit trails',
+        'Implemented OTP and 2FA over SMS and Email',
+        'Built admin dashboard with reports and analytics views'
+      ],
+      technologies: ['PHP (Laravel, CodeIgniter)', 'MySQL', 'HTML', 'CSS', 'JavaScript', 'REST APIs']
+    },
+    {
+      company: 'Librewry Bistro POS System',
+      role: 'Full Stack Developer',
+      period: 'Aug 2022 — Dec 2022',
+      location: 'Freelance',
+      type: 'Freelance',
+      description: 'Built order, inventory, and authentication modules for a bistro POS end-to-end.',
+      achievements: [
+        'Delivered order, inventory, and role-based authentication modules for a bistro POS',
+        'Developed backend APIs and frontend interfaces end-to-end',
+        'Deployed on Netlify and Railway with automatic build previews'
+      ],
+      technologies: ['PHP', 'MySQL', 'HTML', 'CSS', 'JavaScript']
+    },
+    {
+      company: 'E-Cycle Hub',
+      role: 'Full Stack Developer',
+      period: 'Mar 2022 — Jul 2022',
+      location: 'Freelance',
+      type: 'Freelance',
+      description: 'Built a waste-pickup scheduling platform with real-time integrations.',
+      achievements: [
+        'Built waste-pickup scheduling platform with Go backend and Next.js/Vue.js frontends',
+        'Implemented WebSocket and webhook integrations for real-time scheduling',
+        'Designed RESTful APIs over NeonDB serverless PostgreSQL'
+      ],
+      technologies: ['Go', 'Next.js', 'Vue.js', 'PostgreSQL (NeonDB)', 'Vercel', 'Railway']
+    },
+    {
+      company: 'Jolly Ride App',
+      role: 'Mobile Developer',
+      period: 'Oct 2021 — Feb 2022',
+      location: 'Freelance',
+      type: 'Freelance',
+      description: 'Built a cross-platform ride-booking mobile app with real-time features.',
+      achievements: [
+        'Built ride-booking mobile app for iOS and Android with React Native',
+        'Integrated Supabase and Firebase for real-time data, auth, and in-app messaging'
+      ],
+      technologies: ['React Native', 'Supabase', 'Firebase', 'JavaScript']
+    },
+    {
+      company: 'Massage Booking App',
+      role: 'Mobile Developer',
+      period: 'May 2021 — Sep 2021',
+      location: 'Freelance',
+      type: 'Freelance',
+      description: 'Developed an Android booking app with real-time scheduling and notifications.',
+      achievements: [
+        'Developed Android booking app in Android Studio',
+        'Integrated Firebase for real-time scheduling and push notifications'
+      ],
+      technologies: ['Android Studio', 'Firebase', 'Java/Kotlin']
+    },
+    {
+      company: 'Personal Portfolio Website',
+      role: 'Full Stack Developer',
+      period: 'Jan 2021 — Apr 2021',
+      location: 'Personal',
+      type: 'Personal',
+      description: 'Built a responsive, SEO-friendly portfolio with continuous deployment.',
+      achievements: [
+        'Built responsive SEO-friendly portfolio with React.js, Next.js, Tailwind CSS',
+        'Deployed on Vercel with continuous deployment from GitHub'
+      ],
+      technologies: ['React.js', 'Next.js', 'Tailwind CSS', 'Vercel']
     }
   ]
 
-  const totalYears = 2
+  const totalYears = 5
 
   return (
     <section id="experience" className="relative py-20 sm:py-28 overflow-hidden">
@@ -178,9 +273,9 @@ const Experience = () => {
         <ScrollReveal animation="fade-up" delay={400}>
           <div className="mt-12 sm:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {[
-              { value: '2+', label: 'Years Experience' },
-              { value: '2', label: 'Companies' },
-              { value: '7+', label: 'Technologies' },
+              { value: '5+', label: 'Years Experience' },
+              { value: '9', label: 'Roles' },
+              { value: '20+', label: 'Technologies' },
               { value: '100%', label: 'Remote' },
             ].map((stat, idx) => (
               <div

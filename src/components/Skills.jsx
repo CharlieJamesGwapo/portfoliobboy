@@ -1,4 +1,4 @@
-import { Code, Server, Database, Cloud, Smartphone, Wrench } from 'lucide-react'
+import { Code, Server, Database, Cloud, Smartphone, Wrench, Network } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 
 const Skills = () => {
@@ -7,54 +7,66 @@ const Skills = () => {
       title: 'Frontend',
       icon: <Code size={24} />,
       color: 'from-blue-500 to-cyan-500',
-      skills: ['React.js', 'Next.js', 'Vue.js / Nuxt.js', 'Angular', 'Tailwind CSS', 'Bootstrap', 'Material UI', 'HTML5 / CSS3', 'JavaScript (ES6+)', 'TypeScript']
+      skills: ['React.js', 'Next.js', 'Vue.js', 'Nuxt.js', 'Angular', 'Ember.js', 'Tailwind CSS', 'Bootstrap', 'Material UI', 'HTML5/CSS3', 'TypeScript']
     },
     {
       title: 'Backend',
       icon: <Server size={24} />,
       color: 'from-purple-500 to-pink-500',
-      skills: ['Go (Golang)', 'C# / .NET / ASP.NET Core', 'Node.js', 'PHP (Laravel, CodeIgniter)', 'Python (Flask, FastAPI, Django)', 'REST API Design', 'JWT / OAuth / 2FA', 'Microservices Architecture']
+      skills: ['Python (FastAPI, Django, Flask)', 'Go (Golang)', 'C# / .NET / ASP.NET Core', 'Node.js / Express', 'PHP (Laravel, CodeIgniter, Symfony)', 'Java / Kotlin', 'SQLAlchemy', 'Alembic', 'Celery + Redis']
+    },
+    {
+      title: 'APIs & Integrations',
+      icon: <Network size={24} />,
+      color: 'from-rose-500 to-orange-500',
+      skills: ['RESTful APIs', 'GraphQL', 'SOAP', 'WebSocket', 'Webhooks', 'JSON-RPC', 'OpenAPI / Swagger', 'Microservices', 'JWT / OTP / 2FA / RBAC']
     },
     {
       title: 'Databases',
       icon: <Database size={24} />,
       color: 'from-green-500 to-teal-500',
-      skills: ['PostgreSQL', 'MySQL', 'MongoDB', 'NeonDB (Serverless)', 'Supabase', 'Firebase / Firestore', 'Database Design', 'Query Optimization']
+      skills: ['PostgreSQL', 'MySQL', 'MongoDB', 'NeonDB', 'Supabase', 'Firebase / Firestore', 'Schema Design', 'Query Optimization']
     },
     {
       title: 'Cloud & DevOps',
       icon: <Cloud size={24} />,
       color: 'from-cyan-500 to-blue-600',
-      skills: ['AWS Lambda (Serverless)', 'Docker', 'CI/CD (Buddy Pipeline)', 'Git & GitHub', 'Vercel / Netlify', 'IIS Deployment', 'Windows Server', 'Active Directory']
+      skills: ['AWS Lambda', 'Docker', 'Vercel', 'Netlify', 'Render', 'Railway', 'Buddy CI/CD', 'GitLab CI', 'Jenkins', 'Git / GitHub / GitLab / Bitbucket', 'IIS', 'Apache', 'Windows Server', 'Active Directory']
     },
     {
       title: 'Mobile',
       icon: <Smartphone size={24} />,
       color: 'from-orange-500 to-red-500',
-      skills: ['React Native (iOS & Android)', 'Android Studio', 'Mobile UI/UX', 'State Management', 'API Integration']
+      skills: ['React Native (iOS & Android)', 'Android Studio', 'Java / Kotlin', 'Firebase', 'Supabase']
     },
     {
       title: 'Tools & Practices',
       icon: <Wrench size={24} />,
       color: 'from-indigo-500 to-purple-500',
-      skills: ['VS Code', 'Figma', 'Agile / Scrum', 'Code Refactoring', 'Clean Code', 'RBAC Implementation', 'Performance Optimization']
+      skills: ['Figma', 'Agile/Scrum', 'pytest', 'Pandas/NumPy', 'Clean Code', 'RBAC', 'Performance Optimization']
     }
   ]
 
   const coreStack = [
+    { name: 'Python', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
     { name: 'Go', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' },
     { name: '.NET / C#', color: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
     { name: 'Node.js', color: 'bg-green-500/10 text-green-400 border-green-500/20' },
     { name: 'React', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
     { name: 'Next.js', color: 'bg-white/10 text-white border-white/20' },
     { name: 'PHP', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' },
-    { name: 'Python', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
+    { name: 'TypeScript', color: 'bg-blue-500/10 text-blue-300 border-blue-500/20' },
+    { name: 'FastAPI', color: 'bg-teal-500/10 text-teal-300 border-teal-500/20' },
+    { name: 'Django', color: 'bg-green-500/10 text-green-300 border-green-500/20' },
+    { name: 'Vue.js', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+    { name: 'Angular', color: 'bg-red-500/10 text-red-400 border-red-500/20' },
     { name: 'AWS Lambda', color: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
     { name: 'PostgreSQL', color: 'bg-blue-500/10 text-blue-300 border-blue-500/20' },
     { name: 'Docker', color: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20' },
     { name: 'React Native', color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
     { name: 'Supabase', color: 'bg-green-500/10 text-green-300 border-green-500/20' },
     { name: 'Firebase', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+    { name: 'GraphQL', color: 'bg-pink-500/10 text-pink-400 border-pink-500/20' },
     { name: 'Tailwind CSS', color: 'bg-teal-500/10 text-teal-400 border-teal-500/20' }
   ]
 
