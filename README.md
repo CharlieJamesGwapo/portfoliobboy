@@ -1,226 +1,72 @@
-# 🚀 Charlie James Z. Abejo - Professional Portfolio
+# Charlie James Z. Abejo — Portfolio
 
-A modern, responsive, and dynamic personal portfolio website built with **React.js**, **Vite**, and **Tailwind CSS**.
+Production-focused portfolio for an AI Developer and Full-Stack Engineer. The site presents verified experience, projects, skills, credentials, and contact details while preserving the original interactive arcade and optional music player.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/CharlieJamesGwapo/portfolio)
+## Stack
 
-## ✨ Features
+- React 18 and Vite 8
+- Tailwind CSS plus a project-specific CSS design system
+- Three.js through React Three Fiber for the hero systems network and arcade visuals
+- Supabase for optional published tutorials and game leaderboards when configured
+- Resend through the existing `/api/contact` serverless endpoint
 
-### 🎯 Dynamic & Interactive
-- **Real-time Role Rotation** - Title changes every 3 seconds
-- **Live Clock** - Shows current Philippines time
-- **Active Section Tracking** - Navbar highlights current section automatically
-- **Form Validation** - Real-time error checking with instant feedback
-- **Animated Background** - Floating blob animations
-- **Smooth Animations** - 60fps transitions throughout
+The project intentionally remains React + Vite + Tailwind. Three.js, the arcade, individual games, and the music player are code-split so they do not inflate the main application module.
 
-### 📱 Fully Responsive
-- **Mobile-First Design** - Perfect on all devices
-- **Breakpoints**: Mobile (320px+), Tablet (768px+), Desktop (1024px+)
-- **Touch-Optimized** - Large tap targets and smooth interactions
-- **Adaptive Layouts** - Content reorganizes for optimal viewing
-
-### 🎨 Professional Design
-- **Glassmorphism Effects** - Modern backdrop blur
-- **Gradient Themes** - Blue → Purple → Pink color scheme
-- **Custom Scrollbar** - Gradient-styled scrollbar
-- **Hover Effects** - Interactive feedback on all elements
-- **Loading States** - Visual feedback during form submission
-
-### 💼 Portfolio Sections
-1. **Hero** - Professional photo, dynamic roles, quick stats
-2. **About** - Background, achievements, interests
-3. **Education** - Academic history with awards (Dean's Lister!)
-4. **Certificates** - 10+ professional certifications
-5. **Projects** - 4 major full-stack projects
-6. **Skills** - Technical skills with progress bars
-7. **Contact** - Real-time form with validation + live clock
-8. **Footer** - Quick links and social media
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React 18.2.0
-- **Build Tool**: Vite 5.0.8
-- **Styling**: Tailwind CSS 3.3.6
-- **Icons**: Lucide React 0.294.0
-- **Deployment**: Vercel
-
-## 📦 Installation
+## Local development
 
 ```bash
-# Clone the repository
-git clone https://github.com/CharlieJamesGwapo/portfolio.git
-
-# Navigate to project directory
-cd portfolio
-
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-
-# Build for production
-npm run build
 ```
 
-## 🚀 Quick Start
-
-1. **Install Node.js** (v14 or higher) from [nodejs.org](https://nodejs.org)
-2. **Clone this repository**
-3. **Run `npm install`** to install dependencies
-4. **Run `npm run dev`** to start development server
-5. **Open** `http://localhost:5173` in your browser
-
-## 🌐 Deployment to Vercel
-
-### Method 1: GitHub Integration (Recommended)
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Click "New Project"
-4. Import your GitHub repository
-5. Click "Deploy"
-6. Done! Your site is live 🎉
-
-### Method 2: Vercel CLI
+The development server prints the available local URL. A production build can be verified with:
 
 ```bash
-# Install Vercel CLI
-npm install -g vercel
-
-# Login to Vercel
-vercel login
-
-# Deploy
-vercel --prod
+npm run build
+npm run preview
 ```
 
-## 📱 Responsive Design
+## Content architecture
 
-The portfolio is fully responsive across all devices:
+Verified portfolio content lives in `src/data/portfolioData.js`, including:
 
-- **Mobile**: 320px - 767px
-- **Tablet**: 768px - 1023px  
-- **Desktop**: 1024px - 1439px
-- **Large Desktop**: 1440px+
+- Personal details and professional titles
+- Navigation and statistics
+- Experience and project case studies
+- Project filters and archive entries
+- Skill groups, education, credentials, and recognition
+- Interactive game and music metadata
 
-## 🎨 Color Palette
+Game-specific narrative content remains in `src/data/gameData.js` because it drives the dungeon experience.
 
-- **Primary**: Blue (#3b82f6)
-- **Secondary**: Purple (#8b5cf6)
-- **Accent**: Pink (#ec4899)
-- **Success**: Green (#10b981)
-- **Error**: Red (#ef4444)
+## Preserved interactive features
 
-## 📂 Project Structure
+- Accessible rotating professional titles
+- Eight-game Interactive Lab
+- Optional YouTube playlist music player with no autoplay
+- Project, experience, and credential statistics
+- Active sticky navigation and accessible mobile menu
+- Validated contact form using the existing real submission endpoint
+- Clean, build-emitted resume route at `/charlie-james-abejo-resume.pdf`
 
-```
-portfolio/
-├── public/
-│   ├── profile.png          # Professional photo
-│   └── vite.svg
-├── src/
-│   ├── components/
-│   │   ├── Navbar.jsx       # Navigation with active tracking
-│   │   ├── Hero.jsx         # Landing section with photo
-│   │   ├── About.jsx        # Personal background
-│   │   ├── Education.jsx    # Academic history
-│   │   ├── Certificates.jsx # Certifications
-│   │   ├── Projects.jsx     # Portfolio projects
-│   │   ├── Skills.jsx       # Technical skills
-│   │   ├── Contact.jsx      # Contact form with validation
-│   │   └── Footer.jsx       # Footer with links
-│   ├── App.jsx              # Main app component
-│   ├── main.jsx             # Entry point
-│   └── index.css            # Global styles + animations
-├── index.html
-├── package.json
-├── tailwind.config.js
-├── vite.config.js
-└── README.md
-```
+## Performance and accessibility
 
-## ✨ Key Features Explained
+- The Three.js scene is lazy-loaded with a CSS/WebGL fallback, capped device pixel ratio, reduced mobile detail, visibility-aware rendering, and reduced-motion behavior.
+- Games and music load only after explicit user interaction.
+- Navigation, project tabs, experience accordions, arcade dialog, music controls, and form states use keyboard-accessible controls and descriptive labels.
+- Global reduced-motion rules remove nonessential animation.
+- Responsive layouts are maintained from 320px through wide desktop sizes without horizontal overflow.
 
-### Real-Time Form Validation
-- Validates email format
-- Checks minimum character length
-- Shows errors instantly
-- Clears errors as you type
-- Character counter for message field
+## Environment variables
 
-### Active Section Tracking
-- Automatically detects scroll position
-- Highlights current section in navbar
-- Smooth scroll to sections
-- Works on mobile and desktop
+The portfolio can render without optional service configuration. When used:
 
-### Dynamic Role Display
-- Rotates between 4 professional roles
-- Changes every 3 seconds
-- Smooth fade transitions
-- Engaging visual effect
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `RESEND_API_KEY` for the serverless contact endpoint
 
-### Live Clock
-- Shows current Philippines time
-- Updates every second
-- Displays full date
-- Located in Contact section
+Do not send test contact submissions during QA.
 
-## 🔗 Connect With Me
+## Missing media
 
-- **GitHub**: [CharlieJamesGwapo](https://github.com/CharlieJamesGwapo)
-- **LinkedIn**: [Charlie James Abejo](https://www.linkedin.com/in/charlie-james-abejo-26362638a/)
-- **Facebook**: [Retrigadz](https://www.facebook.com/Retrigadz)
-- **Email**: [capstonee2@gmail.com](mailto:capstonee2@gmail.com)
-- **Phone**: 09856122843
-- **Location**: Waterfall, Balingasag, Misamis Oriental
-
-## 👨‍💻 About Me
-
-**Charlie James Z. Abejo**  
-Full Stack Developer | BSIT Student at MOIST | Dean's Lister (Ranked 2)
-
-Passionate about creating innovative web solutions with expertise in:
-- Frontend: React, HTML5, CSS3, JavaScript, Tailwind CSS, Bootstrap
-- Backend: PHP, Laravel, Node.js
-- Database: MySQL, MongoDB
-- Tools: Git, Figma, VS Code
-
-## 🏆 Achievements
-
-- 🥈 Dean's Lister - Ranked 2 (2nd & 3rd Year)
-- 📜 10+ Professional Certifications
-- 💼 4+ Major Full-Stack Projects
-- 🎓 Consistent Fifth Honors (Grade 1-6)
-
-## 📄 License
-
-This project is open source and available for personal use.
-
-## 🙏 Acknowledgments
-
-Built with modern web technologies:
-- React.js for component architecture
-- Tailwind CSS for styling
-- Vite for fast development
-- Lucide React for beautiful icons
-- Vercel for deployment
-
----
-
-**Made with ❤️ by Charlie James Z. Abejo**
-
-*Last Updated: November 2024*
-
-## 🚀 Ready to Deploy!
-
-Your portfolio is production-ready and optimized for:
-- ⚡ Fast loading times
-- 📱 All screen sizes
-- 🎨 Modern design
-- ♿ Accessibility
-- 🔍 SEO optimization
-
-**Deploy now and showcase your skills to the world!** 🌟
+Five authentic Anthropic certificate images are included and shown in the credentials gallery. The repository still does not contain authentic project screenshots, images for the remaining text-only credentials, individual repository URLs for private or unlinked work, or real dungeon audio. The UI reports unavailable media honestly and does not substitute stock images, dummy credentials, or fabricated links.

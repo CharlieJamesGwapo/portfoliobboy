@@ -1,97 +1,147 @@
-import { GraduationCap, Award, Calendar, MapPin } from 'lucide-react'
+import { Award, BadgeCheck, Eye, GraduationCap } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
+import SectionHeading from './SectionHeading'
+import { certifications, education, recognitions } from '../data/portfolioData'
 
-const Education = () => {
-  const education = [
-    {
-      institution: 'Misamis Oriental Institute of Science and Technology',
-      degree: 'Bachelor of Science in Information Technology',
-      location: 'Balingasag, Misamis Oriental',
-      period: '2022 - 2025',
-      awards: [
-        "2nd Year - Dean's Lister, Ranked 2",
-        "3rd Year - Dean's Lister, Ranked 2"
-      ]
-    },
-    {
-      institution: 'Baliwagan National High School',
-      degree: 'Senior High School Graduate',
-      location: 'Balingasag, Misamis Oriental',
-      period: '2016 - 2020',
-      awards: []
-    },
-    {
-      institution: 'Waterfall Elementary School',
-      degree: 'Elementary Graduate',
-      location: 'Balingasag, Misamis Oriental',
-      period: '2015 - 2016',
-      awards: ['Consistent Fifth Honors (Grade 1 to Grade 6)']
-    }
-  ]
+const aiCredentials = certifications.filter((credential) => credential.issuer === 'Anthropic')
+const technicalCredentials = certifications.filter((credential) => credential.issuer !== 'Anthropic')
+const certificateImages = certifications.filter((credential) => credential.image)
+
+function CredentialRecord({ credential }) {
+  const status = credential.expired
+    ? `Expired ${credential.expired}`
+    : credential.expires
+      ? `Expires ${credential.expires}`
+      : credential.kind
 
   return (
-    <section id="education" className="py-16 sm:py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal animation="fade-up">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Education
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto"></div>
-          </div>
-        </ScrollReveal>
-
-        <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
-          {education.map((edu, index) => (
-            <ScrollReveal key={index} animation="fade-up" delay={index * 150}>
-              <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 p-5 sm:p-6 md:p-8">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2.5 sm:p-3 rounded-xl text-white flex-shrink-0">
-                    <GraduationCap size={22} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 mb-1">
-                      {edu.institution}
-                    </h3>
-                    <p className="text-sm sm:text-base text-blue-600 font-semibold mb-2">
-                      {edu.degree}
-                    </p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500 mb-3">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {edu.period}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin size={14} />
-                        {edu.location}
-                      </span>
-                    </div>
-
-                    {edu.awards.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-gray-100">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Award className="text-yellow-500" size={16} />
-                          <span className="text-xs sm:text-sm font-semibold text-gray-700">Awards</span>
-                        </div>
-                        <ul className="space-y-1">
-                          {edu.awards.map((award, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-gray-600 text-xs sm:text-sm">
-                              <span className="text-blue-500 mt-0.5">-</span>
-                              <span>{award}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-      </div>
-    </section>
+    <li className="credential-record">
+      <BadgeCheck size={17} aria-hidden="true" />
+      <span>
+        <strong>{credential.title}</strong>
+        <small>{credential.issuer}{credential.issued ? ` · Issued ${credential.issued}` : ''}</small>
+        <small className={credential.expired ? 'credential-expired' : ''}>{status}</small>
+        {credential.credentialId && <code>Credential ID {credential.credentialId}</code>}
+      </span>
+    </li>
   )
 }
+
+const Education = () => (
+  <section id="education" className="section section-light credentials-section">
+    <div className="page-container">
+      <ScrollReveal variant="left">
+        <SectionHeading
+          eyebrow="05 · Credentials"
+          title="Education and verified continued learning."
+          description="Twenty-three certificates and technical training records, plus two academic recognitions. Credential URLs are omitted where none were supplied."
+          light
+        />
+      </ScrollReveal>
+
+      <div className="foundation-grid credential-foundation-grid">
+        <ScrollReveal variant="scale">
+          <article className="foundation-card foundation-card-primary">
+            <div className="foundation-icon"><GraduationCap size={24} aria-hidden="true" /></div>
+            <p className="eyebrow">Education · {education.period}</p>
+            <h3>{education.degree}</h3>
+            <p className="foundation-place">{education.institution}</p>
+            <p>{education.details}</p>
+          </article>
+        </ScrollReveal>
+
+        <ScrollReveal delay={90} variant="scale">
+          <article className="foundation-card recognition-card">
+            <div className="foundation-icon"><Award size={24} aria-hidden="true" /></div>
+            <p className="eyebrow">Academic recognition</p>
+            <ul className="credential-records recognition-records">
+              {recognitions.map((recognition) => (
+                <li className="credential-record" key={recognition.title}>
+                  <Award size={17} aria-hidden="true" />
+                  <span>
+                    <strong>{recognition.title}</strong>
+                    <small>{recognition.issuer} · {recognition.kind}</small>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </ScrollReveal>
+      </div>
+
+      <ScrollReveal delay={80} variant="up">
+        <div className="certificate-gallery-heading">
+          <div>
+            <p className="eyebrow">Authentic certificate gallery · {String(certificateImages.length).padStart(2, '0')}</p>
+            <h3>Uploaded completion records</h3>
+          </div>
+          <p>Original certificate images supplied for this portfolio. Open any image to inspect the full record.</p>
+        </div>
+      </ScrollReveal>
+
+      <div className="certificate-gallery">
+        {certificateImages.map((credential, index) => (
+          <ScrollReveal key={credential.title} delay={(index % 5) * 50} variant="up">
+            <a
+              className="certificate-image-card"
+              href={credential.image}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`View full certificate: ${credential.title}`}
+            >
+              <span className="certificate-image-frame">
+                <img
+                  src={credential.image}
+                  alt={`${credential.title} certificate issued by ${credential.issuer} to Charlie James Abejo`}
+                  width="3300"
+                  height="2550"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="certificate-view"><Eye size={16} aria-hidden="true" /> View certificate</span>
+              </span>
+              <span className="certificate-image-copy">
+                <strong>{credential.title}</strong>
+                <small>{credential.issuer} · {credential.issued}</small>
+              </span>
+            </a>
+          </ScrollReveal>
+        ))}
+      </div>
+
+      <div className="credential-columns">
+        <ScrollReveal variant="left">
+          <article className="foundation-card credential-panel">
+            <div className="credential-panel-heading">
+              <div className="foundation-icon"><Award size={24} aria-hidden="true" /></div>
+              <div>
+                <p className="eyebrow">AI & Anthropic</p>
+                <h3>{aiCredentials.length} verified learning records</h3>
+              </div>
+            </div>
+            <ul className="credential-records">
+              {aiCredentials.map((credential) => <CredentialRecord key={`${credential.title}-${credential.credentialId || credential.issuer}`} credential={credential} />)}
+            </ul>
+          </article>
+        </ScrollReveal>
+
+        <ScrollReveal delay={80} variant="right">
+          <article className="foundation-card credential-panel">
+            <div className="credential-panel-heading">
+              <div className="foundation-icon"><BadgeCheck size={24} aria-hidden="true" /></div>
+              <div>
+                <p className="eyebrow">Technical & professional</p>
+                <h3>{technicalCredentials.length} certifications and training records</h3>
+              </div>
+            </div>
+            <ul className="credential-records">
+              {technicalCredentials.map((credential) => <CredentialRecord key={`${credential.title}-${credential.issuer}`} credential={credential} />)}
+            </ul>
+          </article>
+        </ScrollReveal>
+      </div>
+    </div>
+  </section>
+)
 
 export default Education

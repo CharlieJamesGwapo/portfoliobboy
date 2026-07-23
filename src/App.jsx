@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { ArrowUp, Loader2, Music2 } from 'lucide-react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import About from './components/About'
@@ -6,57 +7,100 @@ import Experience from './components/Experience'
 import Projects from './components/Projects'
 import Skills from './components/Skills'
 import Education from './components/Education'
-import Certificates from './components/Certificates'
-import Tutorials from './components/Tutorials'
+import InteractiveLab from './components/InteractiveLab'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import MusicPlayer from './components/MusicPlayer'
+
+const MusicPlayer = lazy(() => import('./components/MusicPlayer'))
 
 function App() {
-  const [isVisible, setIsVisible] = useState(false)
+  const [showTop, setShowTop] = useState(false)
+  const [musicOpen, setMusicOpen] = useState(false)
+  const scrollFrame = useRef(null)
+  const musicButtonRef = useRef(null)
 
   useEffect(() => {
-    const toggleVisibility = () => {
-      setIsVisible(window.pageYOffset > 300)
+    const updateScrollState = () => {
+      scrollFrame.current = null
+      setShowTop(window.scrollY > 640)
+      const height = document.documentElement.scrollHeight - window.innerHeight
+      const progress = height > 0 ? Math.min(1, Math.max(0, window.scrollY / height)) : 0
+      document.documentElement.style.setProperty('--scroll-progress', progress.toFixed(4))
     }
 
-    window.addEventListener('scroll', toggleVisibility)
-    return () => window.removeEventListener('scroll', toggleVisibility)
+    const scheduleScrollUpdate = () => {
+      if (scrollFrame.current !== null) return
+      scrollFrame.current = window.requestAnimationFrame(updateScrollState)
+    }
+
+    updateScrollState()
+    window.addEventListener('scroll', scheduleScrollUpdate, { passive: true })
+    window.addEventListener('resize', scheduleScrollUpdate)
+    return () => {
+      if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current)
+      window.removeEventListener('scroll', scheduleScrollUpdate)
+      window.removeEventListener('resize', scheduleScrollUpdate)
+    }
   }, [])
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  useEffect(() => {
+    const openMusic = () => setMusicOpen(true)
+    window.addEventListener('portfolio:open-music', openMusic)
+    document.body.classList.toggle('music-open', musicOpen)
+    return () => {
+      window.removeEventListener('portfolio:open-music', openMusic)
+      document.body.classList.remove('music-open')
+    }
+  }, [musicOpen])
 
   return (
-    <div className="bg-gray-50 overflow-x-hidden">
+    <div className="site-shell">
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <div className="scroll-progress" aria-hidden="true" />
       <Navbar />
-      <Hero />
-      <About />
-      <Experience />
-      <Projects />
-      <Skills />
-      <Education />
-      <Certificates />
-      <Tutorials />
-      <Contact />
+      <main id="main-content">
+        <Hero />
+        <About />
+        <Experience />
+        <Projects />
+        <Skills />
+        <Education />
+        <InteractiveLab />
+        <Contact />
+      </main>
       <Footer />
 
-      {/* Scroll to Top Button */}
       <button
-        onClick={scrollToTop}
-        className={`fixed bottom-6 right-6 sm:bottom-8 sm:right-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 z-50 ${
-          isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-        }`}
-        aria-label="Scroll to top"
+        type="button"
+        className={`back-to-top ${showTop ? 'is-visible' : ''}`}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        aria-label="Back to top"
+        tabIndex={showTop ? 0 : -1}
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-        </svg>
+        <ArrowUp size={18} aria-hidden="true" />
       </button>
 
-      {/* Floating music player (hides while the arcade is open) */}
-      <MusicPlayer />
+      {!musicOpen && (
+        <button
+          ref={musicButtonRef}
+          type="button"
+          className="music-launcher"
+          onClick={() => setMusicOpen(true)}
+          aria-label="Open optional music player"
+        >
+          <Music2 size={17} aria-hidden="true" />
+          <span>Music</span>
+        </button>
+      )}
+
+      {musicOpen && (
+        <Suspense fallback={<div className="music-loading" role="status"><Loader2 className="spin" size={17} /> Loading music controls…</div>}>
+          <MusicPlayer onClose={() => {
+            setMusicOpen(false)
+            window.setTimeout(() => musicButtonRef.current?.focus(), 0)
+          }} />
+        </Suspense>
+      )}
     </div>
   )
 }

@@ -13,6 +13,7 @@ import Leaderboard from './Leaderboard'
 import { getAvatar, makeSprite, getPlayerName } from '../../lib/avatar'
 import { getKeybindings, getAudioSettings, getDisplaySettings } from '../../lib/gameStorage'
 import { OWNER } from '../../data/gameData'
+import { interactiveGames as GAMES } from '../../data/portfolioData'
 
 const GameOverlay = lazy(() => import('./GameOverlay'))
 const AvatarCustomizer = lazy(() => import('./AvatarCustomizer'))
@@ -23,17 +24,6 @@ const RacingGame = lazy(() => import('./RacingGame'))
 const FlappyDev = lazy(() => import('./FlappyDev'))
 const SnakeGame = lazy(() => import('./SnakeGame'))
 const WhackABug = lazy(() => import('./WhackABug'))
-
-const GAMES = [
-  { id: 'dungeon', emoji: '⚔', title: 'Dungeon Crawler', tagline: "Explore Charlie's dungeon. Defeat bugs. Unlock the portfolio.", accent: 'from-cyan-500 to-blue-600' },
-  { id: 'blaster', emoji: '🚀', title: 'Bug Blaster', tagline: 'Shoot the bugs. Collect skills. Survive the wave.', accent: 'from-fuchsia-500 to-purple-600' },
-  { id: 'racer', emoji: '⌨', title: 'Code Racer', tagline: "Type real code from Charlie's projects. Race the clock.", accent: 'from-emerald-500 to-teal-600' },
-  { id: 'blockblast', emoji: '🟦', title: 'Block Blast', tagline: "Clear the grid. Unlock Charlie's projects.", accent: 'from-amber-500 to-orange-600', bestKey: 'blockblast_best', bestKind: 'score' },
-  { id: 'racing', emoji: '🏎', title: 'Pixel Racer', tagline: 'Race the track. Collect skills. Beat the clock.', accent: 'from-red-500 to-rose-600', bestKey: 'arcade_best_racing', bestKind: 'lapMs' },
-  { id: 'flappy', emoji: '🐦', title: 'Flappy Dev', tagline: 'Dodge the brackets. Keep coding.', accent: 'from-sky-500 to-indigo-600', bestKey: 'arcade_best_flappy', bestKind: 'score' },
-  { id: 'snake', emoji: '🐍', title: 'Code Snake', tagline: "Eat the skills. Don't crash.", accent: 'from-lime-500 to-green-600', bestKey: 'arcade_best_snake', bestKind: 'score' },
-  { id: 'whack', emoji: '🔨', title: 'Whack-A-Bug', tagline: 'Squash the bugs. Ship the code.', accent: 'from-yellow-500 to-amber-600', bestKey: 'arcade_best_whack', bestKind: 'score' },
-]
 
 const NEW_GAME_IDS = ['blaster', 'racer', 'blockblast', 'racing', 'flappy', 'snake', 'whack']
 
@@ -101,6 +91,8 @@ function LeaderboardModal({ onClose }) {
 }
 
 export default function ArcadeLobby({ onClose }) {
+  const exitRef = useRef(null)
+  const lobbyRef = useRef(null)
   const [activeGame, setActiveGame] = useState(null)
   const [avatarOpen, setAvatarOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -118,9 +110,37 @@ export default function ArcadeLobby({ onClose }) {
 
   // Mark the body so the floating MusicPlayer hides while the arcade is open.
   useEffect(() => {
+    const previousOverflow = document.body.style.overflow
     document.body.classList.add('game-open')
-    return () => document.body.classList.remove('game-open')
+    document.body.style.overflow = 'hidden'
+    const timer = window.setTimeout(() => exitRef.current?.focus(), 80)
+    return () => {
+      window.clearTimeout(timer)
+      document.body.classList.remove('game-open')
+      document.body.style.overflow = previousOverflow
+    }
   }, [])
+
+  useEffect(() => {
+    if (activeGame) return undefined
+    const trapFocus = (event) => {
+      if (event.key !== 'Tab' || !lobbyRef.current) return
+      const focusable = Array.from(lobbyRef.current.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter((element) => element.offsetParent !== null)
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    window.addEventListener('keydown', trapFocus)
+    return () => window.removeEventListener('keydown', trapFocus)
+  }, [activeGame])
 
   // ESC handling — game → lobby, modals close, lobby → portfolio.
   useEffect(() => {
@@ -192,28 +212,30 @@ export default function ArcadeLobby({ onClose }) {
   const playerName = getPlayerName()
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-hidden bg-black">
+    <div ref={lobbyRef} className="fixed inset-0 z-[100] overflow-hidden bg-black" role="dialog" aria-modal="true" aria-label="Charlie's interactive game arcade">
       <Background3D bossMode={false} />
 
       {/* top bar */}
       <div className="absolute top-0 inset-x-0 z-30 flex items-center justify-between p-4 gap-2">
         <div className="flex items-center gap-2">
           <button
+            ref={exitRef}
             onClick={onClose}
-            className="px-3 py-1.5 rounded-lg bg-black/60 border border-white/15 text-gray-300 hover:text-white hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            aria-label="Exit arcade and return to portfolio"
+            className="min-h-[44px] px-3 py-1.5 rounded-lg bg-black/60 border border-white/15 text-gray-300 hover:text-white hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             <X size={14} /> Exit Arcade
           </button>
           <button
             onClick={() => setLbOpen(true)}
-            className="px-3 py-1.5 rounded-lg bg-black/60 border border-amber-500/30 text-amber-200 hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="min-h-[44px] px-3 py-1.5 rounded-lg bg-black/60 border border-amber-500/30 text-amber-200 hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             <Trophy size={14} /> 🏆 Leaderboard
           </button>
         </div>
         <button
           onClick={() => setAvatarOpen(true)}
-          className="px-3 py-1.5 rounded-lg bg-black/60 border border-cyan-500/30 text-cyan-200 hover:bg-white/10 text-xs font-semibold flex items-center gap-2 transition-colors"
+          className="min-h-[44px] px-3 py-1.5 rounded-lg bg-black/60 border border-cyan-500/30 text-cyan-200 hover:bg-white/10 text-xs font-semibold flex items-center gap-2 transition-colors"
         >
           <AvatarBadge size={28} />
           <span className="hidden sm:inline">🧑‍💻 My Avatar</span>

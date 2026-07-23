@@ -1,346 +1,124 @@
 import { useState } from 'react'
-import { Mail, Phone, MapPin, Send, Github, Linkedin, Facebook, CheckCircle, AlertCircle, Clock } from 'lucide-react'
+import { ArrowUpRight, CheckCircle2, Clock3, FileText, Github, Linkedin, Loader2, Mail, MapPin, Phone } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
+import { profile, resumeUrl } from '../data/portfolioData'
+
+const initialForm = { name: '', email: '', subject: '', message: '' }
+
+const validate = (form) => {
+  const errors = {}
+  if (form.name.trim().length < 2) errors.name = 'Please enter your name.'
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errors.email = 'Enter a valid email address.'
+  if (form.subject.trim().length < 3) errors.subject = 'Add a short subject.'
+  if (form.message.trim().length < 10) errors.message = 'Share at least 10 characters so I have enough context.'
+  return errors
+}
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  })
-
-  const [status, setStatus] = useState('')
+  const [form, setForm] = useState(initialForm)
+  const [status, setStatus] = useState('idle')
+  const [message, setMessage] = useState('')
   const [errors, setErrors] = useState({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const updateField = (event) => {
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
+    setErrors((current) => ({ ...current, [event.target.name]: '' }))
+    if (status !== 'idle') setStatus('idle')
   }
 
-  const validateForm = () => {
-    const newErrors = {}
-    if (!formData.name.trim()) newErrors.name = 'Name is required'
-    if (!formData.email.trim()) newErrors.email = 'Email is required'
-    else if (!validateEmail(formData.email)) newErrors.email = 'Invalid email format'
-    if (!formData.subject.trim()) newErrors.subject = 'Subject is required'
-    if (!formData.message.trim()) newErrors.message = 'Message is required'
-    else if (formData.message.length < 10) newErrors.message = 'Message must be at least 10 characters'
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData({ ...formData, [name]: value })
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: '' })
-    }
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (!validateForm()) {
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    const nextErrors = validate(form)
+    if (Object.keys(nextErrors).length) {
+      setErrors(nextErrors)
       setStatus('error')
+      setMessage('Please review the highlighted fields.')
+      const firstInvalid = Object.keys(nextErrors)[0]
+      window.setTimeout(() => document.getElementById(`contact-${firstInvalid}`)?.focus(), 0)
       return
     }
 
-    setIsSubmitting(true)
     setStatus('sending')
+    setMessage('')
 
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(form),
       })
 
-      const data = await response.json()
-
-      if (response.ok) {
-        setStatus('success')
-        setFormData({ name: '', email: '', subject: '', message: '' })
-        setTimeout(() => setStatus(''), 5000)
-      } else {
-        setStatus('failed')
-        setTimeout(() => setStatus(''), 5000)
-      }
-    } catch (error) {
-      setStatus('failed')
-      setTimeout(() => setStatus(''), 5000)
-    } finally {
-      setIsSubmitting(false)
+      if (!response.ok) throw new Error('Request failed')
+      setForm(initialForm)
+      setErrors({})
+      setStatus('success')
+      setMessage('Thanks — your message is on its way. I’ll reply as soon as I can.')
+    } catch {
+      setStatus('error')
+      setMessage(`The form could not send right now. Please email me directly at ${profile.email}.`)
     }
   }
 
-  const contactInfo = [
-    {
-      icon: <Phone size={20} />,
-      title: 'Phone',
-      value: '0985-612-2843',
-      link: 'tel:09856122843'
-    },
-    {
-      icon: <Mail size={20} />,
-      title: 'Email',
-      value: 'capstonee2@gmail.com',
-      link: 'mailto:capstonee2@gmail.com'
-    },
-    {
-      icon: <MapPin size={20} />,
-      title: 'Location',
-      value: 'Misamis Oriental, Philippines',
-      link: null
-    }
-  ]
-
   return (
-    <section id="contact" className="py-16 sm:py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal animation="fade-up">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Get In Touch
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto mb-4"></div>
-            <p className="text-base sm:text-lg text-gray-600">
-              Have a project in mind? Let's work together!
-            </p>
+    <section id="contact" className="contact-section">
+      <div className="page-container contact-layout">
+        <ScrollReveal className="contact-copy" variant="left">
+          <p className="eyebrow">07 · Contact</p>
+          <h2>Have a system to improve or a product to ship?</h2>
+          <p>
+            Have an AI product, SaaS platform, backend system, or mobile application to build? Let’s discuss
+            the product, architecture, and delivery plan. I work remotely and can overlap US business hours.
+          </p>
+
+          <a className="contact-email" href={`mailto:${profile.email}`}>
+            <span>{profile.email}</span>
+            <ArrowUpRight size={22} aria-hidden="true" />
+          </a>
+
+          <div className="contact-details">
+            <a href={profile.phoneHref}><Phone size={17} aria-hidden="true" /> {profile.phoneDisplay}</a>
+            <span><MapPin size={17} aria-hidden="true" /> {profile.location}</span>
+            <span><Clock3 size={17} aria-hidden="true" /> PHT (UTC+8) · US business-hours overlap</span>
+          </div>
+
+          <div className="contact-socials">
+            <a href={profile.github} target="_blank" rel="noreferrer"><Github size={18} /> GitHub</a>
+            <a href={profile.linkedin} target="_blank" rel="noreferrer"><Linkedin size={18} /> LinkedIn</a>
+            <a href={resumeUrl} download="charlie-james-abejo-resume.pdf"><FileText size={18} /> Download resume</a>
           </div>
         </ScrollReveal>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Contact Information */}
-          <ScrollReveal animation="fade-right">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-                  Contact Information
-                </h3>
-                <p className="text-sm sm:text-base text-gray-600 mb-4">
-                  Open to remote work opportunities. Feel free to reach out for collaborations,
-                  freelance projects, or full-time remote positions.
-                </p>
-
-                <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full mb-6 border border-green-200">
-                  <Clock size={14} />
-                  <span className="text-xs sm:text-sm font-semibold">Usually responds within 24 hours</span>
-                </div>
-              </div>
-
-              {/* Contact Cards */}
-              <div className="space-y-3">
-                {contactInfo.map((info, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-300 border border-gray-100"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2.5 rounded-lg text-white flex-shrink-0">
-                        {info.icon}
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="font-semibold text-gray-900 text-sm">{info.title}</h4>
-                        {info.link ? (
-                          <a
-                            href={info.link}
-                            className="text-blue-600 hover:text-blue-700 transition-colors text-sm break-all"
-                          >
-                            {info.value}
-                          </a>
-                        ) : (
-                          <p className="text-gray-600 text-sm">{info.value}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Social Links */}
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-3 text-sm sm:text-base">Connect With Me</h4>
-                <div className="flex gap-3">
-                  <a
-                    href="https://github.com/CharlieJamesGwapo"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
-                    title="GitHub"
-                  >
-                    <Github size={20} />
-                  </a>
-                  <a
-                    href="https://www.linkedin.com/in/charlie-james-abejo-26362638a/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transform hover:scale-105 transition-all duration-300"
-                    title="LinkedIn"
-                  >
-                    <Linkedin size={20} />
-                  </a>
-                  <a
-                    href="https://www.facebook.com/Retrigadz"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transform hover:scale-105 transition-all duration-300"
-                    title="Facebook"
-                  >
-                    <Facebook size={20} />
-                  </a>
-                </div>
-              </div>
+        <ScrollReveal delay={100} variant="scale">
+          <form className="contact-form" onSubmit={handleSubmit} noValidate aria-busy={status === 'sending'}>
+            <div className="form-row">
+              <label>
+                <span>Name</span>
+                <input id="contact-name" name="name" value={form.name} onChange={updateField} autoComplete="name" required placeholder="Your name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'contact-name-error' : undefined} />
+                {errors.name && <small id="contact-name-error" className="field-error">{errors.name}</small>}
+              </label>
+              <label>
+                <span>Email</span>
+                <input id="contact-email" name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" required placeholder="you@company.com" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'contact-email-error' : undefined} />
+                {errors.email && <small id="contact-email-error" className="field-error">{errors.email}</small>}
+              </label>
             </div>
-          </ScrollReveal>
-
-          {/* Contact Form */}
-          <ScrollReveal animation="fade-left" delay={200}>
-            <div className="bg-gray-50 rounded-2xl border border-gray-200 p-5 sm:p-8">
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
-                Send Me a Message
-              </h3>
-
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="name" className="block text-gray-700 font-medium mb-1.5 text-sm">
-                      Your Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm bg-white ${
-                        errors.name ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Charlie James"
-                    />
-                    {errors.name && (
-                      <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.name}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="email" className="block text-gray-700 font-medium mb-1.5 text-sm">
-                      Your Email *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm bg-white ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="charlie@example.com"
-                    />
-                    {errors.email && (
-                      <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-                        <AlertCircle size={12} />
-                        {errors.email}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-gray-700 font-medium mb-1.5 text-sm">
-                    Subject *
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-sm bg-white ${
-                      errors.subject ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Project Inquiry"
-                  />
-                  {errors.subject && (
-                    <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-                      <AlertCircle size={12} />
-                      {errors.subject}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-gray-700 font-medium mb-1.5 text-sm">
-                    Message *
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows="4"
-                    className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none text-sm bg-white ${
-                      errors.message ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Tell me about your project..."
-                  ></textarea>
-                  {errors.message && (
-                    <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-                      <AlertCircle size={12} />
-                      {errors.message}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={`w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transform hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2 text-sm ${
-                    isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Sending...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send size={16} />
-                      <span>Send Message</span>
-                    </>
-                  )}
-                </button>
-
-                {status === 'success' && (
-                  <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-center gap-2 text-sm">
-                    <CheckCircle size={16} />
-                    <span>Message sent successfully! I'll get back to you soon.</span>
-                  </div>
-                )}
-
-                {status === 'error' && (
-                  <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-center gap-2 text-sm">
-                    <AlertCircle size={16} />
-                    <span>Please fix the errors above and try again.</span>
-                  </div>
-                )}
-
-                {status === 'failed' && (
-                  <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-center gap-2 text-sm">
-                    <AlertCircle size={16} />
-                    <span>Failed to send message. Please try again or email me directly.</span>
-                  </div>
-                )}
-              </form>
-            </div>
-          </ScrollReveal>
-        </div>
+            <label>
+              <span>Subject</span>
+              <input id="contact-subject" name="subject" value={form.subject} onChange={updateField} required placeholder="What would you like to build?" aria-invalid={Boolean(errors.subject)} aria-describedby={errors.subject ? 'contact-subject-error' : undefined} />
+              {errors.subject && <small id="contact-subject-error" className="field-error">{errors.subject}</small>}
+            </label>
+            <label>
+              <span>Message</span>
+              <textarea id="contact-message" name="message" value={form.message} onChange={updateField} required minLength="10" rows="5" placeholder="Share a little context, timeline, or role details." aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? 'contact-message-error' : undefined} />
+              {errors.message && <small id="contact-message-error" className="field-error">{errors.message}</small>}
+            </label>
+            <button className="button button-dark" type="submit" disabled={status === 'sending'}>
+              {status === 'sending' ? <Loader2 className="spin" size={18} /> : status === 'success' ? <CheckCircle2 size={18} /> : <Mail size={18} />}
+              {status === 'sending' ? 'Sending…' : 'Send message'}
+            </button>
+            <p className={`form-status ${status}`} aria-live="polite">{message}</p>
+          </form>
+        </ScrollReveal>
       </div>
     </section>
   )

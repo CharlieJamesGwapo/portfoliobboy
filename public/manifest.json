@@ -1,11 +1,11 @@
 {
   "name": "Charlie James Abejo - Portfolio",
   "short_name": "CJ Portfolio",
-  "description": "Professional portfolio of Charlie James Z. Abejo - Full Stack Developer",
+  "description": "Portfolio of Charlie James Z. Abejo - AI Developer and Full-Stack Engineer",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#3b82f6",
+  "background_color": "#0b2528",
+  "theme_color": "#0b2528",
   "icons": [
     {
       "src": "/favicon.png",

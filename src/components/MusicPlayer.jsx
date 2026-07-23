@@ -1,12 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { SkipBack, SkipForward, Play, Pause, Volume2, Music2, X } from 'lucide-react'
-
-// Mood playlists (YouTube playlist IDs)
-const PLAYLISTS = [
-  { key: 'focus', label: 'Focus', emoji: '💻', id: 'PLOzDu-MXXLliO9fBNZOQTBDddoA3FzZUo' },
-  { key: 'game', label: 'Game Mode', emoji: '🎮', id: 'PLAka7Y5pBdHfNAGNKa7GNnKBFrNNbSSVT' },
-  { key: 'chill', label: 'Chill', emoji: '🌙', id: 'PLMIbmfP_9vb8BCxRoraJpoo4q1yMFg4CE' },
-]
+import { SkipBack, SkipForward, Play, Pause, Volume2, VolumeX, Music2, X } from 'lucide-react'
+import { musicPlaylists as PLAYLISTS } from '../data/portfolioData'
 
 const PREFS_KEY = 'portfolio_music_prefs'
 const TIP_KEY = 'music_tooltip_seen'
@@ -43,7 +37,7 @@ function ensureYouTubeAPI() {
   })
 }
 
-export default function MusicPlayer() {
+export default function MusicPlayer({ onClose }) {
   const playerRef = useRef(null)
   const hostRef = useRef(null)
   const createdRef = useRef(false)
@@ -66,6 +60,10 @@ export default function MusicPlayer() {
     const obs = new MutationObserver(sync)
     obs.observe(document.body, { attributes: true, attributeFilter: ['class'] })
     return () => obs.disconnect()
+  }, [])
+
+  useEffect(() => () => {
+    try { playerRef.current?.destroy?.() } catch { /* noop */ }
   }, [])
 
   // First-render tooltip (once ever)
@@ -146,6 +144,17 @@ export default function MusicPlayer() {
       else playerRef.current?.unMute()
     } catch { /* noop */ }
   }
+  const toggleMute = () => {
+    const next = !muted
+    setMuted(next)
+    try {
+      if (next) playerRef.current?.mute()
+      else {
+        playerRef.current?.unMute()
+        playerRef.current?.setVolume(volume)
+      }
+    } catch { /* noop */ }
+  }
   const pickPlaylist = (pl) => {
     setPlaylistKey(pl.key)
     try {
@@ -173,7 +182,7 @@ export default function MusicPlayer() {
 
       {/* playlist panel (slides up above the pill) */}
       {expanded && (
-        <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 w-72 max-w-[92vw] bg-black/80 backdrop-blur rounded-2xl p-4 mb-2 border border-white/10 shadow-2xl">
+        <div className="music-player-panel fixed bottom-16 left-1/2 -translate-x-1/2 z-50 w-72 max-w-[92vw] bg-black/80 backdrop-blur rounded-2xl p-4 mb-2 border border-white/10 shadow-2xl">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider">Mood</span>
             <button onClick={() => setExpanded(false)} className="p-1 rounded text-gray-400 hover:text-white" aria-label="Close playlist">
@@ -199,7 +208,7 @@ export default function MusicPlayer() {
           <div className="text-xs text-gray-400 mb-2 truncate">{track.title || (isReady ? 'Press play to start' : 'Loading…')}</div>
           <div className="flex items-center justify-center gap-4">
             <button onClick={prev} className="text-gray-300 hover:text-blue-400" aria-label="Previous"><SkipBack size={18} /></button>
-            <button onClick={togglePlay} className="text-white hover:text-blue-400" aria-label="Play/Pause">
+            <button onClick={togglePlay} className="text-white hover:text-blue-400" aria-label={isPlaying ? 'Pause music' : 'Play music'}>
               {isPlaying ? <Pause size={22} /> : <Play size={22} />}
             </button>
             <button onClick={next} className="text-gray-300 hover:text-blue-400" aria-label="Next"><SkipForward size={18} /></button>
@@ -208,7 +217,7 @@ export default function MusicPlayer() {
       )}
 
       {/* pill */}
-      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-full px-4 py-2 shadow-xl">
+      <div className="music-player-pill fixed bottom-3 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-full px-4 py-2 shadow-xl" role="region" aria-label="Optional music player">
         {/* thumbnail */}
         {track.thumb ? (
           <img src={track.thumb} alt="" width="32" height="32" loading="lazy" decoding="async" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
@@ -231,14 +240,16 @@ export default function MusicPlayer() {
 
         {/* prev/next — hidden on mobile unless expanded */}
         <button onClick={prev} className={`${expanded ? 'flex' : 'hidden'} sm:flex text-gray-300 hover:text-blue-400`} aria-label="Previous"><SkipBack size={16} /></button>
-        <button onClick={togglePlay} className="flex text-white hover:text-blue-400" aria-label="Play/Pause">
+        <button onClick={togglePlay} className="flex text-white hover:text-blue-400" aria-label={isPlaying ? 'Pause music' : 'Play music'}>
           {isPlaying ? <Pause size={18} /> : <Play size={18} />}
         </button>
         <button onClick={next} className={`${expanded ? 'flex' : 'hidden'} sm:flex text-gray-300 hover:text-blue-400`} aria-label="Next"><SkipForward size={16} /></button>
 
         {/* volume — md+ only */}
         <div className="hidden md:flex items-center gap-1">
-          <Volume2 size={16} className="text-gray-300" />
+          <button onClick={toggleMute} className="text-gray-300 hover:text-blue-400" aria-label={muted ? 'Unmute music' : 'Mute music'}>
+            {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
           <input
             type="range" min="0" max="100" value={muted ? 0 : volume}
             onChange={(e) => changeVolume(Number(e.target.value))}
@@ -250,6 +261,9 @@ export default function MusicPlayer() {
         {/* expand playlist */}
         <button onClick={() => setExpanded((v) => !v)} className="text-gray-300 hover:text-blue-400" aria-label="Playlist">
           <Music2 size={16} />
+        </button>
+        <button onClick={onClose} className="text-gray-400 hover:text-white" aria-label="Close music player">
+          <X size={16} />
         </button>
       </div>
     </>
