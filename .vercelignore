@@ -2,7 +2,10 @@ node_modules
 .superpowers
 public/audio
 *.md
-*.txt
+# Note: do NOT add "*.txt" here — it would also strip public/robots.txt.
+COMPLETE_SUMMARY.txt
+DEPLOYMENT_CHECKLIST.txt
+INSTALL_INSTRUCTIONS.txt
 
 # Original full-resolution certificate scans (3300x2550 JPEG, ~1.6 MB total).
 # They are kept in the repo as the source of truth, but the build now serves

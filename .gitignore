@@ -27,3 +27,4 @@ config.bat
 
 # Local agent tooling
 .superpowers/
+.env*
