@@ -90,11 +90,14 @@ const Education = () => (
               aria-label={`View full certificate: ${credential.title}`}
             >
               <span className="certificate-image-frame">
+                {/* Gallery uses a 900px WebP thumbnail (~13 kB); the full
+                    1800px WebP is only fetched when the card is opened. */}
                 <img
-                  src={credential.image}
+                  src={credential.thumb || credential.image}
                   alt={`${credential.title} certificate issued by ${credential.issuer} to Charlie James Abejo`}
-                  width="3300"
-                  height="2550"
+                  width="900"
+                  height="696"
+                  sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 22vw"
                   loading="lazy"
                   decoding="async"
                 />

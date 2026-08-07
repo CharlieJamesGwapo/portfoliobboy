@@ -18,14 +18,36 @@ function App() {
   const [musicOpen, setMusicOpen] = useState(false)
   const scrollFrame = useRef(null)
   const musicButtonRef = useRef(null)
+  const progressRef = useRef(null)
+  const showTopRef = useRef(false)
 
   useEffect(() => {
+    // scrollHeight is a layout-forcing read, so it is measured once per resize
+    // rather than on every scroll frame.
+    let maxScroll = 0
+    const measure = () => {
+      maxScroll = document.documentElement.scrollHeight - window.innerHeight
+    }
+
     const updateScrollState = () => {
       scrollFrame.current = null
-      setShowTop(window.scrollY > 640)
-      const height = document.documentElement.scrollHeight - window.innerHeight
-      const progress = height > 0 ? Math.min(1, Math.max(0, window.scrollY / height)) : 0
-      document.documentElement.style.setProperty('--scroll-progress', progress.toFixed(4))
+      const y = window.scrollY
+
+      // Only re-render when the boolean actually flips. Previously every scroll
+      // frame called setState with the same value.
+      const nextShowTop = y > 640
+      if (nextShowTop !== showTopRef.current) {
+        showTopRef.current = nextShowTop
+        setShowTop(nextShowTop)
+      }
+
+      // Write the transform straight onto the progress bar. Setting a custom
+      // property on :root invalidates style for every element that inherits it,
+      // which on a page this tall meant a full-document recalc each frame.
+      const progress = maxScroll > 0 ? Math.min(1, Math.max(0, y / maxScroll)) : 0
+      if (progressRef.current) {
+        progressRef.current.style.transform = `scaleX(${progress.toFixed(4)})`
+      }
     }
 
     const scheduleScrollUpdate = () => {
@@ -33,13 +55,25 @@ function App() {
       scrollFrame.current = window.requestAnimationFrame(updateScrollState)
     }
 
+    const onResize = () => {
+      measure()
+      scheduleScrollUpdate()
+    }
+
+    measure()
     updateScrollState()
     window.addEventListener('scroll', scheduleScrollUpdate, { passive: true })
-    window.addEventListener('resize', scheduleScrollUpdate)
+    window.addEventListener('resize', onResize)
+
+    // The page grows as lazy sections and images settle; re-measure when it does.
+    const resizeObserver = new ResizeObserver(onResize)
+    resizeObserver.observe(document.documentElement)
+
     return () => {
       if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current)
       window.removeEventListener('scroll', scheduleScrollUpdate)
-      window.removeEventListener('resize', scheduleScrollUpdate)
+      window.removeEventListener('resize', onResize)
+      resizeObserver.disconnect()
     }
   }, [])
 
@@ -56,7 +90,7 @@ function App() {
   return (
     <div className="site-shell">
       <a href="#main-content" className="skip-link">Skip to content</a>
-      <div className="scroll-progress" aria-hidden="true" />
+      <div ref={progressRef} className="scroll-progress" aria-hidden="true" />
       <Navbar />
       <main id="main-content">
         <Hero />

@@ -10,6 +10,8 @@
 
     <!-- Preload the above-the-fold hero image (WebP) for faster LCP -->
     <link rel="preload" as="image" href="/profile.webp" type="image/webp" fetchpriority="high" />
+    <!-- Self-hosted variable Inter; preloaded so the swap happens before first paint of the hero -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-var-latin.woff2" crossorigin />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -27,21 +29,54 @@
     <meta property="og:url" content="https://portfoliobboy.vercel.app/" />
     <meta property="og:title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
     <meta property="og:description" content="Intelligent products, scalable APIs, SaaS platforms, CRM integrations, and production backend systems." />
-    <meta property="og:image" content="/profile.png" />
+    <meta property="og:image" content="https://portfoliobboy.vercel.app/profile.png" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://portfoliobboy.vercel.app/" />
     <meta property="twitter:title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
     <meta property="twitter:description" content="Intelligent products, scalable APIs, SaaS platforms, CRM integrations, and production backend systems." />
-    <meta property="twitter:image" content="/profile.png" />
+    <meta property="twitter:image" content="https://portfoliobboy.vercel.app/profile.png" />
     
     <!-- Additional Meta Tags -->
     <meta name="robots" content="index, follow" />
     <meta name="language" content="English" />
-    <meta name="revisit-after" content="7 days" />
-    <meta name="format-detection" content="telephone=yes" />
-    <meta name="format-detection" content="email=yes" />
+    <link rel="canonical" href="https://portfoliobboy.vercel.app/" />
+    <meta name="color-scheme" content="dark light" />
+
+    <!-- Structured data: lets search engines and AI crawlers read the profile directly -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Charlie James Z. Abejo",
+        "url": "https://portfoliobboy.vercel.app/",
+        "image": "https://portfoliobboy.vercel.app/profile.png",
+        "jobTitle": "AI Developer & Full-Stack Engineer",
+        "address": {
+          "@type": "PostalAddress",
+          "addressRegion": "Misamis Oriental",
+          "addressCountry": "PH"
+        },
+        "knowsAbout": [
+          "AI application development",
+          "Full-stack engineering",
+          "Backend systems",
+          "API design",
+          "CRM integrations",
+          "Python",
+          "Go",
+          "React",
+          "Next.js",
+          ".NET"
+        ],
+        "email": "capstonee2@gmail.com",
+        "sameAs": [
+          "https://github.com/CharlieJamesGwapo",
+          "https://www.linkedin.com/in/charlie-james-abejo-26362638a/"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Inter is self-hosted (one 48 kB variable woff2 covering weights 400-800,
+ * latin subset). Self-hosting avoids a third-party DNS + TLS handshake on the
+ * critical path, and the file is preloaded from index.html.
+ *
+ * The type in this design uses very tight tracking that is tuned for Inter, so
+ * the system fallback changed the look noticeably on Android and Windows.
+ */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/inter-var-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/*
+ * Metric-matched fallback: overriding Arial's metrics to Inter's means the
+ * pre-swap and post-swap text occupy the same box, so the font swap costs
+ * zero CLS instead of reflowing every heading on the page.
+ */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  ascent-override: 90.49%;
+  descent-override: 22.56%;
+  line-gap-override: 0%;
+  size-adjust: 107.06%;
+}
+
 :root {
   --ink: #0b2528;
   --ink-soft: #123438;
@@ -20,7 +53,17 @@
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --duration-fast: 180ms;
   --duration-base: 320ms;
-  --scroll-progress: 0;
+  /* Single source of truth for the fixed navbar height, so anchor scroll
+     offsets always land the section title just below the bar. */
+  --nav-height: 80px;
+  --anchor-offset: 96px;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --nav-height: 70px;
+    --anchor-offset: 86px;
+  }
 }
 
 * {
@@ -31,7 +74,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 84px;
+  scroll-padding-top: var(--anchor-offset);
   scrollbar-gutter: stable;
   background: var(--ink);
 }
@@ -41,7 +84,7 @@ body {
   overflow-x: hidden;
   background: var(--ink);
   color: var(--ink);
-  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Inter, 'Inter Fallback', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -87,14 +130,15 @@ img {
   outline-offset: 4px;
 }
 
+/*
+ * Entrance animations are progressive enhancement, never a precondition for
+ * content being visible. `html.motion-ready` is set by main.jsx at boot, so if
+ * JS fails, is blocked, or the browser has no IntersectionObserver, every
+ * section renders at full opacity instead of leaving a blank page behind an
+ * animation that never runs.
+ */
 .site-shell {
   overflow: clip;
-  animation: page-enter 420ms ease-out both;
-}
-
-@keyframes page-enter {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 .skip-link {
@@ -122,7 +166,9 @@ img {
   width: 100%;
   height: 3px;
   background: linear-gradient(90deg, var(--mint), var(--coral));
-  transform: scaleX(var(--scroll-progress));
+  /* Updated imperatively from App.jsx — see the note there on why this is not
+     driven by an inherited custom property. */
+  transform: scaleX(0);
   transform-origin: left center;
   will-change: transform;
   pointer-events: none;
@@ -136,7 +182,7 @@ img {
 .section {
   position: relative;
   padding: clamp(88px, 10vw, 144px) 0;
-  scroll-margin-top: 72px;
+  scroll-margin-top: var(--anchor-offset);
 }
 
 .section-light {
@@ -217,23 +263,31 @@ img {
   line-height: 1.75;
 }
 
-.reveal {
+.motion-ready .reveal:not(.is-visible) {
   opacity: 0;
-  transition:
-    opacity var(--reveal-duration) ease var(--reveal-delay),
-    transform var(--reveal-duration) var(--ease-out) var(--reveal-delay);
+  /* will-change only while the element is actually pending, so we don't hold a
+     compositor layer for every section on the page for the whole session. */
   will-change: opacity, transform;
 }
 
-.reveal-up { transform: translate3d(0, 28px, 0); }
-.reveal-left { transform: translate3d(-30px, 0, 0); }
-.reveal-right { transform: translate3d(30px, 0, 0); }
-.reveal-scale { transform: translate3d(0, 18px, 0) scale(0.975); }
-.reveal-fade { transform: none; }
+.reveal {
+  transition:
+    opacity var(--reveal-duration) ease var(--reveal-delay),
+    transform var(--reveal-duration) var(--ease-out) var(--reveal-delay);
+}
 
-.reveal .section-heading > * {
+.motion-ready .reveal-up:not(.is-visible) { transform: translate3d(0, 28px, 0); }
+.motion-ready .reveal-left:not(.is-visible) { transform: translate3d(-30px, 0, 0); }
+.motion-ready .reveal-right:not(.is-visible) { transform: translate3d(30px, 0, 0); }
+.motion-ready .reveal-scale:not(.is-visible) { transform: translate3d(0, 18px, 0) scale(0.975); }
+.motion-ready .reveal-fade:not(.is-visible) { transform: none; }
+
+.motion-ready .reveal:not(.is-visible) .section-heading > * {
   opacity: 0;
   transform: translate3d(0, 14px, 0);
+}
+
+.reveal .section-heading > * {
   transition:
     opacity 520ms ease,
     transform 520ms var(--ease-out);
@@ -241,11 +295,6 @@ img {
 
 .reveal .section-heading h2 { transition-delay: 70ms; }
 .reveal .section-heading > p:last-child { transition-delay: 140ms; }
-
-.reveal.is-visible .section-heading > * {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
 
 .reveal.is-visible {
   opacity: 1;
@@ -264,7 +313,9 @@ img {
 
 .navbar.is-scrolled {
   border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(7, 29, 32, 0.84);
+  /* Raised from 0.84: the bar passes over the bright mint contact section and
+     the light "paper" sections, where the nav links lost readable contrast. */
+  background: rgba(7, 29, 32, 0.92);
   backdrop-filter: blur(18px);
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.08);
 }
@@ -489,44 +540,50 @@ img {
 
 .hero-copy h1 .hero-line {
   display: block;
-  opacity: 0;
-  transform: translate3d(0, 34px, 0);
-  animation: hero-line-enter 760ms var(--ease-out) forwards;
 }
 
-.hero-copy h1 .hero-line-primary {
-  color: var(--paper);
-  animation-delay: 170ms;
+/*
+ * The <h1> is the LCP element. Chrome does not record LCP while an element is
+ * at opacity 0, so any animation-delay here is added straight onto the LCP
+ * time. The lines therefore start animating immediately (no delay) and only
+ * inside `motion-ready`, so the heading paints on the first frame otherwise.
+ */
+.motion-ready .hero-copy h1 .hero-line {
+  animation: hero-line-enter 520ms var(--ease-out) both;
 }
 
-.hero-copy h1 .hero-line-accent {
-  color: var(--mint);
-  animation-delay: 250ms;
-}
+.hero-copy h1 .hero-line-primary { color: var(--paper); }
+.hero-copy h1 .hero-line-accent { color: var(--mint); }
+.motion-ready .hero-copy h1 .hero-line-accent { animation-delay: 60ms; }
 
 @keyframes hero-line-enter {
+  from { opacity: 0; transform: translate3d(0, 26px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-.hero-enter {
-  opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  animation: hero-content-enter 620ms var(--ease-out) forwards;
+.motion-ready .hero-enter {
+  animation: hero-content-enter 460ms var(--ease-out) both;
 }
 
-.hero-enter-1 { animation-delay: 40ms; }
-.hero-enter-2 { animation-delay: 100ms; }
-.hero-enter-5 { animation-delay: 330ms; }
-.hero-enter-6 { animation-delay: 400ms; }
-.hero-enter-7 { animation-delay: 470ms; }
+.motion-ready .hero-enter-1 { animation-delay: 20ms; }
+.motion-ready .hero-enter-2 { animation-delay: 60ms; }
+.motion-ready .hero-enter-5 { animation-delay: 140ms; }
+.motion-ready .hero-enter-6 { animation-delay: 180ms; }
+.motion-ready .hero-enter-7 { animation-delay: 220ms; }
 
-.hero-enter-visual {
-  transform: translate3d(30px, 0, 0) scale(0.975);
-  animation-delay: 220ms;
-  animation-duration: 780ms;
+.motion-ready .hero-enter-visual {
+  animation-name: hero-visual-enter;
+  animation-delay: 120ms;
+  animation-duration: 620ms;
 }
 
 @keyframes hero-content-enter {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes hero-visual-enter {
+  from { opacity: 0; transform: translate3d(30px, 0, 0) scale(0.975); }
   to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
@@ -756,13 +813,15 @@ img {
   gap: 16px;
   min-height: 104px;
   padding: 20px 0;
-  opacity: 0;
-  transform: translate3d(0, 14px, 0);
-  animation: proof-enter 540ms var(--ease-out) forwards;
-  animation-delay: calc(520ms + var(--proof-index) * 90ms);
+}
+
+.motion-ready .proof-strip > div {
+  animation: proof-enter 440ms var(--ease-out) both;
+  animation-delay: calc(240ms + var(--proof-index) * 60ms);
 }
 
 @keyframes proof-enter {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
@@ -1468,7 +1527,7 @@ img {
 .contact-section {
   position: relative;
   padding: clamp(90px, 11vw, 150px) 0;
-  scroll-margin-top: 72px;
+  scroll-margin-top: var(--anchor-offset);
   background: var(--mint);
 }
 
@@ -2353,8 +2412,11 @@ img {
 @media (max-width: 860px) {
   .music-launcher { display: none; }
 
+  /* Fully opaque on mobile: backdrop-filter is dropped here for performance,
+     and at 0.98 alpha high-contrast content scrolling underneath still ghosted
+     through the bar. */
   .navbar.is-scrolled {
-    background: rgba(7, 29, 32, 0.98);
+    background: #071d20;
     backdrop-filter: none;
   }
 
@@ -2601,17 +2663,21 @@ img {
 
   .section-heading h2,
   .contact-copy h2 {
-    font-size: clamp(2.05rem, 11vw, 3.25rem);
-    line-height: 1.02;
+    font-size: clamp(1.75rem, 8.4vw, 2.6rem);
+    letter-spacing: -0.038em;
+    line-height: 1.06;
   }
 
   .hero-section {
     min-height: auto;
   }
 
+  /* Scaled down for the real Inter metrics — at 14.5vw the headline ran to six
+     lines on a 390px phone and pushed the call-to-action past the fold. */
   .hero-copy h1 {
-    font-size: clamp(2.9rem, 14.5vw, 4.35rem);
-    line-height: 0.94;
+    font-size: clamp(2.15rem, 10.2vw, 3.3rem);
+    letter-spacing: -0.045em;
+    line-height: 1;
   }
 
   .hero-intro {
@@ -2881,6 +2947,59 @@ img {
 
   .hero-stage .portrait-frame {
     transform: none !important;
+  }
+}
+
+/*
+ * Touch targets. Several links are visually small by design (icon buttons in
+ * the archive list, inline text links in contact/footer) and measured well
+ * under the 44px comfortable-tap guideline on a phone.
+ *
+ * Rather than resize them — which would change the layout on every breakpoint —
+ * an invisible ::after expands only the *hit* area on coarse pointers. The
+ * design is untouched; the target becomes thumb-sized.
+ */
+@media (pointer: coarse) {
+  .archive-project > a,
+  .text-link,
+  .footer-links a,
+  .contact-details a,
+  .wordmark {
+    position: relative;
+  }
+
+  .archive-project > a::after,
+  .text-link::after,
+  .footer-links a::after,
+  .contact-details a::after,
+  .wordmark::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    min-width: 44px;
+    height: 100%;
+    min-height: 44px;
+    content: '';
+    transform: translate(-50%, -50%);
+  }
+
+  /* Horizontal scrollers get momentum + snap so they feel native to swipe. */
+  .project-tabs,
+  .project-filters {
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .project-tabs::-webkit-scrollbar,
+  .project-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .project-tabs > *,
+  .project-filters > * {
+    scroll-snap-align: start;
   }
 }
 

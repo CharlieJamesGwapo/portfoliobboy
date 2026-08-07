@@ -31,7 +31,12 @@ const ScrollReveal = ({
     const element = ref.current
     if (!element) return
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Anything the observer can't handle reveals immediately rather than
+    // staying invisible — content is never allowed to depend on an animation.
+    if (
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
       element.classList.add('is-visible')
       return
     }

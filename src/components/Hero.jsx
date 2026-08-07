@@ -1,10 +1,10 @@
-import { lazy, Suspense } from 'react'
 import { ArrowDown, ArrowUpRight, Briefcase, Gamepad2, Github, Linkedin, Mail, MapPin } from 'lucide-react'
 import { professionalTitles, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import AnimatedStat from './AnimatedStat'
 import RotatingTitle from './RotatingTitle'
-
-const HeroSystemsScene = lazy(() => import('./HeroSystemsScene'))
+// Now a ~3 kB canvas renderer (was a 808 kB Three.js scene), so it is cheaper
+// to ship inline than to pay an extra request for a lazy chunk in the hero.
+import HeroSystemsScene from './HeroSystemsScene'
 
 const openGames = () => window.dispatchEvent(new CustomEvent('portfolio:open-games'))
 
@@ -61,10 +61,8 @@ const Hero = () => (
 
       <div className="hero-visual hero-enter hero-enter-visual">
         <div className="systems-visual-shell">
-          <Suspense fallback={<div className="systems-scene-loading" aria-hidden="true" />}>
-            <HeroSystemsScene />
-          </Suspense>
-          <p className="sr-only">Decorative three-dimensional visualization of connected AI, API, database, and cloud systems.</p>
+          <HeroSystemsScene />
+          <p className="sr-only">Decorative visualization of connected AI, API, database, and cloud systems.</p>
           <div className="systems-caption" aria-hidden="true">
             <span>01 · AI orchestration</span>
             <span>02 · API services</span>
@@ -73,7 +71,8 @@ const Hero = () => (
           <div className="engineer-card">
             <picture>
               <source srcSet="/profile.webp" type="image/webp" />
-              <img src="/profile.png" alt="" width="413" height="531" loading="lazy" decoding="async" />
+              {/* Above the fold and preloaded in index.html — must not be lazy. */}
+              <img src="/profile.png" alt="" width="413" height="531" fetchPriority="high" decoding="async" />
             </picture>
             <span><strong>Charlie James</strong>Philippines · Working globally</span>
           </div>

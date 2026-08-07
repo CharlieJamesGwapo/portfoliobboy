@@ -11,17 +11,48 @@ const Navbar = () => {
   const scrollFrame = useRef(null)
 
   useEffect(() => {
-    const sections = ['home', ...links.map((link) => link.href.slice(1))]
+    const ids = ['home', ...links.map((link) => link.href.slice(1))]
+
+    // Section offsets are cached. Reading `offsetTop` forces a synchronous
+    // layout, and doing that for every section on every scroll frame was the
+    // most expensive thing happening during a scroll. Offsets only change when
+    // the page is re-laid out, so that is when we re-measure.
+    let offsets = []
+    const measure = () => {
+      offsets = ids
+        .map((id) => {
+          const section = document.getElementById(id)
+          return section ? { id, top: section.offsetTop } : null
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.top - b.top) // the early-out below relies on this order
+    }
+
+    // Cheap refs avoid re-rendering the whole navbar on frames where nothing
+    // actually changed.
+    let lastScrolled = null
+    let lastActive = null
+
     const updateNavigation = () => {
       scrollFrame.current = null
-      setScrolled(window.scrollY > 20)
-      const marker = window.scrollY + 180
+      const y = window.scrollY
+
+      const nextScrolled = y > 20
+      if (nextScrolled !== lastScrolled) {
+        lastScrolled = nextScrolled
+        setScrolled(nextScrolled)
+      }
+
+      const marker = y + 180
       let current = 'home'
-      sections.forEach((id) => {
-        const section = document.getElementById(id)
-        if (section && section.offsetTop <= marker) current = id
-      })
-      setActive(current)
+      for (let i = 0; i < offsets.length; i += 1) {
+        if (offsets[i].top <= marker) current = offsets[i].id
+        else break
+      }
+      if (current !== lastActive) {
+        lastActive = current
+        setActive(current)
+      }
     }
 
     const scheduleNavigationUpdate = () => {
@@ -29,13 +60,25 @@ const Navbar = () => {
       scrollFrame.current = window.requestAnimationFrame(updateNavigation)
     }
 
+    const onResize = () => {
+      measure()
+      scheduleNavigationUpdate()
+    }
+
+    measure()
     updateNavigation()
     window.addEventListener('scroll', scheduleNavigationUpdate, { passive: true })
-    window.addEventListener('resize', scheduleNavigationUpdate)
+    window.addEventListener('resize', onResize)
+
+    // Sections grow as images and lazy content settle, which moves the offsets.
+    const resizeObserver = new ResizeObserver(onResize)
+    resizeObserver.observe(document.documentElement)
+
     return () => {
       if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current)
       window.removeEventListener('scroll', scheduleNavigationUpdate)
-      window.removeEventListener('resize', scheduleNavigationUpdate)
+      window.removeEventListener('resize', onResize)
+      resizeObserver.disconnect()
     }
   }, [])
 

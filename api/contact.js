@@ -1,13 +1,43 @@
 // Contact form handler — sends via Resend's REST API (no SDK, zero imports,
 // so Vercel's bundler never hangs).
+
+// This endpoint sends mail on the site owner's Resend account. It previously
+// answered `Access-Control-Allow-Origin: *`, which let any site on the web POST
+// to it — an open relay for spam billed to this account. Only the portfolio's
+// own origins may call it now. Same-origin form posts send no Origin header on
+// some browsers, so a missing Origin is allowed; a foreign one is not.
+const ALLOWED_ORIGINS = new Set([
+  'https://portfoliobboy.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+])
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true
+  if (ALLOWED_ORIGINS.has(origin)) return true
+  // Vercel preview deployments for this project.
+  return /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin)
+}
+
+const LIMITS = { name: 120, email: 254, subject: 200, message: 5000 }
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
 export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const origin = req.headers.origin
+
+  if (!isAllowedOrigin(origin)) {
+    return res.status(403).json({ error: 'Forbidden' })
+  }
+
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+    res.setHeader('Vary', 'Origin')
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end()
+    return res.status(204).end()
   }
 
   if (req.method !== 'POST') {
@@ -15,10 +45,26 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { name, email, subject, message } = req.body
+    const body = req.body && typeof req.body === 'object' ? req.body : {}
+    const name = typeof body.name === 'string' ? body.name.trim() : ''
+    const email = typeof body.email === 'string' ? body.email.trim() : ''
+    const subject = typeof body.subject === 'string' ? body.subject.trim() : ''
+    const message = typeof body.message === 'string' ? body.message.trim() : ''
 
     if (!name || !email || !subject || !message) {
       return res.status(400).json({ error: 'All fields are required' })
+    }
+
+    // Cap field lengths so a single request can't be used to blast a huge
+    // payload through the mail provider.
+    const tooLong = Object.entries({ name, email, subject, message })
+      .find(([field, value]) => value.length > LIMITS[field])
+    if (tooLong) {
+      return res.status(400).json({ error: `${tooLong[0]} is too long` })
+    }
+
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json({ error: 'A valid email address is required' })
     }
 
     // Check environment variables
@@ -61,7 +107,9 @@ export default async function handler(req, res) {
         from: 'Portfolio Contact <onboarding@resend.dev>',
         to: ['capstonee2@gmail.com'],
         reply_to: email,
-        subject: 'Portfolio: ' + sanitize(subject),
+        // Strip CR/LF before the value reaches a mail header, and use the raw
+        // (not HTML-escaped) text so subjects don't arrive full of &amp;.
+        subject: 'Portfolio: ' + subject.replace(/[\r\n]+/g, ' '),
         html,
       }),
     })
@@ -74,7 +122,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true, message: 'Email sent successfully' })
   } catch (error) {
+    // Log the detail server-side; don't hand internals back to the caller.
     console.error('Contact form error:', error.message, error.stack)
-    return res.status(500).json({ error: 'Failed to send email', details: error.message })
+    return res.status(500).json({ error: 'Failed to send email' })
   }
 }

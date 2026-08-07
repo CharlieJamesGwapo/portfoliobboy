@@ -2,3 +2,13 @@ node_modules
 .superpowers
 public/audio
 *.md
+*.txt
+
+# Original full-resolution certificate scans (3300x2550 JPEG, ~1.6 MB total).
+# They are kept in the repo as the source of truth, but the build now serves
+# pre-optimised WebP from public/certificates/, so they never need uploading.
+*.jpg
+image.png
+artifacts
+tests
+supabase

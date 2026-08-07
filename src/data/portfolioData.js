@@ -393,7 +393,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 'xy5k5u4b47qi',
     category: 'AI & Anthropic',
-    image: '/certificates/introduction-model-context-protocol.jpg',
+    image: '/certificates/introduction-model-context-protocol.webp',
+    thumb: '/certificates/introduction-model-context-protocol-thumb.webp',
   },
   {
     title: 'AI Capabilities and Limitations',
@@ -426,7 +427,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 'fbvhx43hfmj4',
     category: 'AI & Anthropic',
-    image: '/certificates/teaching-ai-fluency-framework.jpg',
+    image: '/certificates/teaching-ai-fluency-framework.webp',
+    thumb: '/certificates/teaching-ai-fluency-framework-thumb.webp',
   },
   {
     title: 'Claude 101',
@@ -435,7 +437,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: '8smsowpqtnzg',
     category: 'AI & Anthropic',
-    image: '/certificates/claude-101.jpg',
+    image: '/certificates/claude-101.webp',
+    thumb: '/certificates/claude-101-thumb.webp',
   },
   {
     title: 'Building with the Claude API',
@@ -444,7 +447,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 'kwaq247cry7d',
     category: 'AI & Anthropic',
-    image: '/certificates/claude-anthropic-api.jpg',
+    image: '/certificates/claude-anthropic-api.webp',
+    thumb: '/certificates/claude-anthropic-api-thumb.webp',
   },
   {
     title: 'AI Fluency: Framework & Foundations',
@@ -453,7 +457,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 'uzgqztbht6ax',
     category: 'AI & Anthropic',
-    image: '/certificates/ai-fluency-framework-foundations.jpg',
+    image: '/certificates/ai-fluency-framework-foundations.webp',
+    thumb: '/certificates/ai-fluency-framework-foundations-thumb.webp',
   },
   {
     title: 'Java SE 8 Programmer I',
