@@ -3338,11 +3338,16 @@ img {
   color: var(--mint);
 }
 
+/*
+ * Docked above the back-to-top button on the right. It used to sit bottom-left,
+ * where on a short desktop viewport it landed on top of the hero's primary
+ * "Explore selected work" call to action.
+ */
 .music-launcher,
 .music-loading {
   position: fixed;
-  bottom: 24px;
-  left: 24px;
+  right: 24px;
+  bottom: 80px;
   z-index: 82;
   display: inline-flex;
   min-height: 44px;
@@ -3395,7 +3400,7 @@ body.game-open .music-launcher { visibility: hidden; }
   .lab-game-list .reveal:nth-child(odd) { border-right: 0; }
   .lab-game-row { min-height: 116px; padding-inline: 12px; }
   .music-launcher,
-  .music-loading { bottom: 16px; left: 16px; }
+  .music-loading { right: 16px; bottom: 68px; left: auto; }
   .music-launcher { display: none; }
   body.music-open main { padding-bottom: 72px; }
   .music-player-pill { bottom: 10px !important; width: calc(100% - 24px); justify-content: center; padding-inline: 10px !important; }
