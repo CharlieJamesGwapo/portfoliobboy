@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import sys
+from xml.sax.saxutils import escape
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
@@ -161,6 +162,16 @@ FOOTER = ParagraphStyle(
     textColor=MUTED,
 )
 
+CERT_ITEM = ParagraphStyle(
+    "CertificateItem",
+    parent=SMALL,
+    fontSize=7.15,
+    leading=8.8,
+    textColor=INK,
+    leftIndent=7,
+    firstLineIndent=-6,
+)
+
 
 def link(url: str, label: str) -> str:
     return f'<link href="{url}" color="#0F6B60"><u>{label}</u></link>'
@@ -237,6 +248,34 @@ def project(title: str, date: str, body: str, stack: str, project_url: str | Non
     return KeepTogether(content)
 
 
+def certification_grid(label_text: str, items: list[tuple[str, str]]) -> list:
+    rows = []
+    for index in range(0, len(items), 2):
+        row = []
+        for title, details in items[index:index + 2]:
+            row.append(Paragraph(f"- <b>{escape(title)}</b> - {escape(details)}", CERT_ITEM))
+        if len(row) == 1:
+            row.append("")
+        rows.append(row)
+
+    available_width = PAGE_WIDTH - 2 * MARGIN_X
+    table = Table(
+        rows,
+        colWidths=[available_width / 2, available_width / 2],
+        hAlign="LEFT",
+    )
+    table.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (0, -1), 0),
+        ("RIGHTPADDING", (0, 0), (0, -1), 8),
+        ("LEFTPADDING", (1, 0), (1, -1), 8),
+        ("RIGHTPADDING", (1, 0), (1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+    ]))
+    return [Paragraph(label_text, LABEL), Spacer(1, 2), table, Spacer(1, 4)]
+
+
 def footer(canvas, doc):
     canvas.saveState()
     canvas.setStrokeColor(RULE)
@@ -292,7 +331,7 @@ def build_story():
         ),
         experience(
             "Full-Stack Developer - Rooche Digital Company",
-            "Jan 2026 - Mar 2026",
+            "Oct 2025 - Dec 2025",
             [
                 "Delivered client dashboards and web applications with React, Next.js, Angular, Node.js, and FastAPI backends.",
                 "Built validated REST and GraphQL APIs, Firebase/Supabase authentication, row-level security, and real-time WebSocket/webhook updates.",
@@ -347,26 +386,36 @@ def build_story():
     ))
     story.append(Paragraph("Dean's Lister, 2nd and 3rd Year (Ranked 2) | TOPCIT participant (2024-2025)", BODY))
 
-    story.extend(section("Selected Certifications"))
-    certs = [
-        "Databases with SQL - Harvard CS50",
-        "Java SE 8 Programmer I | Go Programming",
-        "AI Fluency: Framework & Foundations - Anthropic, 2026",
-        "Microsoft: Manage AD DS Domain Controllers & FSMO Roles",
-        "Windows Server and Active Directory administration training",
+    story.extend(section("Certifications & Technical Training"))
+    anthropic_certifications = [
+        ("Model Context Protocol: Advanced Topics", "Anthropic, Jul 2026"),
+        ("Introduction to Agent Skills", "Anthropic, Jul 2026"),
+        ("AI Fluency for Builders", "Anthropic, Jul 2026"),
+        ("Introduction to Model Context Protocol", "Anthropic, Jul 2026"),
+        ("AI Capabilities and Limitations", "Anthropic, Jul 2026"),
+        ("Claude Code in Action", "Anthropic, Jul 2026"),
+        ("Introduction to Subagents", "Anthropic, Jul 2026"),
+        ("Teaching the AI Fluency Framework", "Anthropic, Jul 2026"),
+        ("Claude 101", "Anthropic, Jul 2026"),
+        ("Building with the Claude API", "Anthropic, Jul 2026"),
+        ("AI Fluency: Framework & Foundations", "Anthropic, Jul 2026"),
     ]
-    cert_table = Table(
-        [[Paragraph(f"- {item}", BODY)] for item in certs],
-        colWidths=[PAGE_WIDTH - 2 * MARGIN_X],
-        hAlign="LEFT",
-    )
-    cert_table.setStyle(TableStyle([
-        ("LEFTPADDING", (0, 0), (-1, -1), 0),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
-        ("TOPPADDING", (0, 0), (-1, -1), 0),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 1),
-    ]))
-    story.append(cert_table)
+    technical_certifications = [
+        ("Java SE 8 Programmer I", "Java Developer, Jul 2024; expires Dec 2035"),
+        ("Go Programming", "CS50, Jul 2024; expires Feb 2034"),
+        ("Programming in HTML5 with JavaScript and CSS3", "Codemy, May 2025; expires Dec 2032"),
+        ("Full-Stack Web Development Certification", "Codemy, Apr 2025; expired Jul 2025"),
+        ("Databases with SQL", "Harvard CS50"),
+        ("Manage AD DS Domain Controllers & FSMO Roles", "Microsoft"),
+        ("Windows Server 2012 Training", "ITFreeTraining"),
+        ("Active Directory", "ITFreeTraining"),
+        ("MongoDB Database Training", "MongoDB"),
+        ("PHP for Web Development", "CodeMy"),
+        ("JavaScript Programming", "Bro Code"),
+        ("HTML and CSS", "Telugu"),
+    ]
+    story.extend(certification_grid("Anthropic & AI - 11 records", anthropic_certifications))
+    story.extend(certification_grid("Technical & professional - 12 records", technical_certifications))
 
     story.extend(section("Availability"))
     availability = Table(

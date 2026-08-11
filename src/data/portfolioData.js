@@ -104,7 +104,7 @@ export const experiences = [
     role: 'Full-Stack Developer',
     company: 'Rooche Digital Company',
     location: 'Remote',
-    period: 'Jan 2026 — Mar 2026',
+    period: 'Oct 2025 - Dec 2025',
     summary:
       'Delivered client dashboards, web applications, and documented backend services across modern JavaScript and Python stacks.',
     achievements: [

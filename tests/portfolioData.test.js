@@ -93,6 +93,24 @@ test('keeps the original credential inventory and clean resume route', () => {
   assert.equal(resumeUrl, '/charlie-james-abejo-resume.pdf')
 })
 
+test('publishes the corrected Rooche dates and authentic Anthropic certificates', () => {
+  const portfolioRooche = experiences.find((item) => item.company === 'Rooche Digital Company')
+  const gameRooche = EXPERIENCE.find((item) => item.id === 'rooche')
+  assert.equal(portfolioRooche?.period, 'Oct 2025 - Dec 2025')
+  assert.equal(gameRooche?.period, 'Oct 2025 - Dec 2025')
+
+  const uploadedAnthropicTitles = certifications
+    .filter((credential) => credential.issuer === 'Anthropic' && credential.image)
+    .map((credential) => credential.title)
+  assert.deepEqual(uploadedAnthropicTitles, [
+    'Introduction to Model Context Protocol',
+    'Teaching the AI Fluency Framework',
+    'Claude 101',
+    'Building with the Claude API',
+    'AI Fluency: Framework & Foundations',
+  ])
+})
+
 test('only exposes explicitly configured project links', () => {
   const linkedProjects = [...featuredProjects, ...projectArchive].filter((project) => project.url)
   assert.ok(linkedProjects.length > 0)

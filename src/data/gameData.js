@@ -17,7 +17,7 @@ export const EXPERIENCE = [
     hp: 100,
     company: 'Rooche Digital Company',
     role: 'Full Stack Developer',
-    period: 'Jan 2026 — Mar 2026',
+    period: 'Oct 2025 - Dec 2025',
     location: 'Remote',
     type: 'Full-time',
     description:
