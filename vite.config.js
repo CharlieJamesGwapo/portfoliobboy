@@ -9,7 +9,7 @@ import { resolve } from 'node:path'
 const verifiedAssets = [
   {
     route: '/charlie-james-abejo-resume.pdf',
-    source: resolve(process.cwd(), 'CHARLIE_JAMES_ABEJO_RESUME (1).pdf'),
+    source: resolve(process.cwd(), 'ABEJO_CHARLIE_JAMES_RESUME.pdf'),
     contentType: 'application/pdf',
     contentDisposition: 'inline; filename="charlie-james-abejo-resume.pdf"',
   },
