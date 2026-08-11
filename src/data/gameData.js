@@ -47,7 +47,7 @@ export const EXPERIENCE = [
     hp: 150,
     company: 'Robustech IT / SocietyOne',
     role: 'Full Stack Developer',
-    period: 'Jan 2024 — Dec 2025',
+    period: 'Jan 2026 - Apr 2026',
     location: 'Australia (Remote)',
     type: 'Contract',
     description:

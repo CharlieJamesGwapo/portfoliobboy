@@ -86,7 +86,7 @@ export const experiences = [
     role: 'AI Full-Stack Developer',
     company: 'Multi-Club Fitness Group',
     location: 'Australia · Contract · Remote',
-    period: '2026',
+    period: 'May 2026 - Jul 2026',
     featured: true,
     summary:
       'Building a production CRM and management platform that unifies member records, subscriptions, payments, visit history, and team outreach.',
@@ -118,7 +118,7 @@ export const experiences = [
     role: 'Full-Stack Developer',
     company: 'Robustech IT / SocietyOne',
     location: 'Australia · Remote',
-    period: 'Jan 2024 — Dec 2025',
+    period: 'Jan 2026 - Apr 2026',
     summary:
       'Modernized services and integrations for a regulated Australian personal-loan platform.',
     achievements: [
@@ -257,7 +257,7 @@ export const featuredProjects = [
     id: 'fitness-crm',
     categories: ['AI', 'SaaS', 'Backend', 'Full Stack', 'API', 'CRM'],
     title: 'Fitness CRM Platform',
-    eyebrow: 'Multi-club fitness operations · Australia',
+    eyebrow: 'May-Jul 2026 · Multi-club fitness operations · Australia',
     overview: 'A unified operating system for member data, subscriptions, payments, visits, retention, and browser-based calling across multiple fitness clubs.',
     context: 'Member operations, outreach, and financial history were spread across separate tools and data sources.',
     implementation: 'Next.js dashboards backed by bidirectional CRM synchronization, durable jobs, retries, and reconciliation.',
@@ -272,7 +272,7 @@ export const featuredProjects = [
     id: 'societyone',
     categories: ['Backend', 'API', 'Fintech'],
     title: 'SocietyOne Platform Modernization',
-    eyebrow: 'Regulated fintech · Australia',
+    eyebrow: 'Jan-Apr 2026 · Regulated fintech · Australia',
     overview: 'Regulated platform migration spanning Go and Node.js services, .NET standardization, AWS Lambda workflows, and partner-system integrations.',
     context: 'A major data and platform migration for a regulated Australian fintech product.',
     implementation: 'Re-platformed Go and Node.js services to .NET and built AWS Lambda workflows for third-party integrations.',

@@ -13,7 +13,7 @@ import {
   resumeUrl,
   skillGroups,
 } from '../src/data/portfolioData.js'
-import { BIO_SCROLL, SKILL_CATEGORIES } from '../src/data/gameData.js'
+import { BIO_SCROLL, EXPERIENCE, SKILL_CATEGORIES } from '../src/data/gameData.js'
 
 test('preserves the verified professional positioning and identity features', () => {
   assert.equal(professionalTitles.length, 8)
@@ -67,6 +67,21 @@ test('publishes the supplied OMJI projects with realistic dates', () => {
   assert.equal(billing?.eyebrow, 'Apr–Jun 2026 · Internet access and billing')
   assert.ok(billing?.stack.includes('TypeScript'))
   assert.ok(billing?.stack.includes('Go'))
+})
+
+test('uses the corrected 2026 SocietyOne and Multi-Club timeline everywhere', () => {
+  const fitnessExperience = experiences.find((item) => item.company === 'Multi-Club Fitness Group')
+  const societyExperience = experiences.find((item) => item.company === 'Robustech IT / SocietyOne')
+  assert.equal(fitnessExperience?.period, 'May 2026 - Jul 2026')
+  assert.equal(societyExperience?.period, 'Jan 2026 - Apr 2026')
+
+  const fitnessProject = featuredProjects.find((item) => item.id === 'fitness-crm')
+  const societyProject = featuredProjects.find((item) => item.id === 'societyone')
+  assert.equal(fitnessProject?.eyebrow, 'May-Jul 2026 · Multi-club fitness operations · Australia')
+  assert.equal(societyProject?.eyebrow, 'Jan-Apr 2026 · Regulated fintech · Australia')
+
+  const gameSocietyExperience = EXPERIENCE.find((item) => item.id === 'robustech')
+  assert.equal(gameSocietyExperience?.period, 'Jan 2026 - Apr 2026')
 })
 
 test('keeps the original credential inventory and clean resume route', () => {

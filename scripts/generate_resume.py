@@ -282,7 +282,7 @@ def build_story():
     story.extend([
         experience(
             "Full-Stack Developer (Contract) - Multi-Club Fitness Group, Australia",
-            "2026",
+            "May 2026 - Jul 2026",
             [
                 "Built a production CRM and management platform unifying member records, subscriptions, payments, visit history, outreach, and revenue/retention dashboards.",
                 "Designed a bidirectional Python sync worker with Celery, Redis, durable Postgres jobs, idempotency, bounded retries, and reconciliation against source financial reports.",
@@ -302,7 +302,7 @@ def build_story():
         ),
         experience(
             "Full-Stack Developer - Robustech IT / SocietyOne, Australia",
-            "Jan 2024 - Dec 2025",
+            "Jan 2026 - Apr 2026",
             [
                 "Re-platformed Go and Node.js microservices to .NET for a regulated fintech platform, standardizing logging, error handling, and deployments.",
                 "Built Python and .NET AWS Lambda workflows for partner banking and lending integrations.",
