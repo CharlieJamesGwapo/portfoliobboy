@@ -43,7 +43,7 @@ const Projects = () => {
           <SectionHeading
             eyebrow="03 · Product work"
             title="Systems designed around real operational pressure."
-            description="Six detailed case studies representing seven core products, plus eight additional client and independent builds across web, mobile, and operations."
+            description="Seven detailed case studies, plus eight additional client and independent builds across web, mobile, and operations."
             light
           />
         </ScrollReveal>

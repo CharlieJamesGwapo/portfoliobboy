@@ -68,7 +68,7 @@ export default function RotatingTitle({ titles }) {
   return (
     <div className="rotating-title">
       <span className="sr-only">Professional roles: {titles.join(', ')}</span>
-      <span className="rotating-title-label" aria-hidden="true">Currently working as</span>
+      <span className="rotating-title-label" aria-hidden="true">Open to opportunities as</span>
       <span className="rotating-title-value" aria-hidden="true" data-role-index={index}>
         {text}<span className="type-caret" />
       </span>

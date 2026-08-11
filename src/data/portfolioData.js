@@ -35,8 +35,8 @@ export const navigation = [
 ]
 
 export const proofPoints = [
-  { value: '15+', label: 'Genuine products and client builds', numericValue: 15, suffix: '+' },
-  { value: '2+', label: 'Years shipping production software', numericValue: 2, suffix: '+' },
+  { value: '16+', label: 'Genuine products and client builds', numericValue: 16, suffix: '+' },
+  { value: '2', label: 'Years shipping production software', numericValue: 2, suffix: '' },
   { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
   { value: '8', label: 'Playable creative-code experiments', numericValue: 8, suffix: '' },
 ]

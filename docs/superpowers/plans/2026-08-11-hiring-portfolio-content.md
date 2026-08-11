@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Show `2 years` or `2+ years`; never show a five-year claim.
+- Show exactly `2 years`; never show a plus sign or five-year claim for experience.
 - Remove the MOIST Alumni Tracking System from experience and projects.
 - Preserve supplied technology stacks and remove only MongoDB from general skill inventories.
 - Add One Ride Balingasag with `Started Apr 2026` and the supplied Google Play URL.
@@ -50,10 +50,10 @@ test('keeps the requested hiring-focused experience and project inventory', () =
 test('positions the portfolio around two years without a MongoDB skill claim', () => {
   const experienceProof = proofPoints.find((item) => item.label === 'Years shipping production software')
   assert.deepEqual(experienceProof, {
-    value: '2+',
+    value: '2',
     label: 'Years shipping production software',
     numericValue: 2,
-    suffix: '+',
+    suffix: '',
   })
   assert.equal(skillGroups.flatMap((group) => group.skills).includes('MongoDB'), false)
   assert.equal(SKILL_CATEGORIES.flatMap((group) => group.skills).includes('MongoDB'), false)
@@ -84,8 +84,8 @@ Expected: FAIL because the old counts, alumni entries, five-year proof, MongoDB 
 
 In `portfolioData.js`:
 
-- Change the product proof to `15+` because removing one featured case study and adding two changes the total from 14 to 15.
-- Change the experience proof to `{ value: '2+', numericValue: 2, suffix: '+' }`.
+- Change the product proof to `16+` because seven case studies represent eight core products and the archive contains eight additional builds.
+- Change the experience proof to `{ value: '2', numericValue: 2, suffix: '' }`.
 - Change the fitness CRM period from `2026 — Present` to `2026` and its eyebrow from `Current product` to `Multi-club fitness operations`.
 - Delete the complete MOIST Alumni experience and featured-project objects.
 - Remove only `'MongoDB'` from the `Data & infrastructure` skill group.
@@ -149,7 +149,6 @@ git commit -m "feat: refresh hiring portfolio project inventory"
 ### Task 2: Hiring-focused component copy
 
 **Files:**
-- Modify: `tests/portfolioData.test.js`
 - Modify: `src/components/About.jsx:18-27`
 - Modify: `src/components/Experience.jsx:73-78`
 - Modify: `src/components/Projects.jsx:43-47`
@@ -159,28 +158,7 @@ git commit -m "feat: refresh hiring portfolio project inventory"
 - Consumes: the updated counts from Task 1: 7 featured projects, 8 archived projects, and 9 experience entries
 - Produces: consistent hiring-facing prose with no five-year or `currently working as` claims
 
-- [ ] **Step 1: Write failing source-copy regression tests**
-
-At the top of `tests/portfolioData.test.js`, import `readFileSync` from `node:fs`, read the four component sources, and add:
-
-```js
-test('keeps duplicated component copy aligned with the hiring positioning', () => {
-  assert.match(aboutSource, /Across two years of professional work/)
-  assert.doesNotMatch(aboutSource, /five years|currently/i)
-  assert.match(experienceSource, /<strong>2<\/strong><span>Years shipping<\/span>/)
-  assert.match(experienceSource, /<strong>9<\/strong><span>Roles and engagements<\/span>/)
-  assert.match(projectsSource, /Seven detailed case studies.*eight additional/i)
-  assert.match(rotatingTitleSource, />Open to roles in</)
-})
-```
-
-- [ ] **Step 2: Run the tests and confirm component-copy expectations fail**
-
-Run: `npm test`
-
-Expected: FAIL because the components still contain five-year, current-role, and old inventory copy.
-
-- [ ] **Step 3: Update the duplicated component copy**
+- [ ] **Step 1: Update the duplicated component copy**
 
 Use these exact replacements:
 
@@ -202,10 +180,20 @@ a single dependable workflow.
 description="Seven detailed case studies, plus eight additional client and independent builds across web, mobile, and operations."
 
 // RotatingTitle.jsx
-<span className="rotating-title-label" aria-hidden="true">Open to roles in</span>
+<span className="rotating-title-label" aria-hidden="true">Open to opportunities as</span>
 ```
 
-- [ ] **Step 4: Run tests and production build**
+- [ ] **Step 2: Scan the rendered-source inputs for stale marketing copy**
+
+Run:
+
+```bash
+rg -n -i "5\+|five years|currently building|currently working as|current product" src/components src/data
+```
+
+Expected: no stale five-year or `current` marketing phrase remains.
+
+- [ ] **Step 3: Run tests and production build**
 
 Run: `npm test`
 
@@ -215,10 +203,10 @@ Run: `npm run build`
 
 Expected: Vite production build completes successfully.
 
-- [ ] **Step 5: Commit the component task**
+- [ ] **Step 4: Commit the component task**
 
 ```bash
-git add tests/portfolioData.test.js src/components/About.jsx src/components/Experience.jsx src/components/Projects.jsx src/components/RotatingTitle.jsx
+git add src/components/About.jsx src/components/Experience.jsx src/components/Projects.jsx src/components/RotatingTitle.jsx
 git commit -m "fix: align portfolio copy with hiring positioning"
 ```
 

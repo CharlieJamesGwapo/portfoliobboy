@@ -28,7 +28,7 @@ const Experience = () => {
                   <div className="timeline-chapter">
                     <span>2021—2023</span>
                     <strong>Earlier product engagements</strong>
-                    <p>Project-based experience across point of sale, records, scheduling, mobile, and real-time products.</p>
+                    <p>Project-based experience across point of sale, scheduling, mobile, and real-time products.</p>
                   </div>
                 )}
                 <article className={`experience-item ${experience.featured ? 'is-featured' : ''}`}>
@@ -72,8 +72,8 @@ const Experience = () => {
 
         <ScrollReveal variant="fade">
           <div className="experience-summary-strip" aria-label="Experience summary">
-            <div><strong>5+</strong><span>Years shipping</span></div>
-            <div><strong>10</strong><span>Roles and engagements</span></div>
+            <div><strong>2</strong><span>Years shipping</span></div>
+            <div><strong>9</strong><span>Roles and engagements</span></div>
             <div><strong>Web + mobile</strong><span>Product coverage</span></div>
             <div><strong>Remote</strong><span>Australia and US overlap</span></div>
           </div>

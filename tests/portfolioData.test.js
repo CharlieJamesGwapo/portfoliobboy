@@ -33,12 +33,19 @@ test('keeps the requested hiring-focused experience and project inventory', () =
 })
 
 test('positions the portfolio around two years without a MongoDB skill claim', () => {
+  const productProof = proofPoints.find((item) => item.label === 'Genuine products and client builds')
   const experienceProof = proofPoints.find((item) => item.label === 'Years shipping production software')
+  assert.deepEqual(productProof, {
+    value: '16+',
+    label: 'Genuine products and client builds',
+    numericValue: 16,
+    suffix: '+',
+  })
   assert.deepEqual(experienceProof, {
-    value: '2+',
+    value: '2',
     label: 'Years shipping production software',
     numericValue: 2,
-    suffix: '+',
+    suffix: '',
   })
   assert.equal(skillGroups.flatMap((group) => group.skills).includes('MongoDB'), false)
   assert.equal(SKILL_CATEGORIES.flatMap((group) => group.skills).includes('MongoDB'), false)

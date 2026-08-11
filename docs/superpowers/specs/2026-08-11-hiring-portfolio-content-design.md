@@ -19,7 +19,7 @@ The selective approach is preferred because it improves credibility without chan
 
 ### Experience positioning
 
-- Replace every user-facing claim of five or more years with `2 years` or `2+ years`, using `2+` in numeric proof cards and natural prose elsewhere.
+- Replace every user-facing claim of five or more years with exactly `2 years`, using `2` in numeric proof cards and natural prose elsewhere.
 - Remove `current` phrasing from portfolio copy and replace it with outcome-oriented wording.
 - Keep the professional roles and verified technology stacks intact.
 - Remove the MOIST Alumni Online Tracking System experience entry completely.
@@ -43,7 +43,7 @@ The selective approach is preferred because it improves credibility without chan
 
 ### Counts and hiring copy
 
-- Recalculate featured and total project counts after removing one project and adding two.
+- Recalculate featured and total project counts after removing one project and adding two; the seven case studies represent eight core products, plus eight archived builds, for `16+` products and client builds.
 - Keep calls to action focused on hiring, roles, and project discussions.
 - Avoid inflated claims, repository exposure claims, download counts, or business outcomes that were not supplied.
 
