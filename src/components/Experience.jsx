@@ -24,7 +24,7 @@ const Experience = () => {
             const panelId = `experience-panel-${index}`
             return (
               <ScrollReveal key={`${experience.company}-${experience.period}`} delay={(index % 4) * 55} variant="right">
-                {index === 3 && (
+                {index === 4 && (
                   <div className="timeline-chapter">
                     <span>2021—2023</span>
                     <strong>Earlier product engagements</strong>
@@ -73,7 +73,7 @@ const Experience = () => {
         <ScrollReveal variant="fade">
           <div className="experience-summary-strip" aria-label="Experience summary">
             <div><strong>2</strong><span>Years shipping</span></div>
-            <div><strong>9</strong><span>Roles and engagements</span></div>
+            <div><strong>10</strong><span>Roles and engagements</span></div>
             <div><strong>Web + mobile</strong><span>Product coverage</span></div>
             <div><strong>Remote</strong><span>Australia and US overlap</span></div>
           </div>

@@ -24,21 +24,25 @@ test('preserves the verified professional positioning and identity features', ()
 })
 
 test('keeps the requested hiring-focused experience and project inventory', () => {
-  assert.equal(featuredProjects.length, 7)
+  assert.equal(featuredProjects.length, 8)
   assert.equal(projectArchive.length, 8)
-  assert.equal(experiences.length, 9)
+  assert.equal(experiences.length, 10)
   assert.equal(new Set(featuredProjects.map((project) => project.id)).size, featuredProjects.length)
-  assert.equal(experiences.some((item) => /alumni/i.test(item.company)), false)
-  assert.equal(featuredProjects.some((item) => /alumni/i.test(item.title)), false)
+
+  const alumniExperience = experiences.find((item) => item.company === 'MOIST Alumni Online Tracking System')
+  assert.equal(alumniExperience?.period, 'Jan 2025 - Aug 2025')
+
+  const alumniProject = featuredProjects.find((item) => item.id === 'moist-alumni')
+  assert.equal(alumniProject?.eyebrow, 'Jan-Aug 2025 · Secure records platform')
 })
 
 test('positions the portfolio around two years without a MongoDB skill claim', () => {
   const productProof = proofPoints.find((item) => item.label === 'Genuine products and client builds')
   const experienceProof = proofPoints.find((item) => item.label === 'Years shipping production software')
   assert.deepEqual(productProof, {
-    value: '16+',
+    value: '17+',
     label: 'Genuine products and client builds',
-    numericValue: 16,
+    numericValue: 17,
     suffix: '+',
   })
   assert.deepEqual(experienceProof, {

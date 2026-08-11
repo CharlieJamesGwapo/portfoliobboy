@@ -35,7 +35,7 @@ export const navigation = [
 ]
 
 export const proofPoints = [
-  { value: '16+', label: 'Genuine products and client builds', numericValue: 16, suffix: '+' },
+  { value: '17+', label: 'Genuine products and client builds', numericValue: 17, suffix: '+' },
   { value: '2', label: 'Years shipping production software', numericValue: 2, suffix: '' },
   { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
   { value: '8', label: 'Playable creative-code experiments', numericValue: 8, suffix: '' },
@@ -127,6 +127,19 @@ export const experiences = [
       'Owned JSON-RPC, WebSocket, and webhook integrations plus Python reconciliation and reporting automation.',
     ],
     stack: ['C# / .NET', 'Python', 'Go', 'Node.js', 'AWS Lambda', 'PostgreSQL', 'Buddy CI/CD'],
+  },
+  {
+    role: 'Full-Stack Developer',
+    company: 'MOIST Alumni Online Tracking System',
+    location: 'Balingasag, Philippines',
+    period: 'Jan 2025 - Aug 2025',
+    summary: 'Created a secure records platform for alumni registration, profile management, and administrative reporting.',
+    achievements: [
+      'Implemented role-based access control and auditable administrative workflows.',
+      'Added OTP/2FA verification over SMS and email for sensitive account actions.',
+      'Centralized alumni records and reporting in a maintainable relational data model.',
+    ],
+    stack: ['PHP', 'Laravel', 'MySQL', 'JavaScript', 'RBAC', 'OTP / 2FA'],
   },
   {
     role: 'Full-Stack Developer',
@@ -268,6 +281,21 @@ export const featuredProjects = [
     engineering: 'JSON-RPC, WebSocket, webhook, partner-feed, email-parsing, reconciliation, and reporting workflows.',
     delivered: 'Standardized logging, error handling, automated testing, staged deployments, and rollback support.',
     stack: ['.NET', 'Go', 'Node.js', 'AWS Lambda', 'PostgreSQL'],
+    private: true,
+  },
+  {
+    id: 'moist-alumni',
+    categories: ['SaaS', 'Full Stack'],
+    title: 'MOIST Alumni Tracking System',
+    eyebrow: 'Jan-Aug 2025 · Secure records platform',
+    overview: 'A secure alumni registration, profile, records, and administrative reporting platform.',
+    context: 'The institution needed one maintainable system for verified alumni records and administrative reporting.',
+    implementation: 'Laravel and MySQL application with role-aware administrative workflows and SMS/email account verification.',
+    architecture: ['Laravel application', 'MySQL', 'RBAC', 'Audit trail', 'SMS + email OTP'],
+    features: ['Alumni profiles', 'Administrative dashboard', 'Reporting and analytics', 'OTP/2FA'],
+    engineering: 'Role-based access, audit trails, relational data modeling, analytics, and OTP/2FA over SMS and email.',
+    delivered: 'A centralized system for alumni records, secure account actions, and administrative reporting.',
+    stack: ['Laravel', 'MySQL', 'JavaScript', 'RBAC', 'OTP / 2FA'],
     private: true,
   },
   {
