@@ -109,7 +109,7 @@ export const SKILL_CATEGORIES = [
   },
   {
     title: 'Databases',
-    skills: ['PostgreSQL', 'MySQL', 'MongoDB', 'NeonDB', 'Supabase', 'Firebase / Firestore', 'Schema Design', 'Query Optimization'],
+    skills: ['PostgreSQL', 'MySQL', 'NeonDB', 'Supabase', 'Firebase / Firestore', 'Schema Design', 'Query Optimization'],
   },
   {
     title: 'Cloud & DevOps',
@@ -212,7 +212,7 @@ export const OWNER = {
 
 export const BIO_SCROLL = [
   "Welcome, traveler. You stand in the dungeon of Charlie James — Full Stack Developer & Backend Engineer.",
-  "5+ years forging secure, scalable web, API, and mobile applications across Python, Go, .NET, Node.js, and PHP.",
+  "2 years forging secure, scalable web, API, and mobile applications across Python, Go, .NET, Node.js, and PHP.",
   "Venture deeper: defeat the Skills, plunder the Projects Vault, study the Certs, and slay The Bug King to claim victory.",
 ]
 

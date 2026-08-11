@@ -35,8 +35,8 @@ export const navigation = [
 ]
 
 export const proofPoints = [
-  { value: '14+', label: 'Genuine products and client builds', numericValue: 14, suffix: '+' },
-  { value: '5+', label: 'Years shipping production software', numericValue: 5, suffix: '+' },
+  { value: '15+', label: 'Genuine products and client builds', numericValue: 15, suffix: '+' },
+  { value: '2+', label: 'Years shipping production software', numericValue: 2, suffix: '+' },
   { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
   { value: '8', label: 'Playable creative-code experiments', numericValue: 8, suffix: '' },
 ]
@@ -86,7 +86,7 @@ export const experiences = [
     role: 'AI Full-Stack Developer',
     company: 'Multi-Club Fitness Group',
     location: 'Australia · Contract · Remote',
-    period: '2026 — Present',
+    period: '2026',
     featured: true,
     summary:
       'Building a production CRM and management platform that unifies member records, subscriptions, payments, visit history, and team outreach.',
@@ -140,19 +140,6 @@ export const experiences = [
       'Containerized the application for repeatable deployment and maintenance.',
     ],
     stack: ['Go', 'Next.js', 'Vue.js', 'PostgreSQL', 'Docker'],
-  },
-  {
-    role: 'Full-Stack Developer',
-    company: 'MOIST Alumni Online Tracking System',
-    location: 'Balingasag, Philippines',
-    period: 'Jan 2023 — May 2023',
-    summary: 'Created a secure records platform for alumni registration, profile management, and administrative reporting.',
-    achievements: [
-      'Implemented role-based access control and auditable administrative workflows.',
-      'Added OTP/2FA verification over SMS and email for sensitive account actions.',
-      'Centralized alumni records and reporting in a maintainable relational data model.',
-    ],
-    stack: ['PHP', 'Laravel', 'MySQL', 'JavaScript', 'RBAC', 'OTP / 2FA'],
   },
   {
     role: 'Full-Stack Developer',
@@ -223,10 +210,41 @@ export const experiences = [
 
 export const featuredProjects = [
   {
+    id: 'one-ride-balingasag',
+    categories: ['Mobile', 'Full Stack', 'Backend', 'API'],
+    title: 'One Ride Balingasag (OMJI)',
+    eyebrow: 'Started Apr 2026 · Live on Google Play · Balingasag',
+    overview: 'A unified ride-hailing, delivery, pickup, and local-store platform built for everyday transport and errands in Balingasag.',
+    context: 'Passengers, riders, families, and local stores need one service for transport, parcel delivery, scheduled pickup, and local shopping.',
+    implementation: 'React Native mobile delivery backed by a Go and Gin API, PostgreSQL data, real-time WebSocket tracking, maps, plus React web and admin clients.',
+    architecture: ['React Native + Expo', 'React + TypeScript web', 'Go + Gin API', 'PostgreSQL + GORM', 'JWT authentication', 'Maps + WebSockets'],
+    features: ['Pasugo delivery', 'Pasabay motorcycle rides', 'Pasundo scheduled pickup', 'Local store delivery', 'Live tracking and fare estimates', 'Rider, store, and admin operations'],
+    engineering: 'OTP and JWT authentication, distance-based fares, scheduled and recurring bookings, real-time rider tracking, multiple payment methods, ratings, SOS, and operational dashboards.',
+    delivered: 'A live Google Play customer app supported by rider, store, web, and administrative workflows for the Balingasag service area.',
+    stack: ['React Native', 'Expo', 'TypeScript', 'Go', 'Gin', 'PostgreSQL', 'GORM', 'WebSockets'],
+    url: 'https://play.google.com/store/apps/details?id=com.oneridebalingasag.app&hl=en',
+    private: true,
+  },
+  {
+    id: 'omji-billing',
+    categories: ['SaaS', 'Backend', 'Full Stack', 'API'],
+    title: 'OMJI Internet Access & Billing System',
+    eyebrow: 'Apr–Jun 2026 · Internet access and billing',
+    overview: 'A web-based operations system for internet cafés, hotspots, and small ISPs combining prepaid access, billing, network control, and reporting.',
+    context: 'Small internet operators need a practical way to manage timed access, vouchers, customer sessions, connected stations, and daily revenue.',
+    implementation: 'TypeScript and Go services with web, mobile, and endpoint-agent clients, MikroTik RouterOS integration, and Docker-based deployment.',
+    architecture: ['TypeScript services', 'Go services', 'Web + mobile clients', 'Endpoint agent', 'MikroTik RouterOS', 'Docker Compose'],
+    features: ['Time-based prepaid billing', 'Voucher generation', 'Multi-station management', 'Revenue reports and analytics', 'MikroTik access control', 'Tablet-ready administration'],
+    engineering: 'Usage-ledger billing, plan changes, voucher workflows, per-account permissions, network integration, database migrations, and repeatable container deployment.',
+    delivered: 'A private operational platform covering access control, billing, reporting, administration, and multi-branch network support.',
+    stack: ['TypeScript', 'Go', 'React', 'Docker', 'MikroTik RouterOS', 'Web + mobile'],
+    private: true,
+  },
+  {
     id: 'fitness-crm',
     categories: ['AI', 'SaaS', 'Backend', 'Full Stack', 'API', 'CRM'],
     title: 'Fitness CRM Platform',
-    eyebrow: 'Current product · Multi-club operations · Australia',
+    eyebrow: 'Multi-club fitness operations · Australia',
     overview: 'A unified operating system for member data, subscriptions, payments, visits, retention, and browser-based calling across multiple fitness clubs.',
     context: 'Member operations, outreach, and financial history were spread across separate tools and data sources.',
     implementation: 'Next.js dashboards backed by bidirectional CRM synchronization, durable jobs, retries, and reconciliation.',
@@ -297,21 +315,6 @@ export const featuredProjects = [
     stack: ['React Native', 'Android', 'Java / Kotlin', 'Firebase'],
     private: true,
   },
-  {
-    id: 'moist-alumni',
-    categories: ['SaaS', 'Full Stack'],
-    title: 'MOIST Alumni Tracking',
-    eyebrow: 'Secure records platform',
-    overview: 'An alumni records system with role-based access, audit trails, and OTP/2FA over SMS and email.',
-    context: 'A secure alumni registration, profile, records, and administrative reporting platform.',
-    implementation: 'Laravel and MySQL application with role-aware administrative workflows.',
-    architecture: ['Laravel application', 'MySQL', 'RBAC', 'Audit trail', 'SMS + email OTP'],
-    features: ['Alumni profiles', 'Administrative dashboard', 'Analytics', 'OTP/2FA'],
-    engineering: 'Role-based access, audit trails, analytics, and OTP/2FA over SMS and email.',
-    delivered: 'A centralized system for alumni records and administrative reporting.',
-    stack: ['Laravel', 'MySQL', 'RBAC', 'OTP / 2FA'],
-    private: true,
-  },
 ]
 
 export const projectArchive = [
@@ -346,7 +349,7 @@ export const skillGroups = [
   },
   {
     title: 'Data & infrastructure',
-    skills: ['PostgreSQL', 'Supabase', 'Neon', 'MySQL', 'MongoDB', 'Firebase', 'Redis', 'Docker', 'Linux VPS', 'AWS Lambda', 'GitLab CI', 'Buddy CI/CD', 'Jenkins', 'Vercel'],
+    skills: ['PostgreSQL', 'Supabase', 'Neon', 'MySQL', 'Firebase', 'Redis', 'Docker', 'Linux VPS', 'AWS Lambda', 'GitLab CI', 'Buddy CI/CD', 'Jenkins', 'Vercel'],
   },
   {
     title: 'Systems & integrations',
