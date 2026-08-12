@@ -59,6 +59,9 @@ export default function NeonCircuit({ onExit, onContact, onOpenSettings, paused 
   const [submitting, setSubmitting] = useState(false)
   const [showBoard, setShowBoard] = useState(false)
   const [isTouch, setIsTouch] = useState(false)
+  // The engine arrives via a dynamic import. Until it does, starting a run
+  // is a silent no-op, so the button must not look ready.
+  const [ready, setReady] = useState(false)
 
   // Kept in a ref as well: the engine's callbacks fire outside React's render
   // cycle and must not close over a stale `phase`.
@@ -120,6 +123,7 @@ export default function NeonCircuit({ onExit, onContact, onOpenSettings, paused 
         }
         engineRef.current = engine
         engine.resize()
+        setReady(true)
       })
       .catch(() => {
         if (!disposed) setPhase('unsupported')
@@ -304,9 +308,10 @@ export default function NeonCircuit({ onExit, onContact, onOpenSettings, paused 
             )}
             <button
               onClick={startRun}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02]"
+              disabled={!ready}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
-              <Play size={16} /> Start race
+              {ready ? <><Play size={16} /> Start race</> : <><Loader2 size={16} className="animate-spin" /> Loading track…</>}
             </button>
             <p className="mt-3 text-[11px] text-gray-600">Tall blocks must be steered around — only low ones can be jumped.</p>
           </div>

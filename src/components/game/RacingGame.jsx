@@ -1,937 +1,408 @@
-import { Component, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import * as THREE from 'three'
+// ============================================================================
+// RacingGame ("Pixel Racer") — React shell around the 3D circuit engine in
+// src/lib/pixelRacer.js.
+//
+// This replaces the original top-down 2D implementation. The gameplay contract
+// is unchanged on purpose — three laps, three AI rivals, skill badges that
+// grant a boost, a best-lap time in milliseconds stored under
+// `arcade_best_racing`, and a leaderboard entry under game id 'racing' — so the
+// lobby's "Best" badge and every existing score keep working.
+//
+// As with Neon Circuit, this file owns nothing that runs per frame: the engine
+// pushes HUD numbers on a 100 ms timer.
+// ============================================================================
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { ArrowLeft, Flag, Gauge, Loader2, Play, RotateCcw, Settings, Sparkles, Trophy } from 'lucide-react'
 import AudioManager from './AudioManager'
-import { getAvatar, makeSprite } from '../../lib/avatar'
-import { SKILLS, OWNER } from '../../data/gameData'
+import Leaderboard from './Leaderboard'
+import { SKILLS } from '../../data/gameData'
 import { getPlayerName } from '../../lib/gameStorage'
 import { submitScore } from '../../lib/supabase'
-import Leaderboard from './Leaderboard'
 
-// ---------------------------------------------------------------------------
-// WebGL boundary — never let a 3D failure crash the game
-// ---------------------------------------------------------------------------
-class SceneBoundary extends Component {
-  constructor(p) {
-    super(p)
-    this.state = { failed: false }
-  }
-  static getDerivedStateFromError() {
-    return { failed: true }
-  }
-  componentDidCatch() {}
-  render() {
-    return this.state.failed ? this.props.fallback : this.props.children
-  }
-}
-
-// ---------------------------------------------------------------------------
-// 3D background — infinite night starfield scrolling downward (parallax)
-// ---------------------------------------------------------------------------
-function Starfield() {
-  const ref = useRef()
-  const COUNT = 1400
-  const SPREAD_X = 60
-  const SPREAD_Y = 40
-  const { positions, speeds } = useMemo(() => {
-    const arr = new Float32Array(COUNT * 3)
-    const spd = new Float32Array(COUNT)
-    for (let i = 0; i < COUNT; i++) {
-      arr[i * 3 + 0] = (Math.random() - 0.5) * SPREAD_X
-      arr[i * 3 + 1] = (Math.random() - 0.5) * SPREAD_Y
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 20
-      spd[i] = 2 + Math.random() * 8 // parallax: closer stars fall faster
-    }
-    return { positions: arr, speeds: spd }
-  }, [])
-
-  useFrame((_, dt) => {
-    const geo = ref.current
-    if (!geo) return
-    const attr = geo.attributes.position
-    const a = attr.array
-    const top = SPREAD_Y / 2
-    for (let i = 0; i < COUNT; i++) {
-      a[i * 3 + 1] -= speeds[i] * dt
-      if (a[i * 3 + 1] < -top) {
-        a[i * 3 + 1] = top
-        a[i * 3 + 0] = (Math.random() - 0.5) * SPREAD_X
-      }
-    }
-    attr.needsUpdate = true
-  })
-
-  return (
-    <points>
-      <bufferGeometry ref={ref}>
-        <bufferAttribute attach="attributes-position" count={COUNT} array={positions} itemSize={3} />
-      </bufferGeometry>
-      <pointsMaterial size={0.12} sizeAttenuation color="#bcd0ff" transparent opacity={0.9} />
-    </points>
-  )
-}
-
-function Background3D() {
-  return (
-    <div className="absolute inset-0 z-0 pointer-events-none bg-[#05060f]">
-      <SceneBoundary
-        fallback={
-          <div
-            className="absolute inset-0"
-            style={{ background: 'radial-gradient(circle at 50% 30%, #15203f 0%, #05060f 70%)' }}
-          />
-        }
-      >
-        <Canvas camera={{ position: [0, 0, 18], fov: 70 }} dpr={[1, 1.5]}>
-          <Starfield />
-        </Canvas>
-      </SceneBoundary>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// Track geometry (world coordinates)
-// ---------------------------------------------------------------------------
-const WORLD = {
-  cx: 1100,
-  cy: 700,
-  outerRX: 820,
-  outerRY: 520,
-  innerRX: 480,
-  innerRY: 250,
-}
-// Centerline radii (mid of the road) — used for waypoints + finish line.
-const MID_RX = (WORLD.outerRX + WORLD.innerRX) / 2
-const MID_RY = (WORLD.outerRY + WORLD.innerRY) / 2
-
-// Is a point on the road (between inner and outer ellipse)?
-function onRoad(x, y) {
-  const dx = x - WORLD.cx
-  const dy = y - WORLD.cy
-  const outer = (dx * dx) / (WORLD.outerRX * WORLD.outerRX) + (dy * dy) / (WORLD.outerRY * WORLD.outerRY)
-  const inner = (dx * dx) / (WORLD.innerRX * WORLD.innerRX) + (dy * dy) / (WORLD.innerRY * WORLD.innerRY)
-  return outer <= 1 && inner >= 1
-}
-
-// Waypoints around the oval (clockwise) for AI + finish positioning.
-function buildWaypoints(n) {
-  const pts = []
-  for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2
-    pts.push({ x: WORLD.cx + Math.cos(a) * MID_RX, y: WORLD.cy + Math.sin(a) * MID_RY })
-  }
-  return pts
-}
-
+const BEST_KEY = 'arcade_best_racing'
 const LAPS_TO_WIN = 3
-const TOP_SPEED = 360
-const AI_TOP_SPEED = 318
-const ACCEL = 320
-const REVERSE_SPEED = -150
-const STEER_RATE = 2.6
-const GRASS_DRAG = 4.2
-const ROAD_DRAG = 1.2
-const BOOST_MS = 3000
 
-function RacingGame({ onExit, onContact, onOpenSettings, paused }) {
+const formatMs = (ms) => {
+  if (!ms || ms <= 0) return '—'
+  const total = ms / 1000
+  const minutes = Math.floor(total / 60)
+  const seconds = (total % 60).toFixed(2).padStart(5, '0')
+  return minutes > 0 ? `${minutes}:${seconds}` : `${seconds}s`
+}
+
+function readBestLap() {
+  try {
+    const value = Number(localStorage.getItem(BEST_KEY))
+    return Number.isFinite(value) && value > 0 ? value : 0
+  } catch {
+    return 0
+  }
+}
+
+const KEY_MAP = {
+  ArrowUp: 'throttle', KeyW: 'throttle',
+  ArrowDown: 'brake', KeyS: 'brake',
+  ArrowLeft: 'left', KeyA: 'left',
+  ArrowRight: 'right', KeyD: 'right',
+  Space: 'throttle',
+}
+
+const ORDINAL = ['', '1st', '2nd', '3rd', '4th']
+
+export default function RacingGame({ onExit, onContact, onOpenSettings, paused }) {
   const canvasRef = useRef(null)
-  const rafRef = useRef(0)
-  const lastTsRef = useRef(0)
-  const pausedRef = useRef(paused)
-  pausedRef.current = paused
+  const engineRef = useRef(null)
+  const countdownRef = useRef(null)
 
-  const [phase, setPhase] = useState('start') // start | countdown | racing | win | gameover
+  const [phase, setPhase] = useState('intro') // intro | countdown | racing | finished | unsupported
+  const [countdown, setCountdown] = useState(3)
+  const [hud, setHud] = useState({ lap: 1, timeMs: 0, bestLapMs: 0, lastLapMs: 0, speed: 0, boost: false, offTrack: false, position: 1, collected: 0, total: SKILLS.length })
+  const [result, setResult] = useState(null)
+  const [bestLap, setBestLap] = useState(readBestLap)
+  const [submitting, setSubmitting] = useState(false)
+  const [showBoard, setShowBoard] = useState(false)
+  const [isTouch, setIsTouch] = useState(false)
+  // The engine arrives via a dynamic import. Until it does, starting a race
+  // is a silent no-op, so the button must not look ready.
+  const [ready, setReady] = useState(false)
+
   const phaseRef = useRef(phase)
   phaseRef.current = phase
 
-  const [hud, setHud] = useState({ lap: 0, timeMs: 0, speed: 0, boost: false })
-  const [collected, setCollected] = useState([]) // skill names collected
-  const [countdown, setCountdown] = useState(3)
-
-  // results
-  const [bestLapMs, setBestLapMs] = useState(0)
-  const [totalMs, setTotalMs] = useState(0)
-
-  // leaderboard / submit
-  const [name, setName] = useState(getPlayerName() || '')
-  const [submitted, setSubmitted] = useState(false)
-  const [refreshSignal, setRefreshSignal] = useState(0)
-
-  // best lap persisted
-  const [storedBest, setStoredBest] = useState(() => {
-    const v = Number(localStorage.getItem('arcade_best_racing'))
-    return v > 0 ? v : 0
-  })
-
-  // sprite
-  const spriteRef = useRef(null)
   useEffect(() => {
-    spriteRef.current = makeSprite(getAvatar(), 64, { bubble: false })
-  }, [])
-
-  const waypoints = useMemo(() => buildWaypoints(48), [])
-
-  // ---- world state in refs ----
-  const worldRef = useRef(null)
-  const keysRef = useRef({})
-  const touchRef = useRef({ left: false, right: false, gas: false, brake: false })
-
-  const resetWorld = useCallback(() => {
-    // Start on the road at the finish line (rightmost point of centerline),
-    // heading "up" along the track (clockwise => negative y here means moving up).
-    const startX = WORLD.cx + MID_RX
-    const startY = WORLD.cy
-    const makeKart = (offset, color) => ({
-      x: startX,
-      y: startY + offset,
-      heading: -Math.PI / 2, // facing up (toward decreasing y)
-      vel: 0,
-      color,
-      lap: 0,
-      finished: false,
-      wp: 0,
-      prevSide: 1,
-    })
-
-    // skill badges scattered on the road
-    const badges = []
-    const usable = SKILLS.slice()
-    let attempts = 0
-    while (badges.length < SKILLS.length && attempts < 2000) {
-      attempts++
-      const a = Math.random() * Math.PI * 2
-      const t = 0.18 + Math.random() * 0.64 // interpolate inner->outer
-      const rx = WORLD.innerRX + (WORLD.outerRX - WORLD.innerRX) * t
-      const ry = WORLD.innerRY + (WORLD.outerRY - WORLD.innerRY) * t
-      const x = WORLD.cx + Math.cos(a) * rx
-      const y = WORLD.cy + Math.sin(a) * ry
-      // avoid spawning right on the finish line band
-      if (Math.abs(y - WORLD.cy) < 70 && x > WORLD.cx) continue
-      if (!onRoad(x, y)) continue
-      badges.push({ x, y, name: usable[badges.length], taken: false })
-    }
-
-    worldRef.current = {
-      player: { x: startX, y: startY, heading: -Math.PI / 2, vel: 0, lap: 0, prevSide: 1 },
-      ai: [makeKart(-44, '#ef4444'), makeKart(44, '#f97316')],
-      badges,
-      cam: { x: startX, y: startY },
-      startMs: 0,
-      timeMs: 0,
-      lapStartMs: 0,
-      best: 0,
-      laps: 0,
-      boostUntil: 0,
-      collectedSet: new Set(),
-    }
-    setCollected([])
-    setHud({ lap: 0, timeMs: 0, speed: 0, boost: false })
-  }, [])
-
-  // ---- input ----
-  useEffect(() => {
-    const down = (e) => {
-      keysRef.current[e.key.toLowerCase()] = true
-    }
-    const up = (e) => {
-      keysRef.current[e.key.toLowerCase()] = false
-    }
-    window.addEventListener('keydown', down)
-    window.addEventListener('keyup', up)
-    return () => {
-      window.removeEventListener('keydown', down)
-      window.removeEventListener('keyup', up)
+    try {
+      setIsTouch(window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0)
+    } catch {
+      setIsTouch(false)
     }
   }, [])
 
-  // ---- finish-line crossing detection ----
-  // Finish line is the vertical segment at x ~ cx (on the right half, x > cx),
-  // crossing from y < cy to y >= cy (clockwise direction) counts a lap.
-  function crossedFinish(prevX, prevY, x, y) {
-    if (x <= WORLD.cx) return false
-    // crossed the horizontal centerline going downward (clockwise on right side)
-    return prevY < WORLD.cy && y >= WORLD.cy
-  }
+  const handleFinish = useCallback((summary) => {
+    setResult(summary)
+    setPhase('finished')
 
-  // ---- main loop ----
-  useEffect(() => {
-    const cvs = canvasRef.current
-    if (!cvs) return
-    const ctx = cvs.getContext('2d')
-
-    const resize = () => {
-      cvs.width = cvs.clientWidth
-      cvs.height = cvs.clientHeight
-    }
-    resize()
-    window.addEventListener('resize', resize)
-
-    const step = (ts) => {
-      rafRef.current = requestAnimationFrame(step)
-      const w = worldRef.current
-      if (!w) {
-        lastTsRef.current = ts
-        return
-      }
-      let dt = (ts - lastTsRef.current) / 1000
-      lastTsRef.current = ts
-      if (dt > 0.05) dt = 0.05
-
-      const racing = phaseRef.current === 'racing'
-      if (!pausedRef.current && racing) {
-        update(dt, ts)
-      }
-      render(ctx, cvs)
-    }
-
-    const update = (dt, ts) => {
-      const w = worldRef.current
-      const p = w.player
-      const k = keysRef.current
-      const t = touchRef.current
-
-      w.timeMs += dt * 1000
-
-      // steering
-      const steerL = k['arrowleft'] || k['a'] || t.left
-      const steerR = k['arrowright'] || k['d'] || t.right
-      const gas = k['arrowup'] || k['w'] || t.gas
-      const brake = k['arrowdown'] || k['s'] || t.brake
-
-      if (steerL) p.heading -= STEER_RATE * dt
-      if (steerR) p.heading += STEER_RATE * dt
-
-      const boosting = ts < w.boostUntil
-      const maxSpeed = boosting ? TOP_SPEED * 1.45 : TOP_SPEED
-      if (gas) p.vel += ACCEL * dt
-      else if (brake) p.vel -= ACCEL * 1.1 * dt
-      else p.vel *= 1 - 1.4 * dt // coast
-
-      if (p.vel > maxSpeed) p.vel = maxSpeed
-      if (p.vel < REVERSE_SPEED) p.vel = REVERSE_SPEED
-
-      const prevX = p.x
-      const prevY = p.y
-      const nx = p.x + Math.cos(p.heading) * p.vel * dt
-      const ny = p.y + Math.sin(p.heading) * p.vel * dt
-
-      // off-road friction
-      const off = !onRoad(nx, ny)
-      p.x = nx
-      p.y = ny
-      const drag = off ? GRASS_DRAG : ROAD_DRAG
-      p.vel *= 1 - drag * dt
-      if (off && Math.abs(p.vel) > TOP_SPEED * 0.45) p.vel *= 0.965 // grass cap
-
-      // collectibles
-      for (const b of w.badges) {
-        if (b.taken) continue
-        if (Math.hypot(p.x - b.x, p.y - b.y) < 34) {
-          b.taken = true
-          w.collectedSet.add(b.name)
-          setCollected(Array.from(w.collectedSet))
-          AudioManager.playSFX('powerup')
-          if (w.collectedSet.size === SKILLS.length) {
-            w.boostUntil = ts + BOOST_MS
-            AudioManager.playSFX('clear')
-          }
-        }
-      }
-
-      // lap detection (player)
-      if (crossedFinish(prevX, prevY, p.x, p.y)) {
-        const lapTime = w.timeMs - w.lapStartMs
-        if (w.laps > 0 || lapTime > 1500) {
-          // record completed lap
-          if (w.best === 0 || lapTime < w.best) w.best = lapTime
-        }
-        w.lapStartMs = w.timeMs
-        w.laps += 1
-        if (w.laps >= LAPS_TO_WIN) {
-          finishRace('win')
-          return
-        }
-      }
-
-      // AI movement
-      for (const ai of w.ai) {
-        if (ai.finished) continue
-        const target = waypoints[ai.wp]
-        const ang = Math.atan2(target.y - ai.y, target.x - ai.x)
-        // steer toward heading
-        let diff = ang - ai.heading
-        while (diff > Math.PI) diff -= Math.PI * 2
-        while (diff < -Math.PI) diff += Math.PI * 2
-        ai.heading += Math.max(-STEER_RATE * dt, Math.min(STEER_RATE * dt, diff)) + (Math.random() - 0.5) * 0.04
-        ai.vel += ACCEL * dt
-        if (ai.vel > AI_TOP_SPEED) ai.vel = AI_TOP_SPEED
-        const aprevY = ai.y
-        const apx = ai.x
-        ai.x += Math.cos(ai.heading) * ai.vel * dt
-        ai.y += Math.sin(ai.heading) * ai.vel * dt
-        if (Math.hypot(ai.x - target.x, ai.y - target.y) < 70) {
-          ai.wp = (ai.wp + 1) % waypoints.length
-        }
-        // AI lap detection
-        if (crossedFinish(apx, aprevY, ai.x, ai.y)) {
-          ai.lap += 1
-          if (ai.lap >= LAPS_TO_WIN) ai.finished = true
-        }
-      }
-
-      // both AI finished before player => game over
-      if (w.ai.every((a) => a.finished)) {
-        finishRace('gameover')
-        return
-      }
-
-      // camera follows player
-      w.cam.x += (p.x - w.cam.x) * Math.min(1, dt * 6)
-      w.cam.y += (p.y - w.cam.y) * Math.min(1, dt * 6)
-
-      // HUD throttle
-      setHud({
-        lap: Math.min(w.laps + 1, LAPS_TO_WIN),
-        timeMs: w.timeMs,
-        speed: Math.abs(p.vel) / (TOP_SPEED * 1.45),
-        boost: boosting,
+    if (summary.bestLapMs > 0) {
+      setBestLap((current) => {
+        if (current !== 0 && summary.bestLapMs >= current) return current
+        try { localStorage.setItem(BEST_KEY, String(summary.bestLapMs)) } catch { /* storage disabled */ }
+        return summary.bestLapMs
       })
     }
 
-    const finishRace = (result) => {
-      const w = worldRef.current
-      cancelLoopWork()
-      const best = w.best > 0 ? w.best : w.timeMs / LAPS_TO_WIN
-      setBestLapMs(best)
-      setTotalMs(w.timeMs)
-      if (result === 'win') {
-        setPhase('win')
-        if (best > 0 && (storedBest === 0 || best < storedBest)) {
-          localStorage.setItem('arcade_best_racing', String(Math.round(best)))
-          setStoredBest(Math.round(best))
-        }
-        AudioManager.playSFX('victory')
-        AudioManager.playMusic('victory')
-      } else {
-        setPhase('gameover')
-        AudioManager.playSFX('hit')
-      }
-    }
-    const cancelLoopWork = () => {}
+    setSubmitting(true)
+    submitScore({
+      player_name: getPlayerName() || 'Anonymous',
+      // The leaderboard for this game ranks best lap, matching the original.
+      score: Math.round(summary.bestLapMs),
+      time_seconds: Math.round(summary.totalMs / 1000),
+      boss_defeated: summary.position === 1,
+      game: 'racing',
+    })
+      .catch(() => undefined)
+      .finally(() => setSubmitting(false))
+  }, [])
 
-    // ---- render ----
-    const render = (ctx, cvs) => {
-      const w = worldRef.current
-      const W = cvs.width
-      const H = cvs.height
-      ctx.clearRect(0, 0, W, H)
-
-      if (!w) return
-      const offX = W / 2 - w.cam.x
-      const offY = H / 2 - w.cam.y
-
-      // grass
-      ctx.fillStyle = '#0c2415'
-      ctx.fillRect(0, 0, W, H)
-      // subtle grass texture stripes
-      ctx.fillStyle = 'rgba(255,255,255,0.015)'
-      for (let gy = 0; gy < H; gy += 48) ctx.fillRect(0, gy, W, 24)
-
-      ctx.save()
-      ctx.translate(offX, offY)
-
-      // road = outer ellipse minus inner ellipse
-      ctx.fillStyle = '#2b2f38'
-      ctx.beginPath()
-      ctx.ellipse(WORLD.cx, WORLD.cy, WORLD.outerRX, WORLD.outerRY, 0, 0, Math.PI * 2)
-      ctx.ellipse(WORLD.cx, WORLD.cy, WORLD.innerRX, WORLD.innerRY, 0, 0, Math.PI * 2, true)
-      ctx.fill('evenodd')
-
-      // dashed white borders
-      ctx.setLineDash([26, 22])
-      ctx.lineWidth = 5
-      ctx.strokeStyle = '#f8fafc'
-      ctx.beginPath()
-      ctx.ellipse(WORLD.cx, WORLD.cy, WORLD.outerRX, WORLD.outerRY, 0, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.ellipse(WORLD.cx, WORLD.cy, WORLD.innerRX, WORLD.innerRY, 0, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.setLineDash([])
-
-      // start/finish line (checkered) across the road on the right side
-      const fx = WORLD.cx + MID_RX
-      const sq = 12
-      for (let r = 0; r < 2; r++) {
-        for (let yy = -((WORLD.outerRX - WORLD.innerRX) / 2); yy < (WORLD.outerRX - WORLD.innerRX) / 2; yy += sq) {
-          // draw a checker column straddling the road thickness at x=fx
-        }
-      }
-      // simpler: a checker band centered on finish point spanning road width
-      const halfBand = (WORLD.outerRX - WORLD.innerRX) / 2 + 6
-      for (let i = 0; i * sq < halfBand * 2; i++) {
-        const yy = WORLD.cy - halfBand + i * sq
-        ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#111827'
-        ctx.fillRect(fx - 10, yy, 20, sq)
-        ctx.fillStyle = i % 2 === 0 ? '#111827' : '#ffffff'
-        ctx.fillRect(fx + 10, yy, 20, sq)
-      }
-
-      // badges
-      for (const b of w.badges) {
-        if (b.taken) continue
-        ctx.save()
-        ctx.translate(b.x, b.y)
-        ctx.fillStyle = '#facc15'
-        ctx.strokeStyle = '#1f2937'
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.arc(0, 0, 14, 0, Math.PI * 2)
-        ctx.fill()
-        ctx.stroke()
-        ctx.fillStyle = '#1f2937'
-        ctx.font = 'bold 9px monospace'
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(b.name.slice(0, 4), 0, 0)
-        ctx.restore()
-      }
-
-      // AI karts
-      for (const ai of w.ai) {
-        drawKart(ctx, ai.x, ai.y, ai.heading, ai.color, null)
-      }
-      // player kart
-      drawKart(ctx, w.player.x, w.player.y, w.player.heading, '#38bdf8', spriteRef.current)
-
-      ctx.restore()
-    }
-
-    const drawKart = (ctx, x, y, heading, color, sprite) => {
-      ctx.save()
-      ctx.translate(x, y)
-      ctx.rotate(heading + Math.PI / 2) // sprite faces "up" by default
-      if (sprite) {
-        ctx.drawImage(sprite, -28, -28, 56, 56)
-      } else {
-        ctx.fillStyle = color
-        ctx.strokeStyle = '#0b0f1a'
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.rect(-16, -22, 32, 44)
-        ctx.fill()
-        ctx.stroke()
-        ctx.fillStyle = '#0b0f1a'
-        ctx.fillRect(-14, -22, 28, 8) // windshield-ish
-      }
-      ctx.restore()
-    }
-
-    lastTsRef.current = performance.now()
-    rafRef.current = requestAnimationFrame(step)
-    return () => {
-      cancelAnimationFrame(rafRef.current)
-      window.removeEventListener('resize', resize)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [waypoints, storedBest])
-
-  // music lifecycle
+  // --- engine lifecycle ----------------------------------------------------
   useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return undefined
+    let engine = null
+    let disposed = false
+
+    import('../../lib/pixelRacer')
+      .then(({ createPixelRacer }) => {
+        if (disposed) return
+        engine = createPixelRacer(canvas, {
+          skills: SKILLS,
+          onHud: setHud,
+          onFinish: handleFinish,
+          onLap: () => { try { AudioManager.playSFX('door') } catch { /* noop */ } },
+          onPickup: () => { try { AudioManager.playSFX('chest') } catch { /* noop */ } },
+        })
+        if (!engine) {
+          setPhase('unsupported')
+          return
+        }
+        engineRef.current = engine
+        engine.resize()
+        setReady(true)
+      })
+      .catch(() => { if (!disposed) setPhase('unsupported') })
+
     return () => {
-      AudioManager.stopMusic()
+      disposed = true
+      engineRef.current = null
+      engine?.dispose()
+    }
+  }, [handleFinish])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas || typeof ResizeObserver === 'undefined') return undefined
+    const observer = new ResizeObserver(() => engineRef.current?.resize())
+    observer.observe(canvas)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden) engineRef.current?.pause()
+      else if (phaseRef.current === 'racing') engineRef.current?.resume()
+    }
+    const onBlur = () => engineRef.current?.pause()
+    document.addEventListener('visibilitychange', onVisibility)
+    window.addEventListener('blur', onBlur)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('blur', onBlur)
     }
   }, [])
 
-  // ---- start / countdown ----
-  const beginRace = useCallback(() => {
-    AudioManager.init()
-    AudioManager.playSFX('rev')
-    AudioManager.playMusic('arcade')
-    resetWorld()
-    setSubmitted(false)
-    setPhase('countdown')
-    setCountdown(3)
-    let n = 3
-    const tick = () => {
-      n -= 1
-      if (n <= 0) {
-        setCountdown(0)
-        setTimeout(() => setPhase('racing'), 600)
-      } else {
-        setCountdown(n)
-        setTimeout(tick, 800)
-      }
+  useEffect(() => {
+    if (paused) engineRef.current?.pause()
+    else if (phase === 'racing') engineRef.current?.resume()
+  }, [paused, phase])
+
+  // --- input ---------------------------------------------------------------
+  useEffect(() => {
+    if (phase !== 'racing') return undefined
+    const onKeyDown = (event) => {
+      const action = KEY_MAP[event.code]
+      if (!action) return
+      event.preventDefault()
+      engineRef.current?.setInput(action, true)
     }
-    setTimeout(tick, 800)
-  }, [resetWorld])
+    const onKeyUp = (event) => {
+      const action = KEY_MAP[event.code]
+      if (!action) return
+      event.preventDefault()
+      engineRef.current?.setInput(action, false)
+    }
+    const releaseAll = () => {
+      for (const action of ['throttle', 'brake', 'left', 'right']) engineRef.current?.setInput(action, false)
+    }
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+    window.addEventListener('blur', releaseAll)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('blur', releaseAll)
+      releaseAll()
+    }
+  }, [phase])
 
-  const handleSubmit = useCallback(async () => {
-    if (submitted) return
-    const player_name = (name || getPlayerName() || 'Anonymous').trim()
-    setSubmitted(true)
-    await submitScore({
-      player_name,
-      score: Math.round(bestLapMs),
-      time_seconds: Math.round(totalMs / 1000),
-      boss_defeated: false,
-      game: 'racing',
-    })
-    setRefreshSignal((s) => s + 1)
-  }, [submitted, name, bestLapMs, totalMs])
+  // --- countdown -----------------------------------------------------------
+  const beginRace = useCallback(() => {
+    setResult(null)
+    setCountdown(3)
+    setPhase('countdown')
+    try { AudioManager.init() } catch { /* noop */ }
 
-  const fmt = (ms) => {
-    const s = ms / 1000
-    const m = Math.floor(s / 60)
-    const sec = (s % 60).toFixed(2).padStart(5, '0')
-    return `${m}:${sec}`
-  }
+    // The engine starts immediately so the scene is live behind the numbers,
+    // but it is paused until GO — otherwise the AI would be a second up the
+    // road before the player could touch the throttle.
+    engineRef.current?.start()
+    engineRef.current?.pause()
 
-  // touch helpers
-  const bindTouch = (key) => ({
-    onPointerDown: (e) => {
-      e.preventDefault()
-      touchRef.current[key] = true
-    },
-    onPointerUp: (e) => {
-      e.preventDefault()
-      touchRef.current[key] = false
-    },
-    onPointerLeave: () => {
-      touchRef.current[key] = false
-    },
-    onPointerCancel: () => {
-      touchRef.current[key] = false
-    },
+    let remaining = 3
+    countdownRef.current = window.setInterval(() => {
+      remaining -= 1
+      if (remaining <= 0) {
+        window.clearInterval(countdownRef.current)
+        countdownRef.current = null
+        setPhase('racing')
+        engineRef.current?.resume()
+      }
+      setCountdown(remaining)
+    }, 900)
+  }, [])
+
+  useEffect(() => () => {
+    if (countdownRef.current) window.clearInterval(countdownRef.current)
+  }, [])
+
+  const touch = (action) => ({
+    onPointerDown: (event) => { event.preventDefault(); engineRef.current?.setInput(action, true) },
+    onPointerUp: (event) => { event.preventDefault(); engineRef.current?.setInput(action, false) },
+    onPointerLeave: () => engineRef.current?.setInput(action, false),
+    onPointerCancel: () => engineRef.current?.setInput(action, false),
   })
 
+  const touchButton =
+    'pointer-events-auto flex items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white backdrop-blur-sm active:scale-95 active:bg-emerald-400/40 transition-transform select-none'
+
   return (
-    <div className="fixed inset-0 z-[100] overflow-hidden bg-black select-none">
-      <Background3D />
+    <div className="fixed inset-0 z-[100] overflow-hidden bg-[#05070f]" role="dialog" aria-modal="true" aria-label="Pixel Racer, a 3D circuit racing game">
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* gameplay canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 z-10 h-full w-full" />
+      {/* top bar */}
+      <div className="absolute inset-x-0 top-0 z-30 flex items-start justify-between gap-2 p-4">
+        <div className="flex items-center gap-2">
+          <button onClick={onExit} className="flex min-h-[44px] items-center gap-1.5 rounded-lg border border-white/15 bg-black/60 px-3 py-1.5 text-xs font-semibold text-gray-300 hover:bg-white/10 hover:text-white">
+            <ArrowLeft size={14} /> Lobby
+          </button>
+          <button onClick={onOpenSettings} aria-label="Open settings" className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-white/15 bg-black/60 text-gray-300 hover:bg-white/10 hover:text-white">
+            <Settings size={16} />
+          </button>
+        </div>
 
-      {/* top controls */}
-      <button
-        onClick={onExit}
-        className="absolute left-3 top-3 z-40 rounded-lg bg-black/60 px-3 py-2 font-bold text-white ring-1 ring-white/20 hover:bg-black/80"
-      >
-        ✕ Exit
-      </button>
-      <button
-        onClick={onOpenSettings}
-        className="absolute right-3 top-3 z-40 rounded-lg bg-black/60 px-3 py-2 text-xl text-white ring-1 ring-white/20 hover:bg-black/80"
-        aria-label="Settings"
-      >
-        ⚙
-      </button>
-
-      {/* HUD */}
-      {(phase === 'racing' || phase === 'countdown') && (
-        <div className="pointer-events-none absolute inset-0 z-20">
-          {/* lap counter */}
-          <div className="absolute left-3 top-16 rounded-lg bg-black/55 px-3 py-1.5 font-mono text-lg font-bold text-cyan-300 ring-1 ring-white/15">
-            Lap {hud.lap}/{LAPS_TO_WIN}
-          </div>
-          {/* timer */}
-          <div className="absolute right-3 top-16 rounded-lg bg-black/55 px-3 py-1.5 font-mono text-lg font-bold text-yellow-300 ring-1 ring-white/15">
-            ⏱ {fmt(hud.timeMs)}
-          </div>
-
-          {/* speed bar */}
-          <div className="absolute bottom-4 left-3 w-40">
-            <div className="mb-1 font-mono text-xs text-white/80">SPEED {hud.boost ? '🔥' : ''}</div>
-            <div className="h-3 w-full overflow-hidden rounded-full bg-white/15">
-              <div
-                className={`h-full ${hud.boost ? 'bg-orange-400' : 'bg-cyan-400'}`}
-                style={{ width: `${Math.min(100, hud.speed * 100)}%` }}
-              />
+        {(phase === 'racing' || phase === 'countdown') && (
+          <div className="flex flex-wrap items-center justify-end gap-2 text-xs font-semibold">
+            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-white backdrop-blur-sm">
+              <span className="flex items-center gap-1 text-emerald-300"><Flag size={13} /> Lap {hud.lap}/{LAPS_TO_WIN}</span>
+              <span className="text-white/25">|</span>
+              <span className="tabular-nums text-cyan-300">{ORDINAL[hud.position] || '—'}</span>
+              <span className="text-white/25">|</span>
+              <span className="flex items-center gap-1 tabular-nums text-amber-300"><Gauge size={13} /> {hud.speed}</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-white backdrop-blur-sm">
+              <span className="tabular-nums">{formatMs(hud.timeMs)}</span>
+              <span className="text-white/25">|</span>
+              <span className="tabular-nums text-gray-400">Best {formatMs(hud.bestLapMs || bestLap)}</span>
+              <span className="text-white/25">|</span>
+              <span className="flex items-center gap-1 text-emerald-300"><Sparkles size={13} /> {hud.collected}/{hud.total}</span>
             </div>
           </div>
+        )}
+      </div>
 
-          {/* collected skills sidebar */}
-          <div className="absolute right-3 top-28 w-36 rounded-lg bg-black/45 p-2 ring-1 ring-white/10">
-            <div className="mb-1 font-mono text-[10px] uppercase text-emerald-300">
-              Skills {collected.length}/{SKILLS.length}
-            </div>
-            <div className="flex flex-wrap gap-1">
-              {collected.map((s) => (
-                <span key={s} className="rounded bg-emerald-500/25 px-1.5 py-0.5 text-[9px] font-bold text-emerald-200">
-                  {s}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* mini oval map */}
-          <MiniMap worldRef={worldRef} />
+      {phase === 'racing' && hud.offTrack && (
+        <div className="pointer-events-none absolute inset-x-0 top-24 z-30 text-center">
+          <span className="rounded-full bg-rose-500/20 px-3 py-1 text-xs font-bold text-rose-200 ring-1 ring-rose-400/40">Off track — slow down</span>
         </div>
       )}
 
-      {/* mobile controls */}
-      {phase === 'racing' && (
-        <div className="absolute inset-x-0 bottom-0 z-30 flex items-end justify-between p-4 md:hidden">
+      {phase === 'racing' && hud.boost && (
+        <div className="pointer-events-none absolute inset-x-0 top-24 z-30 text-center">
+          <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-200 ring-1 ring-emerald-400/40">All skills collected — BOOST</span>
+        </div>
+      )}
+
+      {/* touch controls */}
+      {phase === 'racing' && isTouch && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex items-end justify-between p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
           <div className="flex gap-3">
-            <button
-              {...bindTouch('left')}
-              className="h-20 w-20 touch-none rounded-full bg-white/15 text-3xl font-bold text-white ring-2 ring-white/30 active:bg-white/30"
-            >
-              ◀
-            </button>
-            <button
-              {...bindTouch('right')}
-              className="h-20 w-20 touch-none rounded-full bg-white/15 text-3xl font-bold text-white ring-2 ring-white/30 active:bg-white/30"
-            >
-              ▶
-            </button>
+            <button className={`${touchButton} h-16 w-16 text-2xl`} aria-label="Steer left" {...touch('left')}>‹</button>
+            <button className={`${touchButton} h-16 w-16 text-2xl`} aria-label="Steer right" {...touch('right')}>›</button>
           </div>
-          <div className="flex flex-col gap-3">
-            <button
-              {...bindTouch('gas')}
-              className="h-20 w-24 touch-none rounded-2xl bg-green-500/30 text-lg font-bold text-green-100 ring-2 ring-green-300/40 active:bg-green-500/50"
-            >
-              GAS
-            </button>
-            <button
-              {...bindTouch('brake')}
-              className="h-16 w-24 touch-none rounded-2xl bg-red-500/30 text-base font-bold text-red-100 ring-2 ring-red-300/40 active:bg-red-500/50"
-            >
-              BRAKE
-            </button>
+          <div className="flex gap-3">
+            <button className={`${touchButton} h-16 w-16 text-[11px] font-bold`} aria-label="Brake" {...touch('brake')}>BRAKE</button>
+            <button className={`${touchButton} h-16 w-20 text-[11px] font-bold`} aria-label="Accelerate" {...touch('throttle')}>GAS</button>
           </div>
         </div>
       )}
 
-      {/* countdown overlay */}
+      {/* countdown */}
       {phase === 'countdown' && (
-        <div className="pointer-events-none absolute inset-0 z-[120] flex items-center justify-center">
-          <div className="text-8xl font-black text-white drop-shadow-[0_0_20px_rgba(56,189,248,0.8)]">
-            {countdown > 0 ? countdown : 'GO!'}
-          </div>
+        <div className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center">
+          <span className="text-7xl font-extrabold text-white drop-shadow-[0_0_25px_rgba(103,224,193,0.8)]">
+            {countdown > 0 ? countdown : 'GO'}
+          </span>
         </div>
       )}
 
-      {/* START overlay */}
-      {phase === 'start' && (
-        <div className="absolute inset-0 z-[120] flex items-center justify-center bg-black/70 p-4">
-          <div className="max-w-md rounded-2xl bg-[#0b1024]/90 p-6 text-center ring-1 ring-cyan-400/30">
-            <h1 className="mb-2 text-4xl font-black text-cyan-300">🏎️ Pixel Racer</h1>
-            <p className="mb-4 text-sm text-white/70">
-              Top-down kart racing. Complete {LAPS_TO_WIN} laps before the CPUs. Collect all skill badges for a speed
-              boost!
+      {/* intro */}
+      {phase === 'intro' && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-emerald-400/25 bg-gradient-to-br from-gray-900 to-gray-950 p-6 text-center shadow-2xl">
+            <div className="mb-4 text-4xl">🏎</div>
+            <h2 className="mb-2 text-2xl font-extrabold text-white">Pixel Racer</h2>
+            <p className="mb-5 text-sm leading-relaxed text-gray-400">
+              A 3D circuit race — real track geometry, chase camera, dynamic shadows, and three AI rivals.
+              Complete {LAPS_TO_WIN} laps. Collect every skill badge for a speed boost.
             </p>
-            <ul className="mb-5 text-left text-xs text-white/60">
-              <li>↑/W accelerate · ↓/S brake · ←→/AD steer</li>
-              <li>Mobile: on-screen steer + GAS/BRAKE</li>
-            </ul>
-            {storedBest > 0 && (
-              <p className="mb-3 font-mono text-sm text-yellow-300">Best lap: {fmt(storedBest)}</p>
-            )}
+            <div className="mb-5 grid grid-cols-2 gap-2 text-[11px] text-gray-400">
+              <div className="rounded-lg border border-white/10 bg-white/5 p-2"><div className="font-bold text-white">Throttle</div>W or ↑</div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-2"><div className="font-bold text-white">Brake</div>S or ↓</div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-2"><div className="font-bold text-white">Steer</div>A / D or ← →</div>
+              <div className="rounded-lg border border-white/10 bg-white/5 p-2"><div className="font-bold text-white">Off track</div>You lose grip</div>
+            </div>
+            {bestLap > 0 && <p className="mb-4 text-xs font-semibold text-amber-300">Best lap · {formatMs(bestLap)}</p>}
             <button
               onClick={beginRace}
-              className="rounded-xl bg-cyan-500 px-8 py-3 text-lg font-bold text-black hover:bg-cyan-400"
+              disabled={!ready}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
-              ▶ Start Race
+              {ready ? <><Play size={16} /> Start race</> : <><Loader2 size={16} className="animate-spin" /> Loading circuit…</>}
             </button>
           </div>
         </div>
       )}
 
-      {/* WIN overlay */}
-      {phase === 'win' && (
-        <ResultScreen
-          title="🏁 RACE COMPLETE"
-          accent="text-emerald-300"
-          totalMs={totalMs}
-          bestLapMs={bestLapMs}
-          fmt={fmt}
-          collected={collected}
-          name={name}
-          setName={setName}
-          submitted={submitted}
-          onSubmit={handleSubmit}
-          refreshSignal={refreshSignal}
-          onExit={onExit}
-          onContact={onContact}
-          showRetry={false}
-          onRetry={beginRace}
-        />
-      )}
+      {/* finish */}
+      {phase === 'finished' && result && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center overflow-y-auto bg-black/75 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-amber-400/25 bg-gradient-to-br from-gray-900 to-gray-950 p-6 text-center shadow-2xl">
+            <div className="mb-3 text-4xl">{result.position === 1 ? '🏆' : '🏁'}</div>
+            <h2 className="mb-1 text-2xl font-extrabold text-white">
+              {result.position === 1 ? 'Race won' : `Finished ${ORDINAL[result.position]}`}
+            </h2>
+            <p className="mb-5 text-sm text-gray-400">
+              {LAPS_TO_WIN} laps in {formatMs(result.totalMs)} · {result.collected}/{result.total} skills collected
+            </p>
 
-      {/* GAME OVER overlay */}
-      {phase === 'gameover' && (
-        <ResultScreen
-          title="💀 DEFEATED"
-          accent="text-red-400"
-          totalMs={totalMs}
-          bestLapMs={bestLapMs}
-          fmt={fmt}
-          collected={collected}
-          name={name}
-          setName={setName}
-          submitted={true}
-          onSubmit={() => {}}
-          refreshSignal={refreshSignal}
-          onExit={onExit}
-          onContact={onContact}
-          showRetry={true}
-          onRetry={beginRace}
-        />
-      )}
-    </div>
-  )
-}
+            <div className="mb-5 grid grid-cols-3 gap-2">
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <div className="text-base font-extrabold tabular-nums text-cyan-300">{formatMs(result.bestLapMs)}</div>
+                <div className="text-[10px] uppercase tracking-wide text-gray-500">Best lap</div>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <div className="text-base font-extrabold tabular-nums text-emerald-300">{ORDINAL[result.position]}</div>
+                <div className="text-[10px] uppercase tracking-wide text-gray-500">Position</div>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <div className="text-base font-extrabold tabular-nums text-amber-300">{formatMs(bestLap)}</div>
+                <div className="text-[10px] uppercase tracking-wide text-gray-500">Record</div>
+              </div>
+            </div>
 
-// ---------------------------------------------------------------------------
-// Mini oval map (bottom-right)
-// ---------------------------------------------------------------------------
-function MiniMap({ worldRef }) {
-  const ref = useRef(null)
-  useEffect(() => {
-    let id
-    const draw = () => {
-      id = requestAnimationFrame(draw)
-      const cvs = ref.current
-      const w = worldRef.current
-      if (!cvs || !w) return
-      const ctx = cvs.getContext('2d')
-      const W = cvs.width
-      const H = cvs.height
-      ctx.clearRect(0, 0, W, H)
-      const sx = W / (WORLD.outerRX * 2.3)
-      const sy = H / (WORLD.outerRY * 2.3)
-      const toX = (x) => W / 2 + (x - WORLD.cx) * sx
-      const toY = (y) => H / 2 + (y - WORLD.cy) * sy
-      ctx.strokeStyle = 'rgba(255,255,255,0.6)'
-      ctx.lineWidth = 2
-      ctx.beginPath()
-      ctx.ellipse(W / 2, H / 2, WORLD.outerRX * sx, WORLD.outerRY * sy, 0, 0, Math.PI * 2)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.ellipse(W / 2, H / 2, WORLD.innerRX * sx, WORLD.innerRY * sy, 0, 0, Math.PI * 2)
-      ctx.stroke()
-      const dot = (x, y, c) => {
-        ctx.fillStyle = c
-        ctx.beginPath()
-        ctx.arc(toX(x), toY(y), 3.5, 0, Math.PI * 2)
-        ctx.fill()
-      }
-      w.ai.forEach((a) => dot(a.x, a.y, a.color))
-      dot(w.player.x, w.player.y, '#38bdf8')
-    }
-    id = requestAnimationFrame(draw)
-    return () => cancelAnimationFrame(id)
-  }, [worldRef])
-  return (
-    <canvas
-      ref={ref}
-      width={150}
-      height={100}
-      className="absolute bottom-4 right-3 rounded-lg bg-black/55 ring-1 ring-white/15"
-    />
-  )
-}
+            {submitting && (
+              <p className="mb-3 flex items-center justify-center gap-2 text-xs text-gray-500">
+                <Loader2 size={13} className="animate-spin" /> Saving lap…
+              </p>
+            )}
 
-// ---------------------------------------------------------------------------
-// Win / Game over result screen
-// ---------------------------------------------------------------------------
-function ResultScreen({
-  title,
-  accent,
-  totalMs,
-  bestLapMs,
-  fmt,
-  collected,
-  name,
-  setName,
-  submitted,
-  onSubmit,
-  refreshSignal,
-  onExit,
-  onContact,
-  showRetry,
-  onRetry,
-}) {
-  return (
-    <div className="absolute inset-0 z-[120] flex items-center justify-center overflow-y-auto bg-black/80 p-4">
-      <div className="my-6 w-full max-w-lg rounded-2xl bg-[#0b1024]/95 p-6 ring-1 ring-white/15">
-        <h2 className={`mb-2 text-center text-4xl font-black ${accent}`}>{title}</h2>
-        <div className="mb-4 grid grid-cols-2 gap-3 text-center">
-          <div className="rounded-lg bg-white/5 p-3">
-            <div className="text-xs text-white/50">Total Time</div>
-            <div className="font-mono text-xl font-bold text-white">{fmt(totalMs)}</div>
-          </div>
-          <div className="rounded-lg bg-white/5 p-3">
-            <div className="text-xs text-white/50">Best Lap</div>
-            <div className="font-mono text-xl font-bold text-yellow-300">{fmt(bestLapMs)}</div>
-          </div>
-        </div>
-
-        {collected.length > 0 && (
-          <div className="mb-4">
-            <div className="mb-1 text-xs uppercase text-emerald-300">Skills Unlocked</div>
-            <div className="flex flex-wrap gap-1.5">
-              {collected.map((s) => (
-                <span
-                  key={s}
-                  className="rounded-md bg-emerald-500/20 px-2 py-1 text-xs font-bold text-emerald-200 ring-1 ring-emerald-400/30"
-                >
-                  ✦ {s}
-                </span>
-              ))}
+            <div className="flex flex-col gap-2">
+              <button onClick={beginRace} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02]">
+                <RotateCcw size={16} /> Race again
+              </button>
+              <div className="flex gap-2">
+                <button onClick={() => setShowBoard(true)} className="flex-1 rounded-xl border border-amber-400/30 bg-white/5 px-4 py-2.5 text-xs font-semibold text-amber-200 hover:bg-white/10">
+                  <Trophy size={13} className="mr-1 inline" /> Leaderboard
+                </button>
+                <button onClick={onContact} className="flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs font-semibold text-gray-300 hover:bg-white/10">
+                  Hire Charlie
+                </button>
+              </div>
+              <button onClick={onExit} className="px-4 py-2 text-xs font-semibold text-gray-500 hover:text-white">Back to lobby</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {!submitted && (
-          <div className="mb-4 flex gap-2">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              maxLength={24}
-              className="flex-1 rounded-lg bg-white/10 px-3 py-2 text-white outline-none ring-1 ring-white/20 focus:ring-cyan-400"
-            />
-            <button
-              onClick={onSubmit}
-              className="rounded-lg bg-cyan-500 px-4 py-2 font-bold text-black hover:bg-cyan-400"
-            >
-              Submit
-            </button>
+      {phase === 'unsupported' && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-white/15 bg-gray-900 p-6 text-center">
+            <div className="mb-3 text-3xl">🚫</div>
+            <h2 className="mb-2 text-lg font-bold text-white">3D unavailable</h2>
+            <p className="mb-5 text-sm text-gray-400">This race needs WebGL, which this browser or device has turned off.</p>
+            <button onClick={onExit} className="rounded-xl border border-white/15 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white hover:bg-white/10">Back to lobby</button>
           </div>
-        )}
-
-        <div className="mb-4">
-          <Leaderboard limit={5} game="racing" refreshSignal={refreshSignal} highlightName={name} />
         </div>
+      )}
 
-        <div className="flex flex-wrap justify-center gap-2">
-          {showRetry && (
-            <button
-              onClick={onRetry}
-              className="rounded-lg bg-yellow-400 px-4 py-2 font-bold text-black hover:bg-yellow-300"
-            >
-              🔁 Retry
-            </button>
-          )}
-          <button
-            onClick={onExit}
-            className="rounded-lg bg-white/15 px-4 py-2 font-bold text-white ring-1 ring-white/25 hover:bg-white/25"
-          >
-            🏠 Lobby
-          </button>
-          <button
-            onClick={onContact}
-            className="rounded-lg bg-purple-500/80 px-4 py-2 font-bold text-white hover:bg-purple-500"
-          >
-            📬 Contact {OWNER.name.split(' ')[0]}
-          </button>
+      {showBoard && (
+        <div className="absolute inset-0 z-[150] flex items-center justify-center bg-black/85 p-4" onClick={() => setShowBoard(false)}>
+          <div className="w-full max-w-lg rounded-2xl border border-amber-500/30 bg-gray-950 p-5" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-lg font-bold text-white"><Trophy size={18} className="text-amber-400" /> Pixel Racer · best lap</h3>
+              <button onClick={() => setShowBoard(false)} className="text-gray-400 hover:text-white" aria-label="Close leaderboard">✕</button>
+            </div>
+            <Leaderboard limit={8} game="racing" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
-
-export default RacingGame
