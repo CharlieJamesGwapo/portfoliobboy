@@ -4,6 +4,19 @@ import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { featuredProjects, projectArchive, projectCategories } from '../data/portfolioData'
 
+// How many builds sit behind each filter. Computed once at module scope: the
+// project data is static, so recomputing it per render (or per keystroke on
+// the filter row) would be pure waste.
+const categoryCounts = Object.fromEntries(
+  projectCategories.map((category) => [
+    category,
+    category === 'All'
+      ? featuredProjects.length + projectArchive.length
+      : featuredProjects.filter((item) => item.categories.includes(category)).length
+        + projectArchive.filter((item) => item.categories.includes(category)).length,
+  ]),
+)
+
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState('All')
   const [activeProjectId, setActiveProjectId] = useState(featuredProjects[0].id)
@@ -14,14 +27,17 @@ const Projects = () => {
     ? projectArchive
     : projectArchive.filter((item) => item.categories.includes(activeCategory))
   const project = visibleFeatured.find((item) => item.id === activeProjectId) || visibleFeatured[0]
-  const activeProject = visibleFeatured.findIndex((item) => item.id === project.id)
+  const activeProject = project ? visibleFeatured.findIndex((item) => item.id === project.id) : -1
 
   const selectCategory = (category) => {
     const nextProjects = category === 'All'
       ? featuredProjects
       : featuredProjects.filter((item) => item.categories.includes(category))
     setActiveCategory(category)
-    setActiveProjectId(nextProjects[0].id)
+    // Optional chaining, not `[0].id`: every category currently has at least
+    // one featured project, but a future data edit that empties one would
+    // otherwise take the whole page down with a TypeError during render.
+    setActiveProjectId(nextProjects[0]?.id ?? null)
   }
 
   const handleTabKeyDown = (event, index) => {
@@ -59,6 +75,8 @@ const Projects = () => {
                 onClick={() => selectCategory(category)}
               >
                 {category}
+                <small aria-hidden="true">{categoryCounts[category]}</small>
+                <span className="sr-only">{` — ${categoryCounts[category]} builds`}</span>
               </button>
             ))}
           </div>
@@ -86,6 +104,13 @@ const Projects = () => {
           </div>
         </ScrollReveal>
 
+        {/* Screen readers get told what the filter did; sighted users can see
+            the tab strip change, but that change is silent otherwise. */}
+        <p className="sr-only" aria-live="polite">
+          {`${visibleFeatured.length} case ${visibleFeatured.length === 1 ? 'study' : 'studies'} and ${visibleArchive.length} archived ${visibleArchive.length === 1 ? 'build' : 'builds'} in ${activeCategory}.`}
+        </p>
+
+        {project && (
         <div
           key={project.id}
           id="active-project-panel"
@@ -158,6 +183,7 @@ const Projects = () => {
             </span>
           </aside>
         </div>
+        )}
 
         {visibleArchive.length > 0 && (
           <>

@@ -3,7 +3,10 @@ import { ArrowUpRight, CheckCircle2, Clock3, FileText, Github, Linkedin, Loader2
 import ScrollReveal from './ScrollReveal'
 import { profile, resumeUrl } from '../data/portfolioData'
 
-const initialForm = { name: '', email: '', subject: '', message: '' }
+// `company` is a honeypot: hidden from people, irresistible to the bots that
+// fill every field they can find. The server drops any submission that has it
+// set, and reports success so the bot has nothing to tune against.
+const initialForm = { name: '', email: '', subject: '', message: '', company: '' }
 
 const validate = (form) => {
   const errors = {}
@@ -112,6 +115,22 @@ const Contact = () => {
               <textarea id="contact-message" name="message" value={form.message} onChange={updateField} required minLength="10" rows="5" placeholder="Share a little context, timeline, or role details." aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? 'contact-message-error' : undefined} />
               {errors.message && <small id="contact-message-error" className="field-error">{errors.message}</small>}
             </label>
+            {/* Off-screen rather than display:none — some bots skip fields
+                they can tell are hidden. tabIndex/aria-hidden keep it out of
+                the keyboard order and out of the accessibility tree. */}
+            <div className="honeypot" aria-hidden="true">
+              <label htmlFor="contact-company">Company (leave this field empty)</label>
+              <input
+                id="contact-company"
+                name="company"
+                type="text"
+                value={form.company}
+                onChange={updateField}
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             <button className="button button-dark" type="submit" disabled={status === 'sending'}>
               {status === 'sending' ? <Loader2 className="spin" size={18} /> : status === 'success' ? <CheckCircle2 size={18} /> : <Mail size={18} />}
               {status === 'sending' ? 'Sending…' : 'Send message'}

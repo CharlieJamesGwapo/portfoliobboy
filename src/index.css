@@ -398,6 +398,59 @@ img {
   transform-origin: left center;
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: end;
+  gap: 10px;
+}
+
+.nav-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #c0cecd;
+  font-size: 0.76rem;
+  font-weight: 650;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+  cursor: pointer;
+}
+
+.nav-search:hover {
+  border-color: rgba(103, 224, 193, 0.45);
+  background: rgba(103, 224, 193, 0.1);
+  color: var(--white);
+}
+
+.nav-search kbd {
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  color: var(--mist);
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Below 1100px the nav row gets tight; the label goes and the control becomes
+   an icon button rather than letting it collide with the primary CTA. */
+@media (max-width: 1099px) {
+  .nav-search span,
+  .nav-search kbd {
+    display: none;
+  }
+
+  .nav-search {
+    padding: 9px;
+  }
+}
+
 .nav-cta {
   justify-self: end;
   padding: 9px 16px;
@@ -1793,8 +1846,11 @@ img {
 
 .back-to-top {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  /* Safe-area insets keep the control clear of the iPhone home indicator and
+     of the rounded corners in landscape, where a plain 24px offset puts it
+     partly under the bezel. */
+  right: calc(24px + env(safe-area-inset-right));
+  bottom: calc(24px + env(safe-area-inset-bottom));
   z-index: 80;
   display: grid;
   width: 44px;
@@ -2421,7 +2477,10 @@ img {
   }
 
   .desktop-nav,
-  .desktop-cta {
+  .desktop-cta,
+  /* Hidden as a whole, not just its children: an empty grid item still claims
+     a column, which would push the menu toggle onto a second row. */
+  .nav-actions {
     display: none;
   }
 
@@ -2433,8 +2492,9 @@ img {
 
   .menu-toggle {
     display: grid;
-    width: 42px;
-    height: 42px;
+    /* 44px is the minimum comfortable touch target; at 42 it was just under. */
+    width: 44px;
+    height: 44px;
     place-items: center;
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 50%;
@@ -2473,12 +2533,18 @@ img {
 
   .mobile-menu nav {
     display: flex;
+    overflow-y: auto;
     width: min(100% - 40px, 640px);
     height: 100%;
     flex-direction: column;
     justify-content: center;
     margin-inline: auto;
-    padding: 30px 0 70px;
+    /* Scrollable and safe-area aware: on a short phone in landscape the seven
+       section links plus the action buttons are taller than the sheet, and a
+       centred flex column clips its overflow at both ends rather than
+       scrolling. */
+    padding: 30px 0 calc(70px + env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
   }
 
   .mobile-menu nav > a:not(.mobile-contact) {
@@ -3128,6 +3194,18 @@ img {
   touch-action: pan-y;
 }
 
+/*
+ * The WebGL canvas sits directly after the 2D one in the DOM, so with the same
+ * z-index it composites on top without needing its own stacking level (which
+ * would put it above the grid overlay). Opacity during the handover is driven
+ * by the renderers themselves, not by a CSS transition: a transition would run
+ * on its own clock and desynchronise from the animation loop, showing a
+ * momentary double-brightness graph where both canvases are near-opaque.
+ */
+.systems-canvas-gl {
+  contain: layout paint;
+}
+
 .systems-fallback {
   position: absolute;
   inset: 12% 10% 22%;
@@ -3237,7 +3315,10 @@ img {
 }
 
 .project-filters button {
+  display: inline-flex;
   min-height: 44px;
+  align-items: center;
+  gap: 7px;
   padding: 8px 13px;
   border: 1px solid var(--line-light);
   border-radius: 999px;
@@ -3251,6 +3332,23 @@ img {
 
 .project-filters button:hover { border-color: var(--mint-deep); color: var(--ink); transform: translate3d(0, -1px, 0); }
 .project-filters button.is-active { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+
+/* Result count. Tabular figures so the pill widths don't jitter between a
+   single- and double-digit count as the row is read across. */
+.project-filters button small {
+  min-width: 20px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: rgba(11, 37, 40, 0.08);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.project-filters button.is-active small {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--mint);
+}
 
 .lab-section {
   overflow: hidden;
@@ -3339,6 +3437,84 @@ img {
 }
 
 /*
+ * Arcade loading skeleton. Mirrors the lobby's real layout so the swap to the
+ * loaded component is a fill-in rather than a jump — nothing moves, the grey
+ * boxes just become content.
+ */
+.arcade-skeleton {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  overflow-y: auto;
+  padding: clamp(24px, 6vh, 64px) 20px;
+  background: #050b0d;
+}
+
+.arcade-skeleton-inner {
+  width: min(980px, 100%);
+  margin-inline: auto;
+}
+
+.arcade-skeleton-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(28px, 5vh, 46px);
+  text-align: center;
+}
+
+.arcade-skeleton-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border: 1px solid rgba(103, 224, 193, 0.28);
+  border-radius: 15px;
+  color: var(--mint);
+}
+
+.arcade-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.arcade-skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.skeleton-bar {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.05) 30%, rgba(255, 255, 255, 0.11) 50%, rgba(255, 255, 255, 0.05) 70%);
+  background-size: 220% 100%;
+  animation: skeleton-shimmer 1.4s linear infinite;
+  /* Staggered per card so the sweep reads as one wave crossing the grid
+     rather than every box pulsing in lockstep. */
+  animation-delay: calc(var(--card-index, 0) * 70ms);
+}
+
+@keyframes skeleton-shimmer { to { background-position: -220% 0; } }
+
+.arcade-skeleton-note {
+  margin-top: 26px;
+  color: #4d6163;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-bar { animation: none; }
+}
+
+/*
  * Docked above the back-to-top button on the right. It used to sit bottom-left,
  * where on a short desktop viewport it landed on top of the hero's primary
  * "Explore selected work" call to action.
@@ -3346,8 +3522,8 @@ img {
 .music-launcher,
 .music-loading {
   position: fixed;
-  right: 24px;
-  bottom: 80px;
+  right: calc(24px + env(safe-area-inset-right));
+  bottom: calc(80px + env(safe-area-inset-bottom));
   z-index: 82;
   display: inline-flex;
   min-height: 44px;
@@ -3400,12 +3576,12 @@ body.game-open .music-launcher { visibility: hidden; }
   .lab-game-list .reveal:nth-child(odd) { border-right: 0; }
   .lab-game-row { min-height: 116px; padding-inline: 12px; }
   .music-launcher,
-  .music-loading { right: 16px; bottom: 68px; left: auto; }
+  .music-loading { right: 16px; bottom: calc(68px + env(safe-area-inset-bottom)); left: auto; }
   .music-launcher { display: none; }
   body.music-open main { padding-bottom: 72px; }
-  .music-player-pill { bottom: 10px !important; width: calc(100% - 24px); justify-content: center; padding-inline: 10px !important; }
-  .music-player-panel { bottom: 62px !important; }
-  .back-to-top { right: 16px; bottom: 16px; }
+  .music-player-pill { bottom: calc(10px + env(safe-area-inset-bottom)) !important; width: calc(100% - 24px); justify-content: center; padding-inline: 10px !important; }
+  .music-player-panel { bottom: calc(62px + env(safe-area-inset-bottom)) !important; }
+  .back-to-top { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3413,4 +3589,228 @@ body.game-open .music-launcher { visibility: hidden; }
   .experience-panel { transition: none; }
   .lab-game-row:hover,
   .music-launcher:hover { transform: none; }
+}
+
+/* ==========================================================================
+   Command palette (⌘K / Ctrl+K)
+   ========================================================================== */
+.palette-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(16px, 12vh, 140px) 16px 24px;
+  background: rgba(4, 18, 20, 0.6);
+  backdrop-filter: blur(6px);
+  animation: palette-fade 160ms var(--ease-out);
+}
+
+.palette {
+  display: flex;
+  overflow: hidden;
+  flex-direction: column;
+  width: min(560px, 100%);
+  max-height: min(560px, 72svh);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 18px;
+  background: rgba(9, 33, 36, 0.98);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.45);
+  color: var(--paper);
+  animation: palette-rise 200ms var(--ease-out);
+}
+
+@keyframes palette-fade { from { opacity: 0; } }
+@keyframes palette-rise { from { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.985); } }
+
+.palette-search {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  color: var(--mist);
+}
+
+.palette-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--paper);
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.palette-search input::placeholder { color: #64797a; }
+
+.palette-search kbd,
+.palette-footer kbd {
+  padding: 3px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--mist);
+  font-family: inherit;
+  font-size: 0.63rem;
+  font-weight: 700;
+}
+
+.palette-results {
+  overflow-y: auto;
+  flex: 1;
+  padding: 8px;
+  margin: 0;
+  list-style: none;
+  /* The list is the only scrollable region, so keep an over-scroll here from
+     chaining into the page behind the dialog. */
+  overscroll-behavior: contain;
+}
+
+.palette-results li {
+  display: grid;
+  align-items: center;
+  grid-template-columns: auto 1fr auto;
+  gap: 11px;
+  padding: 11px 12px;
+  border-radius: 11px;
+  color: #cdd9d8;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+
+/*
+ * A percentage max-width here collapsed the hint to "Jum…": the column is an
+ * `auto` grid track, so during intrinsic sizing the percentage is indefinite
+ * and the track falls back to min-content. A length keeps the track sizing
+ * predictable.
+ */
+.palette-results li small {
+  overflow: hidden;
+  max-width: 15ch;
+  color: #64797a;
+  font-size: 0.7rem;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-results li.is-active {
+  background: rgba(103, 224, 193, 0.13);
+  color: var(--white);
+}
+
+.palette-results li.is-active svg { color: var(--mint); }
+
+.palette-empty {
+  display: block !important;
+  padding: 22px 12px !important;
+  color: var(--mist);
+  font-size: 0.83rem;
+  text-align: center;
+  cursor: default !important;
+}
+
+.palette-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 11px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  color: #64797a;
+  font-size: 0.68rem;
+}
+
+.palette-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+body.palette-open { overflow: hidden; }
+
+@media (max-width: 640px) {
+  .palette-backdrop { padding-top: 12px; align-items: stretch; }
+  .palette { max-height: calc(100svh - 24px); }
+  /* Touch targets need the height even though the desktop row is compact. */
+  .palette-results li { padding: 14px 12px; }
+  .palette-footer { display: none; }
+}
+
+/* ==========================================================================
+   Service-worker update notice
+   ========================================================================== */
+.update-banner {
+  position: fixed;
+  z-index: 210;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  left: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  padding: 11px 12px 11px 18px;
+  border: 1px solid rgba(103, 224, 193, 0.34);
+  border-radius: 999px;
+  margin-inline: auto;
+  background: rgba(9, 33, 36, 0.97);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+  color: var(--paper);
+  font-size: 0.8rem;
+  animation: palette-rise 260ms var(--ease-out);
+}
+
+.update-banner-apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  background: var(--mint);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.update-banner-apply:hover { background: #8ff0d8; }
+
+.update-banner-dismiss {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--mist);
+  cursor: pointer;
+}
+
+.update-banner-dismiss:hover { background: rgba(255, 255, 255, 0.08); color: var(--paper); }
+
+@media (max-width: 520px) {
+  .update-banner { padding-left: 14px; font-size: 0.74rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palette-backdrop,
+  .palette,
+  .update-banner { animation: none; }
+}
+
+/*
+ * Honeypot field. Positioned off-screen rather than hidden with display:none
+ * or visibility:hidden, both of which the better spam bots detect and skip.
+ */
+.honeypot {
+  position: absolute !important;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

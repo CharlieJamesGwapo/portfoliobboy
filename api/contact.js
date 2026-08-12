@@ -51,6 +51,14 @@ export default async function handler(req, res) {
     const subject = typeof body.subject === 'string' ? body.subject.trim() : ''
     const message = typeof body.message === 'string' ? body.message.trim() : ''
 
+    // Honeypot. The field is off-screen and never focusable, so a human cannot
+    // have filled it. Answer 200 rather than 4xx: a rejection tells the bot
+    // exactly which field gave it away, and it will simply stop sending that
+    // one next time.
+    if (typeof body.company === 'string' && body.company.trim() !== '') {
+      return res.status(200).json({ success: true, message: 'Email sent successfully' })
+    }
+
     if (!name || !email || !subject || !message) {
       return res.status(400).json({ error: 'All fields are required' })
     }

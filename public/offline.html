@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b2528" />
+    <title>Offline · Charlie James Abejo</title>
+    <!-- Fully self-contained: this page is served when there is no network,
+         so it cannot reference a stylesheet, a font, or an image. -->
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100svh;
+        padding: 32px;
+        background: #0b2528;
+        color: #f3f0e9;
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.6;
+        text-align: center;
+      }
+      .card { max-width: 460px; }
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 28px;
+        border: 1px solid rgba(103, 224, 193, 0.4);
+        border-radius: 50%;
+        color: #67e0c1;
+        font-size: 0.9rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+      }
+      .eyebrow {
+        margin-bottom: 14px;
+        color: #ff9c77;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin-bottom: 14px;
+        font-size: clamp(1.6rem, 5vw, 2.2rem);
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
+      p { color: #a9b9b8; }
+      button {
+        margin-top: 28px;
+        padding: 13px 26px;
+        border: 0;
+        border-radius: 999px;
+        background: #67e0c1;
+        color: #0b2528;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      button:hover { background: #8ff0d8; }
+      button:focus-visible { outline: 3px solid #ff9c77; outline-offset: 4px; }
+      .status { margin-top: 18px; font-size: 0.8rem; color: #56696a; }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="mark">CA</div>
+      <p class="eyebrow">No connection</p>
+      <h1>You're offline right now.</h1>
+      <p>
+        The portfolio is cached for offline reading, but this particular page hasn't been
+        stored yet. Reconnect and it will load normally.
+      </p>
+      <button type="button" onclick="location.reload()">Try again</button>
+      <p class="status" id="status"></p>
+    </main>
+    <script>
+      // Reload automatically the moment connectivity returns, so the visitor
+      // does not have to notice and retry by hand.
+      var status = document.getElementById('status')
+      function sync() {
+        if (navigator.onLine) {
+          status.textContent = 'Connection restored — reloading…'
+          location.reload()
+        } else {
+          status.textContent = 'Waiting for a connection…'
+        }
+      }
+      window.addEventListener('online', sync)
+      sync()
+    </script>
+  </body>
+</html>

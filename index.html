@@ -8,6 +8,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <meta name="theme-color" content="#0b2528" />
 
+    <!--
+      Boot styles, inlined so they apply before the stylesheet has been
+      fetched. Without them the first paint is the browser's default white,
+      which flashes hard against a dark site on a slow connection.
+
+      This is deliberately *not* a splash overlay. Covering the hero would push
+      the Largest Contentful Paint out to whenever the overlay is removed, so
+      the page would score worse for the sake of looking busier. Instead the
+      page background is correct from the first frame and an empty #root
+      carries a skeleton of the hero's real layout, which is replaced in place
+      the moment React mounts.
+    -->
+    <style>
+      html { background: #0b2528; color-scheme: dark; }
+      body { margin: 0; background: #0b2528; }
+      #root:empty {
+        display: block;
+        min-height: 100svh;
+        background:
+          radial-gradient(circle at 78% 26%, rgba(103, 224, 193, 0.09), transparent 42%),
+          #0b2528;
+      }
+      #root:empty::before {
+        display: block;
+        width: min(1180px, calc(100% - 48px));
+        height: 320px;
+        margin: 168px auto 0;
+        border-radius: 22px;
+        background: linear-gradient(100deg, rgba(255, 255, 255, 0.035) 30%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.035) 70%);
+        background-size: 220% 100%;
+        animation: boot-shimmer 1.4s linear infinite;
+        content: '';
+      }
+      @keyframes boot-shimmer { to { background-position: -220% 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        #root:empty::before { animation: none; }
+      }
+    </style>
+
     <!-- Preload the above-the-fold hero image (WebP) for faster LCP -->
     <link rel="preload" as="image" href="/profile.webp" type="image/webp" fetchpriority="high" />
     <!-- Self-hosted variable Inter; preloaded so the swap happens before first paint of the hero -->

@@ -1,10 +1,17 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
-import { Gamepad2, Loader2, Play, Sparkles } from 'lucide-react'
+import { Gamepad2, Play, Sparkles } from 'lucide-react'
 import { interactiveGames } from '../data/portfolioData'
+import { prefetchProps } from '../lib/prefetch'
+import ArcadeSkeleton from './ArcadeSkeleton'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 
-const ArcadeLobby = lazy(() => import('./game/ArcadeLobby'))
+const loadArcade = () => import('./game/ArcadeLobby')
+const ArcadeLobby = lazy(loadArcade)
+
+// Attached to every control that can open the lab, so the chunk is already
+// downloading by the time the click resolves.
+const warmArcade = prefetchProps('arcade', loadArcade)
 
 export default function InteractiveLab() {
   const [open, setOpen] = useState(false)
@@ -45,7 +52,7 @@ export default function InteractiveLab() {
               <p className="eyebrow">Developer playground · 8 games</p>
               <h3>Charlie’s Arcade</h3>
               <p>Optional, keyboard-aware, and separated from the professional portfolio so it never slows the initial experience.</p>
-              <button ref={launchButton} type="button" className="button button-dark" onClick={launch}>
+              <button ref={launchButton} type="button" className="button button-dark" onClick={launch} {...warmArcade}>
                 <Play size={17} aria-hidden="true" /> Enter interactive lab
               </button>
               <span className="lab-load-note"><Sparkles size={14} aria-hidden="true" /> Game code and 3D assets load on demand</span>
@@ -55,7 +62,7 @@ export default function InteractiveLab() {
           <div className="lab-game-list" aria-label="Available games">
             {interactiveGames.map((game, index) => (
               <ScrollReveal key={game.id} delay={(index % 4) * 45} variant="up">
-                <button type="button" className="lab-game-row" onClick={launch}>
+                <button type="button" className="lab-game-row" onClick={launch} {...warmArcade}>
                   <span aria-hidden="true">{game.emoji}</span>
                   <span><strong>{game.title}</strong><small>{game.tagline}</small></span>
                   <Play size={15} aria-hidden="true" />
@@ -67,7 +74,7 @@ export default function InteractiveLab() {
       </div>
 
       {open && (
-        <Suspense fallback={<div className="arcade-loading" role="status"><Loader2 className="spin" size={22} /> Loading the interactive lab…</div>}>
+        <Suspense fallback={<ArcadeSkeleton />}>
           <ArcadeLobby onClose={close} />
         </Suspense>
       )}

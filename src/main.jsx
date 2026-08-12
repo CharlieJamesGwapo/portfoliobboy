@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import { registerServiceWorker } from './lib/registerServiceWorker'
 import './index.css'
 
 // Entrance animations are opt-in. The stylesheet only hides content behind an
@@ -40,3 +41,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>,
 )
+
+// Registered after render is queued, and the module itself waits for `load`
+// before touching the network — the worker only pays off on a repeat visit,
+// so it must not compete with this visit's resources.
+registerServiceWorker()

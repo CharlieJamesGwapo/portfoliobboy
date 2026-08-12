@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, Search, X } from 'lucide-react'
 import { navigation as links, profile } from '../data/portfolioData'
+
+const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
+
+// Apple keyboards label the key ⌘; everywhere else it is Ctrl. Reading the
+// platform lets the hint match the key the visitor actually has to press.
+const isApplePlatform = () =>
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
 
 const Navbar = () => {
   const [open, setOpen] = useState(false)
@@ -147,7 +154,19 @@ const Navbar = () => {
           ))}
         </nav>
 
-        <a className="nav-cta desktop-cta" href={`mailto:${profile.email}`}>Let’s talk</a>
+        <div className="nav-actions">
+          <button
+            type="button"
+            className="nav-search"
+            onClick={openPalette}
+            aria-label="Open command palette to search sections and actions"
+          >
+            <Search size={15} aria-hidden="true" />
+            <span>Search</span>
+            <kbd aria-hidden="true">{isApplePlatform() ? '⌘' : 'Ctrl'} K</kbd>
+          </button>
+          <a className="nav-cta desktop-cta" href={`mailto:${profile.email}`}>Let’s talk</a>
+        </div>
 
         <button
           ref={toggleRef}
@@ -172,6 +191,16 @@ const Navbar = () => {
           ))}
           <div className="mobile-menu-actions">
             <a className="mobile-contact" href={`mailto:${profile.email}`} onClick={closeMenu}>Start a conversation</a>
+            <button
+              type="button"
+              className="mobile-music"
+              onClick={() => {
+                closeMenu()
+                openPalette()
+              }}
+            >
+              Search sections and actions
+            </button>
             <button
               type="button"
               className="mobile-music"

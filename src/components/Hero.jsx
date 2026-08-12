@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUpRight, Briefcase, Gamepad2, Github, Linkedin, Mail, MapPin } from 'lucide-react'
 import { professionalTitles, profile, proofPoints, resumeUrl } from '../data/portfolioData'
+import { prefetchProps } from '../lib/prefetch'
 import AnimatedStat from './AnimatedStat'
 import RotatingTitle from './RotatingTitle'
 // Now a ~3 kB canvas renderer (was a 808 kB Three.js scene), so it is cheaper
@@ -7,6 +8,10 @@ import RotatingTitle from './RotatingTitle'
 import HeroSystemsScene from './HeroSystemsScene'
 
 const openGames = () => window.dispatchEvent(new CustomEvent('portfolio:open-games'))
+
+// Same chunk key as the interactive lab section, so whichever entry point the
+// visitor reaches for first is the one that pays for the download.
+const warmArcade = prefetchProps('arcade', () => import('./game/ArcadeLobby'))
 
 const Hero = () => (
   <section id="home" className="hero-section">
@@ -46,7 +51,7 @@ const Hero = () => (
           <a className="button button-quiet" href="#contact">
             <Briefcase size={17} aria-hidden="true" /> Hire me
           </a>
-          <button type="button" className="button button-quiet" onClick={openGames}>
+          <button type="button" className="button button-quiet" onClick={openGames} {...warmArcade}>
             <Gamepad2 size={17} aria-hidden="true" /> Play games
           </button>
         </div>
@@ -72,7 +77,10 @@ const Hero = () => (
             <picture>
               <source srcSet="/profile.webp" type="image/webp" />
               {/* Above the fold and preloaded in index.html — must not be lazy. */}
-              <img src="/profile.png" alt="" width="413" height="531" fetchPriority="high" decoding="async" />
+              {/* React 18 does not map the camelCase `fetchPriority` prop, so it
+                  has to be written as the lowercase HTML attribute or the hint
+                  is dropped and React logs an unknown-prop warning. */}
+              <img src="/profile.png" alt="" width="413" height="531" fetchpriority="high" decoding="async" />
             </picture>
             <span><strong>Charlie James</strong>Philippines · Working globally</span>
           </div>
