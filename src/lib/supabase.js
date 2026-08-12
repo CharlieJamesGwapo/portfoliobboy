@@ -5,12 +5,45 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // The game must work even without Supabase configured (local-only leaderboard
-// fallback). Only create a real client when both vars are present.
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+// fallback).
+//
+// A non-empty check is not enough. `createClient` throws on a malformed URL,
+// and it runs at module scope — so an environment variable set to a
+// placeholder, a bare hostname, or a value with stray quotes took down the
+// entire arcade chunk on evaluation, long before any leaderboard was opened.
+// That is exactly what was happening in production: the lobby mounted, the
+// import threw, and the game overlay rendered nothing at all.
+//
+// Parse the URL first, and treat construction failure as "not configured"
+// rather than as fatal. A missing leaderboard is a degraded feature; a broken
+// arcade is a broken page.
+function parseHttpUrl(value) {
+  if (typeof value !== 'string' || !value.trim()) return null
+  try {
+    const url = new URL(value.trim())
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null
+  } catch {
+    return null
+  }
+}
 
-export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null
+const resolvedUrl = parseHttpUrl(supabaseUrl)
+const resolvedKey = typeof supabaseAnonKey === 'string' && supabaseAnonKey.trim() ? supabaseAnonKey.trim() : null
+
+let client = null
+if (resolvedUrl && resolvedKey) {
+  try {
+    client = createClient(resolvedUrl, resolvedKey)
+  } catch (error) {
+    console.warn('[supabase] client disabled, falling back to the local leaderboard:', error?.message)
+  }
+} else if (supabaseUrl || supabaseAnonKey) {
+  // Half-configured is almost always a deployment mistake worth surfacing.
+  console.warn('[supabase] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are set but not usable; using the local leaderboard.')
+}
+
+export const supabase = client
+export const isSupabaseConfigured = Boolean(client)
 
 const LEADERBOARD_TABLE = 'leaderboard'
 const SAVES_TABLE = 'game_saves'
