@@ -1831,6 +1831,18 @@ img {
   gap: 22px;
 }
 
+/*
+ * The back-to-top and music controls are fixed to the bottom-right corner, and
+ * the footer is the one place the page scrolls fully underneath them — the
+ * copyright line was sitting behind the button. Reserve the gutter rather than
+ * hiding the control, so nothing moves as the visitor reaches the end.
+ */
+@media (max-width: 1180px) {
+  .footer-inner {
+    padding-right: 58px;
+  }
+}
+
 .footer-links a {
   display: flex;
   align-items: center;
@@ -2519,7 +2531,10 @@ img {
     inset: 70px 0 0;
     display: block;
     visibility: hidden;
-    background: rgba(7, 29, 32, 0.98);
+    /* Fully opaque, for the same reason .navbar.is-scrolled is on mobile: at
+       0.98 the bright "paper" sections underneath ghosted through clearly
+       enough to read behind the menu items. */
+    background: #071d20;
     opacity: 0;
     transform: translateY(-10px);
     transition: visibility 250ms, opacity 250ms ease, transform 250ms ease;
@@ -2537,15 +2552,26 @@ img {
     width: min(100% - 40px, 640px);
     height: 100%;
     flex-direction: column;
-    justify-content: center;
+    /*
+     * Safe centring. `justify-content: center` centres beautifully until the
+     * content is taller than the box, at which point it overflows *equally in
+     * both directions* — and the overflow above the scroll origin can never be
+     * scrolled to, because scrollTop cannot go negative. On a 650px-tall phone
+     * the seven links plus three action buttons come to 615px in a 580px box,
+     * which pushed "About" up behind the navbar with no way to reach it.
+     *
+     * Auto margins centre the same way when there is room, and collapse to
+     * zero when there is not, so the content starts at the top and the whole
+     * list stays scrollable.
+     */
+    justify-content: flex-start;
     margin-inline: auto;
-    /* Scrollable and safe-area aware: on a short phone in landscape the seven
-       section links plus the action buttons are taller than the sheet, and a
-       centred flex column clips its overflow at both ends rather than
-       scrolling. */
     padding: 30px 0 calc(70px + env(safe-area-inset-bottom));
     overscroll-behavior: contain;
   }
+
+  .mobile-menu nav > :first-child { margin-top: auto; }
+  .mobile-menu nav > :last-child { margin-bottom: auto; }
 
   .mobile-menu nav > a:not(.mobile-contact) {
     display: flex;

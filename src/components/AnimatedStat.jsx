@@ -23,7 +23,13 @@ export default function AnimatedStat({ value, numericValue, suffix = '' }) {
       observer.disconnect()
       const startedAt = performance.now()
       const animate = (time) => {
-        const progress = Math.min(1, (time - startedAt) / duration)
+        // Clamped at both ends, not just capped at 1. A requestAnimationFrame
+        // timestamp is the frame's *start* time, so the first callback can
+        // carry a timestamp earlier than the performance.now() captured in the
+        // IntersectionObserver callback that scheduled it. That made progress
+        // negative, and the cubic ease turned it into a negative count — the
+        // strip briefly rendered "-2+" and "-3" as it scrolled into view.
+        const progress = Math.min(1, Math.max(0, (time - startedAt) / duration))
         const eased = 1 - Math.pow(1 - progress, 3)
         setDisplay(`${Math.round(numericValue * eased)}${suffix}`)
         if (progress < 1) frame = window.requestAnimationFrame(animate)
