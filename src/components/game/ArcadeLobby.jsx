@@ -24,8 +24,9 @@ const RacingGame = lazy(() => import('./RacingGame'))
 const FlappyDev = lazy(() => import('./FlappyDev'))
 const SnakeGame = lazy(() => import('./SnakeGame'))
 const WhackABug = lazy(() => import('./WhackABug'))
+const NeonCircuit = lazy(() => import('./NeonCircuit'))
 
-const NEW_GAME_IDS = ['blaster', 'racer', 'blockblast', 'racing', 'flappy', 'snake', 'whack']
+const NEW_GAME_IDS = ['blaster', 'racer', 'blockblast', 'racing', 'flappy', 'snake', 'whack', 'neon']
 
 function readBest(g) {
   if (!g.bestKey) return null
@@ -193,6 +194,7 @@ export default function ArcadeLobby({ onClose }) {
           {activeGame === 'flappy' && <FlappyDev {...p} />}
           {activeGame === 'snake' && <SnakeGame {...p} />}
           {activeGame === 'whack' && <WhackABug {...p} />}
+          {activeGame === 'neon' && <NeonCircuit {...p} />}
         </Suspense>
         <SettingsPanel
           open={settingsOpen}
@@ -249,7 +251,7 @@ export default function ArcadeLobby({ onClose }) {
             🕹 Charlie's Arcade
           </h1>
           <p className="text-sm sm:text-base text-gray-400">
-            {playerName ? `Welcome back, ${playerName}.` : 'Eight games. One portfolio. Pick your challenge.'}
+            {playerName ? `Welcome back, ${playerName}.` : 'Nine games. One portfolio. Pick your challenge.'}
           </p>
         </div>
 

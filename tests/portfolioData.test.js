@@ -18,7 +18,7 @@ import { BIO_SCROLL, EXPERIENCE, SKILL_CATEGORIES } from '../src/data/gameData.j
 test('preserves the verified professional positioning and identity features', () => {
   assert.equal(professionalTitles.length, 8)
   assert.equal(professionalTitles[0], 'AI Developer')
-  assert.equal(interactiveGames.length, 8)
+  assert.equal(interactiveGames.length, 9)
   assert.equal(new Set(interactiveGames.map((game) => game.id)).size, interactiveGames.length)
   assert.ok(navigation.some((item) => item.href === '#lab'))
 })

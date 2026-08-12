@@ -134,7 +134,7 @@ export default function CommandPalette({ open, onClose }) {
       {
         id: 'games',
         label: 'Play the arcade',
-        hint: 'Eight playable experiments',
+        hint: 'Nine playable experiments',
         icon: Sparkles,
         run: () => window.dispatchEvent(new CustomEvent('portfolio:open-games')),
       },

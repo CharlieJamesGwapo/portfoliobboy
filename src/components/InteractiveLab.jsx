@@ -40,7 +40,7 @@ export default function InteractiveLab() {
           <SectionHeading
             eyebrow="06 · Interactive lab"
             title="Creative code, kept behind an intentional door."
-            description="Eight playable experiments that explore interaction, realtime state, canvas rendering, controls, and game logic—loaded only when you choose to enter."
+            description="Nine playable experiments that explore interaction, realtime state, canvas and WebGL rendering, controls, and game logic—loaded only when you choose to enter."
             light
           />
         </ScrollReveal>
@@ -49,7 +49,7 @@ export default function InteractiveLab() {
           <ScrollReveal variant="scale">
             <div className="lab-launch-card">
               <div className="lab-launch-icon"><Gamepad2 size={28} aria-hidden="true" /></div>
-              <p className="eyebrow">Developer playground · 8 games</p>
+              <p className="eyebrow">Developer playground · 9 games</p>
               <h3>Charlie’s Arcade</h3>
               <p>Optional, keyboard-aware, and separated from the professional portfolio so it never slows the initial experience.</p>
               <button ref={launchButton} type="button" className="button button-dark" onClick={launch} {...warmArcade}>

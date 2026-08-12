@@ -38,7 +38,7 @@ export const proofPoints = [
   { value: '17+', label: 'Genuine products and client builds', numericValue: 17, suffix: '+' },
   { value: '2', label: 'Years shipping production software', numericValue: 2, suffix: '' },
   { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
-  { value: '8', label: 'Playable creative-code experiments', numericValue: 8, suffix: '' },
+  { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },
 ]
 
 export const interactiveGames = [
@@ -50,6 +50,7 @@ export const interactiveGames = [
   { id: 'flappy', emoji: '🐦', title: 'Flappy Dev', tagline: 'Dodge the brackets. Keep coding.', accent: 'from-sky-500 to-indigo-600', bestKey: 'arcade_best_flappy', bestKind: 'score' },
   { id: 'snake', emoji: '🐍', title: 'Code Snake', tagline: "Eat the skills. Don't crash.", accent: 'from-lime-500 to-green-600', bestKey: 'arcade_best_snake', bestKind: 'score' },
   { id: 'whack', emoji: '🔨', title: 'Whack-A-Bug', tagline: 'Squash the bugs. Ship the code.', accent: 'from-yellow-500 to-amber-600', bestKey: 'arcade_best_whack', bestKind: 'score' },
+  { id: 'neon', emoji: '🏁', title: 'Neon Circuit', tagline: 'A true 3D racer — chase camera, real shadows, instanced geometry.', accent: 'from-cyan-500 to-blue-600', bestKey: 'arcade_best_neon', bestKind: 'score' },
 ]
 
 export const musicPlaylists = [
