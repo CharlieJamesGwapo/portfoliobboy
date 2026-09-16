@@ -23,7 +23,9 @@
       html { background: #0b2528; color-scheme: dark; }
       body { margin: 0; background: #0b2528; }
       #root:empty {
-        display: block;
+        /* Keep the decorative marker's margin inside the empty root so its
+           removal cannot move the document when React mounts. */
+        display: flow-root;
         min-height: 100svh;
         background:
           radial-gradient(circle at 78% 26%, rgba(103, 224, 193, 0.09), transparent 42%),

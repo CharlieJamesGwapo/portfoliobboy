@@ -204,7 +204,17 @@ test.describe('portfolio browser quality', () => {
   })
 
   test('failed lab import is retryable and preserves professional DOM', async ({ page }) => {
-    await page.route('**/assets/InteractiveLab-*.js', (route) => route.abort())
+    let labChunkAttempts = 0
+    let labChunkFailures = 0
+    await page.route('**/assets/InteractiveLab-*.js', async (route) => {
+      labChunkAttempts += 1
+      if (labChunkFailures === 0) {
+        labChunkFailures += 1
+        await route.abort()
+        return
+      }
+      await route.continue()
+    })
     await page.goto('/')
     await openArchive(page)
     await page.getByRole('button', { name: 'Launch the lab' }).click()
@@ -214,6 +224,19 @@ test.describe('portfolio browser quality', () => {
     await expect(page.locator('#work')).toBeAttached()
     await expect(page.locator('#experience')).toBeAttached()
     await expect(page.locator('#contact')).toBeAttached()
+
+    await page.getByRole('button', { name: 'Retry lab' }).click()
+    await expect(page.locator('h1')).toBeVisible()
+    await openArchive(page)
+    const launch = page.getByRole('button', { name: 'Launch the lab' })
+    await launch.click()
+    await expect(page.getByRole('button', { name: 'Exit arcade and return to portfolio' })).toBeVisible({ timeout: 15_000 })
+    expect(labChunkFailures).toBe(1)
+    expect(labChunkAttempts).toBeGreaterThanOrEqual(2)
+
+    await page.getByRole('button', { name: 'Exit arcade and return to portfolio' }).click()
+    await expect(page.locator('#work')).toBeVisible()
+    await expect(launch).toBeFocused()
   })
 
   test('serious accessibility violations stay clear across disclosure states', async ({ page }) => {
@@ -347,6 +370,31 @@ test.describe('portfolio browser quality', () => {
     await expect(page.locator('#work')).toBeVisible()
     await expect(page.locator('#experience')).toBeVisible()
     await expect(page.locator('#contact')).toBeVisible()
+  })
+
+  test('empty boot marker stays out of document flow while JavaScript is delayed', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.route('**/assets/index-*.js', async (route) => {
+      await page.waitForTimeout(1500)
+      await route.continue()
+    })
+
+    const navigation = page.goto('/')
+    await page.waitForTimeout(300)
+    const interim = await page.evaluate(() => {
+      const root = document.getElementById('root')
+      return {
+        rootChildren: root?.children.length ?? 0,
+        rootTop: root?.getBoundingClientRect().top ?? Number.NaN,
+        bodyTop: document.body.getBoundingClientRect().top,
+      }
+    })
+    expect(interim.rootChildren).toBe(0)
+    expect(interim.rootTop).toBe(0)
+    expect(interim.bodyTop).toBe(0)
+
+    await navigation
+    await expect(page.locator('h1')).toBeVisible()
   })
 
   test('CSS-disabled DOM retains semantic source order', async ({ page }) => {
