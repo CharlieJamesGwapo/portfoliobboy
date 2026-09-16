@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { navigation } from '../src/data/portfolioData.js'
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8')
 
@@ -33,10 +34,19 @@ test('case studies use the reusable semantic diagram', () => {
 
 test('additional work follows contact and is absent from primary navigation', () => {
   const app = read('src/App.jsx')
-  const nav = read('src/components/Navbar.jsx')
   assert.ok(app.indexOf('<AdditionalWork') > app.indexOf('<Contact'))
-  assert.doesNotMatch(nav, /href\s*=\s*[`'\"]#(?:archive|lab|games?)[`'\"]/i)
-  assert.doesNotMatch(nav, />\s*(?:Archive|Interactive lab|Enter interactive lab|Music)\s*</i)
+  assert.deepEqual(navigation, [
+    { label: 'Work', href: '#work' },
+    { label: 'Experience', href: '#experience' },
+    { label: 'Capabilities', href: '#capabilities' },
+    { label: 'Credentials', href: '#credentials' },
+    { label: 'Contact', href: '#contact' },
+  ])
+  assert.equal(navigation.length, 5)
+  for (const link of navigation) {
+    assert.doesNotMatch(link.label, /archive|lab|game|music/i)
+    assert.doesNotMatch(link.href, /archive|lab|game|music/i)
+  }
 })
 
 test('the lab has one explicit dynamic import boundary', () => {
