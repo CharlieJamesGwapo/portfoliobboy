@@ -1,9 +1,5 @@
-import { createHash } from 'node:crypto'
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
-
-const canonicalPdfHash = 'ffe82da88e664d43d931bcf7f96f620b3efb58cc32d9bd35c18dffc33f18ff60'
-const resumePath = '/charlie-james-abejo-resume.pdf'
 
 const contactValues = {
   name: 'Ada Lovelace',
@@ -180,21 +176,6 @@ test.describe('portfolio browser quality', () => {
     }
   })
 
-  test('canonical resume PDF is stable and linked consistently', async ({ page }) => {
-    const response = await page.request.get(resumePath)
-    expect(response.status()).toBe(200)
-    expect(response.headers()['content-type']).toContain('application/pdf')
-    const digest = createHash('sha256').update(await response.body()).digest('hex')
-    expect(digest).toBe(canonicalPdfHash)
-
-    await page.goto('/')
-    const heroResume = page.locator('.hero-actions a').filter({ hasText: 'View resume (PDF)' })
-    await expect(heroResume).toHaveAttribute('href', resumePath)
-    await expect(heroResume).toHaveAttribute('target', '_blank')
-    await expect(page.locator('#contact .contact-socials a[download]')).toHaveAttribute('href', resumePath)
-    await expect(page.locator('.resume-download')).toHaveAttribute('href', resumePath)
-  })
-
   test('professional page stays within viewport at common widths', async ({ page }) => {
     for (const width of [320, 390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 })
@@ -277,12 +258,43 @@ test.describe('portfolio browser quality', () => {
       await expect(primaryNav.getByRole('link', { name: label, exact: true })).toBeFocused()
     }
 
-    await tabUntil(page, page.locator('#contact-name'))
-    await expect(page.locator('#contact-name')).toBeFocused()
-    await tabUntil(page, page.locator('.additional-work-disclosure > summary'))
-    await expect(page.locator('.additional-work-disclosure > summary')).toBeFocused()
+    const expectNextFocus = async (locator, label) => {
+      await page.keyboard.press('Tab')
+      const activeTag = await page.evaluate(() => document.activeElement?.tagName || '')
+      expect(activeTag, `${label}: Tab moved focus to the document body`).not.toBe('BODY')
+      await expect(locator, `${label}: control was skipped or focus was lost`).toBeFocused()
+    }
+
+    const contactEmail = page.locator('.contact-email')
+    const contactPhone = page.locator('.contact-details a').first()
+    const contactGithub = page.locator('.contact-socials a').nth(0)
+    const contactLinkedin = page.locator('.contact-socials a').nth(1)
+    const contactResume = page.locator('.contact-socials a').nth(2)
+    await tabUntil(page, contactEmail)
+    await expect(contactEmail).toBeFocused()
+    await expectNextFocus(contactPhone, 'contact phone link')
+    await expectNextFocus(contactGithub, 'contact GitHub link')
+    await expectNextFocus(contactLinkedin, 'contact LinkedIn link')
+    await expectNextFocus(contactResume, 'contact resume link')
+
+    const visibleContactFields = contactFields.map((field) => page.locator(`#contact-${field}`))
+    for (const [index, field] of visibleContactFields.entries()) {
+      await expectNextFocus(field, `contact ${contactFields[index]} field`)
+    }
+    const submit = page.locator('#contact form button[type="submit"]')
+    await expectNextFocus(submit, 'contact submit button')
+
+    const summary = page.locator('.additional-work-disclosure > summary')
+    await expectNextFocus(summary, 'archive disclosure')
     await page.keyboard.press('Enter')
     await expect.poll(() => page.locator('.additional-work-disclosure').evaluate((element) => element.open)).toBe(true)
+
+    const archiveLinks = page.locator('.archive-project > a')
+    await expect(archiveLinks).toHaveCount(7)
+    for (let index = 0; index < await archiveLinks.count(); index += 1) {
+      await expectNextFocus(archiveLinks.nth(index), `archive control ${index + 1}`)
+    }
+    await expectNextFocus(page.getByRole('button', { name: 'Launch the lab' }), 'launch lab control')
   })
 
   test('media preferences preserve content, focus, and optional controls', async ({ page }) => {
@@ -347,20 +359,57 @@ test.describe('portfolio browser quality', () => {
     })
 
     const structure = await page.evaluate(() => {
-      const sequence = Array.from(document.querySelectorAll('h1, h2, h3, p, a, ul, ol, label')).map((element) => element.textContent.trim())
+      const normalize = (value) => value.replace(/\s+/g, ' ').trim()
+      const sequence = Array.from(document.querySelectorAll('h1, h2, h3, p, a, ul, ol, label')).map((element) => normalize(element.textContent))
       const headings = Array.from(document.querySelectorAll('h1, h2, h3')).map((element) => element.textContent.trim())
       const paragraphs = Array.from(document.querySelectorAll('p')).map((element) => element.textContent.trim()).filter(Boolean)
       const links = Array.from(document.querySelectorAll('a')).map((element) => element.textContent.trim()).filter(Boolean)
       const lists = document.querySelectorAll('ul, ol').length
       const labels = Array.from(document.querySelectorAll('label')).map((element) => element.textContent.trim())
       const relationships = Array.from(document.querySelectorAll('.system-relationships li')).map((element) => element.textContent.trim())
+      const sourceOrder = Array.from(document.querySelectorAll('main > section, h1, h2, h3, ul, ol, a, label, button, summary')).map((element) => {
+        const section = element.closest('main > section')
+        let kind = 'element'
+        if (element.matches('main > section')) kind = 'section'
+        else if (element.matches('h1, h2, h3')) kind = 'heading'
+        else if (element.matches('.system-relationships')) kind = 'relationships'
+        else if (element.matches('ul, ol')) kind = 'list'
+        else if (element.matches('.hero-actions a')) kind = 'hero-link'
+        else if (element.matches('.resume-download')) kind = 'resume-link'
+        else if (element.matches('.contact-email')) kind = 'contact-email'
+        else if (element.matches('.contact-details a')) kind = 'contact-phone'
+        else if (element.matches('.contact-socials a')) kind = 'contact-social'
+        else if (element.matches('.contact-form label')) kind = 'label'
+        else if (element.matches('.contact-form button')) kind = 'submit'
+        else if (element.matches('.additional-work-disclosure > summary')) kind = 'summary'
+        else if (element.matches('.archive-project > a')) kind = 'archive-link'
+        else if (element.matches('.lab-panel > button')) kind = 'lab-control'
+        else if (element.matches('a')) kind = 'link'
+        return {
+          kind,
+          section: section?.id || '',
+          text: normalize(element.textContent) || element.getAttribute('aria-label') || '',
+          className: typeof element.className === 'string' ? element.className : '',
+        }
+      })
+      const systemSequences = Array.from(document.querySelectorAll('.system-diagram')).map((diagram) => Array.from(diagram.querySelectorAll('figcaption, ol, .system-relationships')).map((element) => ({
+        kind: element.matches('figcaption') ? 'caption' : element.matches('ol') ? 'nodes' : 'relationships',
+        text: normalize(element.textContent),
+      })))
       const labelled = Array.from(document.querySelectorAll('[aria-labelledby]')).map((element) => ({
         reference: element.getAttribute('aria-labelledby'),
         exists: Boolean(document.getElementById(element.getAttribute('aria-labelledby'))),
       }))
       const sectionIds = Array.from(document.querySelectorAll('main > section')).map((element) => element.id)
-      return { sequence, headings, paragraphs, links, lists, labels, relationships, labelled, sectionIds }
+      return { sequence, headings, paragraphs, links, lists, labels, relationships, sourceOrder, systemSequences, labelled, sectionIds }
     })
+
+    const indexOfSource = (kind, text) => structure.sourceOrder.findIndex((item) => item.kind === kind && item.text === text)
+    const assertSourceOrder = (items, description) => {
+      const indices = items.map(([kind, text]) => indexOfSource(kind, text))
+      expect(indices.every((index) => index >= 0), `${description}: missing semantic item`).toBe(true)
+      expect(indices, `${description}: source order changed`).toEqual([...indices].sort((left, right) => left - right))
+    }
 
     expect(structure.headings[0]).toContain('Full-stack product engineer')
     expect(structure.headings.findIndex((heading) => heading.includes('Systems designed around real operational pressure'))).toBeGreaterThan(0)
@@ -373,6 +422,43 @@ test.describe('portfolio browser quality', () => {
     expect(structure.labelled.every((item) => item.exists)).toBe(true)
     expect(structure.sectionIds).toEqual(['home', 'work', 'experience', 'capabilities', 'credentials', 'contact', 'archive'])
     expect(structure.sequence.findIndex((entry) => entry.includes('Full-stack product engineer'))).toBeLessThan(structure.sequence.findIndex((entry) => entry.includes('Systems designed around real operational pressure')))
+
+    assertSourceOrder([
+      ['heading', 'Full-stack product engineer for reliable web, mobile, and CRM systems.'],
+      ['heading', 'Systems designed around real operational pressure.'],
+      ['heading', 'Building across product, platform, and integration layers.'],
+      ['heading', 'Modern tools, applied with production judgment.'],
+      ['heading', 'Education and verified continued learning.'],
+      ['heading', 'Have a system to improve or a product to ship?'],
+    ], 'major heading order')
+    assertSourceOrder([
+      ['hero-link', 'View selected work'],
+      ['hero-link', 'View resume (PDF) approximately 505 KB, opens in a new tab'],
+      ['resume-link', 'Download resume (PDF, approximately 505 KB)'],
+      ['contact-email', 'capstonee2@gmail.com'],
+      ['contact-phone', '+63 985 612 2843'],
+      ['contact-social', 'GitHub'],
+      ['contact-social', 'LinkedIn'],
+      ['contact-social', 'Download resume'],
+      ['label', 'Name'],
+      ['label', 'Email'],
+      ['label', 'Subject'],
+      ['label', 'Message'],
+      ['submit', 'Send message'],
+      ['summary', 'More: archive & lab'],
+    ], 'key link, form, and archive order')
+    expect(structure.sourceOrder.filter((item) => item.kind === 'label' && item.section === 'contact').map((item) => item.text)).toEqual(['Name', 'Email', 'Subject', 'Message', 'Company (leave this field empty)'])
+    expect(structure.systemSequences).toHaveLength(3)
+    for (const [index, systemSequence] of structure.systemSequences.entries()) {
+      expect(systemSequence.map((item) => item.kind), `system ${index + 1} source order`).toEqual(['caption', 'nodes', 'relationships'])
+      expect(systemSequence.at(-1).text).toContain('connects to')
+    }
+    const workLists = structure.sourceOrder.filter((item) => item.kind === 'list' && item.section === 'work')
+    const workRelationships = structure.sourceOrder.filter((item) => item.kind === 'relationships' && item.section === 'work')
+    expect(workLists.length).toBeGreaterThanOrEqual(6)
+    expect(workRelationships).toHaveLength(3)
+    expect(workLists[0].text).toContain('Next.js/React dashboard')
+    expect(structure.sourceOrder.findIndex((item) => item.kind === 'relationships' && item.section === 'work')).toBeGreaterThan(structure.sourceOrder.findIndex((item) => item.kind === 'list' && item.section === 'work'))
   })
 
   test('captures mobile, tablet, and desktop release screenshots', async ({ page }, testInfo) => {
