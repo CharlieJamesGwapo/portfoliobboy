@@ -1,9 +1,9 @@
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
-import { skillGroups } from '../data/portfolioData'
+import { capabilityGroups } from '../data/portfolioData'
 
 const Skills = () => (
-  <section id="skills" className="section section-dark skills-section">
+  <section id="capabilities" className="section section-dark skills-section">
     <div className="page-container skills-layout">
       <ScrollReveal variant="left">
         <div className="skills-sticky">
@@ -22,16 +22,17 @@ const Skills = () => (
       </ScrollReveal>
 
       <div className="skill-groups">
-        {skillGroups.map((group, index) => (
+        {capabilityGroups.map((group, index) => (
           <ScrollReveal key={group.title} delay={index * 65} variant="right">
             <article className="skill-group">
               <div className="skill-group-heading">
-                <span>0{index + 1}</span>
+                <span>{String(index + 1).padStart(2, '0')}</span>
                 <h3>{group.title}</h3>
               </div>
-              <div className="skill-cloud">
-                {group.skills.map((skill) => <span key={skill}>{skill}</span>)}
-              </div>
+              <p className="skill-group-description">{group.description}</p>
+              <ul className="skill-metadata-list" aria-label={`${group.title} technologies`}>
+                {group.skills.map((skill) => <li key={skill}>{skill}</li>)}
+              </ul>
             </article>
           </ScrollReveal>
         ))}

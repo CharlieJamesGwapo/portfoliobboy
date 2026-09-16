@@ -21,7 +21,7 @@
 // Bump CACHE_VERSION to evict everything on the next activation.
 // ============================================================================
 
-const CACHE_VERSION = 'v3'
+const CACHE_VERSION = 'v4'
 const SHELL_CACHE = `shell-${CACHE_VERSION}`
 const ASSET_CACHE = `assets-${CACHE_VERSION}`
 const MEDIA_CACHE = `media-${CACHE_VERSION}`

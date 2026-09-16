@@ -16,15 +16,16 @@
       This is deliberately *not* a splash overlay. Covering the hero would push
       the Largest Contentful Paint out to whenever the overlay is removed, so
       the page would score worse for the sake of looking busier. Instead the
-      page background is correct from the first frame and an empty #root
-      carries a skeleton of the hero's real layout, which is replaced in place
-      the moment React mounts.
+      page background is correct from the first frame and an empty #root carries
+      a quiet block of the hero's real palette until React mounts.
     -->
     <style>
       html { background: #0b2528; color-scheme: dark; }
       body { margin: 0; background: #0b2528; }
       #root:empty {
-        display: block;
+        /* Keep the decorative marker's margin inside the empty root so its
+           removal cannot move the document when React mounts. */
+        display: flow-root;
         min-height: 100svh;
         background:
           radial-gradient(circle at 78% 26%, rgba(103, 224, 193, 0.09), transparent 42%),
@@ -33,23 +34,18 @@
       #root:empty::before {
         display: block;
         width: min(1180px, calc(100% - 48px));
-        height: 320px;
+        height: 2px;
         margin: 168px auto 0;
-        border-radius: 22px;
-        background: linear-gradient(100deg, rgba(255, 255, 255, 0.035) 30%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.035) 70%);
-        background-size: 220% 100%;
-        animation: boot-shimmer 1.4s linear infinite;
+        background: #67e0c1;
+        opacity: 0.24;
         content: '';
-      }
-      @keyframes boot-shimmer { to { background-position: -220% 0; } }
-      @media (prefers-reduced-motion: reduce) {
-        #root:empty::before { animation: none; }
       }
     </style>
 
     <!-- Preload the above-the-fold hero image (WebP) for faster LCP -->
     <link rel="preload" as="image" href="/profile.webp" type="image/webp" fetchpriority="high" />
-    <!-- Self-hosted variable Inter; preloaded so the swap happens before first paint of the hero -->
+    <!-- Self-hosted display and body fonts; preloaded for a stable first paint -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/newsreader-var-latin.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-var-latin.woff2" crossorigin />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -57,25 +53,25 @@
     <meta name="apple-mobile-web-app-title" content="CJ Portfolio" />
     
     <!-- Primary Meta Tags -->
-    <title>Charlie James Abejo | AI Developer &amp; Full-Stack Engineer</title>
-    <meta name="title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
-    <meta name="description" content="AI developer and full-stack engineer building intelligent products, scalable APIs, CRM integrations, SaaS platforms, and production backend systems." />
-    <meta name="keywords" content="Charlie James Abejo, AI Developer, Full-Stack Engineer, Backend Engineer, Python Developer, Go Developer, SaaS Developer, CRM Integration Developer, React, Next.js, .NET, Remote Developer" />
+    <title>Charlie James Abejo | Full-Stack Web &amp; Mobile Developer</title>
+    <meta name="title" content="Charlie James Abejo | Full-Stack Web &amp; Mobile Developer" />
+    <meta name="description" content="Full-stack developer with 5+ years building production web, iOS, Android, CRM, API integration, and real-time systems. Based in the Philippines and available for remote work." />
+    <meta name="keywords" content="Charlie James Abejo, Full-Stack Web Developer, Mobile App Developer, CRM Integration Developer, API Integration, React, Next.js, React Native, Python, Go, .NET, Remote Developer" />
     <meta name="author" content="Charlie James Z. Abejo" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://portfoliobboy.vercel.app/" />
-    <meta property="og:title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
-    <meta property="og:description" content="Intelligent products, scalable APIs, SaaS platforms, CRM integrations, and production backend systems." />
-    <meta property="og:image" content="https://portfoliobboy.vercel.app/profile.png" />
+    <meta property="og:title" content="Charlie James Abejo | Full-Stack Web &amp; Mobile Developer" />
+    <meta property="og:description" content="Full-stack developer with 5+ years building production web, iOS, Android, CRM, API integration, and real-time systems. Based in the Philippines and available for remote work." />
+    <meta property="og:image" content="https://portfoliobboy.vercel.app/og-portfolio.png" />
     
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://portfoliobboy.vercel.app/" />
-    <meta property="twitter:title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
-    <meta property="twitter:description" content="Intelligent products, scalable APIs, SaaS platforms, CRM integrations, and production backend systems." />
-    <meta property="twitter:image" content="https://portfoliobboy.vercel.app/profile.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://portfoliobboy.vercel.app/" />
+    <meta name="twitter:title" content="Charlie James Abejo | Full-Stack Web &amp; Mobile Developer" />
+    <meta name="twitter:description" content="Full-stack developer with 5+ years building production web, iOS, Android, CRM, API integration, and real-time systems. Based in the Philippines and available for remote work." />
+    <meta name="twitter:image" content="https://portfoliobboy.vercel.app/og-portfolio.png" />
     
     <!-- Additional Meta Tags -->
     <meta name="robots" content="index, follow" />
@@ -90,24 +86,29 @@
         "@type": "Person",
         "name": "Charlie James Z. Abejo",
         "url": "https://portfoliobboy.vercel.app/",
-        "image": "https://portfoliobboy.vercel.app/profile.png",
-        "jobTitle": "AI Developer & Full-Stack Engineer",
+        "image": "https://portfoliobboy.vercel.app/og-portfolio.png",
+        "jobTitle": "Full-Stack Web & Mobile App Developer",
         "address": {
           "@type": "PostalAddress",
           "addressRegion": "Misamis Oriental",
           "addressCountry": "PH"
         },
         "knowsAbout": [
-          "AI application development",
-          "Full-stack engineering",
+          "Full-stack web development",
+          "Mobile app development",
           "Backend systems",
-          "API design",
+          "API integration",
           "CRM integrations",
+          "Real-time systems",
+          "React Native",
           "Python",
           "Go",
           "React",
           "Next.js",
-          ".NET"
+          "TypeScript",
+          ".NET",
+          "PostgreSQL",
+          "AWS Lambda"
         ],
         "email": "capstonee2@gmail.com",
         "sameAs": [

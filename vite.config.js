@@ -1,62 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-
-// The resume lives at the repo root with a name we don't want in the URL, so
-// it is copied to a stable public route at build time. Certificate images are
-// now pre-optimised WebP files in public/certificates/ and need no plugin.
-const verifiedAssets = [
-  {
-    route: '/charlie-james-abejo-resume.pdf',
-    source: resolve(process.cwd(), 'ABEJO_CHARLIE_JAMES_RESUME.pdf'),
-    contentType: 'application/pdf',
-    contentDisposition: 'inline; filename="charlie-james-abejo-resume.pdf"',
-  },
-]
-
-function verifiedAssetPlugin() {
-  let isBuild = false
-  const serveAsset = (request, response, next) => {
-    const route = decodeURIComponent(request.url?.split('?')[0] || '')
-    const asset = verifiedAssets.find((item) => item.route === route)
-    if (!asset) {
-      next()
-      return
-    }
-
-    response.statusCode = 200
-    response.setHeader('Content-Type', asset.contentType)
-    if (asset.contentDisposition) response.setHeader('Content-Disposition', asset.contentDisposition)
-    response.end(readFileSync(asset.source))
-  }
-
-  return {
-    name: 'verified-portfolio-assets',
-    configResolved(config) {
-      isBuild = config.command === 'build'
-    },
-    configureServer(server) {
-      server.middlewares.use(serveAsset)
-    },
-    configurePreviewServer(server) {
-      server.middlewares.use(serveAsset)
-    },
-    buildStart() {
-      if (!isBuild) return
-      verifiedAssets.forEach((asset) => {
-        this.emitFile({
-          type: 'asset',
-          fileName: asset.route.slice(1),
-          source: readFileSync(asset.source),
-        })
-      })
-    },
-  }
-}
 
 export default defineConfig({
-  plugins: [react(), verifiedAssetPlugin()],
+  plugins: [react()],
   build: {
     target: 'es2020',
     cssCodeSplit: true,

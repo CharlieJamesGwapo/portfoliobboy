@@ -13,7 +13,7 @@ import Leaderboard from './Leaderboard'
 import { getAvatar, makeSprite, getPlayerName } from '../../lib/avatar'
 import { getKeybindings, getAudioSettings, getDisplaySettings } from '../../lib/gameStorage'
 import { OWNER } from '../../data/gameData'
-import { interactiveGames as GAMES } from '../../data/portfolioData'
+import { labItems as GAMES } from '../../data/portfolioData'
 
 const GameOverlay = lazy(() => import('./GameOverlay'))
 const AvatarCustomizer = lazy(() => import('./AvatarCustomizer'))

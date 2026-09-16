@@ -1,13 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, Search, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { navigation as links, profile } from '../data/portfolioData'
-
-const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
-
-// Apple keyboards label the key ⌘; everywhere else it is Ctrl. Reading the
-// platform lets the hint match the key the visitor actually has to press.
-const isApplePlatform = () =>
-  typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
 
 const Navbar = () => {
   const [open, setOpen] = useState(false)
@@ -19,11 +12,6 @@ const Navbar = () => {
 
   useEffect(() => {
     const ids = ['home', ...links.map((link) => link.href.slice(1))]
-
-    // Section offsets are cached. Reading `offsetTop` forces a synchronous
-    // layout, and doing that for every section on every scroll frame was the
-    // most expensive thing happening during a scroll. Offsets only change when
-    // the page is re-laid out, so that is when we re-measure.
     let offsets = []
     const measure = () => {
       offsets = ids
@@ -32,18 +20,14 @@ const Navbar = () => {
           return section ? { id, top: section.offsetTop } : null
         })
         .filter(Boolean)
-        .sort((a, b) => a.top - b.top) // the early-out below relies on this order
+        .sort((a, b) => a.top - b.top)
     }
 
-    // Cheap refs avoid re-rendering the whole navbar on frames where nothing
-    // actually changed.
     let lastScrolled = null
     let lastActive = null
-
     const updateNavigation = () => {
       scrollFrame.current = null
       const y = window.scrollY
-
       const nextScrolled = y > 20
       if (nextScrolled !== lastScrolled) {
         lastScrolled = nextScrolled
@@ -52,8 +36,8 @@ const Navbar = () => {
 
       const marker = y + 180
       let current = 'home'
-      for (let i = 0; i < offsets.length; i += 1) {
-        if (offsets[i].top <= marker) current = offsets[i].id
+      for (const section of offsets) {
+        if (section.top <= marker) current = section.id
         else break
       }
       if (current !== lastActive) {
@@ -77,7 +61,6 @@ const Navbar = () => {
     window.addEventListener('scroll', scheduleNavigationUpdate, { passive: true })
     window.addEventListener('resize', onResize)
 
-    // Sections grow as images and lazy content settle, which moves the offsets.
     const resizeObserver = new ResizeObserver(onResize)
     resizeObserver.observe(document.documentElement)
 
@@ -101,25 +84,29 @@ const Navbar = () => {
       : null
 
     const onKeyDown = (event) => {
-      if (event.key === 'Escape' && open) {
+      if (!open) return
+
+      if (event.key === 'Escape') {
+        event.preventDefault()
         setOpen(false)
         window.setTimeout(() => toggleRef.current?.focus(), 0)
+        return
       }
 
-      if (event.key === 'Tab' && open) {
-        const focusable = [toggleRef.current, ...Array.from(menuRef.current?.querySelectorAll('a, button') || [])]
-          .filter(Boolean)
-        const first = focusable[0]
-        const last = focusable[focusable.length - 1]
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault()
-          last?.focus()
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault()
-          first?.focus()
-        }
+      if (event.key !== 'Tab') return
+      const focusable = [toggleRef.current, ...Array.from(menuRef.current?.querySelectorAll('a, button') || [])]
+        .filter((element) => element && !element.hasAttribute('disabled'))
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last?.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first?.focus()
       }
     }
+
     window.addEventListener('keydown', onKeyDown)
     return () => {
       if (focusTimer) window.clearTimeout(focusTimer)
@@ -130,42 +117,43 @@ const Navbar = () => {
     }
   }, [open])
 
-  const closeMenu = () => setOpen(false)
+  const closeMenu = () => {
+    setOpen(false)
+    window.setTimeout(() => toggleRef.current?.focus(), 0)
+  }
+
+  const handleLinkClick = (id) => {
+    setActive(id)
+    closeMenu()
+  }
 
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="nav-inner">
-        <a href="#home" className="wordmark" onClick={() => { setActive('home'); closeMenu() }} aria-label={`${profile.shortName}, home`}>
+        <a href="#home" className="wordmark" onClick={() => handleLinkClick('home')} aria-label={`${profile.shortName}, home`}>
           <span className="wordmark-mark" aria-hidden="true">CA</span>
           <span>{profile.shortName}</span>
         </a>
 
         <nav className="desktop-nav" aria-label="Primary navigation">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setActive(link.href.slice(1))}
-              className={active === link.href.slice(1) ? 'active' : ''}
-              aria-current={active === link.href.slice(1) ? 'location' : undefined}
-            >
-              {link.label}
-            </a>
-          ))}
+          {links.map((link) => {
+            const id = link.href.slice(1)
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setActive(id)}
+                className={active === id ? 'active' : ''}
+                aria-current={active === id ? 'location' : undefined}
+              >
+                {link.label}
+              </a>
+            )
+          })}
         </nav>
 
         <div className="nav-actions">
-          <button
-            type="button"
-            className="nav-search"
-            onClick={openPalette}
-            aria-label="Open command palette to search sections and actions"
-          >
-            <Search size={15} aria-hidden="true" />
-            <span>Search</span>
-            <kbd aria-hidden="true">{isApplePlatform() ? '⌘' : 'Ctrl'} K</kbd>
-          </button>
-          <a className="nav-cta desktop-cta" href={`mailto:${profile.email}`}>Let’s talk</a>
+          <a className="nav-cta desktop-cta" href={`mailto:${profile.email}`}>Let&apos;s talk</a>
         </div>
 
         <button
@@ -177,40 +165,23 @@ const Navbar = () => {
           aria-controls="mobile-navigation"
           aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
         >
-          {open ? <X size={22} /> : <Menu size={22} />}
+          {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
         </button>
       </div>
 
       <div ref={menuRef} id="mobile-navigation" className={`mobile-menu ${open ? 'is-open' : ''}`}>
         <nav aria-label="Mobile navigation">
-          {links.map((link, index) => (
-            <a key={link.href} href={link.href} onClick={() => { setActive(link.href.slice(1)); closeMenu() }} style={{ '--menu-index': index }}>
-              <span>0{index + 1}</span>
-              {link.label}
-            </a>
-          ))}
+          {links.map((link, index) => {
+            const id = link.href.slice(1)
+            return (
+              <a key={link.href} href={link.href} onClick={() => handleLinkClick(id)} style={{ '--menu-index': index }}>
+                <span aria-hidden="true">0{index + 1}</span>
+                {link.label}
+              </a>
+            )
+          })}
           <div className="mobile-menu-actions">
             <a className="mobile-contact" href={`mailto:${profile.email}`} onClick={closeMenu}>Start a conversation</a>
-            <button
-              type="button"
-              className="mobile-music"
-              onClick={() => {
-                closeMenu()
-                openPalette()
-              }}
-            >
-              Search sections and actions
-            </button>
-            <button
-              type="button"
-              className="mobile-music"
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent('portfolio:open-music'))
-                closeMenu()
-              }}
-            >
-              Open music player
-            </button>
           </div>
         </nav>
       </div>
