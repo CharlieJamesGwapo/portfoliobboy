@@ -1,5 +1,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { resolve } from 'node:path'
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { createServer } from 'vite'
 import {
   certifications,
   experiences,
@@ -14,6 +18,24 @@ import {
   skillGroups,
 } from '../src/data/portfolioData.js'
 import { BIO_SCROLL, EXPERIENCE, SKILL_CATEGORIES } from '../src/data/gameData.js'
+
+const renderConsumers = async () => {
+  const server = await createServer({
+    configFile: resolve(process.cwd(), 'vite.config.js'),
+    server: { middlewareMode: true },
+  })
+  try {
+    const [{ default: About }, { default: Experience }, { default: Projects }] = await Promise.all([
+      server.ssrLoadModule('/src/components/About.jsx'),
+      server.ssrLoadModule('/src/components/Experience.jsx'),
+      server.ssrLoadModule('/src/components/Projects.jsx'),
+    ])
+    return [About, Experience, Projects]
+      .map((Component) => renderToStaticMarkup(createElement(Component)).replace(/\s+/g, ' '))
+  } finally {
+    await server.close()
+  }
+}
 
 test('preserves the verified professional positioning and identity features', () => {
   assert.equal(professionalTitles.length, 8)
@@ -36,9 +58,10 @@ test('keeps the requested hiring-focused experience and project inventory', () =
   assert.equal(alumniProject?.eyebrow, 'Jan-Aug 2025 · Secure records platform')
 })
 
-test('positions the portfolio around two years without a MongoDB skill claim', () => {
+test('shows careful building-and-shipping experience wording in page consumers', async () => {
+  const [aboutMarkup, experienceMarkup] = await renderConsumers()
   const productProof = proofPoints.find((item) => item.label === 'Genuine products and client builds')
-  const experienceProof = proofPoints.find((item) => item.label === 'Years shipping production software')
+  const experienceProof = proofPoints.find((item) => item.label === 'Years building and shipping software')
   assert.deepEqual(productProof, {
     value: '17+',
     label: 'Genuine products and client builds',
@@ -46,14 +69,16 @@ test('positions the portfolio around two years without a MongoDB skill claim', (
     suffix: '+',
   })
   assert.deepEqual(experienceProof, {
-    value: '2',
-    label: 'Years shipping production software',
-    numericValue: 2,
-    suffix: '',
+    value: '5+',
+    label: 'Years building and shipping software',
+    numericValue: 5,
+    suffix: '+',
   })
   assert.equal(skillGroups.flatMap((group) => group.skills).includes('MongoDB'), false)
   assert.equal(SKILL_CATEGORIES.flatMap((group) => group.skills).includes('MongoDB'), false)
-  assert.equal(BIO_SCROLL.some((line) => /5\+|five years/i.test(line)), false)
+  assert.match(BIO_SCROLL[1], /5\+ years building and shipping software/i)
+  assert.match(aboutMarkup, /5\+ years building and shipping software/i)
+  assert.match(experienceMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '), /5\+ Years building and shipping software/i)
 })
 
 test('publishes the supplied OMJI projects with realistic dates', () => {
@@ -69,19 +94,32 @@ test('publishes the supplied OMJI projects with realistic dates', () => {
   assert.ok(billing?.stack.includes('Go'))
 })
 
-test('uses the corrected 2026 SocietyOne and Multi-Club timeline everywhere', () => {
-  const fitnessExperience = experiences.find((item) => item.company === 'Multi-Club Fitness Group')
+test('keeps public client wording anonymous and aligns every visible role timeline', async () => {
+  const consumerMarkup = await renderConsumers()
+  const australianExperience = experiences.find((item) => item.role === 'AI Full-Stack Developer')
   const societyExperience = experiences.find((item) => item.company === 'Robustech IT / SocietyOne')
-  assert.equal(fitnessExperience?.period, 'May 2026 - Jul 2026')
-  assert.equal(societyExperience?.period, 'Jan 2026 - Apr 2026')
+  const roocheExperience = experiences.find((item) => item.company === 'Rooche Digital Company')
+  assert.equal(australianExperience?.company, 'Australian client')
+  assert.equal(australianExperience?.period, '2026 – Present')
+  assert.equal(roocheExperience?.period, 'Jan 2026 – Mar 2026')
+  assert.equal(societyExperience?.period, 'Jan 2024 – Dec 2025')
 
   const fitnessProject = featuredProjects.find((item) => item.id === 'fitness-crm')
   const societyProject = featuredProjects.find((item) => item.id === 'societyone')
-  assert.equal(fitnessProject?.eyebrow, 'May-Jul 2026 · Multi-club fitness operations · Australia')
-  assert.equal(societyProject?.eyebrow, 'Jan-Apr 2026 · Regulated fintech · Australia')
+  assert.equal(fitnessProject?.title, 'Enterprise CRM Platform')
+  assert.equal(fitnessProject?.eyebrow, '2026 – Present · Australian client · Enterprise CRM platform')
+  assert.equal(societyProject?.eyebrow, 'Jan 2024 – Dec 2025 · Regulated fintech · Australia')
 
   const gameSocietyExperience = EXPERIENCE.find((item) => item.id === 'robustech')
-  assert.equal(gameSocietyExperience?.period, 'Jan 2026 - Apr 2026')
+  const gameRoocheExperience = EXPERIENCE.find((item) => item.id === 'rooche')
+  assert.equal(gameRoocheExperience?.period, 'Jan 2026 – Mar 2026')
+  assert.equal(gameSocietyExperience?.period, 'Jan 2024 – Dec 2025')
+
+  const publicContent = [
+    JSON.stringify({ experiences, featuredProjects, skillGroups, BIO_SCROLL }),
+    ...consumerMarkup,
+  ].join(' ')
+  assert.doesNotMatch(publicContent, /Multi-Club Fitness Group|PerfectGym/i)
 })
 
 test('keeps the original credential inventory and clean resume route', () => {
@@ -96,8 +134,8 @@ test('keeps the original credential inventory and clean resume route', () => {
 test('publishes the corrected Rooche dates and authentic Anthropic certificates', () => {
   const portfolioRooche = experiences.find((item) => item.company === 'Rooche Digital Company')
   const gameRooche = EXPERIENCE.find((item) => item.id === 'rooche')
-  assert.equal(portfolioRooche?.period, 'Oct 2025 - Dec 2025')
-  assert.equal(gameRooche?.period, 'Oct 2025 - Dec 2025')
+  assert.equal(portfolioRooche?.period, 'Jan 2026 – Mar 2026')
+  assert.equal(gameRooche?.period, 'Jan 2026 – Mar 2026')
 
   const uploadedAnthropicTitles = certifications
     .filter((credential) => credential.issuer === 'Anthropic' && credential.image)

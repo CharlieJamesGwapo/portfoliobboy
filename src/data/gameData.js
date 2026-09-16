@@ -17,7 +17,7 @@ export const EXPERIENCE = [
     hp: 100,
     company: 'Rooche Digital Company',
     role: 'Full Stack Developer',
-    period: 'Oct 2025 - Dec 2025',
+    period: 'Jan 2026 – Mar 2026',
     location: 'Remote',
     type: 'Full-time',
     description:
@@ -47,7 +47,7 @@ export const EXPERIENCE = [
     hp: 150,
     company: 'Robustech IT / SocietyOne',
     role: 'Full Stack Developer',
-    period: 'Jan 2026 - Apr 2026',
+    period: 'Jan 2024 – Dec 2025',
     location: 'Australia (Remote)',
     type: 'Contract',
     description:
@@ -212,7 +212,7 @@ export const OWNER = {
 
 export const BIO_SCROLL = [
   "Welcome, traveler. You stand in the dungeon of Charlie James — Full Stack Developer & Backend Engineer.",
-  "2 years forging secure, scalable web, API, and mobile applications across Python, Go, .NET, Node.js, and PHP.",
+  "5+ years building and shipping software across Python, Go, .NET, Node.js, and PHP.",
   "Venture deeper: defeat the Skills, plunder the Projects Vault, study the Certs, and slay The Bug King to claim victory.",
 ]
 

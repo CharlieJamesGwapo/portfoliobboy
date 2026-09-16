@@ -36,7 +36,7 @@ export const navigation = [
 
 export const proofPoints = [
   { value: '17+', label: 'Genuine products and client builds', numericValue: 17, suffix: '+' },
-  { value: '2', label: 'Years shipping production software', numericValue: 2, suffix: '' },
+  { value: '5+', label: 'Years building and shipping software', numericValue: 5, suffix: '+' },
   { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
   { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },
 ]
@@ -85,15 +85,15 @@ export const fitHighlights = [
 export const experiences = [
   {
     role: 'AI Full-Stack Developer',
-    company: 'Multi-Club Fitness Group',
+    company: 'Australian client',
     location: 'Australia · Contract · Remote',
-    period: 'May 2026 - Jul 2026',
+    period: '2026 – Present',
     featured: true,
     summary:
-      'Building a production CRM and management platform that unifies member records, subscriptions, payments, visit history, and team outreach.',
+      'Building an enterprise CRM platform for an Australian client that unifies member records, subscriptions, payments, visit history, and team outreach.',
     achievements: [
       'Delivered revenue, retention, profiling, and win-back dashboards with Next.js 16, React 19, TypeScript, and TanStack Query.',
-      'Designed a bidirectional Python sync worker against the PerfectGym CRM API using Celery, Redis, durable Postgres jobs, leases, idempotency keys, bounded retries, and zombie-run recovery.',
+      'Designed bidirectional Python CRM synchronization using Celery, Redis, durable Postgres jobs, leases, idempotency keys, bounded retries, and recovery workflows.',
       'Embedded Twilio Voice browser calling inside CRM member panels for outreach workflows.',
       'Led member, contract, visit, and payment-history migration with automated reconciliation against source-of-truth financial reports.',
       'Ship daily with Claude Code using repo-level instructions, custom agents, skills, and GitHub, Linear, and Supabase MCP integrations.',
@@ -105,7 +105,7 @@ export const experiences = [
     role: 'Full-Stack Developer',
     company: 'Rooche Digital Company',
     location: 'Remote',
-    period: 'Oct 2025 - Dec 2025',
+    period: 'Jan 2026 – Mar 2026',
     summary:
       'Delivered client dashboards, web applications, and documented backend services across modern JavaScript and Python stacks.',
     achievements: [
@@ -119,7 +119,7 @@ export const experiences = [
     role: 'Full-Stack Developer',
     company: 'Robustech IT / SocietyOne',
     location: 'Australia · Remote',
-    period: 'Jan 2026 - Apr 2026',
+    period: 'Jan 2024 – Dec 2025',
     summary:
       'Modernized services and integrations for a regulated Australian personal-loan platform.',
     achievements: [
@@ -257,12 +257,12 @@ export const featuredProjects = [
   {
     id: 'fitness-crm',
     categories: ['AI', 'SaaS', 'Backend', 'Full Stack', 'API', 'CRM'],
-    title: 'Fitness CRM Platform',
-    eyebrow: 'May-Jul 2026 · Multi-club fitness operations · Australia',
-    overview: 'A unified operating system for member data, subscriptions, payments, visits, retention, and browser-based calling across multiple fitness clubs.',
-    context: 'Member operations, outreach, and financial history were spread across separate tools and data sources.',
+    title: 'Enterprise CRM Platform',
+    eyebrow: '2026 – Present · Australian client · Enterprise CRM platform',
+    overview: 'An enterprise CRM platform for an Australian client, unifying member data, subscriptions, payments, visits, retention, and browser-based calling.',
+    context: 'An Australian client needed one dependable workflow for member operations, outreach, and financial history.',
     implementation: 'Next.js dashboards backed by bidirectional CRM synchronization, durable jobs, retries, and reconciliation.',
-    architecture: ['Next.js dashboards', 'Supabase Postgres', 'Python sync workers', 'Celery + Redis', 'PerfectGym REST + webhooks', 'Twilio Voice'],
+    architecture: ['Next.js dashboards', 'Supabase Postgres', 'Python sync workers', 'Celery + Redis', 'CRM REST + webhooks', 'Twilio Voice'],
     features: ['Revenue and retention dashboards', 'Member profiling', 'Win-back workflows', 'Embedded browser calling'],
     engineering: 'Idempotent sync, bounded retries, leases, zombie-run recovery, and source-of-truth financial reconciliation.',
     delivered: 'One system for member records, subscriptions, payments, visits, outreach, and retention workflows.',
@@ -273,7 +273,7 @@ export const featuredProjects = [
     id: 'societyone',
     categories: ['Backend', 'API', 'Fintech'],
     title: 'SocietyOne Platform Modernization',
-    eyebrow: 'Jan-Apr 2026 · Regulated fintech · Australia',
+    eyebrow: 'Jan 2024 – Dec 2025 · Regulated fintech · Australia',
     overview: 'Regulated platform migration spanning Go and Node.js services, .NET standardization, AWS Lambda workflows, and partner-system integrations.',
     context: 'A major data and platform migration for a regulated Australian fintech product.',
     implementation: 'Re-platformed Go and Node.js services to .NET and built AWS Lambda workflows for third-party integrations.',
@@ -382,7 +382,7 @@ export const skillGroups = [
   },
   {
     title: 'Systems & integrations',
-    skills: ['CRM REST APIs', 'PerfectGym', 'Twilio Voice', 'Bidirectional sync', 'Durable job queues', 'Payment reconciliation', 'RBAC', 'Audit trails', 'OTP / 2FA', 'Row-level security'],
+    skills: ['CRM REST APIs', 'CRM webhook sync', 'Twilio Voice', 'Bidirectional sync', 'Durable job queues', 'Payment reconciliation', 'RBAC', 'Audit trails', 'OTP / 2FA', 'Row-level security'],
   },
 ]
 

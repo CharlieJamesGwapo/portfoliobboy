@@ -16,12 +16,12 @@ const About = () => (
         />
         <div className="about-copy">
           <p>
-            Across two years of professional work, I’ve delivered applications across web, iOS, and Android.
+            Across 5+ years building and shipping software, I’ve delivered applications across web, iOS, and Android.
             My strongest work lives where AI-integrated product features, backend architecture, polished UI,
             and third-party systems meet.
           </p>
           <p>
-            My recent work includes an Australian multi-club fitness platform built end-to-end: member and payment
+            My recent work includes an enterprise CRM platform built end-to-end for an Australian client: member and payment
             data, event-driven CRM sync, retention dashboards, and Twilio calling—replacing scattered tools with
             a single dependable workflow.
           </p>

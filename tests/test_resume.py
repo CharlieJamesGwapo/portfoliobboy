@@ -56,8 +56,11 @@ class ResumeContentTest(unittest.TestCase):
             ).stdout
 
         normalized = " ".join(extracted.split())
-        self.assertIn("Full-Stack Developer - Rooche Digital Company Oct 2025 - Dec 2025", normalized)
-        self.assertNotIn("Jan 2026 - Mar 2026", normalized)
+        self.assertIn("AI Full-Stack Developer (Contract) - Australian Client, Australia 2026 – Present", normalized)
+        self.assertIn("Full-Stack Developer - Rooche Digital Company Jan 2026 – Mar 2026", normalized)
+        self.assertIn("Full-Stack Developer - Robustech IT / SocietyOne, Australia Jan 2024 – Dec 2025", normalized)
+        self.assertNotIn("Multi-Club Fitness Group", normalized)
+        self.assertNotIn("PerfectGym", normalized)
         for certificate in EXPECTED_CERTIFICATES:
             with self.subTest(certificate=certificate):
                 self.assertIn(certificate, normalized)
