@@ -1,88 +1,62 @@
-import { ArrowDown, ArrowUpRight, Briefcase, Gamepad2, Github, Linkedin, Mail, MapPin } from 'lucide-react'
-import { professionalTitles, profile, proofPoints, resumeUrl } from '../data/portfolioData'
-import { prefetchProps } from '../lib/prefetch'
-import AnimatedStat from './AnimatedStat'
-import RotatingTitle from './RotatingTitle'
-// Now a ~3 kB canvas renderer (was a 808 kB Three.js scene), so it is cheaper
-// to ship inline than to pay an extra request for a lazy chunk in the hero.
-import HeroSystemsScene from './HeroSystemsScene'
+import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail, MapPin } from 'lucide-react'
+import { profile, proofPoints, resumeUrl } from '../data/portfolioData'
 
-const openGames = () => window.dispatchEvent(new CustomEvent('portfolio:open-games'))
-
-// Same chunk key as the interactive lab section, so whichever entry point the
-// visitor reaches for first is the one that pays for the download.
-const warmArcade = prefetchProps('arcade', () => import('./game/ArcadeLobby'))
+const hidePortrait = (event) => {
+  event.currentTarget.closest('picture')?.setAttribute('hidden', '')
+}
 
 const Hero = () => (
   <section id="home" className="hero-section">
     <div className="hero-grid" aria-hidden="true" />
-    <div className="hero-orbit hero-orbit-one" aria-hidden="true" />
-    <div className="hero-orbit hero-orbit-two" aria-hidden="true" />
 
     <div className="page-container hero-layout">
       <div className="hero-copy">
         <div className="availability-pill hero-enter hero-enter-1">
           <span className="status-dot" aria-hidden="true" />
-          Available for remote AI, full-stack, and backend opportunities
+          {profile.availability}
         </div>
 
-        <p className="hero-kicker hero-enter hero-enter-2">AI development · Systems engineering · Product delivery</p>
-        <h1>
-          <span className="hero-line hero-line-primary">I build intelligent systems behind</span>{' '}
-          <span className="hero-line hero-line-accent">modern digital products.</span>
-        </h1>
+        <p className="hero-kicker hero-enter hero-enter-2">{profile.role}</p>
+        <h1>{profile.headline}</h1>
 
-        <div className="hero-enter hero-enter-5">
-          <RotatingTitle titles={professionalTitles} />
-        </div>
-
-        <p className="hero-intro hero-enter hero-enter-5">
-          I’m {profile.name}, an AI Developer and Full-Stack Engineer building AI-integrated applications,
-          scalable APIs, SaaS platforms, CRM integrations, mobile products, and reliable backend systems.
-        </p>
+        <p className="hero-intro hero-enter hero-enter-5">{profile.support}</p>
 
         <div className="hero-actions hero-enter hero-enter-6">
-          <a className="button button-primary" href="#projects">
-            Explore selected work <ArrowDown size={17} aria-hidden="true" />
+          <a className="button button-primary" href="#work">
+            View selected work <ArrowDown size={17} aria-hidden="true" />
           </a>
           <a className="button button-secondary" href={resumeUrl} target="_blank" rel="noreferrer">
-            View resume <ArrowUpRight size={17} aria-hidden="true" />
+            View resume (PDF) <ArrowUpRight size={17} aria-hidden="true" />
+            <span className="sr-only">approximately 505 KB, opens in a new tab</span>
           </a>
-          <a className="button button-quiet" href="#contact">
-            <Briefcase size={17} aria-hidden="true" /> Hire me
-          </a>
-          <button type="button" className="button button-quiet" onClick={openGames} {...warmArcade}>
-            <Gamepad2 size={17} aria-hidden="true" /> Play games
-          </button>
         </div>
 
         <div className="hero-socials hero-enter hero-enter-7" aria-label="Profile links">
-          <a href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub profile"><Github size={18} /></a>
-          <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn profile"><Linkedin size={18} /></a>
-          <a href={`mailto:${profile.email}`} aria-label={`Email ${profile.shortName}`}><Mail size={18} /></a>
+          <a href={profile.github} target="_blank" rel="noreferrer" aria-label="Open GitHub profile"><Github size={18} aria-hidden="true" /></a>
+          <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="Open LinkedIn profile"><Linkedin size={18} aria-hidden="true" /></a>
+          <a href={`mailto:${profile.email}`} aria-label={`Email ${profile.shortName}`}><Mail size={18} aria-hidden="true" /></a>
           <span><MapPin size={16} aria-hidden="true" /> {profile.location}</span>
         </div>
       </div>
 
       <div className="hero-visual hero-enter hero-enter-visual">
-        <div className="systems-visual-shell">
-          <HeroSystemsScene />
-          <p className="sr-only">Decorative visualization of connected AI, API, database, and cloud systems.</p>
-          <div className="systems-caption" aria-hidden="true">
-            <span>01 · AI orchestration</span>
-            <span>02 · API services</span>
-            <span>03 · Durable data</span>
-          </div>
-          <div className="engineer-card">
-            <picture>
-              <source srcSet="/profile.webp" type="image/webp" />
-              {/* Above the fold and preloaded in index.html — must not be lazy. */}
-              {/* React 18 does not map the camelCase `fetchPriority` prop, so it
-                  has to be written as the lowercase HTML attribute or the hint
-                  is dropped and React logs an unknown-prop warning. */}
-              <img src="/profile.png" alt="" width="413" height="531" fetchpriority="high" decoding="async" />
-            </picture>
-            <span><strong>Charlie James</strong>Philippines · Working globally</span>
+        <div className="portrait-frame">
+          <picture>
+            <source srcSet="/profile.webp" type="image/webp" />
+            <img
+              src="/profile.png"
+              alt=""
+              width="413"
+              height="531"
+              fetchpriority="high"
+              decoding="async"
+              onError={hidePortrait}
+            />
+          </picture>
+          <div className="portrait-identity">
+            <strong>{profile.name}</strong>
+            <span>{profile.role}</span>
+            <span>{profile.location}</span>
           </div>
         </div>
       </div>
@@ -91,7 +65,7 @@ const Hero = () => (
     <div className="page-container proof-strip" aria-label="Professional highlights">
       {proofPoints.map((item, index) => (
         <div key={item.label} style={{ '--proof-index': index }}>
-          <AnimatedStat {...item} />
+          <strong>{item.value}</strong>
           <span>{item.label}</span>
         </div>
       ))}
