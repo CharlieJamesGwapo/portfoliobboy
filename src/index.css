@@ -1733,6 +1733,11 @@ li {
   list-style: none;
 }
 
+.additional-work-disclosure > summary::after,
+.additional-work-panel-heading .eyebrow {
+  color: #0b705f;
+}
+
 .additional-work-disclosure > summary::-webkit-details-marker {
   display: none;
 }
@@ -1790,13 +1795,13 @@ li {
 }
 
 .archive-number {
-  color: var(--mint-deep);
+  color: #0b705f;
   font-size: 0.63rem;
   font-weight: 850;
 }
 
 .archive-project > div > p {
-  color: var(--mint-deep);
+  color: #0b705f;
   font-size: 0.57rem;
   font-weight: 800;
   text-transform: uppercase;

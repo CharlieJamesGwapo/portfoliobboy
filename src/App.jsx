@@ -81,7 +81,16 @@ function App() {
     const target = document.getElementById(targetId)
     if (!target) return undefined
 
-    const jump = () => target.scrollIntoView({ block: 'start', behavior: 'auto' })
+    const jump = () => {
+      // Deep links need a settled landing point for keyboard and assistive
+      // technology users. Temporarily override the document's smooth-scroll
+      // preference so the repeated post-mount lookup is immediate.
+      const root = document.documentElement
+      const previousBehavior = root.style.scrollBehavior
+      root.style.scrollBehavior = 'auto'
+      target.scrollIntoView({ block: 'start', behavior: 'auto' })
+      root.style.scrollBehavior = previousBehavior
+    }
     jump()
     const frame = window.requestAnimationFrame(jump)
     const settle = window.setTimeout(jump, 400)

@@ -112,14 +112,14 @@ function AdditionalWork() {
               >Launch the lab</button>
 
               {labOpen && (
-                <Suspense fallback={<LabLoading />}>
-                  <LabErrorBoundary>
+                <LabErrorBoundary>
+                  <Suspense fallback={<LabLoading />}>
                     <InteractiveLab
                       onClose={() => setLabOpen(false)}
                       returnFocusRef={launchButtonRef}
                     />
-                  </LabErrorBoundary>
-                </Suspense>
+                  </Suspense>
+                </LabErrorBoundary>
               )}
             </section>
           </div>
