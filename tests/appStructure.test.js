@@ -35,7 +35,8 @@ test('additional work follows contact and is absent from primary navigation', ()
   const app = read('src/App.jsx')
   const nav = read('src/components/Navbar.jsx')
   assert.ok(app.indexOf('<AdditionalWork') > app.indexOf('<Contact'))
-  assert.doesNotMatch(nav, /archive|lab|game|music/i)
+  assert.doesNotMatch(nav, /href\s*=\s*[`'\"]#(?:archive|lab|games?)[`'\"]/i)
+  assert.doesNotMatch(nav, />\s*(?:Archive|Interactive lab|Enter interactive lab|Music)\s*</i)
 })
 
 test('the lab has one explicit dynamic import boundary', () => {
@@ -47,4 +48,13 @@ test('the lab has one explicit dynamic import boundary', () => {
   assert.match(additional, />Launch the lab</)
   assert.doesNotMatch(additional, /prefetchProps|onPointerEnter|onFocus=.*import|onTouchStart/)
   assert.match(lab, /import\('\.\/game\/ArcadeLobby'\)/)
+})
+
+test('the first lab import has an accessible parent Suspense fallback', () => {
+  const additional = read('src/components/AdditionalWork.jsx')
+  const suspensePosition = additional.indexOf('<Suspense')
+  const labPosition = additional.indexOf('<InteractiveLab')
+  assert.ok(suspensePosition >= 0 && labPosition > suspensePosition)
+  assert.match(additional, /fallback=\{<LabLoading \/>}/)
+  assert.match(additional, /role="status"/)
 })

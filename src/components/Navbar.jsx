@@ -2,9 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { navigation as links, profile } from '../data/portfolioData'
 
-const linkText = (link) => link['la' + 'bel']
-const named = (value) => ({ ['aria-' + 'la' + 'bel']: value })
-
 const Navbar = () => {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState('home')
@@ -133,12 +130,12 @@ const Navbar = () => {
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="nav-inner">
-        <a {...named(`${profile.shortName}, home`)} href="#home" className="wordmark" onClick={() => handleLinkClick('home')}>
+        <a href="#home" className="wordmark" onClick={() => handleLinkClick('home')} aria-label={`${profile.shortName}, home`}>
           <span className="wordmark-mark" aria-hidden="true">CA</span>
           <span>{profile.shortName}</span>
         </a>
 
-        <nav {...named('Primary navigation')} className="desktop-nav">
+        <nav className="desktop-nav" aria-label="Primary navigation">
           {links.map((link) => {
             const id = link.href.slice(1)
             return (
@@ -149,7 +146,7 @@ const Navbar = () => {
                 className={active === id ? 'active' : ''}
                 aria-current={active === id ? 'location' : undefined}
               >
-                {linkText(link)}
+                {link.label}
               </a>
             )
           })}
@@ -166,20 +163,20 @@ const Navbar = () => {
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-controls="mobile-navigation"
-          {...named(open ? 'Close navigation menu' : 'Open navigation menu')}
+          aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
         >
           {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
         </button>
       </div>
 
       <div ref={menuRef} id="mobile-navigation" className={`mobile-menu ${open ? 'is-open' : ''}`}>
-        <nav {...named('Mobile navigation')}>
+        <nav aria-label="Mobile navigation">
           {links.map((link, index) => {
             const id = link.href.slice(1)
             return (
               <a key={link.href} href={link.href} onClick={() => handleLinkClick(id)} style={{ '--menu-index': index }}>
                 <span aria-hidden="true">0{index + 1}</span>
-                {linkText(link)}
+                {link.label}
               </a>
             )
           })}

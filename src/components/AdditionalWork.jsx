@@ -1,4 +1,4 @@
-import { Component, lazy, useEffect, useRef, useState } from 'react'
+import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { ArrowUpRight } from 'lucide-react'
 import { supplementalProjects } from '../data/portfolioData'
 
@@ -25,6 +25,14 @@ class LabErrorBoundary extends Component {
 
     return this.props.children
   }
+}
+
+function LabLoading() {
+  return (
+    <div className="lab-loading" role="status" aria-live="polite" aria-atomic="true">
+      Loading the interactive lab…
+    </div>
+  )
 }
 
 function AdditionalWork() {
@@ -104,12 +112,14 @@ function AdditionalWork() {
               >Launch the lab</button>
 
               {labOpen && (
-                <LabErrorBoundary>
-                  <InteractiveLab
-                    onClose={() => setLabOpen(false)}
-                    returnFocusRef={launchButtonRef}
-                  />
-                </LabErrorBoundary>
+                <Suspense fallback={<LabLoading />}>
+                  <LabErrorBoundary>
+                    <InteractiveLab
+                      onClose={() => setLabOpen(false)}
+                      returnFocusRef={launchButtonRef}
+                    />
+                  </LabErrorBoundary>
+                </Suspense>
               )}
             </section>
           </div>
