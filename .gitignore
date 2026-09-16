@@ -11,8 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-test-results/
-artifacts/qa/playwright-report/
 
 # Editor directories and files
 .vscode/*
@@ -29,5 +27,4 @@ config.bat
 
 # Local agent tooling
 .superpowers/
-.worktrees/
 .env*

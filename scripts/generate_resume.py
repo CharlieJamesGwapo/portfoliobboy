@@ -305,7 +305,7 @@ def build_story():
 
     story.extend(section("Professional Summary"))
     story.append(Paragraph(
-        "Full-stack web and mobile developer with <b>2 years of professional experience</b> building production applications, APIs, integrations, and real-time systems. Experienced delivering products end to end, from requirements and data modeling to user interfaces, backend services, deployment, documentation, and handover. Comfortable working directly with non-technical stakeholders and owning dependable systems across TypeScript, React, React Native, Go, Python, .NET, PostgreSQL, and cloud infrastructure.",
+        "Full-stack web and mobile developer with <b>5+ years building and shipping software</b> across web, iOS, and Android. Experienced delivering products end to end, from requirements and data modeling to user interfaces, backend services, deployment, documentation, and handover. Comfortable working directly with non-technical stakeholders and owning dependable systems across TypeScript, React, React Native, Go, Python, .NET, PostgreSQL, and cloud infrastructure.",
         BODY,
     ))
 
@@ -320,18 +320,18 @@ def build_story():
     story.extend(section("Professional Experience"))
     story.extend([
         experience(
-            "Full-Stack Developer (Contract) - Multi-Club Fitness Group, Australia",
-            "May 2026 - Jul 2026",
+            "AI Full-Stack Developer (Contract) - Australian Client, Australia",
+            "2026 – Present",
             [
-                "Built a production CRM and management platform unifying member records, subscriptions, payments, visit history, outreach, and revenue/retention dashboards.",
-                "Designed a bidirectional Python sync worker with Celery, Redis, durable Postgres jobs, idempotency, bounded retries, and reconciliation against source financial reports.",
+                "Built an enterprise CRM and management platform for an Australian client, unifying member records, subscriptions, payments, visit history, outreach, and revenue/retention dashboards.",
+                "Designed bidirectional Python CRM synchronization with Celery, Redis, durable Postgres jobs, idempotency, bounded retries, and reconciliation against source financial reports.",
                 "Integrated Twilio Voice browser calling and translated plain-language business requirements into technical specifications and production architecture.",
             ],
             "TypeScript, Next.js 16, React 19, Python, Celery, Redis, Supabase Postgres, Docker, Twilio",
         ),
         experience(
             "Full-Stack Developer - Rooche Digital Company",
-            "Oct 2025 - Dec 2025",
+            "Jan 2026 – Mar 2026",
             [
                 "Delivered client dashboards and web applications with React, Next.js, Angular, Node.js, and FastAPI backends.",
                 "Built validated REST and GraphQL APIs, Firebase/Supabase authentication, row-level security, and real-time WebSocket/webhook updates.",
@@ -341,7 +341,7 @@ def build_story():
         ),
         experience(
             "Full-Stack Developer - Robustech IT / SocietyOne, Australia",
-            "Jan 2026 - Apr 2026",
+            "Jan 2024 – Dec 2025",
             [
                 "Re-platformed Go and Node.js microservices to .NET for a regulated fintech platform, standardizing logging, error handling, and deployments.",
                 "Built Python and .NET AWS Lambda workflows for partner banking and lending integrations.",

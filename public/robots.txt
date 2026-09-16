@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-# Canonical production origin
 Sitemap: https://portfoliobboy.vercel.app/sitemap.xml
