@@ -134,8 +134,10 @@ img {
 }
 
 :focus-visible {
-  outline: 3px solid var(--coral);
+  /* Ink clears light surfaces; the coral halo clears the ink background. */
+  outline: 3px solid var(--ink);
   outline-offset: 4px;
+  box-shadow: 0 0 0 6px var(--coral);
 }
 
 main:focus {
@@ -157,6 +159,40 @@ main:focus {
 
 .site-shell {
   overflow: clip;
+}
+
+.skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 200;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--mint);
+  color: var(--ink);
+  font-weight: 800;
+  transform: translateY(-150%);
+  transition: transform 180ms ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 110;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--mint), var(--coral));
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
 }
 
 .page-container {
@@ -514,7 +550,7 @@ li {
   font-size: 0.76rem;
   font-weight: 800;
   line-height: 1.3;
-  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
   cursor: pointer;
 }
 
@@ -594,7 +630,7 @@ li {
 
 .hero-visual {
   position: relative;
-  grid-column: 9 / -1;
+  grid-column: 8 / -1;
   justify-self: end;
   width: 100%;
   max-width: 390px;
@@ -779,8 +815,8 @@ li {
 
 .fit-card p {
   color: var(--slate);
-  font-size: 0.8rem;
-  line-height: 1.65;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 /* Selected work: story first in the DOM; the second study reverses visually
@@ -817,6 +853,16 @@ li {
   min-width: 0;
 }
 
+.project-eyebrow {
+  margin-bottom: 10px;
+  color: var(--mint-deep);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
 .case-study-story h3 {
   max-width: 680px;
   margin: 8px 0 13px;
@@ -830,9 +876,9 @@ li {
   max-width: 66ch;
   margin-bottom: 24px;
   color: var(--slate);
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-style: italic;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .case-study-section {
@@ -853,8 +899,8 @@ li {
 .case-study-section p,
 .case-study-section li {
   color: var(--slate);
-  font-size: 0.86rem;
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
 .case-study-section ul {
@@ -1096,8 +1142,8 @@ li {
   max-width: 72ch;
   margin-bottom: 19px;
   color: #d3dedc;
-  font-size: 0.91rem;
-  line-height: 1.72;
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
 .experience-record-body ul {
@@ -1110,8 +1156,8 @@ li {
 }
 
 .experience-record-body li {
-  font-size: 0.83rem;
-  line-height: 1.66;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .experience-record .experience-stack {
@@ -1158,14 +1204,14 @@ li {
 .earlier-work-record h4 {
   margin-bottom: 6px;
   color: var(--paper);
-  font-size: 0.91rem;
-  line-height: 1.3;
+  font-size: 1rem;
+  line-height: 1.35;
 }
 
 .earlier-work-record > p:not(.experience-stack) {
   color: var(--mist);
-  font-size: 0.74rem;
-  line-height: 1.6;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .earlier-work-record .experience-stack {
@@ -1250,8 +1296,8 @@ li {
   max-width: 64ch;
   margin: 0 0 17px 36px;
   color: var(--mist);
-  font-size: 0.82rem;
-  line-height: 1.68;
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
 .skill-metadata-list {
@@ -1332,7 +1378,12 @@ li {
   line-height: 1.06;
 }
 
-.foundation-card > p:last-child,
+.foundation-card > p:last-child {
+  color: var(--slate);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
 .foundation-place {
   color: var(--slate);
   font-size: 0.82rem;
@@ -1586,8 +1637,14 @@ li {
 .contact-form input:focus,
 .contact-form textarea:focus {
   border-color: var(--mint-deep);
-  outline: 0;
-  box-shadow: 0 0 0 3px rgba(15, 128, 109, 0.15);
+}
+
+.contact-form input:focus-visible,
+.contact-form textarea:focus-visible {
+  border-color: var(--ink);
+  outline: 3px solid var(--ink);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 6px var(--coral);
 }
 
 .contact-form [aria-invalid='true'] {
@@ -1714,8 +1771,8 @@ li {
 
 .additional-work-panel-heading > p:last-child {
   color: var(--slate);
-  font-size: 0.82rem;
-  line-height: 1.65;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .project-archive {
@@ -1757,8 +1814,8 @@ li {
 
 .archive-project > div > span {
   color: var(--slate);
-  font-size: 0.7rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.65;
 }
 
 .archive-stack {
@@ -1882,7 +1939,7 @@ li {
   color: var(--mint);
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity 160ms ease, transform 160ms ease;
+  transition: opacity 180ms ease, transform 180ms ease;
   pointer-events: none;
   cursor: pointer;
 }
@@ -2366,7 +2423,7 @@ li {
 
   .hero-intro {
     margin-top: 22px;
-    font-size: 0.97rem;
+    font-size: 1rem;
   }
 
   .hero-actions {
@@ -2468,7 +2525,7 @@ li {
   }
 
   .experience-summary {
-    font-size: 0.86rem;
+    font-size: 1rem;
   }
 
   .earlier-work {

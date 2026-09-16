@@ -11,17 +11,17 @@ const Hero = () => (
 
     <div className="page-container hero-layout">
       <div className="hero-copy">
-        <div className="availability-pill hero-enter hero-enter-1">
+        <div className="availability-pill">
           <span className="status-dot" aria-hidden="true" />
           {profile.availability}
         </div>
 
-        <p className="hero-kicker hero-enter hero-enter-2">{profile.role}</p>
+        <p className="hero-kicker">{profile.role}</p>
         <h1>{profile.headline}</h1>
 
-        <p className="hero-intro hero-enter hero-enter-5">{profile.support}</p>
+        <p className="hero-intro">{profile.support}</p>
 
-        <div className="hero-actions hero-enter hero-enter-6">
+        <div className="hero-actions">
           <a className="button button-primary" href="#work">
             View selected work <ArrowDown size={17} aria-hidden="true" />
           </a>
@@ -31,7 +31,7 @@ const Hero = () => (
           </a>
         </div>
 
-        <div className="hero-socials hero-enter hero-enter-7" aria-label="Profile links">
+        <div className="hero-socials" aria-label="Profile links">
           <a href={profile.github} target="_blank" rel="noreferrer" aria-label="Open GitHub profile"><Github size={18} aria-hidden="true" /></a>
           <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="Open LinkedIn profile"><Linkedin size={18} aria-hidden="true" /></a>
           <a href={`mailto:${profile.email}`} aria-label={`Email ${profile.shortName}`}><Mail size={18} aria-hidden="true" /></a>
@@ -39,7 +39,7 @@ const Hero = () => (
         </div>
       </div>
 
-      <div className="hero-visual hero-enter hero-enter-visual">
+      <div className="hero-visual">
         <div className="portrait-frame">
           <picture>
             <source srcSet="/profile.webp" type="image/webp" />
