@@ -1,8 +1,11 @@
 import { useState } from 'react'
-import { ArrowUpRight, CheckCircle2, FileText, Github, Linkedin, Loader2, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowUpRight, CheckCircle2, Clock3, FileText, Github, Linkedin, Loader2, Mail, MapPin, Phone } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import { profile, resumeUrl } from '../data/portfolioData'
 
+// `company` is a honeypot: hidden from people, irresistible to the bots that
+// fill every field they can find. The server drops any submission that has it
+// set, and reports success so the bot has nothing to tune against.
 const initialForm = { name: '', email: '', subject: '', message: '', company: '' }
 
 const validate = (form) => {
@@ -21,9 +24,8 @@ const Contact = () => {
   const [errors, setErrors] = useState({})
 
   const updateField = (event) => {
-    const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
-    setErrors((current) => ({ ...current, [name]: '' }))
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
+    setErrors((current) => ({ ...current, [event.target.name]: '' }))
     if (status !== 'idle') setStatus('idle')
   }
 
@@ -40,7 +42,6 @@ const Contact = () => {
     }
 
     setStatus('sending')
-    setErrors({})
     setMessage('')
 
     try {
@@ -65,11 +66,11 @@ const Contact = () => {
     <section id="contact" className="contact-section">
       <div className="page-container contact-layout">
         <ScrollReveal className="contact-copy" variant="left">
-          <p className="eyebrow">06 · Contact</p>
+          <p className="eyebrow">07 · Contact</p>
           <h2>Have a system to improve or a product to ship?</h2>
           <p>
-            {profile.availability}. Based in {profile.location}. I build reliable web, mobile, and CRM systems with
-            API integrations, real-time sync, secure data workflows, and AI-assisted delivery.
+            Have an AI product, SaaS platform, backend system, or mobile application to build? Let’s discuss
+            the product, architecture, and delivery plan. I work remotely and can overlap US business hours.
           </p>
 
           <a className="contact-email" href={`mailto:${profile.email}`}>
@@ -78,64 +79,63 @@ const Contact = () => {
           </a>
 
           <div className="contact-details">
-            <a href={profile.phoneHref} aria-label={`Call ${profile.phoneDisplay}`}><Phone size={17} aria-hidden="true" /> {profile.phoneDisplay}</a>
+            <a href={profile.phoneHref}><Phone size={17} aria-hidden="true" /> {profile.phoneDisplay}</a>
             <span><MapPin size={17} aria-hidden="true" /> {profile.location}</span>
-            <span><Mail size={17} aria-hidden="true" /> {profile.availability}</span>
+            <span><Clock3 size={17} aria-hidden="true" /> PHT (UTC+8) · US business-hours overlap</span>
           </div>
 
           <div className="contact-socials">
-            <a href={profile.github} target="_blank" rel="noreferrer" aria-label="Open GitHub profile"><Github size={18} aria-hidden="true" /> GitHub</a>
-            <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="Open LinkedIn profile"><Linkedin size={18} aria-hidden="true" /> LinkedIn</a>
-            <a href={resumeUrl} download="charlie-james-abejo-resume.pdf" aria-label="Download resume PDF, approximately 505 KB"><FileText size={18} aria-hidden="true" /> Download resume</a>
+            <a href={profile.github} target="_blank" rel="noreferrer"><Github size={18} /> GitHub</a>
+            <a href={profile.linkedin} target="_blank" rel="noreferrer"><Linkedin size={18} /> LinkedIn</a>
+            <a href={resumeUrl} download="charlie-james-abejo-resume.pdf"><FileText size={18} /> Download resume</a>
           </div>
         </ScrollReveal>
 
         <ScrollReveal delay={100} variant="scale">
           <form className="contact-form" onSubmit={handleSubmit} noValidate aria-busy={status === 'sending'}>
-            {status === 'error' && Object.keys(errors).length > 0 && (
-              <div className="form-error-summary" role="alert" aria-labelledby="contact-error-title">
-                <strong id="contact-error-title">Please fix the following fields:</strong>
-                <ul>
-                  {Object.entries(errors).map(([field, error]) => error && (
-                    <li key={field}><a href={`#contact-${field}`}>{error}</a></li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             <div className="form-row">
-              <label htmlFor="contact-name">
+              <label>
                 <span>Name</span>
                 <input id="contact-name" name="name" value={form.name} onChange={updateField} autoComplete="name" required placeholder="Your name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'contact-name-error' : undefined} />
                 {errors.name && <small id="contact-name-error" className="field-error">{errors.name}</small>}
               </label>
-              <label htmlFor="contact-email">
+              <label>
                 <span>Email</span>
                 <input id="contact-email" name="email" type="email" value={form.email} onChange={updateField} autoComplete="email" required placeholder="you@company.com" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'contact-email-error' : undefined} />
                 {errors.email && <small id="contact-email-error" className="field-error">{errors.email}</small>}
               </label>
             </div>
-            <label htmlFor="contact-subject">
+            <label>
               <span>Subject</span>
               <input id="contact-subject" name="subject" value={form.subject} onChange={updateField} required placeholder="What would you like to build?" aria-invalid={Boolean(errors.subject)} aria-describedby={errors.subject ? 'contact-subject-error' : undefined} />
               {errors.subject && <small id="contact-subject-error" className="field-error">{errors.subject}</small>}
             </label>
-            <label htmlFor="contact-message">
+            <label>
               <span>Message</span>
               <textarea id="contact-message" name="message" value={form.message} onChange={updateField} required minLength="10" rows="5" placeholder="Share a little context, timeline, or role details." aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? 'contact-message-error' : undefined} />
               {errors.message && <small id="contact-message-error" className="field-error">{errors.message}</small>}
             </label>
-
+            {/* Off-screen rather than display:none — some bots skip fields
+                they can tell are hidden. tabIndex/aria-hidden keep it out of
+                the keyboard order and out of the accessibility tree. */}
             <div className="honeypot" aria-hidden="true">
               <label htmlFor="contact-company">Company (leave this field empty)</label>
-              <input id="contact-company" name="company" type="text" value={form.company} onChange={updateField} tabIndex={-1} autoComplete="off" />
+              <input
+                id="contact-company"
+                name="company"
+                type="text"
+                value={form.company}
+                onChange={updateField}
+                tabIndex={-1}
+                autoComplete="off"
+              />
             </div>
 
             <button className="button button-dark" type="submit" disabled={status === 'sending'}>
               {status === 'sending' ? <Loader2 className="spin" size={18} /> : status === 'success' ? <CheckCircle2 size={18} /> : <Mail size={18} />}
               {status === 'sending' ? 'Sending…' : 'Send message'}
             </button>
-            <p className={`form-status ${status}`} role="status" aria-live="polite" aria-atomic="true">{message}</p>
+            <p className={`form-status ${status}`} aria-live="polite">{message}</p>
           </form>
         </ScrollReveal>
       </div>

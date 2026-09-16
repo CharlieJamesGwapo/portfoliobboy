@@ -22,7 +22,7 @@ const ScrollReveal = ({
   children,
   className = '',
   delay = 0,
-  duration = 360,
+  duration = 640,
   variant = 'up',
 }) => {
   const ref = useRef(null)
