@@ -30,3 +30,21 @@ test('case studies use the reusable semantic diagram', () => {
   assert.match(diagram, /aria-hidden="true"/)
   assert.match(diagram, /focusable="false"/)
 })
+
+test('additional work follows contact and is absent from primary navigation', () => {
+  const app = read('src/App.jsx')
+  const nav = read('src/components/Navbar.jsx')
+  assert.ok(app.indexOf('<AdditionalWork') > app.indexOf('<Contact'))
+  assert.doesNotMatch(nav, /archive|lab|game|music/i)
+})
+
+test('the lab has one explicit dynamic import boundary', () => {
+  const app = read('src/App.jsx')
+  const additional = read('src/components/AdditionalWork.jsx')
+  const lab = read('src/components/InteractiveLab.jsx')
+  assert.doesNotMatch(app, /InteractiveLab|ArcadeLobby|MusicPlayer/)
+  assert.match(additional, /import\('\.\/InteractiveLab'\)/)
+  assert.match(additional, />Launch the lab</)
+  assert.doesNotMatch(additional, /prefetchProps|onPointerEnter|onFocus=.*import|onTouchStart/)
+  assert.match(lab, /import\('\.\/game\/ArcadeLobby'\)/)
+})

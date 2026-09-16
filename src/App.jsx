@@ -7,6 +7,7 @@ import Experience from './components/Experience'
 import Skills from './components/Skills'
 import Education from './components/Education'
 import Contact from './components/Contact'
+import AdditionalWork from './components/AdditionalWork'
 import Footer from './components/Footer'
 
 const getScrollBehavior = () => (
@@ -111,6 +112,7 @@ function App() {
         <Skills />
         <Education />
         <Contact />
+        <AdditionalWork />
       </main>
       <Footer />
 
