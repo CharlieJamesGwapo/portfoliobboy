@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { createServer } from 'vite'
 import {
   certifications,
+  education,
   experiences,
   featuredProjects,
   interactiveGames,
@@ -38,6 +39,7 @@ const renderConsumers = async () => {
 }
 
 test('preserves the verified professional positioning and identity features', () => {
+  assert.equal(education.period, '2022 — 2026')
   assert.equal(professionalTitles.length, 8)
   assert.equal(professionalTitles[0], 'AI Developer')
   assert.equal(interactiveGames.length, 9)

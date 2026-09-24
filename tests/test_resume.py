@@ -59,6 +59,7 @@ class ResumeContentTest(unittest.TestCase):
         self.assertIn("AI Full-Stack Developer (Contract) - Australian Client, Australia 2026 – Present", normalized)
         self.assertIn("Full-Stack Developer - Rooche Digital Company Jan 2026 – Mar 2026", normalized)
         self.assertIn("Full-Stack Developer - Robustech IT / SocietyOne, Australia Jan 2024 – Dec 2025", normalized)
+        self.assertIn("BS in Information Technology - Misamis Oriental Institute of Science and Technology 2022 - 2026", normalized)
         self.assertNotIn("Multi-Club Fitness Group", normalized)
         self.assertNotIn("PerfectGym", normalized)
         for certificate in EXPECTED_CERTIFICATES:

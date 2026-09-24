@@ -389,7 +389,7 @@ export const skillGroups = [
 export const education = {
   institution: 'Misamis Oriental Institute of Science and Technology',
   degree: 'Bachelor of Science in Information Technology',
-  period: '2022 — 2025',
+  period: '2022 — 2026',
   details: "Dean's Lister, 2nd and 3rd Year (Ranked 2) · TOPCIT participant (2024–2025)",
 }
 

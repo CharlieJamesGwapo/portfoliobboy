@@ -382,7 +382,7 @@ def build_story():
     story.extend(section("Education"))
     story.append(dated_heading(
         "BS in Information Technology - Misamis Oriental Institute of Science and Technology",
-        "2022 - 2025",
+        "2022 - 2026",
     ))
     story.append(Paragraph("Dean's Lister, 2nd and 3rd Year (Ranked 2) | TOPCIT participant (2024-2025)", BODY))
 
