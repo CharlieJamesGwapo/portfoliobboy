@@ -2,13 +2,22 @@ import { test, expect } from '@playwright/test'
 
 const themeSelect = (page) => page.locator('select[aria-label="Color theme"]:visible').first()
 
-const parseHex = (value) => {
-  const normalized = value.replace('#', '')
-  return [0, 2, 4].map((offset) => Number.parseInt(normalized.slice(offset, offset + 2), 16) / 255)
+const parseColor = (value) => {
+  const normalized = value.trim()
+  if (normalized === 'transparent') return [0, 0, 0, 0]
+  if (normalized.startsWith('#')) {
+    const hex = normalized.slice(1)
+    const expanded = hex.length === 3 ? hex.split('').map((digit) => `${digit}${digit}`).join('') : hex
+    return [0, 2, 4].map((offset) => Number.parseInt(expanded.slice(offset, offset + 2), 16) / 255).concat(1)
+  }
+  const match = normalized.match(/rgba?\(([^)]+)\)/)
+  if (!match) throw new Error(`Unsupported CSS color: ${value}`)
+  const channels = match[1].replace('/', ' ').split(/[\s,]+/).filter(Boolean)
+  return [0, 1, 2].map((index) => Number.parseFloat(channels[index]) / 255).concat(channels[3] ? Number.parseFloat(channels[3]) : 1)
 }
 
 const relativeLuminance = (value) => {
-  const [red, green, blue] = parseHex(value).map((channel) =>
+  const [red, green, blue] = parseColor(value).map((channel) =>
     channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
   )
   return (0.2126 * red) + (0.7152 * green) + (0.0722 * blue)
@@ -19,6 +28,54 @@ const contrastRatio = (foreground, background) => {
   const dark = Math.min(relativeLuminance(foreground), relativeLuminance(background))
   return (light + 0.05) / (dark + 0.05)
 }
+
+const readRenderedPairs = (page, selectors) => page.evaluate((requestedSelectors) => {
+  const parseCssColor = (value) => {
+    if (value === 'transparent') return [0, 0, 0, 0]
+    const srgbMatch = value.match(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/)
+    if (srgbMatch) {
+      return [1, 2, 3].map((index) => Number.parseFloat(srgbMatch[index]) * 255).concat(srgbMatch[4] ? Number.parseFloat(srgbMatch[4]) : 1)
+    }
+    const match = value.match(/rgba?\(([^)]+)\)/)
+    if (!match) return [0, 0, 0, 0]
+    const channels = match[1].replace('/', ' ').split(/[\s,]+/).filter(Boolean)
+    return [0, 1, 2].map((index) => Number.parseFloat(channels[index])).concat(channels[3] ? Number.parseFloat(channels[3]) : 1)
+  }
+
+  const composite = (foreground, background) => {
+    const alpha = foreground[3] + (background[3] * (1 - foreground[3]))
+    if (!alpha) return [0, 0, 0, 0]
+    return [0, 1, 2].map((index) => (
+      ((foreground[index] * foreground[3]) + (background[index] * background[3] * (1 - foreground[3]))) / alpha
+    )).concat(alpha)
+  }
+
+  const asRgb = ([red, green, blue]) => `rgb(${Math.round(red)}, ${Math.round(green)}, ${Math.round(blue)})`
+  const effectiveBackground = (element) => {
+    let result = [0, 0, 0, 0]
+    let node = element
+    while (node) {
+      result = composite(parseCssColor(getComputedStyle(node).backgroundColor), result)
+      if (result[3] >= 0.995) break
+      node = node.parentElement
+    }
+    return asRgb(result)
+  }
+
+  return Object.fromEntries(requestedSelectors.map((selector) => {
+    const element = document.querySelector(selector)
+    if (!element) return [selector, null]
+    const styles = getComputedStyle(element)
+    const background = effectiveBackground(element)
+    return [selector, {
+      color: styles.color,
+      background,
+      border: asRgb(composite(parseCssColor(styles.borderTopColor), parseCssColor(background))),
+      transitionProperty: styles.transitionProperty,
+      transitionDuration: styles.transitionDuration,
+    }]
+  }))
+}, selectors)
 
 const readThemeSurfaceState = (page) => page.evaluate(() => {
   const root = getComputedStyle(document.documentElement)
@@ -177,4 +234,73 @@ test('denied storage keeps the current-session theme selector usable', async ({ 
   await select.selectOption('dark')
   await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe('dark')
   await expect(select).toHaveValue('dark')
+})
+
+test('rendered theme consumers keep foregrounds, ancestor-composited surfaces, and boundaries legible', async ({ page }) => {
+  await page.route('https://www.youtube.com/**', (route) => route.abort())
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' })
+  await page.goto('/')
+  const select = themeSelect(page)
+
+  for (const preference of ['light', 'dark']) {
+    await select.selectOption(preference)
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe(preference)
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.waitForTimeout(80)
+
+    const navPairs = await readRenderedPairs(page, ['.desktop-nav a'])
+    await page.locator('#ai-systems').scrollIntoViewIfNeeded()
+    const filterPairs = await readRenderedPairs(page, ['.momentum-filters button', '.momentum-filters button:not(.is-active)', '.ai-capability', '.ai-capability-stack span', '.momentum-stack span', '.momentum-card-type'])
+
+    await page.locator('#contact').scrollIntoViewIfNeeded()
+    await page.getByRole('button', { name: 'Send message' }).click()
+    const errorPairs = await readRenderedPairs(page, ['.field-error'])
+
+    await page.keyboard.press('Control+KeyK')
+    await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible()
+    const palettePairs = await readRenderedPairs(page, ['.palette', '.palette-results li', '.palette-results li small', '.palette-search kbd', '.palette-footer kbd'])
+    await page.getByRole('combobox', { name: 'Search sections and actions' }).press('Escape')
+    await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden()
+
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent('portfolio:sw-update', { detail: { apply: () => {} } })))
+    await expect(page.locator('.update-banner')).toBeVisible()
+    const updatePairs = await readRenderedPairs(page, ['.update-banner', '.update-banner-apply', '.update-banner-dismiss'])
+    await page.locator('.update-banner-apply').hover()
+    const updateApplyHover = await readRenderedPairs(page, ['.update-banner-apply'])
+    await page.locator('.update-banner-dismiss').hover()
+    const updateHover = await readRenderedPairs(page, ['.update-banner-dismiss'])
+    await page.locator('.update-banner-dismiss').click()
+
+    await page.evaluate(() => window.dispatchEvent(new CustomEvent('portfolio:open-music')))
+    await expect(page.locator('.music-player-pill')).toBeVisible()
+    await page.getByRole('button', { name: 'Playlist' }).click()
+    await expect(page.locator('.music-player-panel')).toBeVisible()
+    const musicPairs = await readRenderedPairs(page, [
+      '.music-playlist-option[aria-pressed="true"]',
+      '.music-playlist-option:not([aria-pressed="true"])',
+    ])
+    await page.getByRole('button', { name: 'Close music player' }).click()
+
+    const pairs = { ...navPairs, ...filterPairs, ...errorPairs, ...palettePairs, ...updatePairs, ...updateApplyHover, ...updateHover, ...musicPairs }
+    for (const [selector, pair] of Object.entries(pairs)) {
+      expect(pair, `expected rendered selector to be present: ${selector}`).not.toBeNull()
+      expect(contrastRatio(pair.color, pair.background), selector).toBeGreaterThanOrEqual(4.5)
+    }
+    for (const selector of ['.momentum-filters button:not(.is-active)', '.ai-capability', '.palette-search kbd', '.palette-footer kbd', '.music-playlist-option:not([aria-pressed="true"])']) {
+      expect(contrastRatio(pairs[selector].border, pairs[selector].background), `${selector} border`).toBeGreaterThanOrEqual(3)
+    }
+    expect(contrastRatio(updateHover['.update-banner-dismiss'].color, updateHover['.update-banner-dismiss'].background)).toBeGreaterThanOrEqual(4.5)
+  }
+})
+
+test('theme selector border transition is scoped and honors reduced motion', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'no-preference' })
+  await page.goto('/')
+  const selector = themeSelect(page)
+  const motion = await readRenderedPairs(page, ['.theme-selector select'])
+  expect(motion['.theme-selector select'].transitionProperty).toContain('border-color')
+  expect(motion['.theme-selector select'].transitionDuration).toContain('0.18s')
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('.theme-selector select')).transitionProperty)).toBe('none')
 })

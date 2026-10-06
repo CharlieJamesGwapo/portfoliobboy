@@ -194,9 +194,10 @@ export default function MusicPlayer({ onClose }) {
               <button
                 key={pl.key}
                 onClick={() => pickPlaylist(pl)}
-                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl text-xs font-semibold border transition-colors ${
+                aria-pressed={playlistKey === pl.key}
+                className={`music-playlist-option flex flex-col items-center gap-1 px-2 py-2 rounded-xl text-xs font-semibold border transition-colors ${
                   playlistKey === pl.key
-                    ? 'bg-blue-500/20 border-blue-400 text-blue-200'
+                    ? 'is-selected bg-blue-500/20 border-blue-400 text-blue-200'
                     : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
                 }`}
               >

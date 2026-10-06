@@ -397,6 +397,7 @@ body {
   font-size: .72rem;
   font-weight: 700;
   cursor: pointer;
+  transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease, color var(--duration-fast) ease;
 }
 
 .theme-selector select:hover {
@@ -512,6 +513,12 @@ body {
   color: var(--text-muted);
 }
 
+.palette-search kbd,
+.palette-footer kbd {
+  border-color: var(--border-control);
+  color: var(--text-muted);
+}
+
 .palette-results li {
   color: var(--text-primary);
 }
@@ -537,6 +544,38 @@ body {
 .music-player-pill button:hover,
 .music-player-panel button:hover {
   color: var(--accent-action) !important;
+}
+
+.music-playlist-option {
+  border-color: var(--border-control) !important;
+  background: var(--surface-page) !important;
+  color: var(--text-primary) !important;
+}
+
+.music-playlist-option.is-selected,
+.music-playlist-option:hover {
+  border-color: var(--accent-action) !important;
+  background: var(--accent-action) !important;
+  color: var(--on-accent) !important;
+}
+
+.update-banner-apply {
+  background: var(--accent-action);
+  color: var(--on-accent);
+}
+
+.update-banner-apply:hover {
+  background: var(--accent-action);
+  color: var(--on-accent);
+}
+
+.update-banner-dismiss {
+  color: var(--text-muted);
+}
+
+.update-banner-dismiss:hover {
+  background: var(--accent-action);
+  color: var(--on-accent);
 }
 
 @media (max-width: 860px) {

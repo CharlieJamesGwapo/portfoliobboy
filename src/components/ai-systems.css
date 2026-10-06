@@ -19,7 +19,7 @@
 .ai-capability li { display: flex; align-items: flex-start; gap: 7px; }
 .ai-capability li svg { flex-shrink: 0; color: var(--mint-deep); margin-top: 2px; }
 .ai-capability-stack { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 16px; margin-top: auto; border-top: 1px solid var(--line-light); }
-.ai-capability-stack span, .momentum-stack span { font-size: .61rem; color: var(--slate); background: var(--paper); padding: 5px 7px; border-radius: 5px; }
+.ai-capability-stack span, .momentum-stack span { font-size: .61rem; color: var(--text-primary); background: var(--surface-page); padding: 5px 7px; border-radius: 5px; }
 .ai-delivery-note { display: flex; gap: 18px; align-items: center; padding: 24px 28px; margin-top: 20px; background: var(--ink); color: var(--paper); border-radius: 12px; }
 .ai-delivery-note > svg { flex-shrink: 0; color: var(--mint); }
 .ai-delivery-note strong { font-size: .9rem; }
@@ -29,9 +29,9 @@
 .momentum-toolbar { display: flex; gap: 20px; justify-content: space-between; align-items: center; margin: 32px 0 24px; }
 .momentum-toolbar > p { color: var(--slate); flex-shrink: 0; font-size: .72rem; }
 .momentum-filters { display: flex; flex-wrap: wrap; gap: 8px; }
-.momentum-filters button { min-height: 44px; padding: 10px 15px; background: transparent; border: 1px solid var(--line-light); border-radius: 999px; color: var(--slate); font-size: .73rem; font-weight: 700; cursor: pointer; transition: background 150ms, color 150ms; }
-.momentum-filters button:hover { border-color: var(--mint-deep); color: var(--ink); }
-.momentum-filters button.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.momentum-filters button { min-height: 44px; padding: 10px 15px; background: transparent; border: 1px solid var(--border-control); border-radius: 999px; color: var(--text-muted); font-size: .73rem; font-weight: 700; cursor: pointer; transition: background 150ms, border-color 150ms, color 150ms; }
+.momentum-filters button:hover { border-color: var(--accent-action); color: var(--text-primary); }
+.momentum-filters button.is-active { background: var(--surface-ink); color: var(--text-on-ink); border-color: var(--surface-ink); }
 .momentum-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .momentum-card { min-width: 0; overflow: hidden; border: 1px solid var(--line-light); border-radius: 18px; background: var(--white); }
 .momentum-preview { position: relative; display: block; overflow: hidden; aspect-ratio: 16 / 9; background: var(--paper-deep); border-bottom: 1px solid var(--line-light); }
