@@ -25,6 +25,27 @@ The planned public behavior is read-only and portfolio-grounded: bounded
 public facts, no repository or private-client access, no tools, no raw model
 HTML, no autonomous loops, no persistent chat, and no question/answer logs.
 
+### Root-controlled activation attestations
+
+The server activation predicate requires two additional exact environment
+contracts in addition to `PORTFOLIO_CHAT_ENABLED=true`, the verified model ID,
+project OIDC, and the absence of API-key or access-token credentials:
+
+- `PORTFOLIO_CHAT_PROTECTION_ATTESTED=true` means the owner has verified both
+  the published approved protection policy for `POST /api/chat` and
+  `POST /api/portfolio-chat` and the required sixth-request and independent
+  controlled-client runtime results. Unset, `false`, or any other value is
+  treated as not attested.
+- `PORTFOLIO_CHAT_COST_ATTESTED=true` means the owner has freshly verified
+  eligible OIDC/free-credit state, automatic recharge disabled, an enforceable
+  spending boundary, and no paid or key-fallback path. Unset, `false`, or any
+  other value is treated as not attested.
+
+These values are root-controlled deployment attestations, not evidence by
+themselves. They remain unset/false by default and must not be set merely to
+make the route available. No provider generation or activation is authorized
+while either attestation is absent or its underlying evidence is stale.
+
 ### Public-data, privacy, and funding contract
 
 These fixed global constraints are the handoff for later implementation:
@@ -178,6 +199,11 @@ The following are required before either flag may become true:
    project budget is soft and does not satisfy that gate by itself.
 3. Task 5 must provide bounded public-only evaluation, cost/error evidence,
    review, and the applicable release authority.
+
+Only after those gates are evidenced may the owner set both
+`PORTFOLIO_CHAT_PROTECTION_ATTESTED` and `PORTFOLIO_CHAT_COST_ATTESTED` to the
+literal value `true`; the server still requires the exact model, project OIDC,
+and no forbidden key/access-token values at request initialization.
 
 Until then, the server must fail closed, the launcher must stay hidden, and
 the assistant must not be described as activation-ready.

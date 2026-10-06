@@ -46,6 +46,50 @@ const requestFixture = ({
   return request
 }
 
+const alreadyBufferedVercelRequestFixture = ({
+  body = requestBody(),
+  rawText = JSON.stringify(body),
+  origin = 'https://portfoliobboy.vercel.app',
+} = {}) => {
+  const original = new PassThrough()
+  original.end(Buffer.from(rawText, 'utf8'))
+  original.resume()
+
+  const restored = new PassThrough()
+  restored.end(Buffer.from(rawText, 'utf8'))
+
+  const request = new PassThrough()
+  request.method = 'POST'
+  request.url = '/api/portfolio-chat'
+  request.headers = {
+    origin,
+    'content-type': 'application/json',
+  }
+
+  // Model the installed Vercel Node helper: the original request has already
+  // ended, while data listeners and read() are delegated to one buffered
+  // PassThrough restored by the helper. The route must choose one byte-reader.
+  Object.defineProperty(request, 'originalRequest', { value: original })
+  Object.defineProperty(request, 'readableEnded', { value: true, configurable: true })
+  const requestOn = request.on.bind(request)
+  request.on = (event, listener) => {
+    if (event === 'data' || event === 'end' || event === 'error' || event === 'aborted') {
+      return restored.on(event, listener)
+    }
+    return requestOn(event, listener)
+  }
+  request.addListener = request.on
+  request.read = restored.read.bind(restored)
+  Object.defineProperty(request, 'body', {
+    configurable: true,
+    get() {
+      throw new Error('lazy parsed body must not replace raw byte collection')
+    },
+  })
+
+  return request
+}
+
 class ResponseFixture extends EventEmitter {
   constructor({ backpressure = false } = {}) {
     super()
@@ -349,6 +393,91 @@ test('raw bytes are collected from the helper-restored stream before lazy req.bo
 
   assert.equal(response.statusCode, 200)
   assert.equal(responseEvents(response).at(-1)?.type, 'done')
+})
+
+test('already-buffered Vercel helper body is consumed once for disabled requests', async () => {
+  let calls = 0
+  const handler = createChatHandler({
+    enabled: false,
+    allowedOrigins: ALLOWED_ORIGINS,
+    streamAnswer: async function* () {
+      calls += 1
+      yield 'must remain disabled'
+    },
+  })
+  const response = new ResponseFixture()
+
+  await handler(alreadyBufferedVercelRequestFixture(), response)
+
+  assert.equal(response.statusCode, 503)
+  assert.equal(calls, 0)
+})
+
+test('already-buffered Vercel helper body streams enabled requests without duplicate bytes', async () => {
+  let calls = 0
+  const handler = createChatHandler({
+    enabled: true,
+    allowedOrigins: ALLOWED_ORIGINS,
+    streamAnswer: async function* () {
+      calls += 1
+      yield 'buffered body accepted.'
+    },
+    sourcesFor: () => [],
+  })
+  const response = new ResponseFixture()
+
+  await handler(alreadyBufferedVercelRequestFixture(), response)
+
+  assert.equal(calls, 1)
+  assert.equal(responseEvents(response).at(-1)?.type, 'done')
+})
+
+test('already-buffered helper counts a 24 KiB raw UTF-8 body once', async () => {
+  const body = {
+    question: 'q'.repeat(2000),
+    history: Array.from({ length: 5 }, () => ({ role: 'user', content: 'h'.repeat(1800) })),
+  }
+  const bodyText = JSON.stringify(body)
+  const rawText = `${bodyText}${' '.repeat(24 * 1024 - Buffer.byteLength(bodyText, 'utf8'))}`
+  assert.equal(Buffer.byteLength(rawText, 'utf8'), 24 * 1024)
+
+  let calls = 0
+  const handler = createChatHandler({
+    enabled: false,
+    allowedOrigins: ALLOWED_ORIGINS,
+    streamAnswer: async function* () {
+      calls += 1
+      yield 'must remain disabled'
+    },
+  })
+  const response = new ResponseFixture()
+
+  await handler(alreadyBufferedVercelRequestFixture({ body, rawText }), response)
+
+  assert.equal(response.statusCode, 503)
+  assert.equal(calls, 0)
+})
+
+test('already-buffered helper rejects raw UTF-8 bytes above 24 KiB before provider use', async () => {
+  const bodyText = JSON.stringify(requestBody())
+  const rawText = `${bodyText}${' \n'.repeat(14000)}界`
+  assert.ok(Buffer.byteLength(rawText, 'utf8') > 24 * 1024)
+
+  let calls = 0
+  const handler = createChatHandler({
+    enabled: true,
+    allowedOrigins: ALLOWED_ORIGINS,
+    streamAnswer: async function* () {
+      calls += 1
+      yield 'must not run'
+    },
+  })
+  const response = new ResponseFixture()
+
+  await handler(alreadyBufferedVercelRequestFixture({ rawText }), response)
+
+  assert.equal(response.statusCode, 413)
+  assert.equal(calls, 0)
 })
 
 test('canonical path is required while query strings remain accepted', async () => {

@@ -146,12 +146,6 @@ const readRawBody = (request, maxBytes, signal) => {
     request.once?.('error', onError)
     request.once?.('aborted', onAborted)
 
-    // A platform body helper can restore a PassThrough after the original
-    // request already reports readableEnded=true. Pull buffered bytes only
-    // after listeners are installed; never trust req.body as a byte source.
-    const buffered = request.read?.()
-    if (buffered !== null && buffered !== undefined) onData(buffered)
-
     if (!settled && request.readableEnded && request.readableLength === 0) {
       // Give a helper-restored PassThrough one turn to publish its buffered
       // bytes/end event before treating an already-ended request as empty.

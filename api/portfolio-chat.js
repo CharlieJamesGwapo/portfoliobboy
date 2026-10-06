@@ -36,6 +36,10 @@ const activationEnabled = (env = process.env) => env?.PORTFOLIO_CHAT_ENABLED ===
   && env?.PORTFOLIO_AI_MODEL === PORTFOLIO_AI_MODEL
   && !hasForbiddenGatewayCredential(env)
   && Boolean(env?.VERCEL_OIDC_TOKEN)
+  && env?.PORTFOLIO_CHAT_PROTECTION_ATTESTED === 'true'
+  && env?.PORTFOLIO_CHAT_COST_ATTESTED === 'true'
+
+export const isPortfolioChatActivationEnabled = activationEnabled
 
 // The route remains fail-closed until the owner has refreshed OIDC, model,
 // protection, quota, and cost evidence. No API-key or alternate-provider
@@ -48,15 +52,5 @@ const handler = createChatHandler({
   sourcesFor: selectSources,
   deadlineMs: 9000,
 })
-
-// Vercel Pages API route config: retain the existing ten-second function cap
-// and opt this route into platform request cancellation only.
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-  maxDuration: 10,
-  supportsCancellation: true,
-}
 
 export default handler
