@@ -1,0 +1,363 @@
+/*
+ * Portfolio presentation polish.
+ *
+ * Selectors in this file intentionally stay on the editorial portfolio
+ * surfaces and named components. The interactive Lab mounts game HUDs inside
+ * its section, so broad `.section p` / `.section button` rules would silently
+ * change gameplay typography, hitboxes, or art.
+ */
+:root {
+  --duration-fast: 180ms;
+  --duration-base: 240ms;
+  --duration-panel: 240ms;
+}
+
+#main-content > .section,
+#main-content > .contact-section {
+  padding-block: clamp(48px, 6vw, 88px);
+  /* html owns the fixed-header offset; keeping a second section margin here
+     would add the same 96px twice and recreate the legacy top gap. */
+  scroll-margin-top: 0;
+}
+
+#main-content > .section .section-heading h2,
+#main-content > .section .contact-copy h2,
+#main-content > .contact-section .contact-copy h2,
+#main-content > .section .ai-systems-intro h2 {
+  font-size: clamp(2rem, 4vw, 3.75rem);
+}
+
+#main-content > .section .section-heading > p:last-child,
+#main-content > .section .about-copy > p,
+#main-content > .section .experience-summary,
+#main-content > .section .experience-panel li,
+#main-content > .section .project-overview,
+#main-content > .section .project-story-grid p,
+#main-content > .section .project-media-pending > span,
+#main-content > .section .project-archive-heading > p,
+#main-content > .section .archive-project > div > span,
+#main-content > .section .ai-systems-intro-copy > p,
+#main-content > .section .momentum-summary,
+#main-content > .section .momentum-details > p,
+#main-content > .section .system-detail-section p,
+#main-content > .section .foundation-card > p:last-child,
+#main-content > .section .lab-launch-card > p:not(.eyebrow) {
+  max-width: 68ch;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+#main-content > .contact-section .contact-copy > p:nth-of-type(2) {
+  max-width: 68ch;
+  font-size: 1rem;
+}
+
+.navbar {
+  transition: background var(--duration-base) ease,
+    border-color var(--duration-base) ease,
+    backdrop-filter var(--duration-base) ease,
+    box-shadow var(--duration-base) ease;
+}
+
+/* Keep editorial eyebrows and project metadata on semantic theme pairs. */
+#main-content > .credentials-section .eyebrow,
+#main-content > .projects-section .eyebrow,
+#main-content > .projects-section .project-eyebrow,
+#main-content > .projects-section .project-story-grid span,
+#main-content > .projects-section .project-detail-row > div > span {
+  color: var(--accent-action);
+  opacity: 1;
+}
+
+#main-content > .credentials-section .foundation-card-primary .eyebrow {
+  color: var(--mint);
+}
+
+#main-content > .skills-section .skill-group-heading > span,
+#main-content > .skills-section .skill-cloud span {
+  color: var(--text-on-ink-muted);
+}
+
+#main-content > .skills-section .skill-group-heading > span {
+  color: var(--accent-action);
+}
+
+/* Role summary: one stable identity line plus a native disclosure for the full
+   verified role inventory. */
+#main-content .rotating-title {
+  align-items: center;
+  min-height: 44px;
+  margin-top: 20px;
+}
+
+#main-content .rotating-title-value {
+  min-width: 0;
+}
+
+#main-content .role-details {
+  grid-column: 1 / -1;
+  width: fit-content;
+  margin-top: 2px;
+  color: var(--text-on-ink-muted);
+}
+
+#main-content .role-details summary {
+  min-height: 44px;
+  padding: 11px 0;
+  color: var(--text-on-ink-muted);
+  font-size: .78rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+#main-content .role-details ul {
+  display: grid;
+  gap: 5px;
+  padding: 0 0 8px 18px;
+  color: var(--text-on-ink-muted);
+  font-size: .85rem;
+}
+
+#main-content .role-details li::marker {
+  color: var(--accent-coral);
+}
+
+/* Eight case-study tabs stay readable without a precision horizontal drag. */
+.projects-section .project-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: color-mix(in srgb, var(--surface-card) 88%, transparent);
+}
+
+.projects-section .project-tabs button {
+  min-height: 92px;
+  padding: 16px 15px;
+  color: var(--text-muted);
+  font-size: .8rem;
+  transition: background var(--duration-fast) ease, color var(--duration-fast) ease,
+    transform var(--duration-base) var(--ease-out);
+}
+
+.projects-section .project-tabs button:hover,
+.projects-section .project-tabs button.is-active {
+  color: var(--text-primary);
+}
+
+.projects-section .project-showcase {
+  min-height: 0;
+}
+
+.project-story-details {
+  margin-top: 28px;
+  border-top: 1px solid var(--line-light);
+  border-bottom: 1px solid var(--line-light);
+}
+
+.project-story-details summary {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  list-style: none;
+  color: var(--text-primary);
+  font-size: .82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.project-story-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.project-story-details summary > span {
+  color: var(--accent-action);
+  font-size: 1.25rem;
+  transition: transform var(--duration-fast) ease;
+}
+
+.project-story-details[open] summary > span {
+  transform: rotate(45deg);
+}
+
+.project-story-details .project-story-grid {
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.project-story-details .project-detail-row {
+  margin-bottom: 24px;
+}
+
+.project-archive-toggle {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+.project-archive-toggle-button {
+  min-height: 48px;
+  padding: 11px 18px;
+  border: 1px solid var(--border-control);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: .8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background var(--duration-fast) ease, border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.project-archive-toggle-button:hover {
+  border-color: var(--accent-action);
+  background: color-mix(in srgb, var(--accent-action) 10%, var(--surface-page));
+}
+
+/* Skill groups are progressive disclosures, preserving every token while
+   keeping the section scannable on first entry. */
+.skills-section .skill-group {
+  padding: 0;
+}
+
+.skills-section .skill-group-heading {
+  min-height: 64px;
+  margin-bottom: 0;
+  padding: 12px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.skills-section .skill-group-heading::-webkit-details-marker {
+  display: none;
+}
+
+.skills-section .skill-group-heading h3 {
+  flex: 1;
+}
+
+.skills-section .skill-group-heading > b {
+  color: var(--accent-action);
+  font-size: 1.35rem;
+  font-weight: 400;
+  transition: transform var(--duration-fast) ease;
+}
+
+.skills-section .skill-group[open] .skill-group-heading {
+  margin-bottom: 13px;
+}
+
+.skills-section .skill-group[open] .skill-group-heading > b {
+  transform: rotate(45deg);
+}
+
+.skills-section .skill-cloud {
+  padding: 0 0 24px 38px;
+}
+
+.skills-section .skill-cloud span {
+  font-size: .8rem;
+}
+
+@media (max-width: 860px) {
+  .mobile-menu-secondary {
+    display: grid;
+    gap: 4px;
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, .14);
+  }
+
+  .mobile-menu-label {
+    margin-bottom: 4px;
+    color: var(--mint);
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .mobile-menu-secondary a,
+  .mobile-menu-secondary .mobile-music {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    width: fit-content;
+    padding: 10px 0;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-on-ink);
+    font-size: .95rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .mobile-menu-secondary a:hover,
+  .mobile-menu-secondary .mobile-music:hover {
+    color: var(--accent-action);
+  }
+
+  .mobile-menu-actions {
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .projects-section .project-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .projects-section .project-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .projects-section .project-tabs button {
+    min-width: 0;
+    min-height: 88px;
+    padding: 14px 12px;
+  }
+
+  .projects-section .project-tabs button:nth-child(n) {
+    border-left: 1px solid var(--line-light);
+    border-top: 1px solid var(--line-light);
+    border-radius: 0;
+  }
+
+  .projects-section .project-tabs button:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .projects-section .project-tabs button:nth-child(-n + 2) {
+    border-top: 0;
+  }
+
+  .skills-section .skill-cloud {
+    padding-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar,
+  #main-content .project-story-details summary > span,
+  .projects-section .project-tabs button,
+  .project-archive-toggle-button,
+  .skills-section .skill-group-heading > b,
+  #main-content .role-details summary {
+    transition: none;
+  }
+
+  .hero-orbit,
+  .status-dot::after,
+  .contact-section::after,
+  .project-showcase,
+  #main-content .type-caret {
+    animation: none !important;
+  }
+}

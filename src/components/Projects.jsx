@@ -20,6 +20,7 @@ const categoryCounts = Object.fromEntries(
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState('All')
   const [activeProjectId, setActiveProjectId] = useState(featuredProjects[0].id)
+  const [archiveOpen, setArchiveOpen] = useState(false)
   const visibleFeatured = activeCategory === 'All'
     ? featuredProjects
     : featuredProjects.filter((item) => item.categories.includes(activeCategory))
@@ -125,35 +126,38 @@ const Projects = () => {
               <p className="project-overview">{project.overview}</p>
             </div>
 
-            <div className="project-story-grid">
-              <div>
-                <span>Context</span>
-                <p>{project.context}</p>
+            <details className="project-story-details">
+              <summary>Read case study details <span aria-hidden="true">+</span></summary>
+              <div className="project-story-grid">
+                <div>
+                  <span>Context</span>
+                  <p>{project.context}</p>
+                </div>
+                <div>
+                  <span>Implementation</span>
+                  <p>{project.implementation}</p>
+                </div>
+                <div>
+                  <span>Engineering scope</span>
+                  <p>{project.engineering}</p>
+                </div>
+                <div className="project-result">
+                  <span>Delivered</span>
+                  <p>{project.delivered}</p>
+                </div>
               </div>
-              <div>
-                <span>Implementation</span>
-                <p>{project.implementation}</p>
-              </div>
-              <div>
-                <span>Engineering scope</span>
-                <p>{project.engineering}</p>
-              </div>
-              <div className="project-result">
-                <span>Delivered</span>
-                <p>{project.delivered}</p>
-              </div>
-            </div>
 
-            <div className="project-detail-row">
-              <div>
-                <span>Architecture</span>
-                <ul>{project.architecture.map((item) => <li key={item}>{item}</li>)}</ul>
+              <div className="project-detail-row">
+                <div>
+                  <span>Architecture</span>
+                  <ul>{project.architecture.map((item) => <li key={item}>{item}</li>)}</ul>
+                </div>
+                <div>
+                  <span>Product features</span>
+                  <ul>{project.features.map((item) => <li key={item}>{item}</li>)}</ul>
+                </div>
               </div>
-              <div>
-                <span>Product features</span>
-                <ul>{project.features.map((item) => <li key={item}>{item}</li>)}</ul>
-              </div>
-            </div>
+            </details>
 
             <div className="project-showcase-footer">
               <div className="tag-list tag-list-dark">
@@ -185,7 +189,7 @@ const Projects = () => {
         </div>
         )}
 
-        {visibleArchive.length > 0 && (
+        {visibleArchive.length > 0 && archiveOpen && (
           <>
             <div className="project-archive-heading">
               <div>
@@ -223,6 +227,21 @@ const Projects = () => {
               })}
             </div>
           </>
+        )}
+
+        {visibleArchive.length > 0 && (
+          <div className="project-archive-toggle">
+            <button
+              type="button"
+              className="project-archive-toggle-button"
+              aria-expanded={archiveOpen}
+              onClick={() => setArchiveOpen((value) => !value)}
+            >
+              {archiveOpen
+                ? 'Hide earlier builds'
+                : `View all ${visibleArchive.length} earlier builds`}
+            </button>
+          </div>
         )}
       </div>
     </section>

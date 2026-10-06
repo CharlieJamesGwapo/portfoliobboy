@@ -7,6 +7,7 @@ import './index.css'
 import './styles/theme.css'
 import './styles/dialog.css'
 import './styles/credentials.css'
+import './styles/portfolio-ux.css'
 
 // Entrance animations are opt-in. The stylesheet only hides content behind an
 // animation when <html> carries `motion-ready`, so a JS failure, a blocked

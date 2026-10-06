@@ -86,7 +86,8 @@ export default function CommandPalette({ open, onClose }) {
 
     return [
       ...sections,
-      { id: 'go-ai-systems', label: 'AI agents, voice & automation', hint: 'Explore capabilities and live demos', icon: Sparkles, run: () => goTo('#ai-systems') },
+      { id: 'go-momentum-work', label: 'Work', hint: 'Jump to selected Momentum systems', icon: Layers, run: () => goTo('#momentum-work') },
+      { id: 'go-ai-systems', label: 'Services', hint: 'Explore AI agents, voice & automation', icon: Sparkles, run: () => goTo('#ai-systems') },
       {
         id: 'copy-email',
         label: 'Copy email address',

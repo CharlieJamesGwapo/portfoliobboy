@@ -33,7 +33,7 @@ const Hero = () => (
         </h1>
 
         <div className="hero-enter hero-enter-5">
-          <RotatingTitle titles={professionalTitles} />
+          <RotatingTitle role={profile.role} titles={professionalTitles} />
         </div>
 
         <p className="hero-intro hero-enter hero-enter-5">
@@ -42,7 +42,7 @@ const Hero = () => (
         </p>
 
         <div className="hero-actions hero-enter hero-enter-6">
-          <a className="button button-primary" href="#projects">
+          <a className="button button-primary" href="#momentum-work">
             Explore selected work <ArrowDown size={17} aria-hidden="true" />
           </a>
           <a className="button button-secondary" href={resumeUrl} target="_blank" rel="noreferrer">

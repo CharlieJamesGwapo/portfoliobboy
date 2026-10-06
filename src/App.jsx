@@ -229,10 +229,10 @@ function App() {
       <Navbar />
       <main id="main-content">
         <Hero />
-        <About />
-        <Experience />
         <MomentumShowcase />
         <AISystems />
+        <About />
+        <Experience />
         <Projects />
         <Skills />
         <Education />

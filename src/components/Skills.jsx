@@ -24,15 +24,16 @@ const Skills = () => (
       <div className="skill-groups">
         {skillGroups.map((group, index) => (
           <ScrollReveal key={group.title} delay={index * 65} variant="right">
-            <article className="skill-group">
-              <div className="skill-group-heading">
+            <details className="skill-group">
+              <summary className="skill-group-heading">
                 <span>0{index + 1}</span>
                 <h3>{group.title}</h3>
-              </div>
+                <b aria-hidden="true">+</b>
+              </summary>
               <div className="skill-cloud">
                 {group.skills.map((skill) => <span key={skill}>{skill}</span>)}
               </div>
-            </article>
+            </details>
           </ScrollReveal>
         ))}
       </div>
