@@ -46,20 +46,40 @@ test('Control-K keeps its normal open-then-close toggle without another overlay'
 })
 
 test('Escape closes the palette before its delayed input focus settles', async ({ page }) => {
-  await page.clock.install()
+  const clockStart = new Date('2030-01-01T00:00:00.000Z')
+  await page.clock.install({ time: clockStart })
   await page.goto('/#home')
   await expect(page.locator('#main-content')).toBeVisible()
+  await page.clock.pauseAt(new Date('2030-01-01T00:00:10.000Z'))
 
   await page.keyboard.press('Control+k')
   const palette = page.getByRole('dialog', { name: 'Command palette' })
+  const input = page.getByRole('combobox', { name: 'Search sections and actions' })
   await expect(palette).toBeVisible()
   await expect(page.locator('body')).toHaveClass(/palette-open/)
   await expect.poll(() => page.locator('body').evaluate((body) => body.style.overflow)).toBe('hidden')
+  const focusBoundary = await page.evaluate(() => {
+    const paletteElement = document.querySelector('.palette')
+    const inputElement = document.querySelector('.palette input')
+    const activeElement = document.activeElement
+    return {
+      inputFocused: activeElement === inputElement,
+      activeInsidePalette: Boolean(paletteElement?.contains(activeElement)),
+      activeTag: activeElement?.tagName || null,
+    }
+  })
+  expect(focusBoundary.inputFocused).toBe(false)
+  expect(focusBoundary.activeInsidePalette).toBe(false)
 
   await page.keyboard.press('Escape')
   await expect(palette).toBeHidden()
   await expect(page.locator('body')).not.toHaveClass(/palette-open/)
   await expect.poll(() => page.locator('body').evaluate((body) => body.style.overflow)).toBe('')
+
+  await page.keyboard.press('Control+k')
+  await expect(palette).toBeVisible()
+  await page.clock.runFor(30)
+  await expect(input).toBeFocused()
 })
 
 test('credential detail dialog traps focus, restores its trigger, and releases page inertness', async ({ page }) => {
