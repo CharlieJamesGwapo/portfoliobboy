@@ -21,6 +21,23 @@ test('standalone Vercel config opts only portfolio chat into cancellation', asyn
   assert.equal(config.functions['api/contact.js'], undefined)
 })
 
+const firstVercelFunctionMatch = (functions, sourceFile) => Object.entries(functions)
+  .find(([pattern]) => pattern === sourceFile || (
+    pattern === 'api/*.js' && /^api\/[^/]+\.js$/.test(sourceFile)
+  ))
+
+test('Vercel first-match selection preserves chat cancellation and contact wildcard timeout', async () => {
+  const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'))
+  const chatMatch = firstVercelFunctionMatch(config.functions, 'api/portfolio-chat.js')
+  const contactMatch = firstVercelFunctionMatch(config.functions, 'api/contact.js')
+
+  assert.deepEqual(chatMatch, ['api/portfolio-chat.js', {
+    maxDuration: 10,
+    supportsCancellation: true,
+  }])
+  assert.deepEqual(contactMatch, ['api/*.js', { maxDuration: 10 }])
+})
+
 test('preview origin derivation accepts only exact platform URLs', () => {
   const origins = buildAllowedOrigins({
     VERCEL_URL: 'portfoliobboy-preview.vercel.app',
