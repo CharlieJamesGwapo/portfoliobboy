@@ -107,6 +107,7 @@ test('legacy section anchors remain unique and deep links still land on the requ
 
 test('navbar remeasures after project details expand before activating the shifted route', async ({ page }) => {
   await page.goto('/#projects')
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })
   const education = page.locator('#education')
   const before = await education.evaluate((element) => element.offsetTop)
 
@@ -114,7 +115,21 @@ test('navbar remeasures after project details expand before activating the shift
   await expect.poll(() => education.evaluate((element) => element.offsetTop)).toBeGreaterThan(before + 50)
   const after = await education.evaluate((element) => element.offsetTop)
 
-  await page.evaluate((top) => window.scrollTo(0, top - 179), after)
+  const oldEducationActivation = before - 180
+  const newEducationActivation = after - 180
+  const betweenEducationActivations = Math.floor((oldEducationActivation + newEducationActivation) / 2)
+  expect(betweenEducationActivations).toBeGreaterThan(oldEducationActivation)
+  expect(betweenEducationActivations).toBeLessThan(newEducationActivation)
+
+  await page.evaluate((top) => window.scrollTo(0, top), newEducationActivation + 1)
+  await expect.poll(() => page.locator('.desktop-nav a[aria-current="location"]').textContent()).toBe('Credentials')
+
+  // A stale cache would keep Credentials active here. Fresh offsets keep
+  // Skills active, which is intentionally not a desktop presentation link.
+  await page.evaluate((top) => window.scrollTo(0, top), betweenEducationActivations)
+  await expect.poll(() => page.locator('.desktop-nav a[aria-current="location"]').count()).toBe(0)
+
+  await page.evaluate((top) => window.scrollTo(0, top), newEducationActivation + 1)
   await expect.poll(() => page.locator('.desktop-nav a[aria-current="location"]').textContent()).toBe('Credentials')
 })
 

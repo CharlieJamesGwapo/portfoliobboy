@@ -121,14 +121,48 @@ function App() {
     // 'instant' overrides the smooth scroll-behavior on <html>: a page-length
     // smooth scroll on arrival is disorienting, and it fights the second pass.
     const jump = () => target.scrollIntoView({ block: 'start', behavior: 'instant' })
-    jump()
-    const frame = window.requestAnimationFrame(jump)
-    const settle = window.setTimeout(jump, 400)
-
-    return () => {
-      window.cancelAnimationFrame(frame)
-      window.clearTimeout(settle)
+    let frame = null
+    let settle = null
+    let pending = true
+    const intentEvents = [
+      ['pointerdown', { capture: true }],
+      ['wheel', { capture: true, passive: true }],
+      ['touchstart', { capture: true, passive: true }],
+      ['keydown', { capture: true }],
+    ]
+    const removeIntentListeners = () => {
+      for (const [type, options] of intentEvents) window.removeEventListener(type, cancelPending, options)
     }
+    const cancelPending = () => {
+      if (!pending) return
+      pending = false
+      if (frame !== null) {
+        window.cancelAnimationFrame(frame)
+        frame = null
+      }
+      if (settle !== null) {
+        window.clearTimeout(settle)
+        settle = null
+      }
+      removeIntentListeners()
+    }
+    const onSettle = () => {
+      settle = null
+      if (!pending) return
+      jump()
+      pending = false
+      removeIntentListeners()
+    }
+
+    for (const [type, options] of intentEvents) window.addEventListener(type, cancelPending, options)
+    jump()
+    frame = window.requestAnimationFrame(() => {
+      frame = null
+      if (pending) jump()
+    })
+    settle = window.setTimeout(onSettle, 400)
+
+    return cancelPending
   }, [])
 
   const closePalette = useCallback(() => setPaletteOpen(false), [])

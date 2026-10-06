@@ -187,3 +187,67 @@ npx playwright test tests/e2e/portfolio-ai-systems.spec.js --project=firefox -g 
 ```
 
 The browser cache had to be restored locally before this fix-round verification (`npx playwright install chromium firefox webkit`); no repository or deployment state was changed.
+
+## Fix round 2/5: corrected review gaps and Firefox race
+
+Base: `413e2d0cc2a822f8b71baf4af630ff23903fd1c7`
+
+This section corrects the earlier unproved attribution of the two Firefox failures. The first fix-round full suite was `127 passed, 2 failed` in Firefox only (Voice filter count and 768px lazy-image decode); an isolated rerun passing did not establish that either failure pre-existed.
+
+### RED evidence before the fix2 changes
+
+- The frozen-clock Firefox pointer regression failed before the App repair with `Expected: 921.4833374023438; Received: 3222.4833984375`: the 400ms cold-hash correction moved the page between real `pointerdown` and `pointerup`, leaving Voice unpressed and three cards visible.
+- The dynamic-nav test was temporarily run with the existing `Navbar` `measure()` call removed. The new midpoint assertion failed with `Expected: 0 Received: 1`, proving the test distinguishes stale offsets. The exact `measure()` call was restored immediately; no production remeasurement behavior was removed.
+- Before the scoped project-tab repair, actual dark active title text was `rgb(243, 240, 233)` on `rgb(255, 253, 250)`, `1.1209:1`; the active index was `4.778:1`. The former is the observed white-on-white title failure.
+
+### Fix scope
+
+- `src/App.jsx`: pending deep-link rAF and 400ms settlement now yield to explicit visitor `pointerdown`, `wheel`, `touchstart`, or `keydown` intent. No blanket scroll listener was added; no-interaction cold-anchor correction remains.
+- `src/styles/portfolio-ux.css`: active project tabs use the semantic `--surface-card`; tab index spans use `--accent-action`. Existing tab roles, labels, selection state, keyboard behavior, game styles, and project data remain unchanged.
+- `tests/e2e/portfolio-ai-systems.spec.js`: added a real pointer/frozen-clock boundary regression; `document.fonts.ready` resolves while the clock is paused so font layout cannot mask the timing boundary.
+- `tests/e2e/portfolio-journey.spec.js`: establishes Credentials at the new Education threshold, checks a position strictly between old/new thresholds where stale offsets would incorrectly keep Credentials active, then returns to the new threshold.
+- `tests/e2e/portfolio-theme.spec.js`: measures active/inactive title and index text against composited backgrounds in light/dark base and settled hover states without fixed transition sleeps.
+
+### Green evidence
+
+Focused regression and cross-engine checks:
+
+```text
+npx playwright test tests/e2e/portfolio-ai-systems.spec.js -g "deep-link settlement yields" --project=firefox --output=.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/task-6-fix2-clock-fonts-results --trace=retain-on-failure
+1 passed (3.3s)
+
+npx playwright test --output=.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/task-6-fix2-full-results-v3 --trace=retain-on-failure
+135 passed (3.0m)
+```
+
+The final 135-test run covered Chromium, Firefox, and WebKit, including the named AI-systems cases, dynamic navigation, project/skills disclosures, theme/contrast regressions, dialogs, credentials, contact validation, music/Lab ownership, and reduced-motion/no-WebGL behavior. The lazy-image cause remains UNKNOWN; the final suite passing is not treated as retrospective attribution. No offscreen eager-loading or weakened assertion was added.
+
+### Settled UI and computed evidence
+
+The replacement captures were taken only after target reveal elements were visible, opacity `1`, identity transform, and no running reveal animation. Settled project captures are retained at:
+
+- `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/task-6-fix2-light-desktop-projects-settled.png`
+- `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/task-6-fix2-dark-desktop-projects-settled.png`
+- `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/task-6-fix2-light-mobile-projects-settled.png`
+- `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/task-6-fix2-dark-mobile-projects-settled.png`
+
+At 1440px, measured title/index ratios were light base `15.794/6.348` active and `5.630/5.663` inactive; dark base `11.953/8.428` active and `8.300/10.438` inactive. Settled hover ratios were light active `15.794/6.348`, inactive `12.250/5.530`; dark active `11.953/8.428`, inactive `9.783/9.196`. All are at least `4.5:1`. At 390px, both themes retained eight tabs, initially collapsed archive items, and no document horizontal overflow. The anchor contract remained `#education` top `95.7px` (rounded `96px`) with `Credentials` active at the new threshold.
+
+### Repository checks and self-review
+
+```text
+npm test
+29 Node tests passed; 1 Python unittest passed (OK)
+
+npm run build
+success (existing Vite advancedChunks deprecation warning only)
+
+git -c core.fsmonitor=false diff --check
+pass
+```
+
+The scoped diff changes only the App deep-link intent handling, portfolio project-tab CSS, and the three named E2E specs plus this tracked report. Existing QA captures and ignored diagnostic outputs were preserved and not staged. No data-module/original export, game engine/HUD/art/state, renderer, asset, account, credential, provider, contact, deployment, deletion, or push action was performed. Concerns: the original lazy-image failure remains an unresolved cause-attribution UNKNOWN despite the current all-green 3-engine run; the existing `NO_COLOR`/`FORCE_COLOR` warning remains non-failing.
+
+## Fix round 2/5 commit
+
+Exact scoped commit: `c77904d` (`fix: close Task6 navigation and theme gaps`).

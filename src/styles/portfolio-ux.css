@@ -144,6 +144,14 @@
   color: var(--text-primary);
 }
 
+.projects-section .project-tabs button.is-active {
+  background: var(--surface-card);
+}
+
+.projects-section .project-tabs button > span {
+  color: var(--accent-action);
+}
+
 .projects-section .project-showcase {
   min-height: 0;
 }

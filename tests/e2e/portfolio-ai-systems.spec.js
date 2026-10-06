@@ -1,5 +1,31 @@
 import { test, expect } from '@playwright/test'
 
+test('deep-link settlement yields to a visitor pointer intent', async ({ page }) => {
+  await page.clock.install()
+  await page.clock.pauseAt(new Date('2026-10-07T00:00:00Z'))
+  await page.goto('/#ai-systems')
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })
+  await expect(page.locator('#ai-systems-title')).toBeVisible()
+  await expect(page.locator('.momentum-card')).toHaveCount(3)
+  await page.evaluate(() => document.fonts.ready)
+
+  const voice = page.getByRole('group', { name: 'Filter Momentum systems' }).getByRole('button', { name: 'Voice', exact: true })
+  await voice.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }))
+  const bounds = await voice.boundingBox()
+  expect(bounds).not.toBeNull()
+  await page.mouse.move(bounds.x + (bounds.width / 2), bounds.y + (bounds.height / 2))
+  await page.mouse.down()
+
+  const beforeSettlement = await page.evaluate(() => window.scrollY)
+  await page.clock.runFor(410)
+  const afterSettlement = await page.evaluate(() => window.scrollY)
+  expect(afterSettlement).toBe(beforeSettlement)
+
+  await page.mouse.up()
+  await expect(voice).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.momentum-card')).toHaveCount(2)
+})
+
 test('new systems can be filtered and inspected while the existing portfolio remains available', async ({ page }) => {
   await page.goto('/#ai-systems')
   await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })

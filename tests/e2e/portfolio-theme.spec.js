@@ -323,6 +323,49 @@ test('rendered theme consumers keep foregrounds, ancestor-composited surfaces, a
   }
 })
 
+test('project tabs keep title and index text legible across active and hover states', async ({ page }) => {
+  await page.goto('/#projects')
+  const theme = page.locator('select[aria-label="Color theme"]:visible').first()
+  const active = page.locator('.projects-section .project-tabs button.is-active')
+  const inactive = page.locator('.projects-section .project-tabs button:not(.is-active)').first()
+  const selectors = [
+    '.projects-section .project-tabs button.is-active',
+    '.projects-section .project-tabs button.is-active > span',
+    '.projects-section .project-tabs button:not(.is-active)',
+    '.projects-section .project-tabs button:not(.is-active) > span',
+  ]
+
+  for (const preference of ['light', 'dark']) {
+    await theme.selectOption(preference)
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).toBe(preference)
+    await expect.poll(() => active.evaluate((element) => getComputedStyle(element).color)).toBe(
+      preference === 'light' ? 'rgb(11, 37, 40)' : 'rgb(243, 240, 233)',
+    )
+
+    const basePairs = await readRenderedPairs(page, selectors)
+    for (const selector of selectors) {
+      expect(basePairs[selector], `expected rendered selector to be present: ${selector}`).not.toBeNull()
+      expect(contrastRatio(basePairs[selector].color, basePairs[selector].background), `${preference} ${selector}`).toBeGreaterThanOrEqual(4.5)
+    }
+
+    await active.hover()
+    await expect.poll(() => active.evaluate((element) => element.matches(':hover'))).toBe(true)
+    await expect.poll(() => active.evaluate((element) => element.getAnimations().length)).toBe(0)
+    const activeHoverPairs = await readRenderedPairs(page, selectors.slice(0, 2))
+    for (const selector of selectors.slice(0, 2)) {
+      expect(contrastRatio(activeHoverPairs[selector].color, activeHoverPairs[selector].background), `${preference} active hover ${selector}`).toBeGreaterThanOrEqual(4.5)
+    }
+
+    await inactive.hover()
+    await expect.poll(() => inactive.evaluate((element) => element.matches(':hover'))).toBe(true)
+    await expect.poll(() => inactive.evaluate((element) => element.getAnimations().length)).toBe(0)
+    const inactiveHoverPairs = await readRenderedPairs(page, selectors.slice(2))
+    for (const selector of selectors.slice(2)) {
+      expect(contrastRatio(inactiveHoverPairs[selector].color, inactiveHoverPairs[selector].background), `${preference} inactive hover ${selector}`).toBeGreaterThanOrEqual(4.5)
+    }
+  }
+})
+
 test('rendered-pair helper composites a translucent child over its opaque ancestor', async ({ page }) => {
   await page.goto('/')
   await page.evaluate(() => {
