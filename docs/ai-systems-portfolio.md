@@ -31,8 +31,8 @@ These additions are frontend content and need no new backend, paid integration, 
 
 ## Verification
 
-- `npm test` checks the existing portfolio and arcade regression contracts.
-- `npx playwright test tests/e2e/portfolio-ai-systems.spec.js` checks filtering, keyboard expansion, public links, existing sections, image loading, touch targets, and overflow at 320, 390, 768, 1024, and 1440 pixels.
+- `npm test` checks the existing portfolio and corrected resume contracts.
+- `npm run test:e2e` checks filtering, keyboard expansion, public links, existing sections, image loading, touch targets, and overflow at 320, 390, 768, 1024, and 1440 pixels in Chromium, Firefox, and WebKit.
 - `npm run build` checks the production bundle.
 
 The public callback form has not been submitted and provider voice-call completion has not been tested as part of this portfolio task.

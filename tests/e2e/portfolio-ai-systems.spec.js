@@ -29,11 +29,12 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     await expect(page.locator('.momentum-card')).toHaveCount(8)
     await page.locator('#momentum-work').scrollIntoViewIfNeeded()
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
-    const brokenImages = await page.locator('.momentum-preview img').evaluateAll(async (images) => {
-      await Promise.all(images.map((image) => image.decode().catch(() => {})))
-      return images.filter((image) => !image.naturalWidth).map((image) => image.src)
-    })
-    expect(brokenImages).toEqual([])
+    // Native lazy images load as a visitor reaches them. Firefox does not
+    // force an offscreen lazy image to load just because decode() is called.
+    for (const image of await page.locator('.momentum-preview img').all()) {
+      await image.scrollIntoViewIfNeeded()
+      await expect.poll(() => image.evaluate((element) => element.complete && element.naturalWidth > 0)).toBe(true)
+    }
     for (const button of await page.locator('.momentum-filters button').all()) {
       const bounds = await button.boundingBox()
       expect(bounds.height).toBeGreaterThanOrEqual(44)
