@@ -28,6 +28,7 @@ export default function InteractiveLab() {
   }, [])
 
   const close = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('portfolio:lab-close'))
     setOpen(false)
     window.setTimeout(() => returnFocus.current?.focus?.(), 0)
   }, [])

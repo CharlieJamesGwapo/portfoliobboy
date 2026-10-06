@@ -27,6 +27,8 @@ function App() {
   const musicButtonRef = useRef(null)
   const progressRef = useRef(null)
   const showTopRef = useRef(false)
+  const paletteOpenTimerRef = useRef(null)
+  const labOpenRef = useRef(false)
 
   useEffect(() => {
     // scrollHeight is a layout-forcing read, so it is measured once per resize
@@ -131,14 +133,56 @@ function App() {
   const closePalette = useCallback(() => setPaletteOpen(false), [])
 
   useEffect(() => {
-    const openPalette = () => {
-      setMusicOpen(false)
-      setPaletteOpen(true)
+    const cancelPaletteTimer = () => {
+      if (paletteOpenTimerRef.current === null) return
+      window.clearTimeout(paletteOpenTimerRef.current)
+      paletteOpenTimerRef.current = null
     }
+
+    const openPalette = (event) => {
+      const toggle = event?.detail?.toggle === true
+      const labOwnsFocus = labOpenRef.current || document.body.classList.contains('game-open')
+      if (labOwnsFocus) {
+        cancelPaletteTimer()
+        setMusicOpen(false)
+        setPaletteOpen(false)
+        return
+      }
+
+      const takePaletteFocus = () => {
+        paletteOpenTimerRef.current = null
+        if (labOpenRef.current || document.body.classList.contains('game-open')) {
+          setMusicOpen(false)
+          setPaletteOpen(false)
+          return
+        }
+        setMusicOpen(false)
+        setPaletteOpen((value) => (toggle ? !value : true))
+      }
+
+      // Detail and menu owners release focus/inertness in their cleanup. Wait
+      // one task before mounting the palette so its input never captures focus
+      // while either owner is still active.
+      const anotherOverlayOwnsFocus = document.querySelector('dialog.portfolio-dialog[open]')
+        || document.body.classList.contains('menu-open')
+      if (anotherOverlayOwnsFocus) {
+        cancelPaletteTimer()
+        paletteOpenTimerRef.current = window.setTimeout(takePaletteFocus, 0)
+      } else {
+        takePaletteFocus()
+      }
+    }
+
     const closeCompetingOverlays = () => {
+      cancelPaletteTimer()
       setMusicOpen(false)
       setPaletteOpen(false)
     }
+    const onLabOpen = () => {
+      labOpenRef.current = true
+      closeCompetingOverlays()
+    }
+    const onLabClose = () => { labOpenRef.current = false }
 
     const onKeyDown = (event) => {
       // ⌘K on macOS, Ctrl+K elsewhere. Both are claimed by the browser's
@@ -151,14 +195,12 @@ function App() {
 
       if (isShortcut) {
         event.preventDefault()
-        setMusicOpen(false)
-        setPaletteOpen((value) => !value)
+        window.dispatchEvent(new CustomEvent('portfolio:open-palette', { detail: { toggle: true } }))
         return
       }
       if (event.key === '/' && !typing && !event.metaKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault()
-        setMusicOpen(false)
-        setPaletteOpen(true)
+        window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
       }
     }
 
@@ -166,13 +208,16 @@ function App() {
     window.addEventListener('portfolio:open-palette', openPalette)
     window.addEventListener('portfolio:detail-open', closeCompetingOverlays)
     window.addEventListener('portfolio:open-games', closeCompetingOverlays)
-    window.addEventListener('portfolio:lab-open', closeCompetingOverlays)
+    window.addEventListener('portfolio:lab-open', onLabOpen)
+    window.addEventListener('portfolio:lab-close', onLabClose)
     return () => {
+      cancelPaletteTimer()
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('portfolio:open-palette', openPalette)
       window.removeEventListener('portfolio:detail-open', closeCompetingOverlays)
       window.removeEventListener('portfolio:open-games', closeCompetingOverlays)
-      window.removeEventListener('portfolio:lab-open', closeCompetingOverlays)
+      window.removeEventListener('portfolio:lab-open', onLabOpen)
+      window.removeEventListener('portfolio:lab-close', onLabClose)
     }
   }, [])
 
