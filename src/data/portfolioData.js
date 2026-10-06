@@ -82,6 +82,205 @@ export const fitHighlights = [
   },
 ]
 
+export const aiCapabilityRibbon = [
+  'Custom AI agents',
+  'Voice agents',
+  'Workflow automation',
+  'Custom CRM',
+  'n8n',
+  'GoHighLevel',
+]
+
+export const aiSystemCapabilities = [
+  {
+    number: '01',
+    title: 'Custom AI agents',
+    description:
+      'Designs goal-aware agents that use tools, structured output, durable context, and explicit guardrails instead of stopping at a chat interface.',
+    outcomes: ['Tool calling', 'Multi-agent orchestration', 'Human approval paths'],
+    stack: ['OpenAI', 'Anthropic', 'MCP', 'Agent skills'],
+  },
+  {
+    number: '02',
+    title: 'Voice agents & reception',
+    description:
+      'Builds voice workflows for first response, enquiry capture, qualification, booking, live call state, and safe human handoff.',
+    outcomes: ['Inbound & outbound calls', 'Calendar booking', 'Call lifecycle evidence'],
+    stack: ['Twilio', 'LiveKit', 'GPT Live', 'WebSockets'],
+  },
+  {
+    number: '03',
+    title: 'Automation & integrations',
+    description:
+      'Connects business systems through n8n, signed webhooks, queues, retries, idempotency, reconciliation, and GoHighLevel imports or connectors.',
+    outcomes: ['n8n workflows', 'Durable delivery', 'GoHighLevel data flows'],
+    stack: ['n8n', 'REST', 'Webhooks', 'PostgreSQL'],
+  },
+  {
+    number: '04',
+    title: 'Custom CRM & operations',
+    description:
+      'Engineers multi-tenant CRM, CRM AI agents, member, retention, campaign, analytics, and operations products around the way a team actually works.',
+    outcomes: ['Lead & member lifecycle', 'CRM AI agent workflows', 'Audit-ready operations'],
+    stack: ['Next.js', 'React', 'Python', 'Supabase'],
+  },
+  {
+    number: '05',
+    title: 'AI modeling & workflow design',
+    description: 'Models business context, agent instructions, tool contracts, structured responses, and evaluation scenarios so AI behavior fits a real operational workflow.',
+    outcomes: ['Prompt & context modeling', 'Structured response schemas', 'Scenario-based evaluation'],
+    stack: ['LLM integration', 'Tool schemas', 'Agent context', 'Evaluations'],
+  },
+  {
+    number: '06',
+    title: 'GoHighLevel & n8n workflows',
+    description: 'Designs connected CRM workflows and n8n automations, with GoHighLevel contact imports, field mapping, reconciliation, and reliable handoffs between systems.',
+    outcomes: ['CRM workflow automation', 'GoHighLevel imports', 'Webhook-driven handoffs'],
+    stack: ['GoHighLevel', 'n8n', 'CRM connectors', 'Data mapping'],
+  },
+]
+
+export const momentumSystems = [
+  {
+    id: 'hasti',
+    title: 'Hasti',
+    type: 'AI reception & speed-to-lead',
+    categories: ['AI Agents', 'Voice', 'Automation', 'CRM'],
+    status: 'Live AI demo',
+    statusTone: 'live',
+    summary:
+      'A lead-response experience combining a live AI receptionist demonstration with enquiry capture, call progress, qualification, routing, and follow-up workflows.',
+    contribution:
+      'Voice-agent workflow, call-state UX, lead handling, booking-oriented automation, and reliable backend integration patterns.',
+    stack: ['AI voice', 'Twilio', 'LiveKit', 'n8n', 'CRM workflows'],
+    url: 'https://hasti.com.au/',
+    image: '/projects/hasti.png',
+    imageAlt: 'Hasti website showing its AI receptionist experience',
+  },
+  {
+    id: 'zalio',
+    title: 'Zalio',
+    type: 'Custom CRM & member retention',
+    categories: ['CRM', 'Automation', 'Platforms'],
+    status: 'Live product site',
+    statusTone: 'live',
+    summary:
+      'A modular gym operations platform spanning CRM, member retention, campaigns, membership workflows, analytics, and connected business tools.',
+    contribution:
+      'Multi-tenant product architecture, CRM synchronization, retention workflows, operational dashboards, and production delivery.',
+    stack: ['Next.js', 'React', 'TypeScript', 'Encore', 'PostgreSQL'],
+    url: 'https://zalio.ai/',
+    image: '/projects/zalio.png',
+    imageAlt: 'Zalio product website',
+  },
+  {
+    id: 'gymfactories',
+    title: 'GymFactories',
+    type: 'Research, planning & RFQ platform',
+    categories: ['Platforms', 'Automation'],
+    status: 'Live product',
+    statusTone: 'live',
+    summary:
+      'An evidence-led directory and gym-planning product for equipment research, manufacturer discovery, space planning, and supplier enquiries.',
+    contribution:
+      'Search-oriented product architecture, evidence tiers, enquiry workflows, media delivery, and scalable supplier content.',
+    stack: ['TanStack Start', 'React 19', 'PostgreSQL', 'Better Auth'],
+    url: 'https://gymfactories.com/',
+    image: '/projects/gymfactories.png',
+    imageAlt: 'GymFactories equipment research and gym planning website',
+  },
+  {
+    id: 'momentum-strength',
+    title: 'Momentum Strength',
+    type: 'Commerce & 3D product experience',
+    categories: ['Platforms'],
+    status: 'Live product demo',
+    statusTone: 'live',
+    summary:
+      'A commercial gym-equipment experience that combines product discovery with an interactive 3D configuration direction.',
+    contribution:
+      'Responsive product presentation, modern commerce UX, and visualization-oriented frontend architecture.',
+    stack: ['React', 'TypeScript', '3D product UX', 'Vercel'],
+    url: 'https://momentum-strength.vercel.app/',
+    image: '/projects/momentum-strength.png',
+    imageAlt: 'Momentum Strength commercial gym equipment website',
+  },
+  {
+    id: 'hsie-site-scoring',
+    title: 'HSIE Site Scoring',
+    type: 'Property intelligence prototype',
+    categories: ['Analytics', 'Platforms'],
+    status: 'Live prototype',
+    statusTone: 'prototype',
+    summary:
+      'A structured property and acquisition scoring workspace covering site quality, red flags, location context, and evidence-backed review.',
+    contribution:
+      'Decision-support modeling, external map and place data, scoring workflows, and operator-friendly review interfaces.',
+    stack: ['React', 'TypeScript', 'Maps', 'Spatial data'],
+    url: 'https://health-dev-three.vercel.app/',
+    image: '/projects/hsie.png',
+    imageAlt: 'HSIE manual property site scoring prototype',
+  },
+  {
+    id: 'voice-runtime',
+    title: 'AI Voice Runtime',
+    type: 'Backend voice-agent infrastructure',
+    categories: ['AI Agents', 'Voice', 'Automation'],
+    status: 'Private engineering case study',
+    statusTone: 'private',
+    summary:
+      'A contract-first voice backend for call dispatch, live agent sessions, booking tools, event evidence, retries, and controlled workflow integration.',
+    contribution:
+      'Idempotent call control, signed provider webhooks, reservation sagas, outbox delivery, worker fencing, and n8n command contracts.',
+    stack: ['TypeScript', 'Fastify', 'PostgreSQL', 'LiveKit', 'Twilio', 'n8n'],
+  },
+  {
+    id: 'gym-analytics',
+    title: 'Gym Analytics & Retention',
+    type: 'Data platform & decision support',
+    categories: ['Analytics', 'CRM', 'Automation'],
+    status: 'Private product system',
+    statusTone: 'private',
+    summary:
+      'A first-party analytics layer for member, revenue, attendance, product, class, and retention-risk workflows.',
+    contribution:
+      'Source synchronization, KPI fact modeling, durable jobs, reconciliation, risk views, and actionable dashboards.',
+    stack: ['Next.js 16', 'React 19', 'Supabase', 'Python', 'Recharts'],
+  },
+  {
+    id: 'agent-operations',
+    title: 'Agent & Platform Operations',
+    type: 'AI orchestration & control plane',
+    categories: ['AI Agents', 'Platforms'],
+    status: 'Private engineering case study',
+    statusTone: 'private',
+    summary:
+      'Operational tooling for governed agent teams, persistent engineering sessions, signed fleet observations, incidents, and service health.',
+    contribution:
+      'Agent goals and budgets, durable sessions, evidence timelines, alert grouping, access controls, and platform observability.',
+    stack: ['AI agents', 'Node.js', 'PostgreSQL', 'WebSockets', 'Linux'],
+  },
+]
+
+export const momentumEngineeringGroups = [
+  {
+    title: 'AI & voice systems',
+    description: 'Inbound and outbound voice runtimes, agent orchestration, command-centre tooling, and agent operations dashboards.',
+  },
+  {
+    title: 'Revenue & customer operations',
+    description: 'Lead response, GTM workflows, signup handoff, campaigns, CRM forms, marketing modules, and consent-aware follow-up.',
+  },
+  {
+    title: 'Gym products & data',
+    description: 'CRM, members, training, project management, retention analytics, reporting, and connected operational modules.',
+  },
+  {
+    title: 'Platform & delivery',
+    description: 'Control-plane monitoring, persistent sessions, uptime, shared UI systems, websites, prototypes, and delivery templates.',
+  },
+]
+
 export const experiences = [
   {
     role: 'AI Full-Stack Developer',

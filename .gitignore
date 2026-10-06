@@ -28,3 +28,7 @@ config.bat
 # Local agent tooling
 .superpowers/
 .env*
+
+# Browser test output
+test-results/
+playwright-report/
