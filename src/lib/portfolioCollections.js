@@ -9,6 +9,9 @@ export const featuredCredentialTitles = [
 
 export const featuredTitles = new Set(featuredCredentialTitles)
 
+export const featuredMomentumIds = ['hasti', 'zalio', 'gymfactories']
+export const momentumSystemFilters = ['All systems', 'AI Agents', 'Voice', 'Automation', 'CRM', 'Analytics', 'Platforms']
+
 export function selectCredentials(records, { query = '', category = 'all', expanded = false } = {}) {
   const needle = String(query).trim().toLocaleLowerCase('en')
   const matches = records.filter((record) => {
@@ -24,4 +27,14 @@ export function selectCredentials(records, { query = '', category = 'all', expan
   return expanded || needle || category !== 'all'
     ? matches
     : matches.filter((record) => featuredTitles.has(record.title))
+}
+
+export function selectSystems(records, { category = 'All systems', expanded = false } = {}) {
+  const matches = category === 'All systems'
+    ? records
+    : records.filter((record) => record.categories.includes(category))
+
+  return expanded || category !== 'All systems'
+    ? matches
+    : matches.filter((record) => featuredMomentumIds.includes(record.id))
 }

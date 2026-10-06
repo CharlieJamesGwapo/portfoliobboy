@@ -220,12 +220,19 @@ test('renders the additive AI systems section without replacing existing project
   })
   try {
     const { default: AISystems } = await server.ssrLoadModule('/src/components/AISystems.jsx')
-    const markup = renderToStaticMarkup(createElement(AISystems)).replace(/\s+/g, ' ')
-    assert.match(markup, /AI systems &amp; automation/i)
-    assert.match(markup, /Selected Momentum systems/i)
-    assert.match(markup, /Live AI demo/i)
-    assert.match(markup, /Private engineering case study/i)
-    assert.match(markup, /https:\/\/hasti\.com\.au\//i)
+    const { default: MomentumShowcase } = await server.ssrLoadModule('/src/components/MomentumShowcase.jsx')
+    const { default: SystemDetail } = await server.ssrLoadModule('/src/components/SystemDetail.jsx')
+    const serviceMarkup = renderToStaticMarkup(createElement(AISystems)).replace(/\s+/g, ' ')
+    const showcaseMarkup = renderToStaticMarkup(createElement(MomentumShowcase)).replace(/\s+/g, ' ')
+    const privateSystemMarkup = renderToStaticMarkup(createElement(SystemDetail, {
+      system: momentumSystems.find((system) => system.id === 'voice-runtime'),
+    })).replace(/\s+/g, ' ')
+    assert.match(serviceMarkup, /AI systems &amp; automation/i)
+    assert.doesNotMatch(serviceMarkup, /Selected Momentum systems/i)
+    assert.match(showcaseMarkup, /Selected Momentum systems/i)
+    assert.match(showcaseMarkup, /Live AI demo/i)
+    assert.match(showcaseMarkup, /https:\/\/hasti\.com\.au\//i)
+    assert.match(privateSystemMarkup, /Private engineering case study/i)
   } finally {
     await server.close()
   }

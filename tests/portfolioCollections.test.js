@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { certifications } from '../src/data/portfolioData.js'
-import { featuredCredentialTitles, selectCredentials } from '../src/lib/portfolioCollections.js'
+import { certifications, momentumSystems } from '../src/data/portfolioData.js'
+import { featuredCredentialTitles, selectCredentials, selectSystems } from '../src/lib/portfolioCollections.js'
 
 test('default credential view contains the six approved featured records', () => {
   const result = selectCredentials(certifications)
@@ -61,4 +61,35 @@ test('selector returns original records with supplied IDs and image absence inta
   assert.strictEqual(missingImage, certifications.find((item) => item.title === 'Active Directory'))
   assert.equal(missingImage?.credentialId, undefined)
   assert.equal(missingImage?.image, undefined)
+})
+
+test('default Momentum view contains the three approved featured systems', () => {
+  const result = selectSystems(momentumSystems)
+
+  assert.deepEqual(result.map((item) => item.id), ['hasti', 'zalio', 'gymfactories'])
+})
+
+test('expanded Momentum view keeps all eight original systems reachable', () => {
+  const result = selectSystems(momentumSystems, { expanded: true })
+
+  assert.equal(result.length, 8)
+  assert.deepEqual(result, momentumSystems)
+})
+
+test('filters search private systems outside the featured three', () => {
+  const result = selectSystems(momentumSystems, { category: 'Voice' })
+
+  assert.equal(result.length, 2)
+  assert.ok(result.some((item) => item.id === 'hasti'))
+  assert.ok(result.some((item) => item.id === 'voice-runtime' && !item.url))
+})
+
+test('Momentum selector leaves the original records unchanged', () => {
+  const snapshot = structuredClone(momentumSystems)
+
+  selectSystems(momentumSystems)
+  selectSystems(momentumSystems, { category: 'Voice' })
+  selectSystems(momentumSystems, { expanded: true })
+
+  assert.deepEqual(momentumSystems, snapshot)
 })

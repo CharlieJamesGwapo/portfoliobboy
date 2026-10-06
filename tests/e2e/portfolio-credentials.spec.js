@@ -163,7 +163,7 @@ test('credential dialog foregrounds and controls meet computed contrast in both 
     const dialog = page.getByRole('dialog', { name: 'Building with the Claude API' })
     await expect(dialog).toBeVisible()
     const pairs = await page.evaluate(() => {
-      const dialogElement = document.querySelector('.portfolio-dialog')
+      const dialogElement = document.querySelector('.portfolio-dialog[open]')
       const intro = dialogElement?.querySelector('.credential-detail-intro')
       const close = dialogElement?.querySelector('.portfolio-dialog-close')
       const dialogStyles = getComputedStyle(dialogElement)

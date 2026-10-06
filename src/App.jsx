@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import About from './components/About'
 import Experience from './components/Experience'
+import MomentumShowcase from './components/MomentumShowcase'
 import AISystems from './components/AISystems'
 import Projects from './components/Projects'
 import Skills from './components/Skills'
@@ -230,6 +231,7 @@ function App() {
         <Hero />
         <About />
         <Experience />
+        <MomentumShowcase />
         <AISystems />
         <Projects />
         <Skills />
