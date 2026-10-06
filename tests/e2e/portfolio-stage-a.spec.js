@@ -209,10 +209,24 @@ test('detail dialogs keep focus contained and return it to the trigger', async (
   const dialog = page.getByRole('dialog', { name: 'Building with the Claude API' })
   await expect(dialog).toBeVisible()
 
-  await page.keyboard.press('Tab')
-  await expect(dialog.locator(':focus')).toHaveCount(1)
+  const firstFocusable = dialog.getByRole('button', { name: 'Close details' })
+  const lastFocusable = dialog.getByRole('link', { name: /Open original certificate/i })
+  await expect(firstFocusable).toBeFocused()
+
+  // Exercise both actual focus-list boundaries. A single Tab/Shift+Tab
+  // round-trip can pass even when the trap handler is removed.
+  await firstFocusable.focus()
   await page.keyboard.press('Shift+Tab')
-  await expect(dialog.locator(':focus')).toHaveCount(1)
+  await expect(lastFocusable).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(firstFocusable).toBeFocused()
+
+  await lastFocusable.focus()
+  await page.keyboard.press('Tab')
+  await expect(firstFocusable).toBeFocused()
+  await page.keyboard.press('Shift+Tab')
+  await expect(lastFocusable).toBeFocused()
+
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   await expect(trigger).toBeFocused()
@@ -234,11 +248,12 @@ test('initial loading excludes arcade/game/assistant and Three.js requests befor
   })
   page.on('request', (request) => requests.push(request.url()))
   await page.goto('/#home', { waitUntil: 'domcontentloaded' })
-  await page.waitForTimeout(100)
+  // Wait for the actual initial shell rather than an arbitrary timer. The
+  // idle callback remains held, so post-paint work cannot race this snapshot.
+  await expect(page.locator('#home')).toBeVisible()
 
   const forbiddenInitialRequest = requests.filter((url) => /ArcadeLobby|\/game\/|gameData|three(?:\.js|[-/])|r3f|assistant|portfolio-chat/i.test(url))
   expect(forbiddenInitialRequest, 'initial page must not request Lab/game/assistant/Three.js code').toEqual([])
-  await expect(page.locator('#home')).toBeVisible()
 
   // The approved post-paint WebGL upgrade remains independently reachable;
   // releasing the held idle callback is intentionally outside the initial
