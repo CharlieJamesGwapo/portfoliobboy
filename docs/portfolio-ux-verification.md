@@ -232,3 +232,65 @@ contains 106 initial module IDs across `rolldown-runtime`, `react-vendor`, and t
 ### Dialog boundaries and metric scope
 
 The Stage A dialog test now focuses the actual first and last controls and exercises first → Shift+Tab → last → Tab → first as well as last → Tab → first → Shift+Tab → last, followed by Escape and trigger focus return. The benchmark transfer column is explicitly navigation-document transfer; local wall/DCL/load samples do not represent total asset transfer, paint timing, LCP, or UI readiness.
+
+## Stage A final fix wave (2026-10-07)
+
+This is the final whole-Stage A fix-wave record. The review reproduction was based on `73a98da9c6dd0b0e6b95b795936cd8e311d90940`; the application/test fix is `27efb63` (`fix: cancel Momentum scroll restoration on new intent`), and the separately scoped configuration rename is `84934a5` (`chore: use Rolldown codeSplitting option`). The application/config verification below is tied to `84934a5`. A later commit that only updates this verification document is not an application/build input and does not change these results.
+
+### Important scroll-intent fix and RED/GREEN evidence
+
+`MomentumShowcase.closeDetails()` now treats post-dialog scroll restoration as one cancellable lifecycle. It tracks the pending animation frame, 280 ms timer, intent listeners, and cleanup; cancellation is idempotent and runs on a new detail open, unmount, pointer/wheel/touch/keyboard/navigation intent, or a route/location change. The captured pathname/search/hash guard prevents restoration after a new route. Repeated close events do not enqueue another restoration. The original no-interaction return-scroll, filter, and focus-preservation behavior remains covered.
+
+The focused RED run was executed against the unfixed implementation and failed 6/6 (the Contact race and wheel/keyboard cases in Chromium, Firefox, and WebKit). After `27efb63`, the same focused command passed 6/6:
+
+```text
+env -u NO_COLOR FORCE_COLOR=0 npx playwright test tests/e2e/portfolio-ai-systems.spec.js -g "closing a case study yields" --project=chromium --project=firefox --project=webkit --reporter=line
+  6 passed (13.4s)
+```
+
+The Contact case uses a frozen clock, real Hasti open/Escape close, and a real Contact click; after advancing 300 ms, the Contact hash and viewport remain unchanged. The wheel/keyboard case uses real pointer input; Chromium requires a brief clock resume for compositor wheel delivery, then the clock is paused again before the 280 ms restoration deadline. The test still proves the actual wheel and keyboard intent survives the delayed callback. The existing exact no-interaction restoration test remains in the same suite.
+
+### Final standard, build, provenance, and browser matrix
+
+All final application/config verification commands use one color-control convention: `env -u NO_COLOR FORCE_COLOR=0`. This avoids the earlier two-variable runner warning without changing global settings.
+
+```text
+env -u NO_COLOR FORCE_COLOR=0 npm test
+  JavaScript: 43 passed, 0 failed
+  Python: Ran 1 test ... OK
+
+env -u NO_COLOR FORCE_COLOR=0 npm run build
+  1494 modules transformed
+  index-lfcTBcnX.js 122.90 kB
+  index-FyCZiwnc.css 152.41 kB
+  passed; no advancedChunks deprecation warning after the scoped rename
+
+git diff --check HEAD
+  passed
+```
+
+The source-input manifest is the ignored file `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/final-fix-source-copy-20261007.provenance.json`. It records source commit `84934a5`, 175 tracked files, 126 application/build inputs, `allCopyInputsMatchCommit: true`, and `allSourceInputsMatchCommit: true`. The fresh archived source copy is `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/final-fix-source-copy-20261007/`; its only external dependency is the current worktree `node_modules` link. The clean production graph was built from that exact copy at `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/final-fix-production-graph-20261007/production-module-graph.json`, with proof in the adjacent `production-graph-proof.json`: 106 initial module IDs, zero forbidden initial modules, initial chunks `rolldown-runtime-QTnfLwEv.js`, `react-vendor-4ZGzXClA.js`, and `index-lfcTBcnX.js`, and `heroWebgl.js` retained as a dynamic chunk.
+
+The final full matrix used the identified strict external server `http://127.0.0.1:5192/`, started from that exact archived source copy, and wrote unique output to `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/task-final-fix-full-e2e-20261007-rerun/`:
+
+```text
+env -u NO_COLOR FORCE_COLOR=0 PORTFOLIO_EXTERNAL_SERVER=1 PORTFOLIO_BASE_URL=http://127.0.0.1:5192 npx playwright test --output=.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/task-final-fix-full-e2e-20261007-rerun --trace=retain-on-failure --reporter=line
+  183 passed (4.2m)
+  Chromium: 61 passed
+  Firefox: 61 passed
+  WebKit: 61 passed
+```
+
+The first retained attempt at `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/task-final-fix-full-e2e-20261007/` was interrupted before application assertions because the local Playwright browser executables were missing. Its console showed 59 browser-startup failures and 124 not-run tests; `.last-run.json` remains `status: interrupted`. After installing the missing local Chromium, Firefox, and WebKit engines, the rerun above passed from the same source copy and server. Both records are retained; the first is a dependency-startup interruption, not an application result.
+
+### Scoped bundler triage and supplementary native QA
+
+The only bundler change is the `advancedChunks` → `codeSplitting` option rename in `vite.config.js`, committed separately as `84934a5`. Before/after production-graph proofs are retained at `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/tmp/final-fix-code-splitting-before-20261007/` and `.../final-fix-code-splitting-after-20261007/`. Their initial chunks, 106 initial module IDs, dynamic chunk set, hero idle chunk, and every emitted asset are byte-identical; no broader bundler migration was made.
+
+Root's native Chrome evidence remains supplementary in the ignored `.superpowers/sdd/2026-10-06-portfolio-ux-upgrade/native-zoom-qa.md`: native 100% was 1440 × 756 at DPR 2; actual native 200% was 720 × 378 at DPR 4; both Light and Dark modes retained navigation, credential search, and no horizontal overflow. System zoom, theme/search state, viewport, and the temporary QA tab were restored/closed. The source fix and scoped option rename do not change that zoom-sensitive UI evidence; no new production-release claim is made from it. The recorded 5188 server is an old diagnostics-only production-copy server and is not used as final proof here.
+
+### Known limits and preservation boundary
+
+The historical approximately 469-second SSR/build stall remains explicitly `UNKNOWN`: later sequential and standard runs passed without source changes, but no cause is assigned and the retained failed outputs are not deleted or relabelled as pre-existing. Prior baseline/public links/runtime boundaries remain unchanged; this wave is local verification only, with no deployment, release, protected-preview, provider, or external-service action.
+
+The portfolio data, 23 records, recognitions/dates, resume and contacts, music, nine games, all anchors, brand/private labels, and module overview remain preserved. Existing QA artifacts and failed evidence remain in place, and no source, game, renderer, asset, or tracked file was deleted or untracked.
