@@ -28,6 +28,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { navigation, profile, resumeUrl } from '../data/portfolioData'
+import { acquireBodyScrollLock } from '../lib/overlayScrollLock'
 
 const SECTION_ICONS = {
   '#about': User,
@@ -171,10 +172,12 @@ export default function CommandPalette({ open, onClose }) {
     setQuery('')
     setActive(0)
     document.body.classList.add('palette-open')
+    const releaseScrollLock = acquireBodyScrollLock('command-palette')
     const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 30)
 
     return () => {
       window.clearTimeout(focusTimer)
+      releaseScrollLock()
       document.body.classList.remove('palette-open')
       // Returning focus to whatever opened the palette is what makes ⌘K
       // usable twice in a row without touching the mouse.

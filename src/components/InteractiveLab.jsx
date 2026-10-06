@@ -19,6 +19,10 @@ export default function InteractiveLab() {
   const returnFocus = useRef(null)
 
   const launch = useCallback(() => {
+    // This covers direct Lab controls as well as the command-palette event.
+    // PortfolioDialog listens without coupling the game entry to credential
+    // or case-study state.
+    window.dispatchEvent(new CustomEvent('portfolio:lab-open'))
     returnFocus.current = document.activeElement
     setOpen(true)
   }, [])

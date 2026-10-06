@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Menu, Search, X } from 'lucide-react'
 import { navigation as links, profile } from '../data/portfolioData'
+import { acquireBodyScrollLock } from '../lib/overlayScrollLock'
 import ThemeSelector from './ThemeSelector'
 
 const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
@@ -96,6 +97,7 @@ const Navbar = () => {
     const footer = document.querySelector('.footer')
     main?.toggleAttribute('inert', open)
     footer?.toggleAttribute('inert', open)
+    const releaseScrollLock = open ? acquireBodyScrollLock('mobile-menu') : null
 
     const focusTimer = open
       ? window.setTimeout(() => menuRef.current?.querySelector('a')?.focus(), 80)
@@ -121,17 +123,33 @@ const Navbar = () => {
         }
       }
     }
+    const closeForOverlay = () => setOpen(false)
     window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('portfolio:detail-open', closeForOverlay)
+    window.addEventListener('portfolio:open-palette', closeForOverlay)
+    window.addEventListener('portfolio:open-music', closeForOverlay)
+    window.addEventListener('portfolio:open-games', closeForOverlay)
+    window.addEventListener('portfolio:lab-open', closeForOverlay)
     return () => {
       if (focusTimer) window.clearTimeout(focusTimer)
+      releaseScrollLock?.()
       document.body.classList.remove('menu-open')
       main?.removeAttribute('inert')
       footer?.removeAttribute('inert')
       window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('portfolio:detail-open', closeForOverlay)
+      window.removeEventListener('portfolio:open-palette', closeForOverlay)
+      window.removeEventListener('portfolio:open-music', closeForOverlay)
+      window.removeEventListener('portfolio:open-games', closeForOverlay)
+      window.removeEventListener('portfolio:lab-open', closeForOverlay)
     }
   }, [open])
 
   const closeMenu = () => setOpen(false)
+  const toggleMenu = () => {
+    if (!open) window.dispatchEvent(new CustomEvent('portfolio:menu-open'))
+    setOpen((value) => !value)
+  }
 
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
@@ -174,7 +192,7 @@ const Navbar = () => {
           ref={toggleRef}
           type="button"
           className="menu-toggle"
-          onClick={() => setOpen((value) => !value)}
+          onClick={toggleMenu}
           aria-expanded={open}
           aria-controls="mobile-navigation"
           aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}

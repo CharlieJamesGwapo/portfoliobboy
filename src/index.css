@@ -96,10 +96,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-body.menu-open {
-  overflow: hidden;
-}
-
 button,
 input,
 textarea {
@@ -3757,8 +3753,6 @@ body.game-open .music-launcher { visibility: hidden; }
   align-items: center;
   gap: 5px;
 }
-
-body.palette-open { overflow: hidden; }
 
 @media (max-width: 640px) {
   .palette-backdrop { padding-top: 12px; align-items: stretch; }

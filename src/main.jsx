@@ -5,6 +5,7 @@ import { ThemeProvider } from './components/ThemeProvider.jsx'
 import { registerServiceWorker } from './lib/registerServiceWorker'
 import './index.css'
 import './styles/theme.css'
+import './styles/dialog.css'
 
 // Entrance animations are opt-in. The stylesheet only hides content behind an
 // animation when <html> carries `motion-ready`, so a JS failure, a blocked

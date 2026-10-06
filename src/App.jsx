@@ -85,7 +85,10 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const openMusic = () => setMusicOpen(true)
+    const openMusic = () => {
+      setPaletteOpen(false)
+      setMusicOpen(true)
+    }
     window.addEventListener('portfolio:open-music', openMusic)
     document.body.classList.toggle('music-open', musicOpen)
     return () => {
@@ -128,7 +131,14 @@ function App() {
   const closePalette = useCallback(() => setPaletteOpen(false), [])
 
   useEffect(() => {
-    const openPalette = () => setPaletteOpen(true)
+    const openPalette = () => {
+      setMusicOpen(false)
+      setPaletteOpen(true)
+    }
+    const closeCompetingOverlays = () => {
+      setMusicOpen(false)
+      setPaletteOpen(false)
+    }
 
     const onKeyDown = (event) => {
       // ⌘K on macOS, Ctrl+K elsewhere. Both are claimed by the browser's
@@ -141,20 +151,28 @@ function App() {
 
       if (isShortcut) {
         event.preventDefault()
+        setMusicOpen(false)
         setPaletteOpen((value) => !value)
         return
       }
       if (event.key === '/' && !typing && !event.metaKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault()
+        setMusicOpen(false)
         setPaletteOpen(true)
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('portfolio:open-palette', openPalette)
+    window.addEventListener('portfolio:detail-open', closeCompetingOverlays)
+    window.addEventListener('portfolio:open-games', closeCompetingOverlays)
+    window.addEventListener('portfolio:lab-open', closeCompetingOverlays)
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('portfolio:open-palette', openPalette)
+      window.removeEventListener('portfolio:detail-open', closeCompetingOverlays)
+      window.removeEventListener('portfolio:open-games', closeCompetingOverlays)
+      window.removeEventListener('portfolio:lab-open', closeCompetingOverlays)
     }
   }, [])
 

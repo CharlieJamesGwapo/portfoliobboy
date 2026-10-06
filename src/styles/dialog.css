@@ -1,0 +1,90 @@
+.portfolio-dialog {
+  width: min(760px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border-control);
+  border-radius: 20px;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-theme);
+  overflow: hidden;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.portfolio-dialog::backdrop {
+  background: var(--scrim);
+}
+
+.portfolio-dialog-shell {
+  display: flex;
+  max-height: calc(100dvh - 32px);
+  min-height: 0;
+  flex-direction: column;
+}
+
+.portfolio-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 16px max(20px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--border-ui);
+}
+
+.portfolio-dialog-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  line-height: 1.2;
+}
+
+.portfolio-dialog-close {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 9px 13px;
+  border: 1px solid var(--border-control);
+  border-radius: 10px;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.portfolio-dialog-close:hover {
+  border-color: var(--accent-action);
+  background: color-mix(in srgb, var(--accent-action) 10%, var(--surface-page));
+}
+
+.portfolio-dialog-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+}
+
+@media (max-width: 640px) {
+  .portfolio-dialog {
+    width: calc(100% - 16px);
+    border-radius: 16px;
+  }
+
+  .portfolio-dialog-header {
+    gap: 12px;
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+
+  .portfolio-dialog-close {
+    padding-inline: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-dialog,
+  .portfolio-dialog-close {
+    transition: none;
+  }
+}
