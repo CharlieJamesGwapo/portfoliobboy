@@ -88,11 +88,30 @@ export function MomentumShowcase() {
   const selectedTriggerRef = useRef(null)
   const sectionRef = useRef(null)
   const selectedScrollYRef = useRef(0)
+  const selectedSystemRef = useRef(null)
+  const scrollRestoreFrameRef = useRef(null)
   const scrollRestoreTimerRef = useRef(null)
+  const scrollRestoreCleanupRef = useRef(null)
+  const scrollRestoreTokenRef = useRef(0)
+
+  const cancelPendingScrollRestore = useCallback(() => {
+    if (scrollRestoreFrameRef.current !== null) {
+      window.cancelAnimationFrame(scrollRestoreFrameRef.current)
+      scrollRestoreFrameRef.current = null
+    }
+    if (scrollRestoreTimerRef.current !== null) {
+      window.clearTimeout(scrollRestoreTimerRef.current)
+      scrollRestoreTimerRef.current = null
+    }
+    const cleanup = scrollRestoreCleanupRef.current
+    scrollRestoreCleanupRef.current = null
+    cleanup?.()
+    scrollRestoreTokenRef.current += 1
+  }, [])
 
   useEffect(() => () => {
-    if (scrollRestoreTimerRef.current !== null) window.clearTimeout(scrollRestoreTimerRef.current)
-  }, [])
+    cancelPendingScrollRestore()
+  }, [cancelPendingScrollRestore])
 
   const systems = useMemo(
     () => selectSystems(momentumSystems, { category: activeFilter, expanded }),
@@ -100,25 +119,67 @@ export function MomentumShowcase() {
   )
 
   const openDetails = useCallback((system, event) => {
-    if (scrollRestoreTimerRef.current !== null) {
-      window.clearTimeout(scrollRestoreTimerRef.current)
-      scrollRestoreTimerRef.current = null
-    }
+    cancelPendingScrollRestore()
     selectedTriggerRef.current = event.currentTarget
     selectedScrollYRef.current = window.scrollY
+    selectedSystemRef.current = system
     setSelectedSystem(system)
-  }, [])
+  }, [cancelPendingScrollRestore])
 
   const closeDetails = useCallback(() => {
+    if (selectedSystemRef.current === null) return
+
+    selectedSystemRef.current = null
     setSelectedSystem(null)
     const scrollY = selectedScrollYRef.current
+    const restoreLocation = `${window.location.pathname}${window.location.search}${window.location.hash}`
+    cancelPendingScrollRestore()
+    const token = scrollRestoreTokenRef.current
     const restoreScroll = () => {
-      scrollRestoreTimerRef.current = null
-      if (Math.abs(window.scrollY - scrollY) > 1) window.scrollTo(0, scrollY)
+      if (scrollRestoreTokenRef.current !== token) return
+      const currentLocation = `${window.location.pathname}${window.location.search}${window.location.hash}`
+      if (currentLocation !== restoreLocation) {
+        cancelPendingScrollRestore()
+        return
+      }
+      if (Math.abs(window.scrollY - scrollY) > 1) window.scrollTo({ top: scrollY, behavior: 'auto' })
     }
-    window.requestAnimationFrame(restoreScroll)
-    scrollRestoreTimerRef.current = window.setTimeout(restoreScroll, 280)
-  }, [])
+    const completeScrollRestore = () => {
+      if (scrollRestoreTokenRef.current !== token) return
+      scrollRestoreTimerRef.current = null
+      restoreScroll()
+      cancelPendingScrollRestore()
+    }
+    const intentEvents = [
+      ['pointerdown', { capture: true }],
+      ['wheel', { capture: true, passive: true }],
+      ['touchstart', { capture: true, passive: true }],
+      ['keydown', { capture: true }],
+      ['click', { capture: true }],
+      ['auxclick', { capture: true }],
+      ['hashchange', undefined],
+      ['popstate', undefined],
+    ]
+    const cancelForIntent = () => cancelPendingScrollRestore()
+    const removeIntentListeners = () => {
+      for (const [type, options] of intentEvents) window.removeEventListener(type, cancelForIntent, options)
+    }
+
+    scrollRestoreFrameRef.current = window.requestAnimationFrame(() => {
+      scrollRestoreFrameRef.current = null
+      restoreScroll()
+    })
+    scrollRestoreTimerRef.current = window.setTimeout(completeScrollRestore, 280)
+
+    // The close action itself can be Escape or a close-button click. Attach
+    // intent listeners after that event has finished so it remains an
+    // intentional close rather than cancelling its own restoration.
+    Promise.resolve().then(() => {
+      if (scrollRestoreTokenRef.current !== token) return
+      for (const [type, options] of intentEvents) window.addEventListener(type, cancelForIntent, options)
+      scrollRestoreCleanupRef.current = removeIntentListeners
+    })
+  }, [cancelPendingScrollRestore])
 
   return (
     <section

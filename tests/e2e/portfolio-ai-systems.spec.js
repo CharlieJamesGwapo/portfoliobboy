@@ -88,6 +88,99 @@ test('new systems can be filtered and inspected while the existing portfolio rem
   await expect(page.locator('#projects [role="tab"]')).toHaveCount(8)
 })
 
+test('closing a case study yields to a real Contact navigation before delayed restoration', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.clock.install({ time: new Date('2026-10-07T00:00:00.000Z') })
+  await page.goto('/#momentum-work')
+  await page.clock.runFor(450)
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })
+  await expect(page.locator('#momentum-work')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Open case study: Hasti' })).toBeVisible()
+
+  const hastiTrigger = page.getByRole('button', { name: 'Open case study: Hasti' })
+  await hastiTrigger.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }))
+  const scrollBeforeDetails = await page.evaluate(() => window.scrollY)
+  await hastiTrigger.click()
+  await expect(page.getByRole('dialog', { name: 'Hasti' })).toBeVisible()
+
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name: 'Hasti' })).toBeHidden()
+  await expect(hastiTrigger).toBeFocused()
+
+  const contact = page.locator('.desktop-nav').getByRole('link', { name: 'Contact', exact: true })
+  await contact.click()
+  const contactAfterNavigation = await page.evaluate(() => ({
+    hash: window.location.hash,
+    scrollY: window.scrollY,
+    contactTop: document.querySelector('#contact')?.getBoundingClientRect().top,
+  }))
+  expect(contactAfterNavigation.hash).toBe('#contact')
+  expect(contactAfterNavigation.contactTop).toBeGreaterThanOrEqual(0)
+  expect(contactAfterNavigation.contactTop).toBeLessThan(180)
+  expect(contactAfterNavigation.scrollY).not.toBe(scrollBeforeDetails)
+
+  await page.clock.runFor(300)
+  await expect.poll(() => page.evaluate(() => ({
+    hash: window.location.hash,
+    scrollY: window.scrollY,
+    contactTop: document.querySelector('#contact')?.getBoundingClientRect().top,
+  }))).toEqual(contactAfterNavigation)
+})
+
+test('closing a case study yields to real wheel and keyboard intent', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.clock.install({ time: new Date('2026-10-07T00:00:00.000Z') })
+  await page.goto('/#momentum-work')
+  await page.clock.runFor(450)
+  await page.addStyleTag({ content: 'html { scroll-behavior: auto !important; }' })
+  await expect(page.getByRole('button', { name: 'Open case study: Hasti' })).toBeVisible()
+  await page.evaluate(() => {
+    window.__wheelSeen = false
+    window.addEventListener('wheel', () => { window.__wheelSeen = true }, { once: true })
+  })
+
+  const hastiTrigger = page.getByRole('button', { name: 'Open case study: Hasti' })
+  await hastiTrigger.evaluate((element) => element.scrollIntoView({ block: 'center', behavior: 'instant' }))
+  const scrollBeforeDetails = await page.evaluate(() => window.scrollY)
+  await hastiTrigger.click()
+  const hastiDialog = page.getByRole('dialog', { name: 'Hasti' })
+  await expect(hastiDialog).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(hastiDialog).toBeHidden()
+
+  // Chromium does not dispatch compositor wheel input while Playwright's
+  // clock is frozen. Briefly resume only to deliver the real wheel, then
+  // pause before the 280 ms restoration window can elapse.
+  await page.clock.resume()
+  await page.mouse.move(900, 700)
+  await page.mouse.wheel(0, 120)
+  await page.waitForTimeout(20)
+  const pauseAt = await page.evaluate(() => new Date(Date.now() + 1000).toISOString())
+  await page.clock.pauseAt(new Date(pauseAt))
+  await expect.poll(() => page.evaluate(() => window.__wheelSeen)).toBe(true)
+  const wheelScrollY = await page.evaluate(() => window.scrollY)
+  expect(wheelScrollY).not.toBe(scrollBeforeDetails)
+  await page.clock.runFor(300)
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(wheelScrollY)
+
+  await hastiTrigger.click()
+  await expect(hastiDialog).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(hastiDialog).toBeHidden()
+  await page.evaluate(() => window.addEventListener('keydown', (event) => {
+    if (event.key === 'PageDown') event.preventDefault()
+  }, { capture: true, once: true }))
+  await page.keyboard.press('PageDown')
+  await page.evaluate(() => window.scrollTo({ top: window.scrollY + 120, behavior: 'auto' }))
+  const keyboardIntentState = await page.evaluate(() => ({
+    scrollY: window.scrollY,
+  }))
+  await page.clock.runFor(300)
+  await expect.poll(() => page.evaluate(() => ({
+    scrollY: window.scrollY,
+  }))).toEqual(keyboardIntentState)
+})
+
 test('Zalio case study uses a private architecture overview without internal workspace links', async ({ page }) => {
   await page.goto('/#momentum-work')
   await page.getByRole('button', { name: 'Open case study: Zalio' }).click()
