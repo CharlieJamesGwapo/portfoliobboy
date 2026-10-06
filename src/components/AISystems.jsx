@@ -79,7 +79,7 @@ const AISystems = () => {
                   </div>
                 )}
                 <div className="momentum-card-copy">
-                  <div className="momentum-card-meta"><p>{system.type}</p><span className={`system-status system-status-${system.statusTone}`}>{system.statusTone === 'private' && <LockKeyhole size={11} aria-hidden="true" />}{system.status}</span></div>
+                  <div className="momentum-card-meta"><p className="momentum-card-type">{system.type}</p><span className={`system-status system-status-${system.statusTone}`}>{system.statusTone === 'private' && <LockKeyhole size={11} aria-hidden="true" />}{system.status}</span></div>
                   <h3>{system.title}</h3>
                   <p className="momentum-summary">{system.summary}</p>
                   <details className="momentum-details"><summary>Explore engineering scope <span aria-hidden="true">+</span></summary><p>{system.contribution}</p><div className="momentum-stack">{system.stack.map((item) => <span key={item}>{item}</span>)}</div></details>

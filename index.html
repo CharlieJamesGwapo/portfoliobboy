@@ -6,7 +6,31 @@
     <link rel="apple-touch-icon" href="/favicon.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b2528" />
+    <meta name="theme-color" content="#f3f0e9" />
+
+    <!-- Resolve the saved/System preference before the first paint. The
+         controller in src/lib/theme.js uses the same precedence rule after
+         React mounts. -->
+    <script>
+      (() => {
+        const key = 'portfolio:theme:v1'
+        let preference = 'system'
+        let systemDark = false
+        try {
+          const stored = window.localStorage.getItem(key)
+          if (stored === 'light' || stored === 'dark' || stored === 'system') preference = stored
+        } catch {}
+        try {
+          systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        } catch {}
+        const resolved = preference === 'light' || preference === 'dark'
+          ? preference
+          : systemDark ? 'dark' : 'light'
+        document.documentElement.dataset.theme = resolved
+        document.documentElement.style.colorScheme = resolved
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#0b2024' : '#f3f0e9')
+      })()
+    </script>
 
     <!--
       Boot styles, inlined so they apply before the stylesheet has been
@@ -21,14 +45,21 @@
       the moment React mounts.
     -->
     <style>
-      html { background: #0b2528; color-scheme: dark; }
-      body { margin: 0; background: #0b2528; }
+      html { background: #f3f0e9; color-scheme: light; }
+      html[data-theme="dark"] { background: #0b2024; color-scheme: dark; }
+      body { margin: 0; background: #f3f0e9; }
+      html[data-theme="dark"] body { background: #0b2024; }
       #root:empty {
         display: block;
         min-height: 100svh;
         background:
+          radial-gradient(circle at 78% 26%, rgba(11, 107, 88, 0.12), transparent 42%),
+          #f3f0e9;
+      }
+      html[data-theme="dark"] #root:empty {
+        background:
           radial-gradient(circle at 78% 26%, rgba(103, 224, 193, 0.09), transparent 42%),
-          #0b2528;
+          #0b2024;
       }
       #root:empty::before {
         display: block;

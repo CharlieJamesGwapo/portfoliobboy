@@ -23,7 +23,7 @@
 .ai-delivery-note { display: flex; gap: 18px; align-items: center; padding: 24px 28px; margin-top: 20px; background: var(--ink); color: var(--paper); border-radius: 12px; }
 .ai-delivery-note > svg { flex-shrink: 0; color: var(--mint); }
 .ai-delivery-note strong { font-size: .9rem; }
-.ai-delivery-note p { margin-top: 5px; font-size: .73rem; color: #bdcecb; line-height: 1.6; }
+.ai-delivery-note p { margin-top: 5px; font-size: .73rem; color: var(--text-on-ink-muted); line-height: 1.6; }
 .ai-delivery-note > a { display: inline-flex; gap: 8px; align-items: center; margin-left: auto; flex-shrink: 0; color: var(--mint); font-size: .73rem; font-weight: 750; }
 .momentum-work { padding-top: 100px; scroll-margin-top: var(--anchor-offset); }
 .momentum-toolbar { display: flex; gap: 20px; justify-content: space-between; align-items: center; margin: 32px 0 24px; }
@@ -40,10 +40,10 @@
 .momentum-preview > span { position: absolute; bottom: 16px; right: 16px; display: flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: .66rem; font-weight: 750; }
 .momentum-card-copy { padding: 28px; }
 .momentum-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; margin-bottom: 15px; }
-.momentum-card-meta > p { color: var(--mint-deep); font-size: .65rem; font-weight: 750; }
-.system-status { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line-light); border-radius: 999px; padding: 5px 8px; color: var(--slate); font-size: .6rem; font-weight: 700; }
-.system-status-live { color: #08644f; background: #e4f5ec; border-color: #b9dccb; }
-.system-status-prototype { color: #75521c; background: #fcf0d9; border-color: #e6d3ae; }
+.momentum-card-meta > p { color: var(--accent-action); font-size: .65rem; font-weight: 750; }
+.system-status { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--border-control); border-radius: 999px; padding: 5px 8px; color: var(--slate); font-size: .6rem; font-weight: 700; }
+.system-status-live { color: var(--status-success); background: var(--status-success-surface); border-color: var(--status-success); }
+.system-status-prototype { color: var(--status-warning); background: var(--status-warning-surface); border-color: var(--status-warning); }
 .momentum-card h3 { font-size: clamp(1.55rem, 2.8vw, 2.2rem); letter-spacing: -.045em; line-height: 1.15; margin-bottom: 14px; }
 .momentum-summary { color: var(--slate); font-size: .82rem; line-height: 1.7; }
 .momentum-details { margin-top: 22px; border-top: 1px solid var(--line-light); border-bottom: 1px solid var(--line-light); }

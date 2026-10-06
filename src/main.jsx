@@ -1,8 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import { ThemeProvider } from './components/ThemeProvider.jsx'
 import { registerServiceWorker } from './lib/registerServiceWorker'
 import './index.css'
+import './styles/theme.css'
 
 // Entrance animations are opt-in. The stylesheet only hides content behind an
 // animation when <html> carries `motion-ready`, so a JS failure, a blocked
@@ -38,7 +40,9 @@ armEntranceAnimations()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </React.StrictMode>,
 )
 

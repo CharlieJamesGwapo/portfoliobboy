@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Menu, Search, X } from 'lucide-react'
 import { navigation as links, profile } from '../data/portfolioData'
+import ThemeSelector from './ThemeSelector'
 
 const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
 
@@ -155,6 +156,7 @@ const Navbar = () => {
         </nav>
 
         <div className="nav-actions">
+          <ThemeSelector />
           <button
             type="button"
             className="nav-search"
@@ -190,6 +192,7 @@ const Navbar = () => {
             </a>
           ))}
           <div className="mobile-menu-actions">
+            <ThemeSelector className="theme-selector-mobile" />
             <a className="mobile-contact" href={`mailto:${profile.email}`} onClick={closeMenu}>Start a conversation</a>
             <button
               type="button"
