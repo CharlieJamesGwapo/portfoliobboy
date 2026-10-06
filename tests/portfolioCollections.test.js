@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { certifications, momentumSystems } from '../src/data/portfolioData.js'
-import { featuredCredentialTitles, selectCredentials, selectSystems } from '../src/lib/portfolioCollections.js'
+import { featuredCredentialTitles, getSystemLiveActionLabel, selectCredentials, selectSystems } from '../src/lib/portfolioCollections.js'
 
 test('default credential view contains the six approved featured records', () => {
   const result = selectCredentials(certifications)
@@ -92,4 +92,21 @@ test('Momentum selector leaves the original records unchanged', () => {
   selectSystems(momentumSystems, { expanded: true })
 
   assert.deepEqual(momentumSystems, snapshot)
+})
+
+test('live action labels stay status-specific and private systems have no public action', () => {
+  const publicLabels = new Map(
+    momentumSystems
+      .filter((system) => system.url)
+      .map((system) => [system.id, getSystemLiveActionLabel(system)]),
+  )
+
+  assert.deepEqual(publicLabels, new Map([
+    ['hasti', 'Try the AI receptionist'],
+    ['zalio', 'Open the product site'],
+    ['gymfactories', 'Explore the live product'],
+    ['momentum-strength', 'Explore the live demo'],
+    ['hsie-site-scoring', 'Explore the prototype'],
+  ]))
+  assert.equal(getSystemLiveActionLabel(momentumSystems.find((system) => system.id === 'voice-runtime')), null)
 })

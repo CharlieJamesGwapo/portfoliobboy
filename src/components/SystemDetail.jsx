@@ -1,13 +1,6 @@
 import { ArrowUpRight, LockKeyhole } from 'lucide-react'
 import ZalioWorkspaceOverview from './ZalioWorkspaceOverview'
-
-function getLiveAction(system) {
-  if (system.id === 'hasti') return 'Try the AI receptionist'
-  if (system.id === 'zalio') return 'Open the product site'
-  if (system.statusTone === 'prototype') return 'Explore the prototype'
-  if (system.status.toLocaleLowerCase('en').includes('demo')) return 'Explore the live demo'
-  return 'Explore the live product'
-}
+import { getSystemLiveActionLabel } from '../lib/portfolioCollections'
 
 export default function SystemDetail({ system }) {
   const publicUrl = system.url
@@ -40,7 +33,7 @@ export default function SystemDetail({ system }) {
         </p>
         {publicUrl ? (
           <a className="system-detail-live-link" href={publicUrl} target="_blank" rel="noreferrer">
-            {getLiveAction(system)}
+            {getSystemLiveActionLabel(system)}
             <ArrowUpRight size={16} aria-hidden="true" />
             <span className="sr-only"> — {system.title} (opens in a new tab)</span>
           </a>

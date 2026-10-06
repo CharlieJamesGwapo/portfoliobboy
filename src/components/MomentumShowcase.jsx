@@ -6,15 +6,7 @@ import SectionHeading from './SectionHeading'
 import SystemDetail from './SystemDetail'
 import './ai-systems.css'
 import { momentumSystems, momentumEngineeringGroups } from '../data/portfolioData'
-import { momentumSystemFilters, selectSystems } from '../lib/portfolioCollections'
-
-function liveActionLabel(system) {
-  if (system.id === 'hasti') return 'Try the AI receptionist'
-  if (system.id === 'zalio') return 'Open the product site'
-  if (system.statusTone === 'prototype') return 'Explore the prototype'
-  if (system.status.toLocaleLowerCase('en').includes('demo')) return 'Explore the live demo'
-  return 'Explore the live product'
-}
+import { getSystemLiveActionLabel, momentumSystemFilters, selectSystems } from '../lib/portfolioCollections'
 
 function EngineeringPreview({ system }) {
   const descriptor = system.id === 'voice-runtime'
@@ -67,7 +59,7 @@ function MomentumCard({ system, onOpen }) {
           </button>
           {system.url ? (
             <a className="momentum-demo-link" href={system.url} target="_blank" rel="noreferrer">
-              {liveActionLabel(system)}
+              {getSystemLiveActionLabel(system)}
               <ArrowUpRight size={17} aria-hidden="true" />
               <span className="sr-only"> — {system.title} (opens in a new tab)</span>
             </a>

@@ -12,6 +12,15 @@ export const featuredTitles = new Set(featuredCredentialTitles)
 export const featuredMomentumIds = ['hasti', 'zalio', 'gymfactories']
 export const momentumSystemFilters = ['All systems', 'AI Agents', 'Voice', 'Automation', 'CRM', 'Analytics', 'Platforms']
 
+export function getSystemLiveActionLabel(system) {
+  if (!system?.url) return null
+  if (system.id === 'hasti') return 'Try the AI receptionist'
+  if (system.id === 'zalio') return 'Open the product site'
+  if (system.statusTone === 'prototype') return 'Explore the prototype'
+  if (system.status.toLocaleLowerCase('en').includes('demo')) return 'Explore the live demo'
+  return 'Explore the live product'
+}
+
 export function selectCredentials(records, { query = '', category = 'all', expanded = false } = {}) {
   const needle = String(query).trim().toLocaleLowerCase('en')
   const matches = records.filter((record) => {
