@@ -14,6 +14,16 @@ export const forbiddenModuleRules = [
   // Do not misclassify a nested dependency such as
   // @react-three/fiber/node_modules/scheduler as the R3F package itself.
   { name: 'react-three-fiber', test: /(?:^|\/)node_modules\/@react-three\/[^/]+(?:\/(?!node_modules\/).*)?$/i },
+  // The assistant plan keeps only a small launcher eligible for the initial
+  // graph. Panel/client/endpoint implementation modules are lazy, so classify
+  // their Rollup module IDs even when Rollup places them in an arbitrary
+  // shared chunk. These basename rules intentionally do not match
+  // AssistantLauncher.jsx.
+  { name: 'assistant-panel', test: /(?:^|\/)(?:PortfolioAssistant|AssistantPanel)\.(?:jsx?|tsx?|mjs|cjs)(?:[?#].*)?$/i },
+  { name: 'assistant-client', test: /(?:^|\/)(?:portfolioChatClient|PortfolioAssistantClient|AssistantClient)\.(?:jsx?|tsx?|mjs|cjs)(?:[?#].*)?$/i },
+  { name: 'assistant-endpoint', test: /(?:^|\/)(?:portfolio-chat|PortfolioAssistantEndpoint|AssistantEndpoint)\.(?:jsx?|tsx?|mjs|cjs)(?:[?#].*)?$/i },
+  { name: 'assistant-server', test: /(?:^|\/)(?:portfolioChatHandler|portfolioGateway)\.(?:jsx?|tsx?|mjs|cjs)(?:[?#].*)?$/i },
+  { name: 'assistant-sdk', test: /(?:^|\/)node_modules\/(?:ai|@ai-sdk\/[^/]+)(?:\/|$)/i },
   { name: 'assistant', test: /(?:^|\/)(?:assistant|portfolio-chat)(?:[./\/]|$)/i },
 ]
 
