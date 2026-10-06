@@ -16,18 +16,64 @@ The release decision is **blocked / fail closed**.
 - No provider model generation was made during this verification.
 - No provider key, API key, environment value, balance, payment detail, or
   token is recorded here.
-- No WAF draft was published, no recharge or purchase was made, and no
-  deployment or production setting was changed by this task.
+- The owner has a fresh scoped published WAF configuration proof, recorded
+  below; this task did not publish WAF or change a production setting.
+- No recharge or purchase was made, and no deployment was changed by this
+  task.
 
 The planned public behavior is read-only and portfolio-grounded: bounded
 public facts, no repository or private-client access, no tools, no raw model
 HTML, no autonomous loops, no persistent chat, and no question/answer logs.
 
+### Public-data, privacy, and funding contract
+
+These fixed global constraints are the handoff for later implementation:
+
+- The model sees the visitor's question, bounded conversational context, and that public knowledge payload.
+- No filesystem reads of the full repository, private screenshots, research notes, credentials, internal URLs, or live client database access.
+- Validate content type, same-origin policy, message roles, body size (maximum 24 KiB), user question length (maximum 2,000 characters), and history (maximum 10 messages).
+- Cap output at 600 tokens and allow one model generation per request, without tools or autonomous loops.
+- Default financial boundary: no purchased credits, no automatic recharge, no paid plan upgrade, and no provider-key reuse from other client projects.
+- Before enabling the public endpoint, require enforceable rate limits (initial target: five requests per minute per client) and a verified provider spending cap.
+- Do not substitute canned responses and advertise them as AI. No raw model HTML, prompt/answer logs, persistent chat storage, private client access, outbound messages or calls.
+- A separate Railway service is not required for this bounded read-only assistant; do not provision or modify Railway as part of this design.
+
+For honest conversation provenance, history is sent as untrusted quoted context
+inside a single user message; it is never promoted to authoritative assistant
+or system content.
+
+### Task 3 request contract (fixed handoff)
+
+The future endpoint must enforce these constraints before any provider call;
+this Task 1 record does not implement the endpoint or make an SDK call:
+
+- Accept `POST` only with `Content-Type: application/json` and reject unknown
+  request-object keys, arbitrary URL/source fields, rich message parts,
+  `system`, and `tool` roles.
+- Enforce exact same-origin checks. A browser POST must carry `Origin` matching
+  the configured production origin, approved localhost development origin, or
+  the platform-injected exact preview URL. Missing browser `Origin`, an
+  arbitrary `*.vercel.app` origin, or a user-supplied `Host` must not qualify.
+- Permit only `user` and `assistant` history roles. The transport body is
+  `{question:string, history:Array<{role:'user'|'assistant', content:string}>}`.
+- Reject raw UTF-8 bodies over 24 KiB, an empty or over-2,000-character
+  question, more than 10 history messages, or any history content over 4,000
+  characters. Check body size before JSON parsing and validate the parsed
+  object again.
+- A valid request may cause exactly one model generation, capped at 600 output
+  tokens, with no tools, retries, fallbacks, autonomous loops, or browser
+  model override. Disabled or misconfigured activation must fail closed before
+  a provider call.
+- Do not substitute canned text and present it as AI. No raw model HTML,
+  prompt/answer logs, persistent chat, private-client access, outbound sends,
+  or calls are allowed.
+
 ## Evidence collected
 
-Evidence timestamps below are UTC. The latest read-only refresh was
-`2026-10-06T22:03:17Z`; the public model catalogue fetch was
-`2026-10-06T22:00:01Z`.
+Evidence timestamps below are UTC. The latest read-only OIDC credits refresh
+was `2026-10-06T22:03:17Z`; the public model catalogue fetch was
+`2026-10-06T22:00:01Z`; the latest scoped WAF configuration proof was
+`2026-10-06T22:13:46.575Z`.
 
 ### Project and runtime
 
@@ -76,8 +122,14 @@ configured server-side, must equal a currently verified catalogue ID.
   a current activation gate: the model/account view and free-credit status
   must be refreshed again before any activation decision.
 - Authentication must use the project OIDC path for project-budget
-  attribution. No provider key, AI Gateway API key, BYOK credential, or new
-  key was created or inspected.
+  attribution. The installed Gateway docs state that a supplied API key or
+  Vercel access token takes precedence over OIDC, even when invalid; no
+  `AI_GATEWAY_API_KEY` fallback is allowed for this assistant. The same docs
+  state that a request-scoped `providerOptions.gateway.byok` object excludes
+  cached BYOK credentials; Task 3 may use an empty request-scoped object only
+  after validating that behavior against the installed runtime. No provider
+  key, AI Gateway API key, BYOK credential, or new key was created or
+  inspected, and no credential from another client project may be reused.
 
 ### Budget, recharge, and spend boundary
 
@@ -90,21 +142,29 @@ public endpoint.
 An earlier controller UI check observed automatic recharge disabled, but that
 state was not freshly confirmed in this run. Do not describe recharge as
 currently disabled until the owner refreshes the billing view. No credits were
-purchased and no recharge or team-wide billing setting was changed.
+purchased and no recharge or team-wide billing setting was changed. No paid
+call or paid-plan upgrade is authorized; the OIDC path and the verified soft
+budget do not constitute a hard fail-closed ceiling.
 
 ### Platform rate-limit protection
 
-The intended protection gate is a published platform rule for the disabled
-portfolio-chat endpoint: five requests per 60-second fixed window per IP, with
-the sixth request rejected as HTTP 429. A read-only controller check found a
-valid draft matching that policy, but current publication/active status remains
-unverified. This document intentionally omits raw firewall identifiers and
-account metadata.
+The latest scoped read-only configuration proof after the owner's publication
+reports the following public policy at `2026-10-06T22:13:46.575Z`:
 
-Vercel documents fixed-window counters as per-region, so a real controlled
-client six-request test is still required after the disabled endpoint is
-deployed and the owner confirms the rule is active. Trusted provider headers
-will not be spoofed to manufacture that proof.
+- Display name: `Protect Charlie AI`.
+- Published request paths: `POST /api/chat` and `POST /api/portfolio-chat`.
+- Counter: five requests per 60-second fixed window per IP.
+- Excess action: HTTP 429 rate limiting.
+- Configuration validity: `true`; remaining draft changes: `0`.
+
+This is configuration proof only, not runtime behavior proof. The actual
+controlled-client six-request test has not been performed; it remains required
+after the disabled endpoint is deployed. Trusted provider headers will not be
+spoofed to manufacture that proof. This document intentionally omits raw
+firewall identifiers and account metadata.
+
+Vercel documents fixed-window counters as per-region, so the six-request test
+must use an independent controlled client against the real protected route.
 
 ## Activation gates still missing
 
@@ -113,12 +173,10 @@ The following are required before either flag may become true:
 1. Task 3 must deploy the real endpoint disabled and prove that the actual
    published platform rule rejects the sixth request, without relying on a
    memory-only counter.
-2. The owner must confirm the intended protection is published and active by a
-   fresh scoped inspection; the current state is not treated as published.
-3. The owner must refresh free-credit eligibility and recharge state, then
+2. The owner must refresh free-credit eligibility and recharge state, then
    provide an enforceable provider-side spending boundary. The existing USD 1
    project budget is soft and does not satisfy that gate by itself.
-4. Task 5 must provide bounded public-only evaluation, cost/error evidence,
+3. Task 5 must provide bounded public-only evaluation, cost/error evidence,
    review, and the applicable release authority.
 
 Until then, the server must fail closed, the launcher must stay hidden, and
@@ -147,14 +205,23 @@ The installed API facts that constrain Task 3 are:
 - AI SDK 7 exposes `streamText` and the Gateway provider accepts an exact
   `creator/model-name` string such as the live-selected model ID. No separate
   provider package is required for Gateway routing.
+- Gateway authentication precedence and cached BYOK behavior are activation
+  hazards: a supplied API key or Vercel access token wins over OIDC, and a
+  request-scoped `byok` option can exclude cached BYOK credentials. Task 3
+  must preserve project OIDC, reject API-key fallback, and validate the
+  request-scoped empty-`byok` approach before using it. No other-client key is
+  permitted.
 - `streamText` accepts `instructions`, `messages`, `maxOutputTokens`,
   `maxRetries`, and `abortSignal`. The current docs prefer `instructions` for
   server-owned model behavior; user-controlled messages must not be promoted
   to trusted system content.
 - `textStream` is an async iterable/readable stream of text deltas, but error
-  parts are not surfaced there. The endpoint must also observe `result.stream`
-  or `onError`, consume the stream to completion, and avoid treating an empty
-  or interrupted stream as a successful answer.
+  parts are not surfaced there. The endpoint must observe preferred
+  `result.stream` (the installed API marks `fullStream` deprecated) or
+  `onError`, consume the stream to completion, and avoid treating an empty or
+  interrupted stream as a successful answer. The installed default `onError`
+  logs with `console.error`; production code must override it with a sanitized
+  handler that never logs question, answer, or provider payload content.
 - `maxRetries: 0` disables request retries. The current `streamText` reference
   also documents `streamRetries` as opt-in and defaulting to zero; Task 3 must
   keep both bounded.
@@ -195,5 +262,6 @@ No live model call was made to validate this snippet in Task 1.
   unrelated dependency upgrade was run.
 
 No source/assets, games, QA screenshots, client data, deployment settings,
-WAF publication, environment values, account resources, or production state
-were changed.
+environment values, account resources, or production state were changed by
+this task. The owner's published WAF configuration proof above was an external
+scoped operation; this task performed no publication and no provider call.
