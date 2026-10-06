@@ -528,6 +528,10 @@ body {
   color: var(--text-primary);
 }
 
+.palette-results li.is-active small {
+  color: var(--text-primary);
+}
+
 .music-player-pill .text-gray-200,
 .music-player-pill .text-gray-300,
 .music-player-panel .text-gray-200,
@@ -552,8 +556,8 @@ body {
   color: var(--text-primary) !important;
 }
 
-.music-playlist-option.is-selected,
-.music-playlist-option:hover {
+.music-player-panel .music-playlist-option.is-selected,
+.music-player-panel .music-playlist-option:hover {
   border-color: var(--accent-action) !important;
   background: var(--accent-action) !important;
   color: var(--on-accent) !important;

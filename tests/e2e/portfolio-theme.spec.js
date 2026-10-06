@@ -52,13 +52,16 @@ const readRenderedPairs = (page, selectors) => page.evaluate((requestedSelectors
 
   const asRgb = ([red, green, blue]) => `rgb(${Math.round(red)}, ${Math.round(green)}, ${Math.round(blue)})`
   const effectiveBackground = (element) => {
-    let result = [0, 0, 0, 0]
+    const layers = []
     let node = element
     while (node) {
-      result = composite(parseCssColor(getComputedStyle(node).backgroundColor), result)
-      if (result[3] >= 0.995) break
+      const layer = parseCssColor(getComputedStyle(node).backgroundColor)
+      layers.push(layer)
+      if (layer[3] >= 0.995) break
       node = node.parentElement
     }
+    let result = [0, 0, 0, 0]
+    for (const layer of layers.reverse()) result = composite(layer, result)
     return asRgb(result)
   }
 
@@ -279,6 +282,14 @@ test('rendered theme consumers keep foregrounds, ancestor-composited surfaces, a
       '.music-playlist-option[aria-pressed="true"]',
       '.music-playlist-option:not([aria-pressed="true"])',
     ])
+    const selectedPlaylist = page.locator('.music-playlist-option[aria-pressed="true"]')
+    const unselectedPlaylist = page.locator('.music-playlist-option:not([aria-pressed="true"])').first()
+    await selectedPlaylist.hover()
+    await page.waitForTimeout(50)
+    const selectedPlaylistHover = await readRenderedPairs(page, ['.music-playlist-option[aria-pressed="true"]'])
+    await unselectedPlaylist.hover()
+    await page.waitForTimeout(50)
+    const unselectedPlaylistHover = await readRenderedPairs(page, ['.music-playlist-option:not([aria-pressed="true"])'])
     await page.getByRole('button', { name: 'Close music player' }).click()
 
     const pairs = { ...navPairs, ...filterPairs, ...errorPairs, ...palettePairs, ...updatePairs, ...updateApplyHover, ...updateHover, ...musicPairs }
@@ -290,7 +301,33 @@ test('rendered theme consumers keep foregrounds, ancestor-composited surfaces, a
       expect(contrastRatio(pairs[selector].border, pairs[selector].background), `${selector} border`).toBeGreaterThanOrEqual(3)
     }
     expect(contrastRatio(updateHover['.update-banner-dismiss'].color, updateHover['.update-banner-dismiss'].background)).toBeGreaterThanOrEqual(4.5)
+    for (const [label, pair] of [
+      ['selected music playlist hover', selectedPlaylistHover['.music-playlist-option[aria-pressed="true"]']],
+      ['unselected music playlist hover', unselectedPlaylistHover['.music-playlist-option:not([aria-pressed="true"])']],
+    ]) {
+      expect(contrastRatio(pair.color, pair.background), label).toBeGreaterThanOrEqual(4.5)
+    }
   }
+})
+
+test('rendered-pair helper composites a translucent child over its opaque ancestor', async ({ page }) => {
+  await page.goto('/')
+  await page.evaluate(() => {
+    const ancestor = document.createElement('div')
+    ancestor.dataset.themePairFixture = 'ancestor'
+    ancestor.style.backgroundColor = 'rgb(9, 33, 36)'
+    const child = document.createElement('span')
+    child.dataset.themePairFixture = 'child'
+    child.style.backgroundColor = 'rgba(103, 224, 193, 0.5)'
+    child.style.color = 'rgb(255, 253, 250)'
+    child.textContent = 'fixture'
+    ancestor.append(child)
+    document.body.append(ancestor)
+  })
+
+  const pair = await readRenderedPairs(page, ['[data-theme-pair-fixture="child"]'])
+  expect(pair['[data-theme-pair-fixture="child"]'].background).toBe('rgb(56, 129, 115)')
+  expect(pair['[data-theme-pair-fixture="child"]'].background).not.toBe('rgb(9, 33, 36)')
 })
 
 test('theme selector border transition is scoped and honors reduced motion', async ({ page }) => {
