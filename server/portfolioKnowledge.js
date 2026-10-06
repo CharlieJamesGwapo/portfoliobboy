@@ -6,7 +6,6 @@ import {
   featuredProjects,
   momentumSystems,
   profile,
-  professionalTitles,
   projectArchive,
   recognitions,
 } from '../src/data/portfolioData.js'
@@ -23,6 +22,24 @@ const SECTION_SOURCES = [
   { id: 'lab', label: 'Interactive Lab', href: '/#lab', topics: ['lab', 'game', 'games', 'experiment', 'experiments'] },
   { id: 'contact', label: 'Contact Charlie', href: '/#contact', topics: ['contact', 'hire', 'hiring', 'email', 'reach', 'connect'] },
 ]
+
+const REVIEWED_PUBLIC_SOURCE_PAIRS = Object.freeze([
+  { id: 'project-one-ride-balingasag', href: 'https://play.google.com/store/apps/details?id=com.oneridebalingasag.app&hl=en' },
+  { id: 'project-ecycle-hub', href: 'https://ecyclehub.vercel.app/' },
+  { id: 'project-g2-pos-system', href: 'https://g2possystem.vercel.app/landing' },
+  { id: 'project-reflecticss', href: 'https://reflecticss.vercel.app/' },
+  { id: 'project-study-pulse', href: 'https://study-pulse-ten.vercel.app/' },
+  { id: 'project-shayne-dr', href: 'https://shayneanddr.netlify.app/' },
+  { id: 'project-vince-lloyd-portfolio', href: 'https://vincelloyd.netlify.app/' },
+  { id: 'project-laarni-portfolio', href: 'https://laarni.netlify.app/' },
+  { id: 'system-hasti', href: 'https://hasti.com.au/' },
+  { id: 'system-zalio', href: 'https://zalio.ai/' },
+  { id: 'system-gymfactories', href: 'https://gymfactories.com/' },
+  { id: 'system-momentum-strength', href: 'https://momentum-strength.vercel.app/' },
+  { id: 'system-hsie-site-scoring', href: 'https://health-dev-three.vercel.app/' },
+])
+
+const REVIEWED_PUBLIC_URLS = new Set(REVIEWED_PUBLIC_SOURCE_PAIRS.map(({ href }) => href))
 
 const PUBLIC_HOST_BLOCKLIST = new Set([
   'localhost',
@@ -48,15 +65,21 @@ const isSafePublicUrl = (value) => {
   try {
     const url = new URL(value)
     if (url.protocol !== 'https:' || url.username || url.password) return false
-    if (PUBLIC_HOST_BLOCKLIST.has(url.hostname.toLowerCase())) return false
-    if (url.hostname.endsWith('.internal') || url.hostname.endsWith('.local')) return false
-    if (/^(?:10|127|169\.254|192\.168)\./.test(url.hostname)) return false
-    if (/^172\.(?:1[6-9]|2\d|3[01])\./.test(url.hostname)) return false
+    const hostname = url.hostname.toLowerCase()
+    if (PUBLIC_HOST_BLOCKLIST.has(hostname)) return false
+    if (hostname.endsWith('.internal') || hostname.endsWith('.local') || hostname.endsWith('.localhost')) return false
+    if (hostname.endsWith('.internal.zalio.ai')) return false
+    if (/^\[[^\]]+\]$/.test(hostname)) return false
+    if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname)) return false
     return true
   } catch {
     return false
   }
 }
+
+const isReviewedSourcePair = (id, href) => REVIEWED_PUBLIC_SOURCE_PAIRS.some((source) => source.id === id && source.href === href)
+
+const isReviewedPublicUrl = (value) => isSafePublicUrl(value) && REVIEWED_PUBLIC_URLS.has(value)
 
 const projectFacts = (project) => {
   const output = pick(project, [
@@ -77,8 +100,7 @@ const projectFacts = (project) => {
     'private',
   ])
 
-  if (isSafePublicUrl(project.url)) {
-    output.url = project.url
+  if (isReviewedPublicUrl(project.url)) {
     output.hasPublicLink = true
   } else {
     output.hasPublicLink = false
@@ -89,8 +111,7 @@ const projectFacts = (project) => {
 
 const archiveFacts = (project) => {
   const output = pick(project, ['title', 'type', 'categories', 'description', 'stack', 'private'])
-  if (isSafePublicUrl(project.url)) {
-    output.url = project.url
+  if (isReviewedPublicUrl(project.url)) {
     output.hasPublicLink = true
   } else {
     output.hasPublicLink = false
@@ -141,8 +162,7 @@ const momentumFacts = (system) => {
     'stack',
   ])
 
-  if (isSafePublicUrl(system.url)) {
-    output.url = system.url
+  if (isReviewedPublicUrl(system.url)) {
     output.hasPublicLink = true
   } else {
     output.hasPublicLink = false
@@ -159,9 +179,10 @@ const projectSources = () => {
   const sources = []
 
   for (const project of featuredProjects) {
-    if (isSafePublicUrl(project.url)) {
+    const id = `project-${project.id}`
+    if (isReviewedSourcePair(id, project.url)) {
       sources.push({
-        id: `project-${project.id}`,
+        id,
         label: project.title,
         href: project.url,
         topics: [project.id, project.title, ...(project.categories || [])],
@@ -170,9 +191,10 @@ const projectSources = () => {
   }
 
   for (const project of projectArchive) {
-    if (!project.private && isSafePublicUrl(project.url)) {
+    const id = `project-${slugify(project.title)}`
+    if (isReviewedSourcePair(id, project.url)) {
       sources.push({
-        id: `project-${slugify(project.title)}`,
+        id,
         label: project.title,
         href: project.url,
         topics: [project.title, project.type, ...(project.categories || [])],
@@ -181,9 +203,10 @@ const projectSources = () => {
   }
 
   for (const system of momentumSystems) {
-    if (isSafePublicUrl(system.url)) {
+    const id = `system-${system.id}`
+    if (isReviewedSourcePair(id, system.url)) {
       sources.push({
-        id: `system-${system.id}`,
+        id,
         label: system.title,
         href: system.url,
         topics: [system.id, system.title, system.type, ...(system.categories || [])],
@@ -198,8 +221,7 @@ const sourceRegistry = () => [...SECTION_SOURCES, ...projectSources()]
 
 export function buildKnowledge() {
   const facts = {
-    profile: pick(profile, ['name', 'shortName', 'role', 'location', 'email', 'github', 'linkedin', 'portfolio']),
-    professionalTitles: [...professionalTitles],
+    profile: pick(profile, ['name', 'shortName', 'role', 'location', 'email']),
     experiences: experiences.map(experienceFacts),
     featuredProjects: featuredProjects.map(projectFacts),
     projectArchive: projectArchive.map(archiveFacts),
@@ -264,4 +286,4 @@ export function buildInstructions() {
   ].join('\n')
 }
 
-export { isSafePublicUrl }
+export { isReviewedPublicUrl, isSafePublicUrl }

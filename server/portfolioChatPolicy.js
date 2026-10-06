@@ -66,10 +66,9 @@ export function validateChatRequest({ method, headers, body, rawBytes, allowedOr
     fail(415, 'UNSUPPORTED_MEDIA_TYPE')
   }
 
-  if (rawBytes !== undefined && rawBytes !== null) {
-    if (!Number.isSafeInteger(rawBytes) || rawBytes < 0) fail(400, 'INVALID_BODY')
-    if (rawBytes > MAX_BODY_BYTES) fail(413, 'PAYLOAD_TOO_LARGE')
-  }
+  if (rawBytes === undefined || rawBytes === null) fail(400, 'INVALID_BODY')
+  if (!Number.isSafeInteger(rawBytes) || rawBytes < 0) fail(400, 'INVALID_BODY')
+  if (rawBytes > MAX_BODY_BYTES) fail(413, 'PAYLOAD_TOO_LARGE')
 
   const bodyBytes = serializedBytes(body)
   if (bodyBytes === null) fail(400, 'INVALID_BODY')

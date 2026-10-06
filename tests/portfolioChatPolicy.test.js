@@ -61,6 +61,13 @@ test('rejects oversized multibyte input before generation', () => {
   }, 413, 'PAYLOAD_TOO_LARGE')
 })
 
+test('requires the raw UTF-8 byte measurement before accepting a request', () => {
+  assertPolicy({ ...validRequest(), rawBytes: undefined }, 400, 'INVALID_BODY')
+  assertPolicy({ ...validRequest(), rawBytes: null }, 400, 'INVALID_BODY')
+  assertPolicy({ ...validRequest(), rawBytes: -1 }, 400, 'INVALID_BODY')
+  assertPolicy({ ...validRequest(), rawBytes: 24 * 1024 + 1 }, 413, 'PAYLOAD_TOO_LARGE')
+})
+
 test('checks serialized UTF-8 size again even when the raw-byte hint is small', () => {
   const request = validRequest({ question: '界'.repeat(9000) })
   request.rawBytes = 1
