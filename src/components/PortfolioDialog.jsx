@@ -43,8 +43,34 @@ export default function PortfolioDialog({
     }))
 
     if (!dialog.open) dialog.showModal()
+    // WebKit does not consistently move focus into a native modal when the
+    // opening control was clicked after another overlay closed. Move focus
+    // synchronously, then repeat on the next task for browsers that finish
+    // promoting the dialog asynchronously.
+    focusWithoutScrolling(closeButtonRef.current)
     const releaseScrollLock = acquireBodyScrollLock('portfolio-detail')
     const focusTimer = window.setTimeout(() => focusWithoutScrolling(closeButtonRef.current), 0)
+
+    const getFocusableElements = () => Array.from(dialog.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    )).filter((element) => element instanceof HTMLElement && element.offsetParent !== null)
+
+    const onKeyDown = (event) => {
+      if (event.key !== 'Tab') return
+      const focusable = getFocusableElements()
+      if (focusable.length === 0) return
+
+      const active = document.activeElement
+      const activeIndex = focusable.indexOf(active)
+      const nextIndex = activeIndex === -1
+        ? (event.shiftKey ? focusable.length - 1 : 0)
+        : (activeIndex + (event.shiftKey ? -1 : 1) + focusable.length) % focusable.length
+      event.preventDefault()
+      focusWithoutScrolling(focusable[nextIndex])
+    }
+    // Capture at the window because WebKit can keep native-dialog Tab events
+    // from reaching a bubbling document listener before moving focus to body.
+    window.addEventListener('keydown', onKeyDown, true)
 
     const closeForOverlay = () => onCloseRef.current?.()
     window.addEventListener('portfolio:open-games', closeForOverlay)
@@ -55,6 +81,7 @@ export default function PortfolioDialog({
 
     return () => {
       window.clearTimeout(focusTimer)
+      window.removeEventListener('keydown', onKeyDown, true)
       window.removeEventListener('portfolio:open-games', closeForOverlay)
       window.removeEventListener('portfolio:lab-open', closeForOverlay)
       window.removeEventListener('portfolio:open-palette', closeForOverlay)
