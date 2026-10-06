@@ -250,4 +250,4 @@ The scoped diff changes only the App deep-link intent handling, portfolio projec
 
 ## Fix round 2/5 commit
 
-Exact scoped commit: `c77904d` (`fix: close Task6 navigation and theme gaps`).
+Exact scoped implementation commit: `7ead29b` (`fix: close Task6 navigation and theme gaps`).
