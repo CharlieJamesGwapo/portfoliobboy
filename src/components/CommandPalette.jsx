@@ -85,6 +85,7 @@ export default function CommandPalette({ open, onClose }) {
 
     return [
       ...sections,
+      { id: 'go-ai-systems', label: 'AI agents, voice & automation', hint: 'Explore capabilities and live demos', icon: Sparkles, run: () => goTo('#ai-systems') },
       {
         id: 'copy-email',
         label: 'Copy email address',

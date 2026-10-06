@@ -5,11 +5,15 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createServer } from 'vite'
 import {
+  aiCapabilityRibbon,
+  aiSystemCapabilities,
   certifications,
   education,
   experiences,
   featuredProjects,
   interactiveGames,
+  momentumEngineeringGroups,
+  momentumSystems,
   navigation,
   professionalTitles,
   proofPoints,
@@ -155,4 +159,77 @@ test('only exposes explicitly configured project links', () => {
   const linkedProjects = [...featuredProjects, ...projectArchive].filter((project) => project.url)
   assert.ok(linkedProjects.length > 0)
   linkedProjects.forEach((project) => assert.match(project.url, /^https:\/\//))
+})
+
+test('adds evidence-backed AI, automation, voice, CRM, and integration positioning', () => {
+  assert.deepEqual(aiCapabilityRibbon, [
+    'Custom AI agents',
+    'Voice agents',
+    'Workflow automation',
+    'Custom CRM',
+    'n8n',
+    'GoHighLevel',
+  ])
+
+  assert.deepEqual(
+    aiSystemCapabilities.map((capability) => capability.title),
+    [
+      'Custom AI agents',
+      'Voice agents & reception',
+      'Automation & integrations',
+      'Custom CRM & operations',
+      'AI modeling & workflow design',
+      'GoHighLevel & n8n workflows',
+    ],
+  )
+
+  const capabilityCopy = JSON.stringify(aiSystemCapabilities)
+  assert.match(capabilityCopy, /tool calling/i)
+  assert.match(capabilityCopy, /human handoff/i)
+  assert.match(capabilityCopy, /idempotency/i)
+  assert.match(capabilityCopy, /GoHighLevel/i)
+})
+
+test('curates Momentum systems with honest readiness and only verified public links', () => {
+  assert.equal(momentumSystems.length, 8)
+  assert.equal(momentumEngineeringGroups.length, 4)
+
+  const hasti = momentumSystems.find((system) => system.id === 'hasti')
+  assert.equal(hasti?.status, 'Live AI demo')
+  assert.equal(hasti?.url, 'https://hasti.com.au/')
+
+  const voiceRuntime = momentumSystems.find((system) => system.id === 'voice-runtime')
+  assert.equal(voiceRuntime?.status, 'Private engineering case study')
+  assert.equal(voiceRuntime?.url, undefined)
+
+  momentumSystems
+    .filter((system) => system.url)
+    .forEach((system) => assert.match(system.url, /^https:\/\//))
+
+  const privateSystemCopy = JSON.stringify(momentumEngineeringGroups)
+  assert.match(privateSystemCopy, /Agent orchestration/i)
+  assert.match(privateSystemCopy, /campaigns/i)
+  assert.match(privateSystemCopy, /Control-plane monitoring/i)
+  assert.doesNotMatch(privateSystemCopy, /github\.com\/momentum-au/i)
+})
+
+test('renders the additive AI systems section without replacing existing project inventory', async () => {
+  const server = await createServer({
+    configFile: resolve(process.cwd(), 'vite.config.js'),
+    server: { middlewareMode: true },
+  })
+  try {
+    const { default: AISystems } = await server.ssrLoadModule('/src/components/AISystems.jsx')
+    const markup = renderToStaticMarkup(createElement(AISystems)).replace(/\s+/g, ' ')
+    assert.match(markup, /AI systems &amp; automation/i)
+    assert.match(markup, /Selected Momentum systems/i)
+    assert.match(markup, /Live AI demo/i)
+    assert.match(markup, /Private engineering case study/i)
+    assert.match(markup, /https:\/\/hasti\.com\.au\//i)
+  } finally {
+    await server.close()
+  }
+
+  assert.equal(featuredProjects.length, 8)
+  assert.equal(projectArchive.length, 8)
 })

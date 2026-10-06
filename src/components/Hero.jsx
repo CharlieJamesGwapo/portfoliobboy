@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUpRight, Briefcase, Gamepad2, Github, Linkedin, Mail, MapPin } from 'lucide-react'
-import { professionalTitles, profile, proofPoints, resumeUrl } from '../data/portfolioData'
+import { aiCapabilityRibbon, professionalTitles, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import { prefetchProps } from '../lib/prefetch'
 import AnimatedStat from './AnimatedStat'
 import RotatingTitle from './RotatingTitle'
@@ -86,6 +86,11 @@ const Hero = () => (
           </div>
         </div>
       </div>
+    </div>
+
+    <div className="page-container ai-hero-ribbon" aria-label="AI and automation services">
+      <a href="#ai-systems">What I build <ArrowUpRight size={15} aria-hidden="true" /></a>
+      <ul>{aiCapabilityRibbon.map((capability) => <li key={capability}>{capability}</li>)}</ul>
     </div>
 
     <div className="page-container proof-strip" aria-label="Professional highlights">
