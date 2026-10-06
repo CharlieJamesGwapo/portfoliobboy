@@ -254,6 +254,19 @@ test('rendered theme consumers keep foregrounds, ancestor-composited surfaces, a
     const navPairs = await readRenderedPairs(page, ['.desktop-nav a'])
     await page.locator('#ai-systems').scrollIntoViewIfNeeded()
     const filterPairs = await readRenderedPairs(page, ['.momentum-filters button', '.momentum-filters button:not(.is-active)', '.ai-capability', '.ai-capability-stack span', '.momentum-stack span', '.momentum-card-type'])
+    await page.locator('#projects').scrollIntoViewIfNeeded()
+    const projectPairs = await readRenderedPairs(page, [
+      '.project-filters button:not(.is-active) small',
+      '.project-filters button.is-active small',
+      '.projects-section .project-eyebrow',
+      '.projects-section .project-overview',
+    ])
+    await page.locator('#skills').scrollIntoViewIfNeeded()
+    const skillsPairs = await readRenderedPairs(page, [
+      '.skills-section .section-heading .eyebrow',
+      '.skills-section .skill-group-heading > span',
+      '.skills-section .skill-cloud span',
+    ])
 
     await page.locator('#contact').scrollIntoViewIfNeeded()
     await page.getByRole('button', { name: 'Send message' }).click()
@@ -292,7 +305,7 @@ test('rendered theme consumers keep foregrounds, ancestor-composited surfaces, a
     const unselectedPlaylistHover = await readRenderedPairs(page, ['.music-playlist-option:not([aria-pressed="true"])'])
     await page.getByRole('button', { name: 'Close music player' }).click()
 
-    const pairs = { ...navPairs, ...filterPairs, ...errorPairs, ...palettePairs, ...updatePairs, ...updateApplyHover, ...updateHover, ...musicPairs }
+    const pairs = { ...navPairs, ...filterPairs, ...projectPairs, ...skillsPairs, ...errorPairs, ...palettePairs, ...updatePairs, ...updateApplyHover, ...updateHover, ...musicPairs }
     for (const [selector, pair] of Object.entries(pairs)) {
       expect(pair, `expected rendered selector to be present: ${selector}`).not.toBeNull()
       expect(contrastRatio(pair.color, pair.background), selector).toBeGreaterThanOrEqual(4.5)

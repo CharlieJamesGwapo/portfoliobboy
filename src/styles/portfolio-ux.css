@@ -47,6 +47,12 @@
   line-height: 1.65;
 }
 
+#main-content > .projects-section .project-detail-row li,
+#main-content > .skills-section .skill-cloud span {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
 #main-content > .contact-section .contact-copy > p:nth-of-type(2) {
   max-width: 68ch;
   font-size: 1rem;
@@ -76,10 +82,6 @@
 #main-content > .skills-section .skill-group-heading > span,
 #main-content > .skills-section .skill-cloud span {
   color: var(--text-on-ink-muted);
-}
-
-#main-content > .skills-section .skill-group-heading > span {
-  color: var(--accent-action);
 }
 
 /* Role summary: one stable identity line plus a native disclosure for the full
@@ -213,6 +215,14 @@
   background: color-mix(in srgb, var(--accent-action) 10%, var(--surface-page));
 }
 
+/* Filter counts are normal-text labels. Keep inactive badges on the semantic
+   card surface so their inherited muted text cannot fall below 4.5:1 after
+   translucent compositing in the light theme. */
+#main-content > .projects-section .project-filters button:not(.is-active) small {
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
 /* Skill groups are progressive disclosures, preserving every token while
    keeping the section scannable on first entry. */
 .skills-section .skill-group {
@@ -255,7 +265,7 @@
 }
 
 .skills-section .skill-cloud span {
-  font-size: .8rem;
+  font-size: 1rem;
 }
 
 @media (max-width: 860px) {

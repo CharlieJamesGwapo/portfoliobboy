@@ -104,3 +104,86 @@ The existing HeroSystemsScene renderer, stable visual frame/layers, idle behavio
 
 Exact commit subject: `feat: polish portfolio navigation hierarchy and motion`
 The resulting commit hash is returned in the implementation handoff after the scoped source files and this report are committed together.
+
+## Fix round 1: controller-confirmed review gaps
+
+Base: `04472b156d7361b6db0509be3d96654357221d2e`
+
+### RED before the fixes
+
+After restoring the pinned local Playwright browsers (the first invocation was blocked because the cache had no Chromium executable), the focused Chromium gap run was:
+
+```text
+npx playwright test tests/e2e/portfolio-journey.spec.js -g "remeasures|original projects|skills retain|project filter" --project=chromium
+3 failed, 1 passed
+
+Failures:
+- project architecture/features font-size assertion: Expected true, received false
+- skill-token font-size assertion: Expected true, received false
+- light inactive project-count badge: 4.3714667390693025:1, expected >= 4.5:1
+```
+
+The existing remeasurement assertion passed before the CSS fix, confirming the existing ResizeObserver path was functional but previously unproved in the journey suite.
+
+### Fix scope
+
+- `src/styles/portfolio-ux.css`: named `#main-content > .projects-section .project-detail-row li` and `#main-content > .skills-section .skill-cloud span` selectors now enforce a 16px/1rem floor with readable line-height. Inactive project-count badges use semantic `--text-primary` on `--surface-card`; active badges retain their existing semantic mint treatment. The light Skills group-number metadata now uses the ink-island `--text-on-ink-muted` pair instead of dark `--accent-action`.
+- `tests/e2e/portfolio-journey.spec.js`: added real project-details expansion → downstream offset change → Credentials active navigation proof, expanded-content 16px assertions, and composited active/inactive badge contrast assertions in both themes.
+- `tests/e2e/portfolio-theme.spec.js`: rendered theme-pair regression coverage now includes project badges/metadata and Skills eyebrow/group metadata/token pairs in both themes.
+- No portfolio data exports, game engine/HUD/art/state, renderer, asset, account, secret, provider, deployment, or deletion changes.
+
+### GREEN and repository checks
+
+Focused journey plus relevant theme checks after all fixes:
+
+```text
+npx playwright test tests/e2e/portfolio-journey.spec.js tests/e2e/portfolio-theme.spec.js -g "journey 1|legacy section|remeasures|mobile navigation|hero shows|original projects|skills retain|project filter|reduced motion|rendered theme consumers"
+33 passed (54.9s)
+
+npm test
+29 Node tests passed; 1 Python unittest passed
+
+npm run build
+success
+```
+
+### Settled fix-round evidence
+
+Captures were produced only after each target section's `.reveal` elements had become `is-visible`, reached opacity `1`/identity transform, and had no running reveal transition; they are not mid-transition samples:
+
+- Desktop Education/light: `/tmp/task6-fix-light-desktop-education-settled-v2.png`
+- Desktop Education/dark: `/tmp/task6-fix-dark-desktop-education-settled-v2.png`
+- Desktop Projects/light: `/tmp/task6-fix-light-desktop-projects-settled-v2.png`
+- Desktop Projects/dark: `/tmp/task6-fix-dark-desktop-projects-settled-v2.png`
+- Mobile Projects/light: `/tmp/task6-fix-light-mobile-projects-settled-v2.png`
+- Mobile Projects/dark: `/tmp/task6-fix-dark-mobile-projects-settled-v2.png`
+
+Measured at 1440px after settlement:
+
+- Anchor/active route: `#education` top `95.7px`, active `Credentials`, in both themes.
+- Expansion/remeasurement: Education `offsetTop` changed from `9785` to `10630` after opening project details; scrolling to the shifted route activated `Credentials` in both themes.
+- Project detail architecture/features: every rendered entry `16px`; Skills: all 65 tokens `16px`.
+- Light ratios: Education eyebrow `6.348:1`, education-card eyebrow `9.934:1`, Projects eyebrow `6.348:1`, Projects overview `5.706:1`, inactive count badge `15.794:1`, active count badge `6.418:1`, Skills eyebrow `9.934:1`, Skills group metadata `9.511:1`, Skills token `8.152:1`.
+- Dark ratios: Education eyebrow `8.428:1`, education-card eyebrow `10.438:1`, Projects eyebrow `8.428:1`, Projects overview `8.069:1`, inactive count badge `11.953:1`, active count badge `6.418:1`, Skills eyebrow `10.438:1`, Skills group metadata `9.993:1`, Skills token `8.638:1`.
+- Mobile at 390px in both themes: 8 project tabs, archive initially 0, no horizontal overflow.
+
+Fix-round commit subject: `fix: close Task6 review gaps`
+The resulting fix commit hash is returned in the implementation handoff after the final full browser run and scoped commit.
+
+### Final full browser run
+
+The one requested fresh full run was:
+
+```text
+npx playwright test
+127 passed, 2 failed (3.4m)
+```
+
+The two failures were unchanged pre-existing AI-systems checks in Firefox only: the Voice filter briefly reported 3 cards instead of 2, and the 768px lazy-image check did not observe `naturalWidth > 0` within its timeout. No Task6 journey/theme/credentials/dialog/Lab/music test failed. An isolated diagnostic rerun of exactly those unchanged Firefox checks passed:
+
+```text
+npx playwright test tests/e2e/portfolio-ai-systems.spec.js --project=firefox -g "new systems can be filtered|768px viewport"
+2 passed (4.8s)
+```
+
+The browser cache had to be restored locally before this fix-round verification (`npx playwright install chromium firefox webkit`); no repository or deployment state was changed.
