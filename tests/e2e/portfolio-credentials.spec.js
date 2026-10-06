@@ -95,6 +95,31 @@ test('progressive disclosure exposes all records and restores featured view', as
   await expect(page.locator('.credential-explorer-item')).toHaveCount(6)
 })
 
+test('retains expanded preference after query and category filters are cleared', async ({ page }) => {
+  await openCredentials(page)
+
+  await page.getByRole('button', { name: 'View all 23 records' }).click()
+  await expect(page.locator('.credential-explorer-item')).toHaveCount(23)
+  await expect(page.getByRole('button', { name: 'Show featured' })).toBeVisible()
+
+  const search = page.getByRole('searchbox', { name: 'Search credentials' })
+  await search.fill('active directory')
+  await expect(page.locator('.credential-explorer-item')).toHaveCount(1)
+  await expect(page.getByRole('button', { name: 'Show featured' })).toHaveCount(0)
+  await expect(page.getByText('Filters search all 23 records.')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Technical & Professional' }).click()
+  await expect(page.locator('.credential-explorer-item')).toHaveCount(1)
+
+  await search.fill('')
+  await expect(page.locator('.credential-explorer-item')).toHaveCount(12)
+  await expect(page.getByRole('button', { name: 'Show featured' })).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'All', exact: true }).click()
+  await expect(page.locator('.credential-explorer-item')).toHaveCount(23)
+  await expect(page.getByRole('button', { name: 'Show featured' })).toBeVisible()
+})
+
 test('details expose the five supplied certificate image URLs', async ({ page }) => {
   await openCredentials(page)
   await page.getByRole('button', { name: 'View all 23 records' }).click()

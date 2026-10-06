@@ -45,6 +45,23 @@ test('Control-K keeps its normal open-then-close toggle without another overlay'
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden()
 })
 
+test('Escape closes the palette before its delayed input focus settles', async ({ page }) => {
+  await page.clock.install()
+  await page.goto('/#home')
+  await expect(page.locator('#main-content')).toBeVisible()
+
+  await page.keyboard.press('Control+k')
+  const palette = page.getByRole('dialog', { name: 'Command palette' })
+  await expect(palette).toBeVisible()
+  await expect(page.locator('body')).toHaveClass(/palette-open/)
+  await expect.poll(() => page.locator('body').evaluate((body) => body.style.overflow)).toBe('hidden')
+
+  await page.keyboard.press('Escape')
+  await expect(palette).toBeHidden()
+  await expect(page.locator('body')).not.toHaveClass(/palette-open/)
+  await expect.poll(() => page.locator('body').evaluate((body) => body.style.overflow)).toBe('')
+})
+
 test('credential detail dialog traps focus, restores its trigger, and releases page inertness', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 900 })
   await page.goto('/#education')

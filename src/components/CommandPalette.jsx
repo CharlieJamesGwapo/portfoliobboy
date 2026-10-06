@@ -185,6 +185,21 @@ export default function CommandPalette({ open, onClose }) {
     }
   }, [open])
 
+  // The input focus is intentionally deferred so the palette can mount before
+  // stealing focus. During that boundary Escape may land on body instead of
+  // inside the palette subtree; keep the close action global while open so the
+  // overlay cannot remain stuck behind a delayed focus task.
+  useEffect(() => {
+    if (!open) return undefined
+    const onWindowKeyDown = (event) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+      event.preventDefault()
+      onClose()
+    }
+    window.addEventListener('keydown', onWindowKeyDown)
+    return () => window.removeEventListener('keydown', onWindowKeyDown)
+  }, [open, onClose])
+
   // Keep the highlighted row in view when arrowing past the fold.
   useEffect(() => {
     if (!open) return
