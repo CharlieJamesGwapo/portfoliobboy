@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "vite build",
     "test": "node --test && python3 -m unittest discover -s tests -p 'test_*.py'",
-    "test:e2e": "playwright test tests/e2e/portfolio-ai-systems.spec.js",
+    "test:e2e": "playwright test",
     "preview": "vite preview",
     "deploy": "npx vercel build --prod && npx vercel deploy --prebuilt --prod"
   },
