@@ -24,7 +24,7 @@ function commitBytes(sourceRoot, sourceCommit, relativePath) {
 }
 
 export function isApplicationInput(relativePath) {
-  if (/^(?:src|public|api)\//.test(relativePath)) return true
+  if (/^(?:src|public|api|server)\//.test(relativePath)) return true
   if (/^(?:index\.html|package(?:-lock)?\.json|vite\.config\.js|tailwind\.config\.js|postcss\.config\.js|vercel\.json)$/.test(relativePath)) return true
   // Root-level verified assets are read by vite.config.js and are part of the
   // production build input even though they are not under public/.

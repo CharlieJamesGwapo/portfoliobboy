@@ -14,6 +14,8 @@ test('source provenance selects and hashes committed application/build inputs', 
   assert.equal(manifest.allSourceInputsMatchCommit, true)
   assert.equal(isApplicationInput('src/App.jsx'), true)
   assert.equal(isApplicationInput('public/certificates/claude-anthropic-api.webp'), true)
+  assert.equal(isApplicationInput('server/portfolioKnowledge.js'), true)
+  assert.equal(isApplicationInput('server/portfolioChatPolicy.js'), true)
   assert.equal(isApplicationInput('docs/portfolio-ux-verification.md'), false)
   assert.equal(isApplicationInput('tests/e2e/portfolio-stage-a.spec.js'), false)
 })
