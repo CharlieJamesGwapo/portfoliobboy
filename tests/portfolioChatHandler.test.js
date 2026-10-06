@@ -15,6 +15,7 @@ const requestFixture = ({
   contentType = 'application/json',
   path = '/api/portfolio-chat',
   helperRestored = false,
+  endRequest = true,
 } = {}) => {
   const request = new PassThrough()
   request.method = method
@@ -42,7 +43,7 @@ const requestFixture = ({
     })
   }
 
-  process.nextTick(() => request.end(Buffer.from(rawText, 'utf8')))
+  if (endRequest) process.nextTick(() => request.end(Buffer.from(rawText, 'utf8')))
   return request
 }
 
@@ -190,6 +191,62 @@ test('foreign origin is rejected before the provider is called', async () => {
   assert.deepEqual(JSON.parse(response.body), {
     error: { code: 'ORIGIN_NOT_ALLOWED', message: 'Request origin is not allowed.' },
   })
+})
+
+test('invalid request envelopes reject before reading a never-ending body', async () => {
+  const cases = [
+    {
+      name: 'GET with no body',
+      method: 'GET',
+      rawText: '',
+      expectedStatus: 405,
+      expectedCode: 'METHOD_NOT_ALLOWED',
+    },
+    {
+      name: 'GET with malformed JSON',
+      method: 'GET',
+      rawText: 'not-json',
+      expectedStatus: 405,
+      expectedCode: 'METHOD_NOT_ALLOWED',
+    },
+    {
+      name: 'foreign origin with malformed JSON',
+      origin: 'https://evil.vercel.app',
+      rawText: 'not-json',
+      expectedStatus: 403,
+      expectedCode: 'ORIGIN_NOT_ALLOWED',
+    },
+    {
+      name: 'unsupported media with malformed JSON',
+      contentType: 'text/plain',
+      rawText: 'not-json',
+      expectedStatus: 415,
+      expectedCode: 'UNSUPPORTED_MEDIA_TYPE',
+    },
+  ]
+
+  for (const testCase of cases) {
+    let calls = 0
+    const handler = createChatHandler({
+      enabled: true,
+      allowedOrigins: ALLOWED_ORIGINS,
+      deadlineMs: 20,
+      streamAnswer: async function* () {
+        calls += 1
+        yield 'must not run'
+      },
+    })
+    const response = new ResponseFixture()
+    const request = requestFixture({ ...testCase, endRequest: false })
+
+    await handler(request, response)
+
+    assert.equal(response.statusCode, testCase.expectedStatus, testCase.name)
+    assert.equal(JSON.parse(response.body).error.code, testCase.expectedCode, testCase.name)
+    assert.equal(calls, 0, testCase.name)
+    assert.equal(request.readableFlowing, null, `${testCase.name} must not start body flow`)
+    if (testCase.expectedStatus === 405) assert.equal(response.getHeader('allow'), 'POST')
+  }
 })
 
 test('oversized UTF-8 body is rejected before parsing or generation', async () => {

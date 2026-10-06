@@ -55,7 +55,7 @@ const serializedBytes = (body) => {
   }
 }
 
-export function validateChatRequest({ method, headers, body, rawBytes, allowedOrigins } = {}) {
+export function validateChatRequestEnvelope({ method, headers, allowedOrigins } = {}) {
   if (method !== 'POST') fail(405, 'METHOD_NOT_ALLOWED')
 
   const origin = header(headers, 'origin')
@@ -65,6 +65,10 @@ export function validateChatRequest({ method, headers, body, rawBytes, allowedOr
   if (typeof contentType !== 'string' || contentType.split(';', 1)[0].trim().toLocaleLowerCase('en') !== 'application/json') {
     fail(415, 'UNSUPPORTED_MEDIA_TYPE')
   }
+}
+
+export function validateChatRequest({ method, headers, body, rawBytes, allowedOrigins } = {}) {
+  validateChatRequestEnvelope({ method, headers, allowedOrigins })
 
   if (rawBytes === undefined || rawBytes === null) fail(400, 'INVALID_BODY')
   if (!Number.isSafeInteger(rawBytes) || rawBytes < 0) fail(400, 'INVALID_BODY')

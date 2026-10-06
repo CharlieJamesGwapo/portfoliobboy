@@ -1,6 +1,7 @@
 import {
   ChatPolicyError,
   MAX_BODY_BYTES,
+  validateChatRequestEnvelope,
   validateChatRequest,
 } from './portfolioChatPolicy.js'
 import { buildKnowledge, selectSources } from './portfolioKnowledge.js'
@@ -62,6 +63,7 @@ const safeMessage = (code) => ERROR_MESSAGES[code] || ERROR_MESSAGES.PROVIDER_UN
 const sendJson = (response, status, code) => {
   if (isResponseClosed(response)) return false
   responseStatus(response, status)
+  if (status === 405) responseHeader(response, 'Allow', 'POST')
   responseHeader(response, 'Cache-Control', 'no-store')
   responseHeader(response, 'Content-Type', 'application/json; charset=utf-8')
   response.end(JSON.stringify({ error: { code, message: safeMessage(code) } }))
@@ -233,6 +235,21 @@ export function createChatHandler({
   return async function portfolioChatHandler(request, response) {
     if (!parseCanonicalPath(request?.url)) {
       sendJson(response, 404, 'NOT_FOUND')
+      return
+    }
+
+    try {
+      validateChatRequestEnvelope({
+        method: request?.method,
+        headers: request?.headers,
+        allowedOrigins,
+      })
+    } catch (error) {
+      if (error instanceof ChatPolicyError) {
+        sendJson(response, error.status, error.code)
+        return
+      }
+      sendJson(response, 400, 'INVALID_BODY')
       return
     }
 
