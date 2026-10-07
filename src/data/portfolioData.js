@@ -286,7 +286,7 @@ export const experiences = [
     role: 'AI Full-Stack Developer',
     company: 'Australian client',
     location: 'Australia · Contract · Remote',
-    period: '2026',
+    period: 'Jun 2026 – Sep 2026',
     featured: true,
     summary:
       'Building an enterprise CRM platform for an Australian client that unifies member records, subscriptions, payments, visit history, and team outreach.',

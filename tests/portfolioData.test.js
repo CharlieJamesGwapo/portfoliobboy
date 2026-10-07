@@ -108,7 +108,7 @@ test('keeps public client wording anonymous and aligns every visible role timeli
   const societyExperience = experiences.find((item) => item.company === 'Robustech IT / SocietyOne')
   const roocheExperience = experiences.find((item) => item.company === 'Rooche Digital Company')
   assert.equal(australianExperience?.company, 'Australian client')
-  assert.equal(australianExperience?.period, '2026')
+  assert.equal(australianExperience?.period, 'Jun 2026 – Sep 2026')
   assert.equal(roocheExperience?.period, 'Jan 2026 – Mar 2026')
   assert.equal(societyExperience?.period, 'Jan 2024 – Dec 2025')
 
@@ -140,7 +140,7 @@ test('preserves every portfolio export when only the Australian client period ch
   const expectedExports = {
     ...baselineModule,
     experiences: baselineModule.experiences.map((experience, index) =>
-      index === 0 ? { ...experience, period: '2026' } : experience,
+      index === 0 ? { ...experience, period: 'Jun 2026 – Sep 2026' } : experience,
     ),
   }
 
