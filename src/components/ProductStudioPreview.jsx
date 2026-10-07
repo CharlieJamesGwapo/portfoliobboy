@@ -28,14 +28,68 @@ export function OneRidePhonePreview() {
   const [failedSourceIds, setFailedSourceIds] = useState([])
   const [tiltEnabled, setTiltEnabled] = useState(false)
   const phoneRef = useRef(null)
+  const failedSourceIdsRef = useRef(new Set())
+  const pointerFrame = useRef(null)
+  const pointerPosition = useRef(null)
 
-  const selectedScreen = oneRidePreview.screenshots[selectedIndex]
+  const selectedScreen = selectedIndex === null ? null : oneRidePreview.screenshots[selectedIndex]
   const displayScreen = oneRidePreview.screenshots.find((screen) => screen.src === displaySrc) || selectedScreen
 
-  useEffect(() => {
-    setDisplaySrc(selectedScreen.src)
+  const resetPointerTilt = () => {
+    pointerPosition.current = null
+    if (pointerFrame.current !== null) {
+      window.cancelAnimationFrame(pointerFrame.current)
+      pointerFrame.current = null
+    }
+    if (!phoneRef.current) return
+    phoneRef.current.style.setProperty('--phone-rotate-x', '2deg')
+    phoneRef.current.style.setProperty('--phone-rotate-y', '-9deg')
+  }
+
+  const applyPointerTilt = () => {
+    pointerFrame.current = null
+    if (!tiltEnabled || !phoneRef.current || !pointerPosition.current) return
+    const bounds = phoneRef.current.getBoundingClientRect()
+    const x = (pointerPosition.current.clientX - bounds.left) / bounds.width - 0.5
+    const y = (pointerPosition.current.clientY - bounds.top) / bounds.height - 0.5
+    phoneRef.current.style.setProperty('--phone-rotate-x', `${(-y * 5).toFixed(2)}deg`)
+    phoneRef.current.style.setProperty('--phone-rotate-y', `${(x * 7 - 9).toFixed(2)}deg`)
+  }
+
+  const handlePointerMove = (event) => {
+    if (!tiltEnabled || !phoneRef.current) return
+    pointerPosition.current = { clientX: event.clientX, clientY: event.clientY }
+    if (pointerFrame.current !== null) return
+    pointerFrame.current = window.requestAnimationFrame(applyPointerTilt)
+  }
+
+  const handleScreenSelection = (index) => {
+    const screen = oneRidePreview.screenshots[index]
+    failedSourceIdsRef.current = new Set()
     setFailedSourceIds([])
-  }, [selectedScreen.src])
+    setSelectedIndex(index)
+    setDisplaySrc(screen.src)
+  }
+
+  const handleImageError = () => {
+    const currentSource = oneRidePreview.screenshots.find((screen) => screen.src === displaySrc)
+    if (!currentSource) return
+
+    const nextFailedSourceIds = new Set(failedSourceIdsRef.current)
+    nextFailedSourceIds.add(currentSource.id)
+    failedSourceIdsRef.current = nextFailedSourceIds
+    setFailedSourceIds([...nextFailedSourceIds])
+
+    const nextScreen = oneRidePreview.screenshots.find((screen) => !nextFailedSourceIds.has(screen.id))
+    if (!nextScreen) {
+      setSelectedIndex(null)
+      setDisplaySrc(null)
+      return
+    }
+
+    setSelectedIndex(oneRidePreview.screenshots.indexOf(nextScreen))
+    setDisplaySrc(nextScreen.src)
+  }
 
   useEffect(() => {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)')
@@ -43,43 +97,22 @@ export function OneRidePhonePreview() {
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
 
     const syncTiltCapability = () => {
-      setTiltEnabled(finePointer.matches && !reducedMotion.matches && !connection?.saveData)
+      const nextTiltEnabled = finePointer.matches && !reducedMotion.matches && !connection?.saveData
+      setTiltEnabled(nextTiltEnabled)
+      if (!nextTiltEnabled) resetPointerTilt()
     }
 
     syncTiltCapability()
     finePointer.addEventListener?.('change', syncTiltCapability)
     reducedMotion.addEventListener?.('change', syncTiltCapability)
+    connection?.addEventListener?.('change', syncTiltCapability)
     return () => {
       finePointer.removeEventListener?.('change', syncTiltCapability)
       reducedMotion.removeEventListener?.('change', syncTiltCapability)
+      connection?.removeEventListener?.('change', syncTiltCapability)
+      resetPointerTilt()
     }
   }, [])
-
-  const handlePointerMove = (event) => {
-    if (!tiltEnabled || !phoneRef.current) return
-    const bounds = phoneRef.current.getBoundingClientRect()
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5
-    phoneRef.current.style.setProperty('--phone-rotate-x', `${(-y * 5).toFixed(2)}deg`)
-    phoneRef.current.style.setProperty('--phone-rotate-y', `${(x * 7 - 9).toFixed(2)}deg`)
-  }
-
-  const resetPointerTilt = () => {
-    if (!phoneRef.current) return
-    phoneRef.current.style.setProperty('--phone-rotate-x', '2deg')
-    phoneRef.current.style.setProperty('--phone-rotate-y', '-9deg')
-  }
-
-  const handleImageError = () => {
-    const currentSource = oneRidePreview.screenshots.find((screen) => screen.src === displaySrc)
-    const nextScreen = oneRidePreview.screenshots.find(
-      (screen) => screen.src !== displaySrc && !failedSourceIds.includes(screen.id),
-    )
-
-    if (!currentSource || failedSourceIds.includes(currentSource.id)) return
-    setFailedSourceIds((ids) => [...ids, currentSource.id])
-    setDisplaySrc(nextScreen?.src || null)
-  }
 
   return (
     <div className="studio-phone-column" data-testid="oneride-preview">
@@ -136,7 +169,7 @@ export function OneRidePhonePreview() {
             aria-label={`Show OneRide screenshot ${index + 1}: ${screen.label}`}
             aria-pressed={selectedIndex === index}
             className={selectedIndex === index ? 'is-selected' : ''}
-            onClick={() => setSelectedIndex(index)}
+            onClick={() => handleScreenSelection(index)}
           >
             <span>{String(index + 1).padStart(2, '0')}</span>
             {screen.label}
@@ -144,6 +177,45 @@ export function OneRidePhonePreview() {
         ))}
       </div>
     </div>
+  )
+}
+
+function StaticOneRideScreenshot() {
+  const [displaySrc, setDisplaySrc] = useState(oneRidePreview.screenshots[1].src)
+  const [failedSourceIds, setFailedSourceIds] = useState([])
+  const failedSourceIdsRef = useRef(new Set())
+  const displayScreen = oneRidePreview.screenshots.find((screen) => screen.src === displaySrc)
+
+  const handleImageError = () => {
+    const nextFailedSourceIds = new Set(failedSourceIdsRef.current)
+    if (displayScreen) nextFailedSourceIds.add(displayScreen.id)
+    failedSourceIdsRef.current = nextFailedSourceIds
+    setFailedSourceIds([...nextFailedSourceIds])
+    const nextScreen = oneRidePreview.screenshots.find((screen) => !nextFailedSourceIds.has(screen.id))
+    setDisplaySrc(nextScreen?.src || null)
+  }
+
+  if (!displaySrc) {
+    return (
+      <div className="studio-static-phone-empty" role="status">
+        <strong>Official preview unavailable.</strong>
+        <span>Open the store listing for the live app imagery.</span>
+        <a href={oneRidePreview.sourceUrl} target="_blank" rel="noreferrer">Open official app listing <ArrowUpRight size={14} aria-hidden="true" /></a>
+      </div>
+    )
+  }
+
+  return (
+    <img
+      src={displaySrc}
+      alt={displayScreen.alt}
+      width="600"
+      height="1067"
+      loading="lazy"
+      decoding="async"
+      onError={handleImageError}
+      data-failed-screenshot-count={failedSourceIds.length}
+    />
   )
 }
 
@@ -238,14 +310,7 @@ export default function ProductStudioPreview() {
               </div>
               <div className="studio-static-phone" aria-label="OneRide official store screenshot preview">
                 <p className="studio-preview-label">A closer look above</p>
-                <img
-                  src={oneRidePreview.screenshots[1].src}
-                  alt={oneRidePreview.screenshots[1].alt}
-                  width="600"
-                  height="1067"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <StaticOneRideScreenshot />
                 <a href="#home" className="studio-inline-link">See the interactive app preview <ChevronRight size={15} aria-hidden="true" /></a>
               </div>
             </article>

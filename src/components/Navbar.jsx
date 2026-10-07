@@ -44,7 +44,6 @@ const Navbar = () => {
   const menuRef = useRef(null)
   const toggleRef = useRef(null)
   const moreRef = useRef(null)
-  const moreMenuRef = useRef(null)
   const moreToggleRef = useRef(null)
   const scrollFrame = useRef(null)
 
@@ -162,12 +161,19 @@ const Navbar = () => {
   }, [open])
 
   useEffect(() => {
-    const closeMobileMenuOnDesktop = () => {
-      if (window.innerWidth > 860) setOpen(false)
+    const closeViewportSpecificDisclosure = () => {
+      if (window.innerWidth > 860) {
+        setOpen(false)
+        return
+      }
+
+      const focusInsideMore = moreRef.current?.contains(document.activeElement)
+      if (focusInsideMore) window.setTimeout(() => toggleRef.current?.focus(), 0)
+      setMoreOpen(false)
     }
 
-    window.addEventListener('resize', closeMobileMenuOnDesktop)
-    return () => window.removeEventListener('resize', closeMobileMenuOnDesktop)
+    window.addEventListener('resize', closeViewportSpecificDisclosure)
+    return () => window.removeEventListener('resize', closeViewportSpecificDisclosure)
   }, [])
 
   useEffect(() => {
@@ -177,9 +183,6 @@ const Navbar = () => {
       if (event.key === 'Escape') {
         setMoreOpen(false)
         window.setTimeout(() => moreToggleRef.current?.focus(), 0)
-      }
-      if (event.key === 'Tab' && moreRef.current && !moreRef.current.contains(document.activeElement)) {
-        setMoreOpen(false)
       }
     }
 
@@ -197,6 +200,9 @@ const Navbar = () => {
 
   const closeMenu = () => setOpen(false)
   const closeMore = () => setMoreOpen(false)
+  const handleMoreFocusOut = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) closeMore()
+  }
   const moreIsActive = moreNavigation.some((link) => active === link.href.slice(1))
 
   return (
@@ -219,14 +225,13 @@ const Navbar = () => {
               {link.label}
             </a>
           ))}
-          <div ref={moreRef} className={`more-navigation ${moreOpen ? 'is-open' : ''}`}>
+          <div ref={moreRef} className={`more-navigation ${moreOpen ? 'is-open' : ''}`} onBlur={handleMoreFocusOut}>
             <button
               ref={moreToggleRef}
               type="button"
               className={`more-toggle ${moreIsActive ? 'is-active' : ''}`}
               aria-expanded={moreOpen}
               aria-controls="more-navigation-menu"
-              aria-haspopup="true"
               aria-label="More navigation"
               onClick={() => setMoreOpen((value) => !value)}
               onKeyDown={(event) => {
@@ -239,7 +244,7 @@ const Navbar = () => {
               More <ChevronDown size={14} aria-hidden="true" />
             </button>
             {moreOpen && (
-              <div ref={moreMenuRef} id="more-navigation-menu" className="more-navigation-menu">
+              <div id="more-navigation-menu" className="more-navigation-menu">
                 {moreNavigation.map((link) => (
                   <a
                     key={link.href}

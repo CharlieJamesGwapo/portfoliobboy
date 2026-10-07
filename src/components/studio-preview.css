@@ -25,6 +25,20 @@
   z-index: 1;
 }
 
+/* The studio preview keeps the hero atmosphere quiet until a person chooses
+   an interaction. These scoped overrides leave the original hero stylesheet
+   intact while making its decorative orbit and availability ring static. */
+.hero-section .hero-orbit {
+  animation: none;
+  will-change: auto;
+}
+
+.hero-section .status-dot::after {
+  animation: none;
+  opacity: 0.55;
+  transform: scale(1);
+}
+
 .studio-heading {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 0.52fr);
@@ -79,7 +93,7 @@
 
 .studio-card-eyebrow {
   color: var(--mint-deep);
-  font-size: 0.63rem;
+  font-size: 0.75rem;
   font-weight: 850;
   letter-spacing: 0.12em;
   line-height: 1.5;
@@ -98,7 +112,7 @@
 .studio-feature-copy > p:not(.studio-card-eyebrow):not(.studio-source-note) {
   max-width: 450px;
   color: var(--slate);
-  font-size: 0.86rem;
+  font-size: 0.875rem;
   line-height: 1.7;
 }
 
@@ -118,7 +132,7 @@
   border: 1px solid var(--line-light);
   border-radius: 999px;
   color: var(--mint-deep);
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   font-weight: 800;
 }
 
@@ -143,7 +157,7 @@
   align-items: center;
   gap: 6px;
   color: var(--ink);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 800;
   line-height: 1.35;
   text-decoration: underline;
@@ -161,8 +175,8 @@
 
 .studio-source-note {
   margin-top: 20px;
-  color: #728180;
-  font-size: 0.62rem;
+  color: #46615e;
+  font-size: 0.75rem;
   line-height: 1.55;
 }
 
@@ -170,7 +184,7 @@
   display: inline-flex;
   min-height: 44px;
   align-items: center;
-  color: var(--mint-deep);
+  color: #0b6558;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -185,7 +199,7 @@
 .studio-preview-label {
   margin-bottom: 9px;
   color: var(--mint-deep);
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 850;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -293,6 +307,33 @@
   border-radius: 24px;
   box-shadow: 10px 18px 30px rgba(7, 30, 32, 0.18);
   object-fit: cover;
+}
+
+.studio-static-phone-empty {
+  display: grid;
+  width: min(100%, 260px);
+  min-height: 190px;
+  align-content: center;
+  gap: 10px;
+  padding: 22px 16px;
+  border: 1px dashed rgba(11, 37, 40, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 253, 250, 0.72);
+  color: var(--ink);
+  text-align: center;
+}
+
+.studio-static-phone-empty strong { font-size: 0.875rem; }
+.studio-static-phone-empty span { color: var(--slate); font-size: 0.875rem; line-height: 1.5; }
+.studio-static-phone-empty a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--mint-deep);
+  font-size: 0.8rem;
+  font-weight: 800;
 }
 
 .studio-static-phone .studio-inline-link { margin-top: 12px; }
@@ -416,13 +457,13 @@
 }
 
 .studio-phone-empty strong { font-size: 0.9rem; }
-.studio-phone-empty span { color: var(--slate); font-size: 0.72rem; line-height: 1.5; }
-.studio-phone-empty a { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 5px; color: var(--mint-deep); font-size: 0.7rem; font-weight: 800; }
+.studio-phone-empty span { color: var(--slate); font-size: 0.875rem; line-height: 1.5; }
+.studio-phone-empty a { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 5px; color: var(--mint-deep); font-size: 0.8rem; font-weight: 800; }
 
 .studio-media-status {
   margin-top: 9px;
   color: #7a4a38;
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   line-height: 1.4;
 }
 
@@ -443,7 +484,7 @@
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.48);
   color: var(--slate);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-align: left;
   cursor: pointer;
@@ -452,7 +493,7 @@
 
 .studio-screen-controls button span {
   color: var(--mint-deep);
-  font-size: 0.55rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
 }
 
@@ -519,7 +560,7 @@
   bottom: 10px;
   z-index: 1;
   color: var(--paper);
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   font-weight: 850;
   letter-spacing: 0.1em;
 }
@@ -542,7 +583,7 @@
 .studio-live-card-copy > p:not(.studio-card-eyebrow) {
   max-width: 320px;
   color: var(--slate);
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   line-height: 1.55;
 }
 
@@ -578,7 +619,7 @@
   align-items: center;
   gap: 5px;
   color: var(--slate);
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   font-weight: 800;
   transition: color var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
 }
@@ -641,7 +682,7 @@
   .studio-live-card-media,
   .studio-live-card-media img { min-height: 145px; height: 145px; }
   .studio-live-card-copy { padding: 16px; }
-  .studio-live-card-copy > p:not(.studio-card-eyebrow) { font-size: 0.67rem; }
+  .studio-live-card-copy > p:not(.studio-card-eyebrow) { font-size: 0.875rem; }
   .studio-secondary { grid-template-columns: 1fr; gap: 14px; }
 }
 
@@ -673,7 +714,7 @@
   .studio-live-card-media,
   .studio-live-card-media img { height: 162px; min-height: 162px; }
   .studio-live-card-copy { padding: 14px 12px; }
-  .studio-live-card-copy > p:not(.studio-card-eyebrow) { font-size: 0.64rem; }
+  .studio-live-card-copy > p:not(.studio-card-eyebrow) { font-size: 0.875rem; }
 }
 
 @media (max-width: 860px), (prefers-reduced-motion: reduce) {
