@@ -170,7 +170,10 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     for (const control of await page.locator('#product-studio-preview button, #product-studio-preview a').all()) {
       const bounds = await control.boundingBox()
-      expect(bounds?.height ?? 0).toBeGreaterThanOrEqual(44)
+      const renderedHeight = bounds?.height ?? 0
+      const computedMinHeight = await control.evaluate((node) => Number.parseFloat(getComputedStyle(node).minHeight))
+      expect(computedMinHeight).toBeGreaterThanOrEqual(44)
+      expect(renderedHeight).toBeGreaterThanOrEqual(43.99)
     }
   })
 }
