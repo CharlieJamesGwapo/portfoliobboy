@@ -1,8 +1,35 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, Search, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Menu, Search, X } from 'lucide-react'
 import { navigation as links, profile } from '../data/portfolioData'
+import './navbar-preview.css'
 
 const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
+
+const primaryNavigation = [
+  { label: 'Work', href: '#product-studio-preview' },
+  { label: 'About', href: '#about' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Contact', href: '#contact' },
+]
+
+const moreNavigation = [
+  { label: 'Project archive', href: '#projects' },
+  { label: 'Skills', href: '#skills' },
+  { label: 'Credentials', href: '#education' },
+  { label: 'Interactive Lab', href: '#lab' },
+  { label: 'AI systems', href: '#ai-systems' },
+]
+
+// Keep every existing mobile destination, with the new live-work and AI
+// systems anchors added as additive entries rather than rewriting the source
+// navigation export in portfolioData.js.
+const mobileNavigation = [
+  { label: 'Work', href: '#product-studio-preview' },
+  ...links,
+  { label: 'AI systems', href: '#ai-systems' },
+]
+
+const navigationTargets = [...primaryNavigation, ...moreNavigation]
 
 // Apple keyboards label the key ⌘; everywhere else it is Ctrl. Reading the
 // platform lets the hint match the key the visitor actually has to press.
@@ -13,12 +40,15 @@ const Navbar = () => {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState('home')
   const [scrolled, setScrolled] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const menuRef = useRef(null)
   const toggleRef = useRef(null)
+  const moreRef = useRef(null)
+  const moreToggleRef = useRef(null)
   const scrollFrame = useRef(null)
 
   useEffect(() => {
-    const ids = ['home', ...links.map((link) => link.href.slice(1))]
+    const ids = ['home', ...navigationTargets.map((link) => link.href.slice(1))]
 
     // Section offsets are cached. Reading `offsetTop` forces a synchronous
     // layout, and doing that for every section on every scroll frame was the
@@ -130,28 +160,104 @@ const Navbar = () => {
     }
   }, [open])
 
+  useEffect(() => {
+    const closeViewportSpecificDisclosure = () => {
+      if (window.innerWidth > 860) {
+        setOpen(false)
+        return
+      }
+
+      const focusInsideMore = moreRef.current?.contains(document.activeElement)
+      if (focusInsideMore) window.setTimeout(() => toggleRef.current?.focus(), 0)
+      setMoreOpen(false)
+    }
+
+    window.addEventListener('resize', closeViewportSpecificDisclosure)
+    return () => window.removeEventListener('resize', closeViewportSpecificDisclosure)
+  }, [])
+
+  useEffect(() => {
+    if (!moreOpen) return undefined
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setMoreOpen(false)
+        window.setTimeout(() => moreToggleRef.current?.focus(), 0)
+      }
+    }
+
+    const onPointerDown = (event) => {
+      if (!moreRef.current?.contains(event.target)) setMoreOpen(false)
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('pointerdown', onPointerDown)
+    }
+  }, [moreOpen])
+
   const closeMenu = () => setOpen(false)
+  const closeMore = () => setMoreOpen(false)
+  const handleMoreFocusOut = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) closeMore()
+  }
+  const moreIsActive = moreNavigation.some((link) => active === link.href.slice(1))
 
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="nav-inner">
-        <a href="#home" className="wordmark" onClick={() => { setActive('home'); closeMenu() }} aria-label={`${profile.shortName}, home`}>
+        <a href="#home" className="wordmark" onClick={() => { setActive('home'); closeMenu(); closeMore() }} aria-label={`${profile.shortName}, home`}>
           <span className="wordmark-mark" aria-hidden="true">CA</span>
           <span>{profile.shortName}</span>
         </a>
 
         <nav className="desktop-nav" aria-label="Primary navigation">
-          {links.map((link) => (
+          {primaryNavigation.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              onClick={() => setActive(link.href.slice(1))}
+              onClick={() => { setActive(link.href.slice(1)); closeMore() }}
               className={active === link.href.slice(1) ? 'active' : ''}
               aria-current={active === link.href.slice(1) ? 'location' : undefined}
             >
               {link.label}
             </a>
           ))}
+          <div ref={moreRef} className={`more-navigation ${moreOpen ? 'is-open' : ''}`} onBlur={handleMoreFocusOut}>
+            <button
+              ref={moreToggleRef}
+              type="button"
+              className={`more-toggle ${moreIsActive ? 'is-active' : ''}`}
+              aria-expanded={moreOpen}
+              aria-controls="more-navigation-menu"
+              aria-label="More navigation"
+              onClick={() => setMoreOpen((value) => !value)}
+              onKeyDown={(event) => {
+                if (event.key !== 'ArrowDown') return
+                event.preventDefault()
+                setMoreOpen(true)
+                window.setTimeout(() => moreRef.current?.querySelector('a')?.focus(), 0)
+              }}
+            >
+              More <ChevronDown size={14} aria-hidden="true" />
+            </button>
+            {moreOpen && (
+              <div id="more-navigation-menu" className="more-navigation-menu">
+                {moreNavigation.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => { setActive(link.href.slice(1)); closeMore() }}
+                  >
+                    {link.label}
+                    <ChevronRight size={13} aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="nav-actions">
@@ -183,9 +289,9 @@ const Navbar = () => {
 
       <div ref={menuRef} id="mobile-navigation" className={`mobile-menu ${open ? 'is-open' : ''}`}>
         <nav aria-label="Mobile navigation">
-          {links.map((link, index) => (
+          {mobileNavigation.map((link, index) => (
             <a key={link.href} href={link.href} onClick={() => { setActive(link.href.slice(1)); closeMenu() }} style={{ '--menu-index': index }}>
-              <span>0{index + 1}</span>
+              <span aria-hidden="true">0{index + 1}</span>
               {link.label}
             </a>
           ))}

@@ -212,7 +212,7 @@ export const OWNER = {
 
 export const BIO_SCROLL = [
   "Welcome, traveler. You stand in the dungeon of Charlie James — Full Stack Developer & Backend Engineer.",
-  "5+ years building and shipping software across Python, Go, .NET, Node.js, and PHP.",
+  "Hands-on development across Python, Go, .NET, Node.js, and PHP.",
   "Venture deeper: defeat the Skills, plunder the Projects Vault, study the Certs, and slay The Bug King to claim victory.",
 ]
 

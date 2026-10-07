@@ -16,9 +16,7 @@ const About = () => (
         />
         <div className="about-copy">
           <p>
-            Across 5+ years building and shipping software, I’ve delivered applications across web, iOS, and Android.
-            My strongest work lives where AI-integrated product features, backend architecture, polished UI,
-            and third-party systems meet.
+            I build web and mobile applications, focusing on useful features, reliable backends, and clear interfaces.
           </p>
           <p>
             My recent work includes an enterprise CRM platform built end-to-end for an Australian client: member and payment

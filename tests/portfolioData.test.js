@@ -69,7 +69,7 @@ test('keeps the requested hiring-focused experience and project inventory', () =
 test('shows careful building-and-shipping experience wording in page consumers', async () => {
   const [aboutMarkup, experienceMarkup] = await renderConsumers()
   const productProof = proofPoints.find((item) => item.label === 'Genuine products and client builds')
-  const experienceProof = proofPoints.find((item) => item.label === 'Years building and shipping software')
+  const experienceProof = proofPoints.find((item) => item.label === 'Development')
   assert.deepEqual(productProof, {
     value: '17+',
     label: 'Genuine products and client builds',
@@ -77,16 +77,14 @@ test('shows careful building-and-shipping experience wording in page consumers',
     suffix: '+',
   })
   assert.deepEqual(experienceProof, {
-    value: '5+',
-    label: 'Years building and shipping software',
-    numericValue: 5,
-    suffix: '+',
+    value: 'Hands-on',
+    label: 'Development',
   })
   assert.equal(skillGroups.flatMap((group) => group.skills).includes('MongoDB'), false)
   assert.equal(SKILL_CATEGORIES.flatMap((group) => group.skills).includes('MongoDB'), false)
-  assert.match(BIO_SCROLL[1], /5\+ years building and shipping software/i)
-  assert.match(aboutMarkup, /5\+ years building and shipping software/i)
-  assert.match(experienceMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '), /5\+ Years building and shipping software/i)
+  assert.equal(BIO_SCROLL[1], 'Hands-on development across Python, Go, .NET, Node.js, and PHP.')
+  assert.match(aboutMarkup, /I build web and mobile applications, focusing on useful features, reliable backends, and clear interfaces\./i)
+  assert.match(experienceMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '), /Hands-on Development/i)
 })
 
 test('publishes the supplied OMJI projects with realistic dates', () => {
@@ -130,7 +128,7 @@ test('keeps public client wording anonymous and aligns every visible role timeli
   assert.doesNotMatch(publicContent, /Multi-Club Fitness Group|PerfectGym/i)
 })
 
-test('preserves every portfolio export when only the Australian client period changes', async () => {
+test('preserves history and inventory while applying approved date and positioning copy', async () => {
   const baselineSource = execFileSync(
     'git',
     ['show', '3f329a4bd4da43163807ef7760ec8d59725aa0cd:src/data/portfolioData.js'],
@@ -141,6 +139,9 @@ test('preserves every portfolio export when only the Australian client period ch
     ...baselineModule,
     experiences: baselineModule.experiences.map((experience, index) =>
       index === 0 ? { ...experience, period: 'Jun 2026 – Sep 2026' } : experience,
+    ),
+    proofPoints: baselineModule.proofPoints.map((proofPoint, index) =>
+      index === 1 ? { value: 'Hands-on', label: 'Development' } : proofPoint,
     ),
   }
 
