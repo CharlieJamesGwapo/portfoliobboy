@@ -1,9 +1,11 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { resolve } from 'node:path'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createServer } from 'vite'
+import * as portfolioData from '../src/data/portfolioData.js'
 import {
   aiCapabilityRibbon,
   aiSystemCapabilities,
@@ -106,7 +108,7 @@ test('keeps public client wording anonymous and aligns every visible role timeli
   const societyExperience = experiences.find((item) => item.company === 'Robustech IT / SocietyOne')
   const roocheExperience = experiences.find((item) => item.company === 'Rooche Digital Company')
   assert.equal(australianExperience?.company, 'Australian client')
-  assert.equal(australianExperience?.period, '2026 – Present')
+  assert.equal(australianExperience?.period, 'Jun 2026 – Sep 2026')
   assert.equal(roocheExperience?.period, 'Jan 2026 – Mar 2026')
   assert.equal(societyExperience?.period, 'Jan 2024 – Dec 2025')
 
@@ -126,6 +128,27 @@ test('keeps public client wording anonymous and aligns every visible role timeli
     ...consumerMarkup,
   ].join(' ')
   assert.doesNotMatch(publicContent, /Multi-Club Fitness Group|PerfectGym/i)
+})
+
+test('preserves every portfolio export when only the Australian client period changes', async () => {
+  const baselineSource = execFileSync(
+    'git',
+    ['show', '3f329a4bd4da43163807ef7760ec8d59725aa0cd:src/data/portfolioData.js'],
+    { encoding: 'utf8' },
+  )
+  const baselineModule = await import(`data:text/javascript,${encodeURIComponent(baselineSource)}`)
+  const expectedExports = {
+    ...baselineModule,
+    experiences: baselineModule.experiences.map((experience, index) =>
+      index === 0 ? { ...experience, period: 'Jun 2026 – Sep 2026' } : experience,
+    ),
+  }
+
+  assert.deepEqual(
+    Object.keys(portfolioData).sort(),
+    Object.keys(expectedExports).sort(),
+  )
+  assert.deepEqual(Object.fromEntries(Object.entries(portfolioData)), expectedExports)
 })
 
 test('keeps the original credential inventory and clean resume route', () => {
