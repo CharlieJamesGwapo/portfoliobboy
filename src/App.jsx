@@ -5,6 +5,7 @@ import CommandPalette from './components/CommandPalette'
 import UpdateBanner from './components/UpdateBanner'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import ProductStudioPreview from './components/ProductStudioPreview'
 import About from './components/About'
 import Experience from './components/Experience'
 import AISystems from './components/AISystems'
@@ -165,6 +166,7 @@ function App() {
       <Navbar />
       <main id="main-content">
         <Hero />
+        <ProductStudioPreview />
         <About />
         <Experience />
         <AISystems />

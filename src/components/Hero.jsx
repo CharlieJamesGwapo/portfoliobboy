@@ -1,17 +1,7 @@
-import { ArrowDown, ArrowUpRight, Briefcase, Gamepad2, Github, Linkedin, Mail, MapPin } from 'lucide-react'
-import { aiCapabilityRibbon, professionalTitles, profile, proofPoints, resumeUrl } from '../data/portfolioData'
-import { prefetchProps } from '../lib/prefetch'
+import { ArrowDown, ArrowUpRight, Briefcase, Github, Linkedin, Mail, MapPin } from 'lucide-react'
+import { aiCapabilityRibbon, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import AnimatedStat from './AnimatedStat'
-import RotatingTitle from './RotatingTitle'
-// Now a ~3 kB canvas renderer (was a 808 kB Three.js scene), so it is cheaper
-// to ship inline than to pay an extra request for a lazy chunk in the hero.
-import HeroSystemsScene from './HeroSystemsScene'
-
-const openGames = () => window.dispatchEvent(new CustomEvent('portfolio:open-games'))
-
-// Same chunk key as the interactive lab section, so whichever entry point the
-// visitor reaches for first is the one that pays for the download.
-const warmArcade = prefetchProps('arcade', () => import('./game/ArcadeLobby'))
+import { OneRidePhonePreview } from './ProductStudioPreview'
 
 const Hero = () => (
   <section id="home" className="hero-section">
@@ -26,34 +16,38 @@ const Hero = () => (
           Available for remote AI, full-stack, and backend opportunities
         </div>
 
-        <p className="hero-kicker hero-enter hero-enter-2">AI development · Systems engineering · Product delivery</p>
+        <div className="hero-identity hero-enter hero-enter-2">
+          <picture>
+            <source srcSet="/profile.webp" type="image/webp" />
+            <img src="/profile.png" alt="" width="56" height="56" fetchpriority="high" decoding="async" />
+          </picture>
+          <div>
+            <p className="hero-kicker">Charlie Abejo</p>
+            <span>Philippines · Working globally</span>
+          </div>
+        </div>
         <h1>
-          <span className="hero-line hero-line-primary">I build intelligent systems behind</span>{' '}
-          <span className="hero-line hero-line-accent">modern digital products.</span>
+          <span className="hero-line hero-line-primary">AI Developer &amp;</span>{' '}
+          <span className="hero-line hero-line-accent">Full-Stack Engineer.</span>
         </h1>
 
-        <div className="hero-enter hero-enter-5">
-          <RotatingTitle titles={professionalTitles} />
-        </div>
-
         <p className="hero-intro hero-enter hero-enter-5">
-          I’m {profile.name}, an AI Developer and Full-Stack Engineer building AI-integrated applications,
-          scalable APIs, SaaS platforms, CRM integrations, mobile products, and reliable backend systems.
+          I build AI systems, CRM workflows, mobile apps, and APIs that move products from idea to reliable operation.
         </p>
 
         <div className="hero-actions hero-enter hero-enter-6">
-          <a className="button button-primary" href="#projects">
-            Explore selected work <ArrowDown size={17} aria-hidden="true" />
+          <a className="button button-primary" href="#product-studio-preview">
+            Explore projects <ArrowDown size={17} aria-hidden="true" />
           </a>
           <a className="button button-secondary" href={resumeUrl} target="_blank" rel="noreferrer">
             View resume <ArrowUpRight size={17} aria-hidden="true" />
           </a>
-          <a className="button button-quiet" href="#contact">
-            <Briefcase size={17} aria-hidden="true" /> Hire me
+        </div>
+
+        <div className="hero-support-actions hero-enter hero-enter-6">
+          <a className="hero-contact-link" href="#contact">
+            <Briefcase size={16} aria-hidden="true" /> Get in touch <ArrowUpRight size={14} aria-hidden="true" />
           </a>
-          <button type="button" className="button button-quiet" onClick={openGames} {...warmArcade}>
-            <Gamepad2 size={17} aria-hidden="true" /> Play games
-          </button>
         </div>
 
         <div className="hero-socials hero-enter hero-enter-7" aria-label="Profile links">
@@ -65,26 +59,7 @@ const Hero = () => (
       </div>
 
       <div className="hero-visual hero-enter hero-enter-visual">
-        <div className="systems-visual-shell">
-          <HeroSystemsScene />
-          <p className="sr-only">Decorative visualization of connected AI, API, database, and cloud systems.</p>
-          <div className="systems-caption" aria-hidden="true">
-            <span>01 · AI orchestration</span>
-            <span>02 · API services</span>
-            <span>03 · Durable data</span>
-          </div>
-          <div className="engineer-card">
-            <picture>
-              <source srcSet="/profile.webp" type="image/webp" />
-              {/* Above the fold and preloaded in index.html — must not be lazy. */}
-              {/* React 18 does not map the camelCase `fetchPriority` prop, so it
-                  has to be written as the lowercase HTML attribute or the hint
-                  is dropped and React logs an unknown-prop warning. */}
-              <img src="/profile.png" alt="" width="413" height="531" fetchpriority="high" decoding="async" />
-            </picture>
-            <span><strong>Charlie James</strong>Philippines · Working globally</span>
-          </div>
-        </div>
+        <OneRidePhonePreview />
       </div>
     </div>
 
