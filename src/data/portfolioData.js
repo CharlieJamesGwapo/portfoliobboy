@@ -36,7 +36,7 @@ export const navigation = [
 
 export const proofPoints = [
   { value: '17+', label: 'Genuine products and client builds', numericValue: 17, suffix: '+' },
-  { value: '5+', label: 'Years building and shipping software', numericValue: 5, suffix: '+' },
+  { value: 'Hands-on', label: 'Development' },
   { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
   { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },
 ]
