@@ -28,6 +28,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { navigation, profile, resumeUrl } from '../data/portfolioData'
+import { acquireBodyScrollLock } from '../lib/overlayScrollLock'
 
 const SECTION_ICONS = {
   '#about': User,
@@ -85,7 +86,8 @@ export default function CommandPalette({ open, onClose }) {
 
     return [
       ...sections,
-      { id: 'go-ai-systems', label: 'AI agents, voice & automation', hint: 'Explore capabilities and live demos', icon: Sparkles, run: () => goTo('#ai-systems') },
+      { id: 'go-momentum-work', label: 'Work', hint: 'Jump to selected Momentum systems', icon: Layers, run: () => goTo('#momentum-work') },
+      { id: 'go-ai-systems', label: 'Services', hint: 'Explore AI agents, voice & automation', icon: Sparkles, run: () => goTo('#ai-systems') },
       {
         id: 'copy-email',
         label: 'Copy email address',
@@ -171,16 +173,33 @@ export default function CommandPalette({ open, onClose }) {
     setQuery('')
     setActive(0)
     document.body.classList.add('palette-open')
+    const releaseScrollLock = acquireBodyScrollLock('command-palette')
     const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 30)
 
     return () => {
       window.clearTimeout(focusTimer)
+      releaseScrollLock()
       document.body.classList.remove('palette-open')
       // Returning focus to whatever opened the palette is what makes ⌘K
       // usable twice in a row without touching the mouse.
       returnFocusRef.current?.focus?.()
     }
   }, [open])
+
+  // The input focus is intentionally deferred so the palette can mount before
+  // stealing focus. During that boundary Escape may land on body instead of
+  // inside the palette subtree; keep the close action global while open so the
+  // overlay cannot remain stuck behind a delayed focus task.
+  useEffect(() => {
+    if (!open) return undefined
+    const onWindowKeyDown = (event) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+      event.preventDefault()
+      onClose()
+    }
+    window.addEventListener('keydown', onWindowKeyDown)
+    return () => window.removeEventListener('keydown', onWindowKeyDown)
+  }, [open, onClose])
 
   // Keep the highlighted row in view when arrowing past the fold.
   useEffect(() => {

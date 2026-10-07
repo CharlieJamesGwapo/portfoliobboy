@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Menu, Search, X } from 'lucide-react'
-import { navigation as links, profile } from '../data/portfolioData'
+import { primaryNavigation, profile, secondaryNavigation } from '../data/portfolioData'
+import { acquireBodyScrollLock } from '../lib/overlayScrollLock'
+import ThemeSelector from './ThemeSelector'
 
 const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
 
@@ -18,7 +20,11 @@ const Navbar = () => {
   const scrollFrame = useRef(null)
 
   useEffect(() => {
-    const ids = ['home', ...links.map((link) => link.href.slice(1))]
+    const ids = ['home', ...new Set(
+      [...primaryNavigation, ...secondaryNavigation]
+        .filter((link) => link.href?.startsWith('#'))
+        .map((link) => link.href.slice(1)),
+    )]
 
     // Section offsets are cached. Reading `offsetTop` forces a synchronous
     // layout, and doing that for every section on every scroll frame was the
@@ -95,6 +101,7 @@ const Navbar = () => {
     const footer = document.querySelector('.footer')
     main?.toggleAttribute('inert', open)
     footer?.toggleAttribute('inert', open)
+    const releaseScrollLock = open ? acquireBodyScrollLock('mobile-menu') : null
 
     const focusTimer = open
       ? window.setTimeout(() => menuRef.current?.querySelector('a')?.focus(), 80)
@@ -120,17 +127,33 @@ const Navbar = () => {
         }
       }
     }
+    const closeForOverlay = () => setOpen(false)
     window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('portfolio:detail-open', closeForOverlay)
+    window.addEventListener('portfolio:open-palette', closeForOverlay)
+    window.addEventListener('portfolio:open-music', closeForOverlay)
+    window.addEventListener('portfolio:open-games', closeForOverlay)
+    window.addEventListener('portfolio:lab-open', closeForOverlay)
     return () => {
       if (focusTimer) window.clearTimeout(focusTimer)
+      releaseScrollLock?.()
       document.body.classList.remove('menu-open')
       main?.removeAttribute('inert')
       footer?.removeAttribute('inert')
       window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('portfolio:detail-open', closeForOverlay)
+      window.removeEventListener('portfolio:open-palette', closeForOverlay)
+      window.removeEventListener('portfolio:open-music', closeForOverlay)
+      window.removeEventListener('portfolio:open-games', closeForOverlay)
+      window.removeEventListener('portfolio:lab-open', closeForOverlay)
     }
   }, [open])
 
   const closeMenu = () => setOpen(false)
+  const toggleMenu = () => {
+    if (!open) window.dispatchEvent(new CustomEvent('portfolio:menu-open'))
+    setOpen((value) => !value)
+  }
 
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
@@ -141,7 +164,7 @@ const Navbar = () => {
         </a>
 
         <nav className="desktop-nav" aria-label="Primary navigation">
-          {links.map((link) => (
+          {primaryNavigation.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -155,6 +178,7 @@ const Navbar = () => {
         </nav>
 
         <div className="nav-actions">
+          <ThemeSelector />
           <button
             type="button"
             className="nav-search"
@@ -172,7 +196,7 @@ const Navbar = () => {
           ref={toggleRef}
           type="button"
           className="menu-toggle"
-          onClick={() => setOpen((value) => !value)}
+          onClick={toggleMenu}
           aria-expanded={open}
           aria-controls="mobile-navigation"
           aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
@@ -183,13 +207,47 @@ const Navbar = () => {
 
       <div ref={menuRef} id="mobile-navigation" className={`mobile-menu ${open ? 'is-open' : ''}`}>
         <nav aria-label="Mobile navigation">
-          {links.map((link, index) => (
+          {primaryNavigation.map((link, index) => (
             <a key={link.href} href={link.href} onClick={() => { setActive(link.href.slice(1)); closeMenu() }} style={{ '--menu-index': index }}>
               <span>0{index + 1}</span>
               {link.label}
             </a>
           ))}
+          <div className="mobile-menu-secondary" aria-label="Secondary navigation">
+            <span className="mobile-menu-label">More routes</span>
+            {secondaryNavigation.map((link, index) => {
+              if (link.action === 'music') {
+                return (
+                  <button
+                    key={link.label}
+                    type="button"
+                    className="mobile-music"
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('portfolio:open-music'))
+                      closeMenu()
+                    }}
+                    style={{ '--menu-index': primaryNavigation.length + index }}
+                  >
+                    {link.label}
+                  </button>
+                )
+              }
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target={link.external ? '_blank' : undefined}
+                  rel={link.external ? 'noreferrer' : undefined}
+                  onClick={() => { if (link.href.startsWith('#')) setActive(link.href.slice(1)); closeMenu() }}
+                  style={{ '--menu-index': primaryNavigation.length + index }}
+                >
+                  {link.label}
+                </a>
+              )
+            })}
+          </div>
           <div className="mobile-menu-actions">
+            <ThemeSelector className="theme-selector-mobile" />
             <a className="mobile-contact" href={`mailto:${profile.email}`} onClick={closeMenu}>Start a conversation</a>
             <button
               type="button"
@@ -200,16 +258,6 @@ const Navbar = () => {
               }}
             >
               Search sections and actions
-            </button>
-            <button
-              type="button"
-              className="mobile-music"
-              onClick={() => {
-                window.dispatchEvent(new CustomEvent('portfolio:open-music'))
-                closeMenu()
-              }}
-            >
-              Open music player
             </button>
           </div>
         </nav>

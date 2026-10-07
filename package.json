@@ -10,13 +10,14 @@
     "dev": "vite",
     "build": "vite build",
     "test": "node --test && python3 -m unittest discover -s tests -p 'test_*.py'",
-    "test:e2e": "playwright test tests/e2e/portfolio-ai-systems.spec.js",
+    "test:e2e": "playwright test",
     "preview": "vite preview",
     "deploy": "npx vercel build --prod && npx vercel deploy --prebuilt --prod"
   },
   "dependencies": {
     "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.108.2",
+    "ai": "^7.0.128",
     "howler": "^2.2.4",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",

@@ -1,0 +1,607 @@
+/* Theme tokens are deliberately semantic. Legacy ink/mint aliases remain for
+   authored game art and the ink-backed hero renderer. */
+:root,
+:root[data-theme='light'] {
+  --surface-page: #f3f0e9;
+  --surface-card: #fffdfa;
+  --text-primary: #0b2528;
+  --text-muted: #56696a;
+  --border-ui: #8b9c99;
+  --border-control: #536c66;
+  --accent-action: #0b6b58;
+  --on-accent: #fffdfa;
+  --focus-ring: #0b6b58;
+  --scrim: rgb(0 0 0 / .55);
+  --surface-contact: #67e0c1;
+  --text-on-contact: #0b2528;
+  --status-error: #8f2f26;
+  --status-error-surface: #fff1ee;
+  --status-success: #08644f;
+  --status-success-surface: #e4f5ec;
+  --status-warning: #75521c;
+  --status-warning-surface: #fcf0d9;
+  --accent-coral: #b24e30;
+  --surface-ink: #0b2528;
+  --text-on-ink: #f3f0e9;
+  --text-on-ink-muted: #bacbc7;
+  --shadow-theme: 0 24px 70px rgb(7 30 32 / .13);
+}
+
+:root[data-theme='dark'] {
+  --surface-page: #0b2024;
+  --surface-card: #163236;
+  --text-primary: #f3f0e9;
+  --text-muted: #bacbc7;
+  --border-ui: #688580;
+  --border-control: #8fb9af;
+  --accent-action: #67e0c1;
+  --on-accent: #0b2528;
+  --focus-ring: #67e0c1;
+  --scrim: rgb(0 0 0 / .65);
+  --surface-contact: #163236;
+  --text-on-contact: #f3f0e9;
+  --status-error: #f07366;
+  --status-error-surface: #3a2528;
+  --status-success: #9be7c2;
+  --status-success-surface: #173e37;
+  --status-warning: #f4c98a;
+  --status-warning-surface: #49391f;
+  --accent-coral: #ff9c77;
+  --surface-ink: #0b2024;
+  --text-on-ink: #f3f0e9;
+  --text-on-ink-muted: #bacbc7;
+  --shadow-theme: 0 24px 70px rgb(0 0 0 / .32);
+  --slate: #bacbc7;
+  --mist: #bacbc7;
+}
+
+html,
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+}
+
+:focus-visible {
+  outline-color: var(--focus-ring);
+}
+
+/* The hero's graph and portrait remain an authored ink island in Light mode;
+   its copy uses the existing paper/mint treatment while other surfaces adapt. */
+.section-light,
+.section-paper,
+.ai-systems-section,
+.projects-section,
+.credentials-section {
+  color: var(--text-primary);
+}
+
+.section-light .text-ink,
+.section-paper .text-ink,
+.section-light .text-slate,
+.section-paper .text-slate,
+.ai-systems-section .text-ink,
+.projects-section .text-ink,
+.credentials-section .text-ink {
+  color: var(--text-primary);
+}
+
+.section-light .text-slate,
+.section-paper .text-slate,
+.ai-systems-section .text-slate,
+.projects-section .text-slate,
+.credentials-section .text-slate {
+  color: var(--text-muted);
+}
+
+.section-light,
+.credentials-section {
+  background: var(--surface-card);
+}
+
+.section-paper,
+.ai-systems-section,
+.projects-section {
+  background-color: var(--surface-page);
+}
+
+.section-dark,
+.footer {
+  background-color: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+
+.fit-card,
+.project-card,
+.project-showcase,
+.project-tabs,
+.certificate-image-card,
+.foundation-card,
+.ai-capability,
+.momentum-card,
+.contact-form {
+  background: var(--surface-card);
+  border-color: var(--border-control);
+  color: var(--text-primary);
+}
+
+.fit-card:hover,
+.project-card:hover,
+.ai-capability:hover,
+.momentum-card:hover {
+  box-shadow: var(--shadow-theme);
+}
+
+.fit-card > span,
+.archive-private,
+.project-links > span,
+.credential-record code {
+  color: var(--text-muted);
+}
+
+.fit-card p,
+.about-copy,
+.ai-systems-intro-copy > p,
+.momentum-summary,
+.project-overview,
+.certificate-gallery-heading > p,
+.credential-item small,
+.credential-record small,
+.project-archive-heading > p,
+.archive-project > div > span {
+  color: var(--text-muted);
+}
+
+.text-link,
+.project-links a,
+.certificate-gallery-heading h3,
+.project-story-heading h3,
+.certificate-image-copy strong,
+.credential-record strong,
+.credential-item strong {
+  color: var(--text-primary);
+}
+
+.foundation-card-primary,
+.project-story-grid .project-result,
+.lab-launch-card {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+
+.foundation-card-primary > p:last-child,
+.foundation-card-primary .foundation-place,
+.lab-launch-card > p:not(.eyebrow) {
+  color: var(--text-on-ink-muted);
+}
+
+.project-story-grid > div,
+.project-media-pending {
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+.certificate-image-frame {
+  background: color-mix(in srgb, var(--surface-page) 82%, var(--surface-card));
+}
+
+.certificate-view {
+  border-color: var(--border-control);
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+
+.project-story-grid p,
+.project-media-pending > span {
+  color: var(--text-muted);
+}
+
+.lab-game-row {
+  color: var(--text-primary);
+}
+
+.lab-game-row:hover {
+  background: color-mix(in srgb, var(--accent-action) 9%, var(--surface-page));
+}
+
+.text-link { border-color: var(--border-control); }
+.text-link:hover,
+.project-links a:hover,
+.ai-systems-intro-copy > a,
+.momentum-demo-link { color: var(--accent-action); }
+
+.navbar.is-scrolled {
+  border-color: var(--border-ui);
+  background: var(--surface-ink);
+}
+
+/* Light mode keeps the connected-systems renderer as an ink-backed visual
+   island, while the surrounding hero copy and proof surfaces use the warm
+   paper tokens. */
+:root[data-theme='light'] .hero-section {
+  background: var(--surface-page);
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .hero-grid {
+  opacity: .18;
+  background-image:
+    linear-gradient(rgb(11 37 40 / .08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(11 37 40 / .08) 1px, transparent 1px);
+}
+
+:root[data-theme='light'] .hero-orbit {
+  border-color: color-mix(in srgb, var(--accent-action) 22%, transparent);
+}
+
+:root[data-theme='light'] .availability-pill {
+  border-color: color-mix(in srgb, var(--accent-action) 55%, transparent);
+  background: color-mix(in srgb, var(--accent-action) 10%, transparent);
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .status-dot {
+  background: var(--accent-action);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent-action) 14%, transparent);
+}
+
+:root[data-theme='light'] .status-dot::after {
+  border-color: var(--accent-action);
+}
+
+:root[data-theme='light'] .hero-kicker,
+:root[data-theme='light'] .rotating-title-value {
+  color: var(--accent-coral);
+}
+
+:root[data-theme='light'] .rotating-title-label {
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .hero-copy h1 .hero-line-primary,
+:root[data-theme='light'] .rotating-title,
+:root[data-theme='light'] .button-secondary,
+:root[data-theme='light'] .button-quiet {
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .hero-copy h1 .hero-line-accent {
+  color: var(--accent-action);
+}
+
+:root[data-theme='light'] .hero-intro {
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .button-primary {
+  background: var(--accent-action);
+  color: var(--on-accent);
+  box-shadow: 0 14px 35px color-mix(in srgb, var(--accent-action) 18%, transparent);
+}
+
+:root[data-theme='light'] .button-primary:hover {
+  background: #095c4d;
+}
+
+:root[data-theme='light'] .button-secondary {
+  border-color: var(--border-control);
+}
+
+:root[data-theme='light'] .button-secondary:hover,
+:root[data-theme='light'] .button-quiet:hover {
+  border-color: var(--accent-action);
+  background: color-mix(in srgb, var(--accent-action) 9%, transparent);
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .hero-socials {
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .hero-socials > a {
+  border-color: var(--border-control);
+}
+
+:root[data-theme='light'] .hero-socials > a:hover {
+  color: var(--accent-action);
+}
+
+:root[data-theme='light'] .ai-hero-ribbon {
+  border-color: var(--border-control);
+}
+
+:root[data-theme='light'] .ai-hero-ribbon > a {
+  color: var(--accent-action);
+}
+
+:root[data-theme='light'] .ai-hero-ribbon ul,
+:root[data-theme='light'] .proof-strip span {
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .proof-strip {
+  border-color: var(--border-control);
+}
+
+:root[data-theme='light'] .proof-strip > div + div {
+  border-color: var(--border-control);
+}
+
+:root[data-theme='light'] .proof-strip strong {
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .navbar:not(.is-scrolled) .wordmark,
+:root[data-theme='light'] .navbar:not(.is-scrolled) .desktop-nav a,
+:root[data-theme='light'] .navbar:not(.is-scrolled) .nav-search,
+:root[data-theme='light'] .navbar:not(.is-scrolled) .nav-cta,
+:root[data-theme='light'] .navbar:not(.is-scrolled) .theme-selector {
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .navbar:not(.is-scrolled) .menu-toggle {
+  border-color: var(--border-control);
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+:root[data-theme='light'] .navbar:not(.is-scrolled) .nav-search,
+:root[data-theme='light'] .navbar:not(.is-scrolled) .nav-cta {
+  border-color: var(--border-control);
+}
+
+:root[data-theme='light'] .navbar:not(.is-scrolled) .nav-search {
+  background: color-mix(in srgb, var(--surface-card) 80%, transparent);
+}
+
+:root[data-theme='light'] .navbar:not(.is-scrolled) .nav-search kbd {
+  border-color: var(--border-control);
+  color: var(--text-muted);
+}
+
+:root[data-theme='light'] .navbar:not(.is-scrolled) .wordmark-mark {
+  border-color: var(--accent-action);
+  color: var(--accent-action);
+}
+
+:root[data-theme='light'] .navbar:not(.is-scrolled) .desktop-nav a:hover,
+:root[data-theme='light'] .navbar:not(.is-scrolled) .desktop-nav a.active {
+  color: var(--accent-action);
+}
+
+.nav-actions {
+  margin-left: 16px;
+}
+
+.theme-selector {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  color: var(--paper);
+  font-size: .7rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.theme-selector > span {
+  letter-spacing: .02em;
+}
+
+.theme-selector select {
+  min-height: 44px;
+  padding: 8px 30px 8px 10px;
+  border: 1px solid var(--border-control);
+  border-radius: 999px;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.theme-selector select:hover {
+  border-color: var(--accent-action);
+}
+
+.theme-selector-mobile {
+  width: 100%;
+  justify-content: space-between;
+  color: var(--paper);
+}
+
+.theme-selector-mobile select {
+  min-width: 132px;
+}
+
+.contact-section {
+  background: var(--surface-contact);
+  color: var(--text-on-contact);
+}
+
+.contact-section .eyebrow,
+.contact-copy h2,
+.contact-email,
+.contact-details,
+.contact-copy > p:nth-of-type(2) {
+  color: var(--text-on-contact);
+}
+
+.contact-email {
+  border-color: color-mix(in srgb, var(--text-on-contact) 60%, transparent);
+}
+
+.contact-form {
+  box-shadow: var(--shadow-theme);
+}
+
+.contact-form label > span {
+  color: var(--text-primary);
+}
+
+.contact-form input,
+.contact-form textarea {
+  border-color: var(--border-control);
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: var(--accent-action);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-action) 24%, transparent);
+}
+
+.contact-form [aria-invalid='true'] {
+  border-color: var(--status-error);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--status-error) 18%, transparent);
+}
+
+.field-error,
+.form-status.error,
+.credential-record .credential-expired {
+  color: var(--status-error);
+}
+
+.form-status.success,
+.system-status-live {
+  color: var(--status-success);
+}
+
+.system-status-live {
+  background: var(--status-success-surface);
+  border-color: var(--status-success);
+}
+
+.system-status-prototype {
+  color: var(--status-warning);
+  background: var(--status-warning-surface);
+  border-color: var(--status-warning);
+}
+
+.palette-backdrop {
+  background: var(--scrim);
+}
+
+.palette,
+.update-banner,
+.music-player-pill,
+.music-player-panel {
+  border-color: var(--border-control) !important;
+  background: var(--surface-card) !important;
+  color: var(--text-primary);
+}
+
+.palette-search,
+.palette-footer {
+  border-color: var(--border-ui);
+  color: var(--text-muted);
+}
+
+.palette-search input {
+  color: var(--text-primary);
+}
+
+.palette-search input::placeholder,
+.palette-results li small,
+.palette-footer {
+  color: var(--text-muted);
+}
+
+.palette-search kbd,
+.palette-footer kbd {
+  border-color: var(--border-control);
+  color: var(--text-muted);
+}
+
+.palette-results li {
+  color: var(--text-primary);
+}
+
+.palette-results li.is-active {
+  background: color-mix(in srgb, var(--accent-action) 18%, transparent);
+  color: var(--text-primary);
+}
+
+.palette-results li.is-active small {
+  color: var(--text-primary);
+}
+
+.music-player-pill .text-gray-200,
+.music-player-pill .text-gray-300,
+.music-player-panel .text-gray-200,
+.music-player-panel .text-gray-300,
+.music-player-panel .text-gray-400 {
+  color: var(--text-muted) !important;
+}
+
+.music-player-pill .text-white,
+.music-player-panel .text-white {
+  color: var(--text-primary) !important;
+}
+
+.music-player-pill button:hover,
+.music-player-panel button:hover {
+  color: var(--accent-action) !important;
+}
+
+.music-playlist-option {
+  border-color: var(--border-control) !important;
+  background: var(--surface-page) !important;
+  color: var(--text-primary) !important;
+}
+
+.music-player-panel .music-playlist-option.is-selected,
+.music-player-panel .music-playlist-option:hover {
+  border-color: var(--accent-action) !important;
+  background: var(--accent-action) !important;
+  color: var(--on-accent) !important;
+}
+
+.update-banner-apply {
+  background: var(--accent-action);
+  color: var(--on-accent);
+}
+
+.update-banner-apply:hover {
+  background: var(--accent-action);
+  color: var(--on-accent);
+}
+
+.update-banner-dismiss {
+  color: var(--text-muted);
+}
+
+.update-banner-dismiss:hover {
+  background: var(--accent-action);
+  color: var(--on-accent);
+}
+
+@media (max-width: 860px) {
+  .navbar.is-scrolled,
+  .mobile-menu {
+    background: var(--surface-ink);
+  }
+
+  :root[data-theme='light'] .navbar:not(.is-scrolled) .mobile-menu .theme-selector-mobile {
+    color: var(--paper);
+  }
+
+  .mobile-menu-actions .theme-selector {
+    order: -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-selector select,
+  .navbar,
+  .palette,
+  .contact-form {
+    transition: none;
+  }
+}

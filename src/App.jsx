@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import About from './components/About'
 import Experience from './components/Experience'
+import MomentumShowcase from './components/MomentumShowcase'
 import AISystems from './components/AISystems'
 import Projects from './components/Projects'
 import Skills from './components/Skills'
@@ -27,6 +28,8 @@ function App() {
   const musicButtonRef = useRef(null)
   const progressRef = useRef(null)
   const showTopRef = useRef(false)
+  const paletteOpenTimerRef = useRef(null)
+  const labOpenRef = useRef(false)
 
   useEffect(() => {
     // scrollHeight is a layout-forcing read, so it is measured once per resize
@@ -85,7 +88,10 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const openMusic = () => setMusicOpen(true)
+    const openMusic = () => {
+      setPaletteOpen(false)
+      setMusicOpen(true)
+    }
     window.addEventListener('portfolio:open-music', openMusic)
     document.body.classList.toggle('music-open', musicOpen)
     return () => {
@@ -115,20 +121,103 @@ function App() {
     // 'instant' overrides the smooth scroll-behavior on <html>: a page-length
     // smooth scroll on arrival is disorienting, and it fights the second pass.
     const jump = () => target.scrollIntoView({ block: 'start', behavior: 'instant' })
-    jump()
-    const frame = window.requestAnimationFrame(jump)
-    const settle = window.setTimeout(jump, 400)
-
-    return () => {
-      window.cancelAnimationFrame(frame)
-      window.clearTimeout(settle)
+    let frame = null
+    let settle = null
+    let pending = true
+    const intentEvents = [
+      ['pointerdown', { capture: true }],
+      ['wheel', { capture: true, passive: true }],
+      ['touchstart', { capture: true, passive: true }],
+      ['keydown', { capture: true }],
+    ]
+    const removeIntentListeners = () => {
+      for (const [type, options] of intentEvents) window.removeEventListener(type, cancelPending, options)
     }
+    const cancelPending = () => {
+      if (!pending) return
+      pending = false
+      if (frame !== null) {
+        window.cancelAnimationFrame(frame)
+        frame = null
+      }
+      if (settle !== null) {
+        window.clearTimeout(settle)
+        settle = null
+      }
+      removeIntentListeners()
+    }
+    const onSettle = () => {
+      settle = null
+      if (!pending) return
+      jump()
+      pending = false
+      removeIntentListeners()
+    }
+
+    for (const [type, options] of intentEvents) window.addEventListener(type, cancelPending, options)
+    jump()
+    frame = window.requestAnimationFrame(() => {
+      frame = null
+      if (pending) jump()
+    })
+    settle = window.setTimeout(onSettle, 400)
+
+    return cancelPending
   }, [])
 
   const closePalette = useCallback(() => setPaletteOpen(false), [])
 
   useEffect(() => {
-    const openPalette = () => setPaletteOpen(true)
+    const cancelPaletteTimer = () => {
+      if (paletteOpenTimerRef.current === null) return
+      window.clearTimeout(paletteOpenTimerRef.current)
+      paletteOpenTimerRef.current = null
+    }
+
+    const openPalette = (event) => {
+      const toggle = event?.detail?.toggle === true
+      const labOwnsFocus = labOpenRef.current || document.body.classList.contains('game-open')
+      if (labOwnsFocus) {
+        cancelPaletteTimer()
+        setMusicOpen(false)
+        setPaletteOpen(false)
+        return
+      }
+
+      const takePaletteFocus = () => {
+        paletteOpenTimerRef.current = null
+        if (labOpenRef.current || document.body.classList.contains('game-open')) {
+          setMusicOpen(false)
+          setPaletteOpen(false)
+          return
+        }
+        setMusicOpen(false)
+        setPaletteOpen((value) => (toggle ? !value : true))
+      }
+
+      // Detail and menu owners release focus/inertness in their cleanup. Wait
+      // one task before mounting the palette so its input never captures focus
+      // while either owner is still active.
+      const anotherOverlayOwnsFocus = document.querySelector('dialog.portfolio-dialog[open]')
+        || document.body.classList.contains('menu-open')
+      if (anotherOverlayOwnsFocus) {
+        cancelPaletteTimer()
+        paletteOpenTimerRef.current = window.setTimeout(takePaletteFocus, 0)
+      } else {
+        takePaletteFocus()
+      }
+    }
+
+    const closeCompetingOverlays = () => {
+      cancelPaletteTimer()
+      setMusicOpen(false)
+      setPaletteOpen(false)
+    }
+    const onLabOpen = () => {
+      labOpenRef.current = true
+      closeCompetingOverlays()
+    }
+    const onLabClose = () => { labOpenRef.current = false }
 
     const onKeyDown = (event) => {
       // ⌘K on macOS, Ctrl+K elsewhere. Both are claimed by the browser's
@@ -141,20 +230,29 @@ function App() {
 
       if (isShortcut) {
         event.preventDefault()
-        setPaletteOpen((value) => !value)
+        window.dispatchEvent(new CustomEvent('portfolio:open-palette', { detail: { toggle: true } }))
         return
       }
       if (event.key === '/' && !typing && !event.metaKey && !event.ctrlKey && !event.altKey) {
         event.preventDefault()
-        setPaletteOpen(true)
+        window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('portfolio:open-palette', openPalette)
+    window.addEventListener('portfolio:detail-open', closeCompetingOverlays)
+    window.addEventListener('portfolio:open-games', closeCompetingOverlays)
+    window.addEventListener('portfolio:lab-open', onLabOpen)
+    window.addEventListener('portfolio:lab-close', onLabClose)
     return () => {
+      cancelPaletteTimer()
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('portfolio:open-palette', openPalette)
+      window.removeEventListener('portfolio:detail-open', closeCompetingOverlays)
+      window.removeEventListener('portfolio:open-games', closeCompetingOverlays)
+      window.removeEventListener('portfolio:lab-open', onLabOpen)
+      window.removeEventListener('portfolio:lab-close', onLabClose)
     }
   }, [])
 
@@ -165,9 +263,10 @@ function App() {
       <Navbar />
       <main id="main-content">
         <Hero />
+        <MomentumShowcase />
+        <AISystems />
         <About />
         <Experience />
-        <AISystems />
         <Projects />
         <Skills />
         <Education />

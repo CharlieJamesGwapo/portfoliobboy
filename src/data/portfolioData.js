@@ -34,6 +34,26 @@ export const navigation = [
   { label: 'Contact', href: '#contact' },
 ]
 
+// Presentation navigation is intentionally separate from the original full
+// navigation above. The archive, command palette, and data-preservation tests
+// still consume `navigation` as the complete section inventory.
+export const primaryNavigation = [
+  { label: 'Work', href: '#momentum-work' },
+  { label: 'Services', href: '#ai-systems' },
+  { label: 'About', href: '#about' },
+  { label: 'Credentials', href: '#education' },
+  { label: 'Contact', href: '#contact' },
+]
+
+export const secondaryNavigation = [
+  { label: 'Experience', href: '#experience' },
+  { label: 'Projects', href: '#projects' },
+  { label: 'Skills', href: '#skills' },
+  { label: 'Interactive Lab', href: '#lab' },
+  { label: 'View resume', href: resumeUrl, external: true },
+  { label: 'Open music player', action: 'music' },
+]
+
 export const proofPoints = [
   { value: '17+', label: 'Genuine products and client builds', numericValue: 17, suffix: '+' },
   { value: '5+', label: 'Years building and shipping software', numericValue: 5, suffix: '+' },

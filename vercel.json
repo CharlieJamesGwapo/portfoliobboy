@@ -4,6 +4,10 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "functions": {
+    "api/portfolio-chat.js": {
+      "maxDuration": 10,
+      "supportsCancellation": true
+    },
     "api/*.js": {
       "maxDuration": 10
     }
