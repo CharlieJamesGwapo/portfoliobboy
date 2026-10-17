@@ -27,6 +27,7 @@ export const professionalTitles = [
 export const navigation = [
   { label: 'About', href: '#about' },
   { label: 'Experience', href: '#experience' },
+  { label: 'Live', href: '#live-projects' },
   { label: 'Projects', href: '#projects' },
   { label: 'Skills', href: '#skills' },
   { label: 'Credentials', href: '#education' },
@@ -378,6 +379,10 @@ export const experiences = [
       'Ship daily with Claude Code using repo-level instructions, custom agents, skills, and GitHub, Linear, and Supabase MCP integrations.',
     ],
     stack: ['Next.js 16', 'React 19', 'TypeScript', 'Encore.ts', 'PostgreSQL', 'LiveKit', 'Twilio', 'n8n', 'Expo', 'Python'],
+    links: [
+      { label: 'zalio.ai', url: 'https://zalio.ai/' },
+      { label: 'hasti.com.au — live Alex demo', url: 'https://hasti.com.au/' },
+    ],
   },
   {
     role: 'Full-Stack Developer',
@@ -395,7 +400,7 @@ export const experiences = [
   },
   {
     role: 'Full-Stack Developer',
-    company: 'Robustech IT / SocietyOne',
+    company: 'Australian Fintech · Lending Platform',
     location: 'Australia · Remote',
     period: 'Jan 2024 – Dec 2025',
     summary:
@@ -458,6 +463,7 @@ export const experiences = [
       'Deployed a Go API backed by Neon serverless Postgres.',
     ],
     stack: ['Go', 'Next.js', 'Vue.js', 'WebSockets', 'Webhooks', 'Neon Postgres'],
+    links: [{ label: 'ecyclehub.vercel.app', url: 'https://ecyclehub.vercel.app/' }],
   },
   {
     role: 'Mobile Developer',
@@ -548,9 +554,9 @@ export const featuredProjects = [
     private: true,
   },
   {
-    id: 'societyone',
+    id: 'fintech-lending',
     categories: ['Backend', 'API', 'Fintech'],
-    title: 'SocietyOne Platform Modernization',
+    title: 'Fintech Lending Platform Modernization',
     eyebrow: 'Jan 2024 – Dec 2025 · Regulated fintech · Australia',
     overview: 'Regulated platform migration spanning Go and Node.js services, .NET standardization, AWS Lambda workflows, and partner-system integrations.',
     context: 'A major data and platform migration for a regulated Australian fintech product.',
@@ -633,9 +639,13 @@ export const projectArchive = [
   { title: 'Vince Lloyd Portfolio', type: 'Client portfolio', categories: ['Full Stack'], description: 'Professional portfolio designed to present a client’s work and profile across device sizes.', stack: ['HTML', 'CSS', 'JavaScript'], url: 'https://vincelloyd.netlify.app/' },
   { title: 'Laarni Portfolio', type: 'Client portfolio', categories: ['Full Stack'], description: 'Clean, responsive personal portfolio centered on readable content and accessible navigation.', stack: ['HTML', 'CSS', 'JavaScript'], url: 'https://laarni.netlify.app/' },
   { title: 'Librewry Bistro POS', type: 'Operations product', categories: ['SaaS', 'Full Stack'], description: 'Café POS for order management, inventory tracking, sales analytics, and role-aware access.', stack: ['PHP', 'MySQL', 'JavaScript'], private: true },
+  { title: 'Advanced E-commerce Traffic Filtering System', type: 'Security prototype', categories: ['Security', 'Backend'], description: 'Layered traffic-filtering prototype to identify suspicious automated requests using Cloudflare WAF rules, IP/ASN analysis, bot detection, and managed challenges, reducing false positives while preserving legitimate traffic and conversions.', stack: ['Cloudflare WAF', 'Bot detection', 'IP / ASN analysis', 'Managed challenges'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
+  { title: 'AI-Powered Bot Traffic Detection', type: 'AI / ML security', categories: ['AI', 'Security'], description: 'Python anomaly-detection analysis of web traffic logs covering request frequency, user-agent patterns, and unusual browsing behaviour, with generated detection reports.', stack: ['Python', 'Anomaly detection', 'Traffic log analysis'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
+  { title: 'Web Security Monitoring Dashboard', type: 'Security tooling', categories: ['Security', 'Full Stack'], description: 'Monitors suspicious requests, IP addresses, and traffic patterns with alerting workflows and documented test scenarios to measure detection accuracy.', stack: ['Monitoring', 'Alerting', 'Traffic analysis'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
+  { title: 'Shopify & Cloudflare anti-bot development', type: 'E-commerce security', categories: ['Security', 'Full Stack'], description: 'Custom Shopify solutions and Cloudflare-based anti-bot protections for e-commerce storefronts.', stack: ['Shopify', 'Cloudflare', 'Anti-bot'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
 ]
 
-export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'API', 'Fintech', 'CRM']
+export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'API', 'Fintech', 'CRM', 'Security']
 
 export const skillGroups = [
   {
@@ -816,3 +826,40 @@ export const recognitions = [
   { title: "Dean's Lister — 2nd and 3rd Year, Ranked 2", issuer: 'MOIST', kind: 'Academic recognition' },
   { title: 'TOPCIT — Test of Practical Competency in IT', issuer: 'TOPCIT', kind: '2024–2025 participant' },
 ]
+
+export const liveLinks = [
+  { id: 'alex-demo', title: 'Alex — AI Voice Agent demo', url: 'https://hasti.com.au/', label: 'Talk to Alex', kind: 'AI voice demo', description: 'Request a callback and talk to the live AI voice agent (LiveKit + GPT-Live over Twilio SIP).' },
+  { id: 'hasti', title: 'Hasti — AI reception & speed-to-lead', url: 'https://hasti.com.au/', label: 'Visit hasti.com.au', kind: 'Product', description: 'A lead-response experience combining a live AI receptionist demonstration with enquiry capture, qualification, routing, and follow-up workflows.' },
+  { id: 'zalio', title: 'Zalio — gym CRM & operations platform', url: 'https://zalio.ai/', label: 'Visit zalio.ai', kind: 'Product', description: 'A modular gym operations platform spanning CRM, member retention, campaigns, membership workflows, and analytics.' },
+  { id: 'gymfactories', title: 'Gym Factories', url: 'https://gymfactories.com/', label: 'Visit gymfactories.com', kind: 'Product', description: 'An evidence-led directory and gym-planning product for equipment research, manufacturer discovery, space planning, and supplier enquiries.' },
+  { id: 'momentum-strength', title: 'Momentum Strength', url: 'https://momentum-strength.vercel.app/', label: 'Open Momentum Strength', kind: 'Web app', description: 'A commercial gym-equipment experience that combines product discovery with an interactive 3D configuration direction.' },
+  { id: 'hsie', title: 'HSIE Site Scoring', url: 'https://health-dev-three.vercel.app/', label: 'Open HSIE Site Scoring', kind: 'Web app', description: 'A structured property and acquisition scoring workspace covering site quality, red flags, and evidence-backed review.' },
+  { id: 'omji', title: 'One Ride Balingasag (OMJI)', url: 'https://play.google.com/store/apps/details?id=com.oneridebalingasag.app&hl=en', label: 'Get it on Google Play', kind: 'Mobile app', description: 'A unified ride-hailing, delivery, pickup, and local-store platform built for everyday transport and errands in Balingasag.' },
+  { id: 'ecycle', title: 'E-Cycle Hub', url: 'https://ecyclehub.vercel.app/', label: 'Open E-Cycle Hub', kind: 'Web app', description: 'Waste-pickup scheduling with real-time updates, webhook integrations, and a Go API on serverless Postgres.' },
+  { id: 'g2-pos', title: 'G2 POS System', url: 'https://g2possystem.vercel.app/landing', label: 'Open G2 POS', kind: 'Web app', description: 'Point-of-sale dashboard for order processing, sales tracking, inventory, and operational reporting.' },
+  { id: 'reflecticss', title: 'ReflectiCSS', url: 'https://reflecticss.vercel.app/', label: 'Open ReflectiCSS', kind: 'Web app', description: 'Interactive interface for exploring and generating CSS styles.' },
+  { id: 'study-pulse', title: 'Study Pulse', url: 'https://study-pulse-ten.vercel.app/', label: 'Open Study Pulse', kind: 'Web app', description: 'Study planning and progress-tracking experience for organizing sessions and reviewing performance.' },
+  { id: 'shayne-dr', title: 'Shayne & DR', url: 'https://shayneanddr.netlify.app/', label: 'Visit site', kind: 'Client site', description: 'Custom client website with responsive layout and modern UI presentation.' },
+  { id: 'vince-lloyd', title: 'Vince Lloyd Portfolio', url: 'https://vincelloyd.netlify.app/', label: 'Visit site', kind: 'Client site', description: 'Professional portfolio presenting a client’s work and profile across device sizes.' },
+  { id: 'laarni', title: 'Laarni Portfolio', url: 'https://laarni.netlify.app/', label: 'Visit site', kind: 'Client site', description: 'Clean, responsive personal portfolio centered on readable content and accessible navigation.' },
+]
+
+export const voiceCallFlow = {
+  title: 'Anatomy of a real Alex call',
+  note: 'Signalling timeline from a real outbound test call, with phone numbers, IP addresses and credentials removed.',
+  parties: ['Alex (LiveKit SIP)', 'Twilio SIP trunk', 'Phone network'],
+  steps: [
+    { t: '0.0 s', from: 0, to: 1, label: 'INVITE', detail: 'Alex offers G.722 HD, PCMU and PCMA audio' },
+    { t: '0.0 s', from: 1, to: 0, label: '100 Trying', detail: 'Twilio accepts the call for routing' },
+    { t: '5.3 s', from: 1, to: 0, label: '180 Ringing', detail: 'The callee’s phone is ringing' },
+    { t: '15.3 s', from: 1, to: 0, label: '200 OK', detail: 'Answered — PCMU (G.711) negotiated' },
+    { t: '15.7 s', from: 0, to: 1, label: 'ACK', detail: 'Media starts; Alex opens with a researched question' },
+    { t: '15.7–100 s', from: 0, to: 2, label: 'Conversation', detail: '~84 s live AI conversation, transcribed and reviewed after the call' },
+    { t: '100.0 s', from: 2, to: 0, label: 'BYE', detail: 'Callee hangs up; Alex closes its leg and logs the outcome' },
+  ],
+  stats: [
+    { value: '15.3 s', label: 'ring to answer' },
+    { value: '~84 s', label: 'AI conversation' },
+    { value: 'G.722 → G.711', label: 'codec negotiation' },
+  ],
+}

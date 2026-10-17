@@ -1,0 +1,118 @@
+/* Live projects: dark band right after the hero. Desktop 3-column grid; phones get compact ~72px rows. */
+.live-projects-section { background: var(--ink); color: var(--paper); padding: clamp(64px, 8vw, 112px) 0; }
+.live-projects-heading { max-width: 760px; margin-bottom: clamp(28px, 4vw, 44px); }
+.live-projects-heading h2 { margin: 14px 0 14px; font-size: clamp(2rem, 4.2vw, 3.4rem); font-weight: 620; letter-spacing: -0.05em; line-height: 1.04; }
+.live-projects-heading > p:last-child { max-width: 560px; color: var(--mist); font-size: 1rem; line-height: 1.7; }
+
+.live-feature {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'icon copy cta' 'icon copy host';
+  gap: 6px 26px;
+  align-items: center;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid rgba(103, 224, 193, 0.45);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(103, 224, 193, 0.2), transparent 45%),
+    linear-gradient(135deg, rgba(103, 224, 193, 0.1), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+.live-feature-icon { grid-area: icon; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px; background: var(--mint); color: var(--ink); }
+.live-feature-copy { grid-area: copy; min-width: 0; }
+.live-feature-copy h3 { margin: 10px 0 8px; font-size: clamp(1.4rem, 2.6vw, 2rem); letter-spacing: -0.04em; line-height: 1.15; }
+.live-feature-copy > p:last-child { max-width: 600px; color: #c9d8d5; font-size: 0.9rem; line-height: 1.65; }
+.live-feature-cta { grid-area: cta; justify-self: end; }
+.live-feature-host { grid-area: host; justify-self: end; color: var(--mist); font-size: 0.7rem; }
+
+.live-kind { display: inline-flex; align-items: center; gap: 7px; width: fit-content; padding: 3px 9px; border: 1px solid var(--line-dark); border-radius: 999px; color: var(--mist); font-size: 0.64rem; font-weight: 750; letter-spacing: 0.04em; white-space: nowrap; }
+.live-kind-accent { border-color: rgba(103, 224, 193, 0.5); color: var(--mint); }
+.live-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 0 rgba(103, 224, 193, 0.6); animation: live-pulse 2.2s ease-out infinite; }
+@keyframes live-pulse { 70%, 100% { box-shadow: 0 0 0 9px rgba(103, 224, 193, 0); } }
+
+.live-toolbar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; margin: 34px 0 18px; }
+.live-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.live-filters button { min-height: 44px; padding: 8px 16px; border: 1px solid var(--line-dark); border-radius: 999px; background: transparent; color: var(--mist); font: inherit; font-size: 0.74rem; font-weight: 700; cursor: pointer; transition: background 150ms, color 150ms, border-color 150ms; }
+.live-filters button:hover { border-color: var(--mint); color: var(--paper); }
+.live-filters button[aria-pressed='true'] { background: var(--mint); border-color: var(--mint); color: var(--ink); }
+.live-filters button:focus-visible,
+.live-card:focus-visible,
+.live-feature-cta:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+.live-toolbar > p { color: var(--mist); font-size: 0.72rem; }
+
+.live-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; list-style: none; }
+.live-toolbar + .live-grid { margin-top: 0; }
+.live-grid > li { min-width: 0; }
+.live-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 8px;
+  height: 100%;
+  min-height: 150px;
+  padding: 20px 46px 18px 20px;
+  border: 1px solid var(--line-dark);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--paper);
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+.live-card:hover { border-color: rgba(103, 224, 193, 0.6); background: rgba(103, 224, 193, 0.07); transform: translate3d(0, -2px, 0); }
+.live-card-title { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.25; }
+.live-card-desc { color: #b9c9c6; font-size: 0.78rem; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.live-card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.live-host { color: var(--mist); font-size: 0.68rem; overflow-wrap: anywhere; }
+.live-card-icon { position: absolute; top: 18px; right: 18px; color: var(--mint); transition: transform 200ms var(--ease-out); }
+.live-card:hover .live-card-icon { transform: translate3d(3px, -3px, 0); }
+
+@media (max-width: 960px) {
+  .live-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .live-projects-section.section { padding: 48px 0; }
+  .live-projects-heading { margin-bottom: 20px; }
+  .live-projects-heading h2 { margin: 10px 0 8px; font-size: 1.85rem; }
+  .live-projects-heading > p:last-child { font-size: 0.86rem; line-height: 1.55; }
+
+  .live-feature {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'copy' 'cta' 'host';
+    gap: 10px;
+    padding: 18px;
+    border-radius: 16px;
+  }
+  .live-feature-icon { display: none; }
+  .live-feature-copy h3 { margin: 8px 0 6px; font-size: 1.3rem; }
+  .live-feature-copy > p:last-child { font-size: 0.8rem; line-height: 1.55; }
+  .live-feature-cta { justify-self: stretch; }
+  .live-feature-host { justify-self: center; }
+
+  .live-toolbar { margin: 20px 0 10px; }
+  .live-filters { gap: 6px; }
+  .live-filters button { padding: 6px 13px; }
+  .live-toolbar > p { display: none; }
+
+  .live-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; margin-top: 10px; }
+  .live-card {
+    grid-template-rows: auto auto auto;
+    gap: 2px;
+    min-height: 72px;
+    padding: 10px 44px 10px 14px;
+    border-radius: 12px;
+  }
+  .live-card:hover { transform: none; }
+  .live-card-title { font-size: 0.95rem; }
+  .live-card-desc { -webkit-line-clamp: 1; font-size: 0.74rem; line-height: 1.4; }
+  .live-card-icon { top: 50%; right: 14px; margin-top: -9px; }
+  .live-card:hover .live-card-icon { transform: none; }
+  .live-kind { padding: 1px 7px; font-size: 0.6rem; }
+  .live-host { font-size: 0.64rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-pulse { animation: none; }
+  .live-card, .live-card-icon { transition: none; }
+  .live-card:hover { transform: none; }
+}

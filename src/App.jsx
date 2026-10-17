@@ -5,10 +5,12 @@ import CommandPalette from './components/CommandPalette'
 import UpdateBanner from './components/UpdateBanner'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import LiveProjects from './components/LiveProjects'
 import ProductStudioPreview from './components/ProductStudioPreview'
 import About from './components/About'
 import Experience from './components/Experience'
 import AISystems from './components/AISystems'
+import VoiceAgentDemo from './components/VoiceAgentDemo'
 import Projects from './components/Projects'
 import Skills from './components/Skills'
 import Education from './components/Education'
@@ -166,10 +168,12 @@ function App() {
       <Navbar />
       <main id="main-content">
         <Hero />
+        <LiveProjects />
         <ProductStudioPreview />
         <About />
         <Experience />
         <AISystems />
+        <VoiceAgentDemo />
         <Projects />
         <Skills />
         <Education />

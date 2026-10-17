@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, MapPin } from 'lucide-react'
+import { ArrowUpRight, ChevronDown, MapPin } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { experiences } from '../data/portfolioData'
@@ -64,6 +64,23 @@ const Experience = () => {
                   <div id={panelId} className={`experience-panel ${isExpanded ? 'is-open' : ''}`}>
                     <div className="experience-panel-inner">
                       <p className="experience-summary">{experience.summary}</p>
+                      {Array.isArray(experience.links) && experience.links.length > 0 && (
+                        <ul className="experience-links" aria-label={`Links for ${experience.company}`}>
+                          {experience.links.map((link) => (
+                            <li key={link.url}>
+                              <a
+                                href={link.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label={`${link.label} (opens in a new tab)`}
+                              >
+                                {link.label}
+                                <ArrowUpRight size={14} aria-hidden="true" />
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                       <ul id={listId} className={extraCount > 0 && !allShown ? 'is-collapsed' : ''}>
                         {experience.achievements.map((achievement, achievementIndex) => (
                           <li

@@ -15,6 +15,7 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.platypus import (
     BaseDocTemplate,
+    CondPageBreak,
     Frame,
     KeepTogether,
     PageBreak,
@@ -276,6 +277,58 @@ def certification_grid(label_text: str, items: list[tuple[str, str]]) -> list:
     return [Paragraph(label_text, LABEL), Spacer(1, 2), table, Spacer(1, 4)]
 
 
+LIVE_ITEMS = [
+    ("Alex AI voice agent", "live callback demo", "https://hasti.com.au/", "hasti.com.au"),
+    ("Hasti", "AI reception &amp; speed-to-lead", "https://hasti.com.au/", "hasti.com.au"),
+    ("Zalio", "gym CRM &amp; operations platform", "https://zalio.ai/", "zalio.ai"),
+    ("GymFactories", "gym research &amp; RFQ platform", "https://gymfactories.com/", "gymfactories.com"),
+    ("Momentum Strength", "commerce &amp; 3D product UX", "https://momentum-strength.vercel.app/", "momentum-strength.vercel.app"),
+    ("HSIE Site Scoring", "property intelligence prototype", "https://health-dev-three.vercel.app/", "health-dev-three.vercel.app"),
+    ("One Ride Balingasag (OMJI)", "Android app", "https://play.google.com/store/apps/details?id=com.oneridebalingasag.app&amp;hl=en", "Google Play"),
+    ("E-Cycle Hub", "waste-pickup scheduling", "https://ecyclehub.vercel.app/", "ecyclehub.vercel.app"),
+    ("G2 POS System", "", "https://g2possystem.vercel.app/landing", "g2possystem.vercel.app"),
+    ("ReflectiCSS", "", "https://reflecticss.vercel.app/", "reflecticss.vercel.app"),
+    ("Study Pulse", "", "https://study-pulse-ten.vercel.app/", "study-pulse-ten.vercel.app"),
+]
+
+CLIENT_SITES = [
+    ("https://shayneanddr.netlify.app/", "shayneanddr.netlify.app"),
+    ("https://vincelloyd.netlify.app/", "vincelloyd.netlify.app"),
+    ("https://laarni.netlify.app/", "laarni.netlify.app"),
+]
+
+
+def live_products() -> list:
+    cells = [
+        Paragraph(
+            f"- <b>{name}</b> - " + (f"{desc} - " if desc else "") + link(url, label),
+            CERT_ITEM,
+        )
+        for name, desc, url, label in LIVE_ITEMS
+    ]
+    if len(cells) % 2:
+        cells.append("")
+    rows = [cells[i:i + 2] for i in range(0, len(cells), 2)]
+    clients = " &nbsp;|&nbsp; ".join(link(url, label) for url, label in CLIENT_SITES)
+    rows.append([Paragraph(f"- <b>Client sites:</b> {clients}", CERT_ITEM), ""])
+    available_width = PAGE_WIDTH - 2 * MARGIN_X
+    table = Table(rows, colWidths=[available_width / 2, available_width / 2], hAlign="LEFT")
+    table.setStyle(TableStyle([
+        ("SPAN", (0, -1), (1, -1)),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (0, -1), 0),
+        ("RIGHTPADDING", (0, 0), (0, -1), 8),
+        ("LEFTPADDING", (1, 0), (1, -1), 8),
+        ("RIGHTPADDING", (1, 0), (1, -1), 0),
+        ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 1.2),
+    ]))
+    return [CondPageBreak(1.3 * inch)] + section("Live Products & Demos") + [
+        table,
+        Spacer(1, 2),
+    ]
+
+
 def footer(canvas, doc):
     canvas.saveState()
     canvas.setStrokeColor(RULE)
@@ -323,7 +376,7 @@ def build_story():
             "AI Full-Stack Engineer - Zalio · Momentum, Australia · Remote",
             "Jun 2026 – Present",
             [
-                "Building Zalio's gym CRM and operations platform, the Alex AI voice agent, and Hasti's AI reception and lead-response products across web, mobile, voice, and automation.",
+                "Building " + link("https://zalio.ai/", "zalio.ai") + " (gym CRM and operations platform), the Alex AI voice agent, and " + link("https://hasti.com.au/", "hasti.com.au") + " (AI reception and lead response) across web, mobile, voice, and automation.",
                 "Lead engineer on the Zalio CRM module (2,000+ commits): omnichannel lead inbox with SLA alerts, forms, campaigns, retention workflows, revenue/retention dashboards, and Twilio browser calling.",
                 "Built Alex, a self-hosted AI voice agent on LiveKit and GPT-Live over Twilio SIP, with evidence-grounded research calls, voicemail detection, a restart-safe call queue, and cited AI call reviews.",
                 "Designed n8n integrations with durable receipts, idempotency keys, and reconciliation linking the voice backend, CRM, GTM engine, calendar, and email.",
@@ -342,17 +395,18 @@ def build_story():
             "Python, FastAPI, Node.js, React, Next.js, Angular, PostgreSQL, Firebase, Supabase, Docker",
         ),
         experience(
-            "Full-Stack Developer - Robustech IT / SocietyOne, Australia",
+            "Full-Stack Developer - Australian Fintech · Lending Platform",
             "Jan 2024 – Dec 2025",
             [
-                "Re-platformed Go and Node.js microservices to .NET for a regulated fintech platform, standardizing logging, error handling, and deployments.",
+                "Re-platformed Go and Node.js microservices to .NET for a regulated Australian fintech lending platform, standardizing logging, error handling, and deployments.",
                 "Built Python and .NET AWS Lambda workflows for partner banking and lending integrations.",
                 "Owned JSON-RPC, WebSocket, webhook, reconciliation, reporting, and partner-feed automation with staged CI/CD and rollback support.",
             ],
             "C#/.NET, Python, Go, Node.js, AWS Lambda, PostgreSQL, REST, GraphQL, Buddy CI/CD",
         ),
-        PageBreak(),
     ])
+
+    story.extend(live_products())
 
     story.extend(section("Selected Projects"))
     story.extend([
@@ -375,6 +429,14 @@ def build_story():
             "Created a secure alumni registration, profile management, records, and administrative reporting platform with role-based access, audit trails, relational data modeling, analytics, and OTP/2FA over SMS and email.",
             "PHP, Laravel, MySQL, JavaScript, RBAC, OTP/2FA",
         ),
+        KeepTogether([
+            dated_heading("Security &amp; AI/ML Projects (personal)", "May – Jul 2026"),
+            bullet("<b>Advanced E-commerce Traffic Filtering System:</b> Cloudflare WAF rules, IP/ASN analysis, bot detection, and managed challenges tuned for low false positives."),
+            bullet("<b>AI-Powered Bot Traffic Detection:</b> Python anomaly detection over traffic logs (request frequency, user-agent patterns) with detection reports."),
+            bullet("<b>Web Security Monitoring Dashboard:</b> surfaces suspicious requests, IPs, and traffic patterns with alerting and documented test scenarios."),
+            bullet("Also built custom Shopify solutions and Cloudflare-based anti-bot protections."),
+            Spacer(1, 7),
+        ]),
         Paragraph(
             "<b>Additional projects:</b> Filtra Coffee POS, E-Cycle Hub waste-pickup scheduling, Jolly Ride, and native Android massage booking applications.",
             BODY,
@@ -419,7 +481,6 @@ def build_story():
     story.extend(certification_grid("Anthropic & AI - 11 records", anthropic_certifications))
     story.extend(certification_grid("Technical & professional - 12 records", technical_certifications))
 
-    story.extend(section("Availability"))
     availability = Table(
         [[Paragraph(
             "<b>Available for remote full-stack, backend, and mobile opportunities.</b> Flexible overlap for US and Australian business hours. Independent, detail-focused, and comfortable owning delivery from architecture through deployment, documentation, and maintenance.",
@@ -436,7 +497,7 @@ def build_story():
         ("TOPPADDING", (0, 0), (-1, -1), 7),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
     ]))
-    story.append(availability)
+    story.append(KeepTogether(section("Availability") + [availability]))
 
     return story
 
