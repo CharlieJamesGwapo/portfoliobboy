@@ -182,7 +182,6 @@ img {
 .section {
   position: relative;
   padding: clamp(88px, 10vw, 144px) 0;
-  scroll-margin-top: var(--anchor-offset);
 }
 
 .section-light {
@@ -596,48 +595,28 @@ img {
 }
 
 /*
- * The <h1> is the LCP element. Chrome does not record LCP while an element is
- * at opacity 0, so any animation-delay here is added straight onto the LCP
- * time. The lines therefore start animating immediately (no delay) and only
- * inside `motion-ready`, so the heading paints on the first frame otherwise.
+ * First paint must show the real hero. Everything here is a short (<= 400ms),
+ * delay-free settle that starts from a mostly-opaque state, so the headline,
+ * subtitle, CTAs and phone preview are all readable on the very first frame
+ * (the <h1> is the LCP element, and Chrome ignores opacity:0 text for LCP).
+ * No animation-delay: with `both` fill a delay holds the element at its
+ * `from` keyframe, which is what used to leave the screen looking empty.
+ * Gated on `motion-ready` (not set under prefers-reduced-motion, see main.jsx).
  */
 .motion-ready .hero-copy h1 .hero-line {
-  animation: hero-line-enter 520ms var(--ease-out) both;
+  animation: hero-settle 320ms var(--ease-out) backwards;
 }
 
 .hero-copy h1 .hero-line-primary { color: var(--paper); }
 .hero-copy h1 .hero-line-accent { color: var(--mint); }
-.motion-ready .hero-copy h1 .hero-line-accent { animation-delay: 60ms; }
-
-@keyframes hero-line-enter {
-  from { opacity: 0; transform: translate3d(0, 26px, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
 
 .motion-ready .hero-enter {
-  animation: hero-content-enter 460ms var(--ease-out) both;
+  animation: hero-settle 360ms var(--ease-out) backwards;
 }
 
-.motion-ready .hero-enter-1 { animation-delay: 20ms; }
-.motion-ready .hero-enter-2 { animation-delay: 60ms; }
-.motion-ready .hero-enter-5 { animation-delay: 140ms; }
-.motion-ready .hero-enter-6 { animation-delay: 180ms; }
-.motion-ready .hero-enter-7 { animation-delay: 220ms; }
-
-.motion-ready .hero-enter-visual {
-  animation-name: hero-visual-enter;
-  animation-delay: 120ms;
-  animation-duration: 620ms;
-}
-
-@keyframes hero-content-enter {
-  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+@keyframes hero-settle {
+  from { opacity: 0.72; transform: translate3d(0, 10px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
-@keyframes hero-visual-enter {
-  from { opacity: 0; transform: translate3d(30px, 0, 0) scale(0.975); }
-  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
 .hero-intro {
@@ -869,12 +848,11 @@ img {
 }
 
 .motion-ready .proof-strip > div {
-  animation: proof-enter 440ms var(--ease-out) both;
-  animation-delay: calc(240ms + var(--proof-index) * 60ms);
+  animation: proof-enter 360ms var(--ease-out) backwards;
 }
 
 @keyframes proof-enter {
-  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  from { opacity: 0.72; transform: translate3d(0, 8px, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
@@ -1580,7 +1558,6 @@ img {
 .contact-section {
   position: relative;
   padding: clamp(90px, 11vw, 150px) 0;
-  scroll-margin-top: var(--anchor-offset);
   background: var(--mint);
 }
 
@@ -1740,6 +1717,8 @@ img {
 .contact-form input,
 .contact-form textarea {
   width: 100%;
+  /* >= 16px stops iOS Safari zooming the page when a field is focused. */
+  font-size: max(16px, 1rem);
   border: 1px solid rgba(11, 37, 40, 0.16);
   border-radius: 9px;
   background: var(--white);
@@ -1777,7 +1756,7 @@ img {
 
 .field-error {
   color: #8f2f26;
-  font-size: 0.69rem;
+  font-size: 0.78rem;
   font-weight: 650;
   line-height: 1.4;
 }
@@ -3665,7 +3644,8 @@ body.game-open .music-launcher { visibility: hidden; }
   border: 0;
   background: transparent;
   color: var(--paper);
-  font-size: 0.95rem;
+  /* 16px minimum so iOS does not zoom the viewport when the palette opens. */
+  font-size: max(16px, 0.95rem);
   outline: none;
 }
 

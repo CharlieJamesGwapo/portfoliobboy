@@ -1,13 +1,18 @@
-import { Award, BadgeCheck, Eye, GraduationCap } from 'lucide-react'
+import { useState } from 'react'
+import { Award, BadgeCheck, ChevronDown, Eye, GraduationCap } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { certifications, education, recognitions } from '../data/portfolioData'
+import './education.css'
+
+// Records shown per credential panel before the mobile "Show all" toggle (CSS-only; desktop shows all).
+const MOBILE_VISIBLE_RECORDS = 4
 
 const aiCredentials = certifications.filter((credential) => credential.issuer === 'Anthropic')
 const technicalCredentials = certifications.filter((credential) => credential.issuer !== 'Anthropic')
 const certificateImages = certifications.filter((credential) => credential.image)
 
-function CredentialRecord({ credential }) {
+function CredentialRecord({ credential, extra = false }) {
   const status = credential.expired
     ? `Expired ${credential.expired}`
     : credential.expires
@@ -15,7 +20,7 @@ function CredentialRecord({ credential }) {
       : credential.kind
 
   return (
-    <li className="credential-record">
+    <li className={`credential-record ${extra ? 'is-extra' : ''}`}>
       <BadgeCheck size={17} aria-hidden="true" />
       <span>
         <strong>{credential.title}</strong>
@@ -24,6 +29,47 @@ function CredentialRecord({ credential }) {
         {credential.credentialId && <code>Credential ID {credential.credentialId}</code>}
       </span>
     </li>
+  )
+}
+
+function CredentialPanel({ id, icon: Icon, eyebrow, title, credentials, getKey, delay, variant }) {
+  const [showAll, setShowAll] = useState(false)
+  const listId = `credential-records-${id}`
+  const extraCount = Math.max(0, credentials.length - MOBILE_VISIBLE_RECORDS)
+
+  return (
+    <ScrollReveal delay={delay} variant={variant}>
+      <article className="foundation-card credential-panel">
+        <div className="credential-panel-heading">
+          <div className="foundation-icon"><Icon size={24} aria-hidden="true" /></div>
+          <div>
+            <p className="eyebrow">{eyebrow}</p>
+            <h3>{title}</h3>
+          </div>
+        </div>
+        <ul id={listId} className={`credential-records ${extraCount > 0 && !showAll ? 'is-collapsed' : ''}`}>
+          {credentials.map((credential, index) => (
+            <CredentialRecord
+              key={getKey(credential)}
+              credential={credential}
+              extra={index >= MOBILE_VISIBLE_RECORDS}
+            />
+          ))}
+        </ul>
+        {extraCount > 0 && (
+          <button
+            type="button"
+            className="credential-more"
+            aria-expanded={showAll}
+            aria-controls={listId}
+            onClick={() => setShowAll((current) => !current)}
+          >
+            {showAll ? 'Show fewer records' : `Show all ${credentials.length} records`}
+            <ChevronDown size={16} aria-hidden="true" />
+          </button>
+        )}
+      </article>
+    </ScrollReveal>
   )
 }
 
@@ -97,7 +143,7 @@ const Education = () => (
                   alt={`${credential.title} certificate issued by ${credential.issuer} to Charlie James Abejo`}
                   width="900"
                   height="696"
-                  sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 22vw"
+                  sizes="(max-width: 768px) 46vw, (max-width: 1024px) 30vw, 22vw"
                   loading="lazy"
                   decoding="async"
                 />
@@ -113,35 +159,25 @@ const Education = () => (
       </div>
 
       <div className="credential-columns">
-        <ScrollReveal variant="left">
-          <article className="foundation-card credential-panel">
-            <div className="credential-panel-heading">
-              <div className="foundation-icon"><Award size={24} aria-hidden="true" /></div>
-              <div>
-                <p className="eyebrow">AI & Anthropic</p>
-                <h3>{aiCredentials.length} verified learning records</h3>
-              </div>
-            </div>
-            <ul className="credential-records">
-              {aiCredentials.map((credential) => <CredentialRecord key={`${credential.title}-${credential.credentialId || credential.issuer}`} credential={credential} />)}
-            </ul>
-          </article>
-        </ScrollReveal>
-
-        <ScrollReveal delay={80} variant="right">
-          <article className="foundation-card credential-panel">
-            <div className="credential-panel-heading">
-              <div className="foundation-icon"><BadgeCheck size={24} aria-hidden="true" /></div>
-              <div>
-                <p className="eyebrow">Technical & professional</p>
-                <h3>{technicalCredentials.length} certifications and training records</h3>
-              </div>
-            </div>
-            <ul className="credential-records">
-              {technicalCredentials.map((credential) => <CredentialRecord key={`${credential.title}-${credential.issuer}`} credential={credential} />)}
-            </ul>
-          </article>
-        </ScrollReveal>
+        <CredentialPanel
+          id="ai"
+          icon={Award}
+          eyebrow="AI & Anthropic"
+          title={`${aiCredentials.length} verified learning records`}
+          credentials={aiCredentials}
+          getKey={(credential) => `${credential.title}-${credential.credentialId || credential.issuer}`}
+          variant="left"
+        />
+        <CredentialPanel
+          id="technical"
+          icon={BadgeCheck}
+          eyebrow="Technical & professional"
+          title={`${technicalCredentials.length} certifications and training records`}
+          credentials={technicalCredentials}
+          getKey={(credential) => `${credential.title}-${credential.issuer}`}
+          delay={80}
+          variant="right"
+        />
       </div>
     </div>
   </section>

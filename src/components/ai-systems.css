@@ -25,7 +25,7 @@
 .ai-delivery-note strong { font-size: .9rem; }
 .ai-delivery-note p { margin-top: 5px; font-size: .73rem; color: #bdcecb; line-height: 1.6; }
 .ai-delivery-note > a { display: inline-flex; gap: 8px; align-items: center; margin-left: auto; flex-shrink: 0; color: var(--mint); font-size: .73rem; font-weight: 750; }
-.momentum-work { padding-top: 100px; scroll-margin-top: var(--anchor-offset); }
+.momentum-work { padding-top: 100px; }
 .momentum-toolbar { display: flex; gap: 20px; justify-content: space-between; align-items: center; margin: 32px 0 24px; }
 .momentum-toolbar > p { color: var(--slate); flex-shrink: 0; font-size: .72rem; }
 .momentum-filters { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -71,3 +71,57 @@
 @media (max-width: 760px) { .ai-hero-ribbon { align-items: flex-start; flex-direction: column; gap: 16px; } .ai-systems-intro { grid-template-columns: 1fr; gap: 24px; } .ai-delivery-note { flex-wrap: wrap; } .ai-delivery-note > div { flex: 1; min-width: 180px; } .ai-delivery-note > a { margin-left: 40px; } .momentum-grid { grid-template-columns: 1fr; } .momentum-toolbar { align-items: flex-start; flex-direction: column; gap: 12px; } .momentum-work { padding-top: 72px; } .momentum-index { grid-template-columns: 1fr; gap: 28px; } }
 @media (max-width: 480px) { .ai-capability-grid { grid-template-columns: 1fr; } .ai-capability { padding: 24px; } .ai-capability-top { margin-bottom: 20px; } .ai-hero-ribbon ul { gap: 12px 18px; } .ai-hero-ribbon li { font-size: .69rem; } .momentum-card-copy { padding: 22px; } .ai-delivery-note { padding: 22px; } .momentum-index > div:last-child { grid-template-columns: 1fr; gap: 22px; } }
 @media (prefers-reduced-motion: reduce) { .momentum-preview img, .momentum-details summary > span { transition: none; } }
+.momentum-toggle { display: none; }
+
+/* Phone layout: carousel for capabilities, collapsed systems list, tighter rhythm.
+   ai-systems.css is loaded before index.css, so rules that fight index.css use a
+   doubled selector (.ai-systems-section.section) to win on specificity. */
+@media (max-width: 640px) {
+  .ai-systems-section.section { padding: 56px 0; }
+  .ai-systems-intro { gap: 18px; margin-bottom: 28px; }
+  .ai-systems-intro h2 { margin-top: 10px; font-size: clamp(1.9rem, 9vw, 2.4rem); }
+  .ai-systems-intro-copy > p { font-size: .92rem; line-height: 1.6; }
+  .ai-systems-intro-copy > a { min-height: 44px; margin-top: 8px; }
+
+  /* Capability carousel */
+  .ai-capability-grid { display: flex; gap: 12px; margin-inline: -16px; padding: 4px 16px 14px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 16px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .ai-capability-grid::-webkit-scrollbar { display: none; }
+  .ai-capability-grid:focus-visible { outline: 2px solid var(--mint-deep); outline-offset: -2px; border-radius: 12px; }
+  .ai-capability-grid > .reveal { flex: 0 0 85%; min-width: 0; height: auto; scroll-snap-align: start; scroll-snap-stop: always; }
+  /* Off-screen carousel slides never intersect the viewport, so never hold them back for the reveal animation. */
+  .motion-ready .ai-capability-grid > .reveal:not(.is-visible) { opacity: 1; transform: none; }
+  .ai-capability { padding: 20px; }
+  .ai-capability-top { margin-bottom: 14px; }
+  .ai-capability h3 { margin-bottom: 8px; }
+  .ai-capability ul { margin: 14px 0; gap: 7px; }
+
+  .ai-delivery-note { margin-top: 8px; padding: 18px; gap: 12px; }
+  .ai-delivery-note > a { min-height: 44px; margin-left: 0; }
+
+  /* Systems */
+  .momentum-work { padding-top: 40px; }
+  .momentum-toolbar { width: 100%; margin: 18px 0 16px; gap: 6px; }
+  .momentum-filters { flex-wrap: nowrap; width: calc(100% + 16px); margin-right: -16px; padding-right: 16px; overflow-x: auto; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .momentum-filters::-webkit-scrollbar { display: none; }
+  .momentum-filters button { flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start; }
+  .momentum-grid { gap: 16px; }
+  .momentum-card { border-radius: 14px; }
+  .momentum-card-copy { padding: 18px; }
+  .momentum-card-meta { margin-bottom: 10px; }
+  .momentum-card h3 { margin-bottom: 8px; font-size: 1.4rem; }
+  .momentum-details { margin-top: 14px; }
+  .momentum-engineering-visual { min-height: 0; gap: 12px; padding: 18px; }
+  .momentum-engineering-visual i { width: 24px; }
+  .momentum-toggle { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; margin-top: 16px; padding: 12px 20px; border: 1px solid var(--ink); border-radius: 999px; background: transparent; color: var(--ink); font: inherit; font-size: .8rem; font-weight: 750; cursor: pointer; transition: background 150ms, color 150ms; }
+  .momentum-toggle:hover, .momentum-toggle:focus-visible { background: var(--ink); color: var(--paper); }
+
+  /* Engineering groups: compact stacked list */
+  .momentum-index { margin-top: 32px; gap: 18px; padding-top: 24px; }
+  .momentum-index-heading h3 { margin: 10px 0; font-size: 1.45rem; }
+  .momentum-index > div:last-child { gap: 0; }
+  .momentum-index > div:last-child > article { padding-block: 14px; border-top: 1px solid var(--line-light); }
+  .momentum-index > div:last-child > article:first-child { border-top: 0; padding-top: 0; }
+  .momentum-index h4 { margin-bottom: 4px; }
+  .momentum-index article > p { line-height: 1.6; }
+}
+@media (prefers-reduced-motion: reduce) { .ai-capability-grid { scroll-behavior: auto; } .momentum-toggle { transition: none; } }

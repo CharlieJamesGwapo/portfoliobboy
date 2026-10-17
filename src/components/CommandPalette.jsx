@@ -177,10 +177,25 @@ export default function CommandPalette({ open, onClose }) {
       window.clearTimeout(focusTimer)
       document.body.classList.remove('palette-open')
       // Returning focus to whatever opened the palette is what makes ⌘K
-      // usable twice in a row without touching the mouse.
-      returnFocusRef.current?.focus?.()
+      // usable twice in a row without touching the mouse. But if a command
+      // already moved focus on purpose (jumping to a section), leave it there
+      // instead of snatching it back to the opener.
+      const current = document.activeElement
+      if (!current || current === document.body) returnFocusRef.current?.focus?.({ preventScroll: true })
     }
   }, [open])
+
+  // Escape must close the palette even if focus drifted off the input (a click
+  // on the dialog's padding blurs it, and the dialog's own onKeyDown then
+  // never sees the key).
+  useEffect(() => {
+    if (!open) return undefined
+    const onEscape = (event) => {
+      if (event.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onEscape)
+    return () => window.removeEventListener('keydown', onEscape)
+  }, [open, onClose])
 
   // Keep the highlighted row in view when arrowing past the fold.
   useEffect(() => {
@@ -212,7 +227,7 @@ export default function CommandPalette({ open, onClose }) {
       setActive((index) => (results.length ? (index - 1 + results.length) % results.length : 0))
       return
     }
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
       event.preventDefault()
       runCommand(results[active])
     }

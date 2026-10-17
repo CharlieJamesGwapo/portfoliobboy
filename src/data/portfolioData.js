@@ -142,6 +142,22 @@ export const aiSystemCapabilities = [
 
 export const momentumSystems = [
   {
+    id: 'alex',
+    title: 'Alex — AI Voice Agent',
+    type: 'Outbound & inbound AI voice agent',
+    categories: ['AI Agents', 'Voice', 'Automation'],
+    status: 'Live AI demo',
+    statusTone: 'live',
+    summary:
+      'An AI voice agent that makes evidence-grounded outbound research calls, answers inbound enquiries and books appointments, and powers the live callback demo on hasti.com.au.',
+    contribution:
+      'Built the self-hosted voice runtime on LiveKit Agents and GPT-Live over Twilio SIP: pre-call website research with grounded opening questions, conservative voicemail detection, a restart-safe five-slot call queue with pause and resume, transfer and recording handling, AI call review where every claim cites the transcript, and follow-up email with reply tracking.',
+    stack: ['LiveKit Agents', 'OpenAI GPT-Live', 'Twilio SIP', 'TypeScript', 'PostgreSQL', 'n8n'],
+    url: 'https://hasti.com.au/',
+    linkLabel: 'Talk to Alex',
+    visualLabel: 'Research · Call · Review',
+  },
+  {
     id: 'hasti',
     title: 'Hasti',
     type: 'AI reception & speed-to-lead',
@@ -151,9 +167,10 @@ export const momentumSystems = [
     summary:
       'A lead-response experience combining a live AI receptionist demonstration with enquiry capture, call progress, qualification, routing, and follow-up workflows.',
     contribution:
-      'Voice-agent workflow, call-state UX, lead handling, booking-oriented automation, and reliable backend integration patterns.',
-    stack: ['AI voice', 'Twilio', 'LiveKit', 'n8n', 'CRM workflows'],
+      'Built the live Alex callback demo — request verification, live call status and captions, hang-up, consent capture, and per-IP rate limits — plus a durable CRM enquiry outbox, consent-gated lead tracking, and first-party visit analytics.',
+    stack: ['AI voice', 'LiveKit', 'Python', 'SQLite outbox', 'n8n', 'Stripe'],
     url: 'https://hasti.com.au/',
+    linkLabel: 'Try the AI receptionist',
     image: '/projects/hasti.png',
     imageAlt: 'Hasti website showing its AI receptionist experience',
   },
@@ -167,11 +184,81 @@ export const momentumSystems = [
     summary:
       'A modular gym operations platform spanning CRM, member retention, campaigns, membership workflows, analytics, and connected business tools.',
     contribution:
-      'Multi-tenant product architecture, CRM synchronization, retention workflows, operational dashboards, and production delivery.',
-    stack: ['Next.js', 'React', 'TypeScript', 'Encore', 'PostgreSQL'],
+      'Work across the connected-module platform — Hasti service diagnostics, WhatsApp and Twilio enquiry lanes, an access-isolated internal Control app, marketing alerts, and migration and CI hardening — plus employee status, device sessions, and availability in the Expo mobile app.',
+    stack: ['TanStack Start', 'React 19', 'Encore.ts', 'PostgreSQL', 'Expo', 'LiveKit'],
     url: 'https://zalio.ai/',
     image: '/projects/zalio.png',
     imageAlt: 'Zalio product website',
+  },
+  {
+    id: 'zalio-crm',
+    title: 'Zalio CRM',
+    type: 'Lead inbox, forms & retention module',
+    categories: ['CRM', 'Automation', 'Voice'],
+    status: 'Private product module',
+    statusTone: 'private',
+    summary:
+      'The CRM module of Zalio: an omnichannel lead inbox, form builder, campaigns, retention hub, browser calling, and calendar bookings for gym teams.',
+    contribution:
+      'Lead engineer with 2,000+ commits: SMS, WhatsApp, and email inbox with response-time SLA alerts and realtime streams, lead dedupe and merge, replay-safe form webhooks and Meta conversions, retention and reactivation workflows, Twilio browser calling, Google Calendar bookings, and consent-safe intake of Alex voice enquiries.',
+    stack: ['Next.js 16', 'React 19', 'PostgreSQL', 'Twilio', 'Google Calendar', 'Playwright'],
+    visualLabel: 'Inbox · Forms · Retention',
+  },
+  {
+    id: 'gtm-engine',
+    title: 'GTM Engine',
+    type: 'Revenue operations & outbound platform',
+    categories: ['Automation', 'CRM', 'Voice', 'Analytics'],
+    status: 'Private engineering case study',
+    statusTone: 'private',
+    summary:
+      'A multi-instance revenue-operations platform for prospect discovery, ranked worklists, pipelines, email follow-up, and AI-assisted outbound calling.',
+    contribution:
+      'Built the Alex calling workflow for Hasti: a prospect call drawer, bulk call queues that continue past one page with pause and resume, call review with transcript evidence and recordings, operator-approved follow-up drafts, reply triage, and follow-up status.',
+    stack: ['Next.js 16', 'React 19', 'PostgreSQL', 'Better Auth', 'Twilio', 'Anthropic'],
+    visualLabel: 'Prospects · Calls · Follow-up',
+  },
+  {
+    id: 'n8n-automation',
+    title: 'n8n Automation Layer',
+    type: 'Workflow orchestration & integrations',
+    categories: ['Automation', 'AI Agents'],
+    status: 'Private engineering case study',
+    statusTone: 'private',
+    summary:
+      'n8n workflows connecting the voice backend, CRM, GTM engine, calendar, and email — from research-call dispatch to follow-up delivery and reply tracking.',
+    contribution:
+      'Research-call workflow with LLM review and citation checks against the transcript, callback-request intake, Gmail follow-up dispatch and reply matching, and calendar booking commands — kept safe with receipt-before-acknowledge, idempotency keys, no automatic retry on writes, lease fencing, and reconciliation.',
+    stack: ['n8n', 'Webhooks', 'PostgreSQL', 'Gmail API', 'Google Calendar', 'LLM evaluation'],
+    visualLabel: 'Trigger · Verify · Deliver',
+  },
+  {
+    id: 'hasti-client',
+    title: 'Hasti Client App',
+    type: 'Native iOS & Android client app',
+    categories: ['Platforms', 'CRM'],
+    status: 'Private client app',
+    statusTone: 'private',
+    summary:
+      'A native app where Hasti customers follow their leads, conversations, appointments, and weekly results, with role-controlled screens for staff.',
+    contribution:
+      'Shipped 46 pull requests in nine days through release v1.4.0: an Expo Router app, Fastify and PostgreSQL API, push notifications with a weekly results digest, staff sign-in through Zalio CRM, per-service connection diagnostics, and accessibility and brand audits.',
+    stack: ['Expo', 'React Native', 'TypeScript', 'Fastify', 'PostgreSQL'],
+    visualLabel: 'Leads · Appointments · Results',
+  },
+  {
+    id: 'zalio-ui',
+    title: 'Zalio Design System',
+    type: 'Component library & docs',
+    categories: ['Platforms'],
+    status: 'Private engineering case study',
+    statusTone: 'private',
+    summary:
+      "Zalio's shared design system: a component library with a living docs site, theming, motion tokens, and an icon registry used across the web app and CRM.",
+    contribution:
+      'Built from scratch in two weeks: 120+ primitives and product components on Base UI and Tailwind 4, light, dark, and system theming, token-driven brand color and motion, an accessible docs gallery, and agent-readable UI guidelines.',
+    stack: ['TanStack Start', 'Tailwind 4', 'Base UI', 'Vitest'],
+    visualLabel: 'Tokens · Components · Docs',
   },
   {
     id: 'gymfactories',
@@ -222,19 +309,6 @@ export const momentumSystems = [
     imageAlt: 'HSIE manual property site scoring prototype',
   },
   {
-    id: 'voice-runtime',
-    title: 'AI Voice Runtime',
-    type: 'Backend voice-agent infrastructure',
-    categories: ['AI Agents', 'Voice', 'Automation'],
-    status: 'Private engineering case study',
-    statusTone: 'private',
-    summary:
-      'A contract-first voice backend for call dispatch, live agent sessions, booking tools, event evidence, retries, and controlled workflow integration.',
-    contribution:
-      'Idempotent call control, signed provider webhooks, reservation sagas, outbox delivery, worker fencing, and n8n command contracts.',
-    stack: ['TypeScript', 'Fastify', 'PostgreSQL', 'LiveKit', 'Twilio', 'n8n'],
-  },
-  {
     id: 'gym-analytics',
     title: 'Gym Analytics & Retention',
     type: 'Data platform & decision support',
@@ -246,6 +320,7 @@ export const momentumSystems = [
     contribution:
       'Source synchronization, KPI fact modeling, durable jobs, reconciliation, risk views, and actionable dashboards.',
     stack: ['Next.js 16', 'React 19', 'Supabase', 'Python', 'Recharts'],
+    visualLabel: 'Sync · Model · Insights',
   },
   {
     id: 'agent-operations',
@@ -259,6 +334,7 @@ export const momentumSystems = [
     contribution:
       'Agent goals and budgets, durable sessions, evidence timelines, alert grouping, access controls, and platform observability.',
     stack: ['AI agents', 'Node.js', 'PostgreSQL', 'WebSockets', 'Linux'],
+    visualLabel: 'Agents · Sessions · Evidence',
   },
 ]
 
@@ -283,22 +359,25 @@ export const momentumEngineeringGroups = [
 
 export const experiences = [
   {
-    role: 'AI Full-Stack Developer',
-    company: 'Australian client',
-    location: 'Australia · Contract · Remote',
-    period: 'Jun 2026 – Sep 2026',
+    role: 'AI Full-Stack Engineer',
+    company: 'Zalio · Momentum',
+    location: 'Australia · Remote',
+    period: 'Jun 2026 – Present',
     featured: true,
     summary:
-      'Building an enterprise CRM platform for an Australian client that unifies member records, subscriptions, payments, visit history, and team outreach.',
+      "Building Zalio's gym CRM and operations platform, the Alex AI voice agent, and Hasti's AI reception and lead-response products across web, mobile, voice, and automation.",
     achievements: [
+      'Lead engineer on the Zalio CRM module with 2,000+ commits: omnichannel lead inbox with SLA alerts, forms, campaigns, retention workflows, and Twilio browser calling.',
+      'Built Alex, a self-hosted AI voice agent on LiveKit and GPT-Live over Twilio SIP, with evidence-grounded research calls, voicemail detection, a restart-safe call queue, and cited AI call reviews.',
+      'Designed n8n integrations with durable receipts, idempotency keys, and reconciliation linking the voice backend, CRM, GTM engine, calendar, and email.',
+      'Shipped the Hasti Client iOS and Android app (Expo, Fastify, PostgreSQL) in 46 pull requests over nine days, and the live Alex demo on hasti.com.au.',
+      "Built the bulk Alex calling workflow in the GTM engine, Zalio's design system, and employee features in the Expo mobile app.",
       'Delivered revenue, retention, profiling, and win-back dashboards with Next.js 16, React 19, TypeScript, and TanStack Query.',
       'Designed bidirectional Python CRM synchronization using Celery, Redis, durable Postgres jobs, leases, idempotency keys, bounded retries, and recovery workflows.',
-      'Embedded Twilio Voice browser calling inside CRM member panels for outreach workflows.',
       'Led member, contract, visit, and payment-history migration with automated reconciliation against source-of-truth financial reports.',
       'Ship daily with Claude Code using repo-level instructions, custom agents, skills, and GitHub, Linear, and Supabase MCP integrations.',
-      'Translate plain-language requirements from a non-technical business owner into specifications and production architecture.',
     ],
-    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Python', 'Celery', 'Redis', 'Supabase', 'Docker', 'Twilio'],
+    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Encore.ts', 'PostgreSQL', 'LiveKit', 'Twilio', 'n8n', 'Expo', 'Python'],
   },
   {
     role: 'Full-Stack Developer',
