@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowDown, ArrowUpRight, Bot, Check, Headphones, Layers3, LockKeyhole, Network, SlidersHorizontal, Workflow } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
@@ -8,11 +8,40 @@ import { aiSystemCapabilities, momentumEngineeringGroups, momentumSystems } from
 const capabilityIcons = [Bot, Headphones, Workflow, Layers3, SlidersHorizontal, Network]
 const filters = ['All systems', 'AI Agents', 'Voice', 'Automation', 'CRM', 'Analytics', 'Platforms']
 
+const MOBILE_QUERY = '(max-width: 640px)'
+const MOBILE_VISIBLE_SYSTEMS = 3
+
+// Reports whether the viewport is phone-sized. Starts false on the server so
+// SSR output (and tests) render the full desktop markup, and every browser API
+// access is guarded.
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined
+    const query = window.matchMedia(MOBILE_QUERY)
+    const update = () => setIsMobile(query.matches)
+    update()
+    query.addEventListener?.('change', update)
+    return () => query.removeEventListener?.('change', update)
+  }, [])
+  return isMobile
+}
+
 const AISystems = () => {
   const [activeFilter, setActiveFilter] = useState(filters[0])
+  const [showAll, setShowAll] = useState(false)
+  const isMobile = useIsMobile()
   const systems = activeFilter === filters[0]
     ? momentumSystems
     : momentumSystems.filter((system) => system.categories.includes(activeFilter))
+
+  const canCollapse = systems.length > MOBILE_VISIBLE_SYSTEMS
+  const collapsed = isMobile && canCollapse && !showAll
+  const visibleSystems = collapsed ? systems.slice(0, MOBILE_VISIBLE_SYSTEMS) : systems
+  const selectFilter = (filter) => {
+    setActiveFilter(filter)
+    setShowAll(false)
+  }
 
   return (
     <section id="ai-systems" className="section section-paper ai-systems-section" aria-labelledby="ai-systems-title">
@@ -30,7 +59,10 @@ const AISystems = () => {
           </div>
         </ScrollReveal>
 
-        <div className="ai-capability-grid">
+        <div
+          className="ai-capability-grid"
+          {...(isMobile ? { role: 'region', 'aria-label': 'AI system capabilities, swipe to browse', tabIndex: 0 } : {})}
+        >
           {aiSystemCapabilities.map((capability, index) => {
             const Icon = capabilityIcons[index]
             return (
@@ -59,13 +91,13 @@ const AISystems = () => {
           </ScrollReveal>
           <div className="momentum-toolbar">
             <div className="momentum-filters" role="group" aria-label="Filter Momentum systems">
-              {filters.map((filter) => <button key={filter} type="button" aria-pressed={activeFilter === filter} className={activeFilter === filter ? 'is-active' : ''} onClick={() => setActiveFilter(filter)}>{filter}</button>)}
+              {filters.map((filter) => <button key={filter} type="button" aria-pressed={activeFilter === filter} className={activeFilter === filter ? 'is-active' : ''} onClick={() => selectFilter(filter)}>{filter}</button>)}
             </div>
             <p aria-live="polite">{systems.length} {systems.length === 1 ? 'system' : 'systems'}</p>
           </div>
 
-          <div className="momentum-grid">
-            {systems.map((system) => (
+          <div id="momentum-grid" className="momentum-grid">
+            {visibleSystems.map((system) => (
               <article key={system.id} className={`momentum-card ${system.image ? 'has-image' : 'is-engineering'}`}>
                 {system.image ? (
                   <a className="momentum-preview" href={system.url} target="_blank" rel="noreferrer" aria-label={`Explore ${system.title} (opens in a new tab)`}>
@@ -75,7 +107,7 @@ const AISystems = () => {
                 ) : (
                   <div className="momentum-engineering-visual" aria-hidden="true">
                     <span>ENGINEERING NOTES</span><div><span>INPUT</span><i /><span>CONTROL</span><i /><span>STATE</span></div>
-                    <p>{system.id === 'voice-runtime' ? 'Voice · Events · Booking' : system.id === 'gym-analytics' ? 'Sync · Model · Insights' : 'Agents · Sessions · Evidence'}</p>
+                    <p>{system.visualLabel ?? 'Input · Control · State'}</p>
                   </div>
                 )}
                 <div className="momentum-card-copy">
@@ -83,11 +115,17 @@ const AISystems = () => {
                   <h3>{system.title}</h3>
                   <p className="momentum-summary">{system.summary}</p>
                   <details className="momentum-details"><summary>Explore engineering scope <span aria-hidden="true">+</span></summary><p>{system.contribution}</p><div className="momentum-stack">{system.stack.map((item) => <span key={item}>{item}</span>)}</div></details>
-                  {system.url ? <a className="momentum-demo-link" href={system.url} target="_blank" rel="noreferrer">{system.id === 'hasti' ? 'Try the AI receptionist' : system.statusTone === 'prototype' ? 'Explore the prototype' : 'Explore live product'}<ArrowUpRight size={17} aria-hidden="true" /><span className="sr-only"> — {system.title} (opens in a new tab)</span></a> : <span className="momentum-private-note"><LockKeyhole size={13} aria-hidden="true" /> Private client system</span>}
+                  {system.url ? <a className="momentum-demo-link" href={system.url} target="_blank" rel="noreferrer">{system.linkLabel ?? (system.statusTone === 'prototype' ? 'Explore the prototype' : 'Explore live product')}<ArrowUpRight size={17} aria-hidden="true" /><span className="sr-only"> — {system.title} (opens in a new tab)</span></a> : <span className="momentum-private-note"><LockKeyhole size={13} aria-hidden="true" /> Private client system</span>}
                 </div>
               </article>
             ))}
           </div>
+
+          {isMobile && canCollapse && (
+            <button type="button" className="momentum-toggle" aria-expanded={showAll} aria-controls="momentum-grid" onClick={() => setShowAll((value) => !value)}>
+              {showAll ? 'Show fewer' : `Show all ${systems.length} systems`}
+            </button>
+          )}
 
           <div className="momentum-index">
             <div className="momentum-index-heading"><p className="eyebrow">Behind the products</p><h3>A connected engineering practice.</h3><p>Related modules and internal systems span four areas. Public case studies focus on product behavior; client source code stays private.</p></div>

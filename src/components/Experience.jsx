@@ -3,9 +3,14 @@ import { ChevronDown, MapPin } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { experiences } from '../data/portfolioData'
+import './experience.css'
+
+// Achievements shown before the mobile "Show more" toggle (CSS-only; desktop shows all).
+const MOBILE_VISIBLE_ACHIEVEMENTS = 3
 
 const Experience = () => {
   const [expanded, setExpanded] = useState(0)
+  const [showAll, setShowAll] = useState({})
 
   return (
     <section id="experience" className="section section-dark">
@@ -22,6 +27,9 @@ const Experience = () => {
           {experiences.map((experience, index) => {
             const isExpanded = expanded === index
             const panelId = `experience-panel-${index}`
+            const listId = `experience-achievements-${index}`
+            const extraCount = Math.max(0, experience.achievements.length - MOBILE_VISIBLE_ACHIEVEMENTS)
+            const allShown = Boolean(showAll[index])
             return (
               <ScrollReveal key={`${experience.company}-${experience.period}`} delay={(index % 4) * 55} variant="right">
                 {index === 4 && (
@@ -56,9 +64,28 @@ const Experience = () => {
                   <div id={panelId} className={`experience-panel ${isExpanded ? 'is-open' : ''}`}>
                     <div className="experience-panel-inner">
                       <p className="experience-summary">{experience.summary}</p>
-                      <ul>
-                        {experience.achievements.map((achievement) => <li key={achievement}>{achievement}</li>)}
+                      <ul id={listId} className={extraCount > 0 && !allShown ? 'is-collapsed' : ''}>
+                        {experience.achievements.map((achievement, achievementIndex) => (
+                          <li
+                            key={achievement}
+                            className={achievementIndex >= MOBILE_VISIBLE_ACHIEVEMENTS ? 'is-extra' : undefined}
+                          >
+                            {achievement}
+                          </li>
+                        ))}
                       </ul>
+                      {extraCount > 0 && (
+                        <button
+                          type="button"
+                          className="experience-more"
+                          aria-expanded={allShown}
+                          aria-controls={listId}
+                          onClick={() => setShowAll((current) => ({ ...current, [index]: !current[index] }))}
+                        >
+                          {allShown ? 'Show less' : `Show ${extraCount} more`}
+                          <ChevronDown size={16} aria-hidden="true" />
+                        </button>
+                      )}
                       <div className="tag-list">
                         {experience.stack.map((item) => <span key={item}>{item}</span>)}
                       </div>

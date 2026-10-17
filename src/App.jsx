@@ -186,6 +186,7 @@ function App() {
         className={`back-to-top ${showTop ? 'is-visible' : ''}`}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         aria-label="Back to top"
+        aria-hidden={showTop ? undefined : 'true'}
         tabIndex={showTop ? 0 : -1}
       >
         <ArrowUp size={18} aria-hidden="true" />
