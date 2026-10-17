@@ -1,3 +1,27 @@
+/* Role links: small pills under the summary. */
+#experience .experience-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; padding: 0; list-style: none; }
+#experience .experience-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(103, 224, 193, 0.4);
+  border-radius: 999px;
+  color: var(--mint);
+  font-size: 0.74rem;
+  font-weight: 750;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+#experience .experience-links a:hover { border-color: var(--mint); background: rgba(103, 224, 193, 0.1); }
+#experience .experience-links a:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+#experience .experience-links svg { transition: transform 180ms var(--ease-out); }
+#experience .experience-links a:hover svg { transform: translate3d(2px, -2px, 0); }
+@media (max-width: 768px) {
+  #experience .experience-links { margin-bottom: 14px; }
+  #experience .experience-links a { min-height: 44px; padding: 0 16px; }
+}
+
 /* Experience: compact mobile layout. Desktop (>768px) is untouched; the toggle is hidden there. */
 .experience-more { display: none; }
 
@@ -66,5 +90,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .experience-more svg { transition: none !important; }
+  .experience-more svg, #experience .experience-links svg { transition: none !important; }
 }

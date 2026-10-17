@@ -9,7 +9,7 @@
 // ============================================================================
 
 // --- EXPERIENCE DEN -------------------------------------------------------
-// Two enemies per spec: Rooche Digital (100 HP) and Robustech (150 HP).
+// Two enemies per spec: Rooche Digital (100 HP) and the Australian fintech engagement (150 HP).
 // Full real experience data kept for the "defeat shows experience card" popup.
 export const EXPERIENCE = [
   {
@@ -43,9 +43,9 @@ export const EXPERIENCE = [
     ],
   },
   {
-    id: 'robustech',
+    id: 'fintech-lending',
     hp: 150,
-    company: 'Robustech IT / SocietyOne',
+    company: 'Australian Fintech · Lending Platform',
     role: 'Full Stack Developer',
     period: 'Jan 2024 – Dec 2025',
     location: 'Australia (Remote)',
@@ -169,7 +169,7 @@ export const PROJECTS = [
     liveUrl: 'https://study-pulse-ten.vercel.app/',
   },
   {
-    title: 'SocietyOne Loan Platform',
+    title: 'Fintech Loan Platform',
     type: 'Professional / Fintech',
     description:
       'Online personal loan platform for Australian clients. Rewrote legacy Go services into C# .NET, built AWS Lambda functions, and optimized APIs.',
@@ -280,7 +280,7 @@ export const PLAYER_CONFIG = {
 export const SKILL_INFO = {
   Python: 'Primary backend language — FastAPI, Django, Flask, automation.',
   Go: 'High-performance services & POS/recycling platforms.',
-  '.NET / C#': 'ASP.NET Core fintech services at SocietyOne.',
+  '.NET / C#': 'ASP.NET Core services for an Australian fintech lending platform.',
   'Node.js': 'APIs, tooling, and real-time services with Express.',
   React: 'Component-driven UIs across client dashboards.',
   'Next.js': 'SSR/ISR frontends for POS & web apps.',

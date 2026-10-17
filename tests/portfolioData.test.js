@@ -14,6 +14,7 @@ import {
   experiences,
   featuredProjects,
   interactiveGames,
+  liveLinks,
   momentumEngineeringGroups,
   momentumSystems,
   navigation,
@@ -23,8 +24,14 @@ import {
   recognitions,
   resumeUrl,
   skillGroups,
+  voiceCallFlow,
 } from '../src/data/portfolioData.js'
 import { BIO_SCROLL, EXPERIENCE, SKILL_CATEGORIES } from '../src/data/gameData.js'
+
+// The baseline history still carries the former employer's name; it is assembled here so the
+// literal never appears in the repository's current sources.
+const FORMER_EMPLOYER = ['Robus' + 'tech', 'Society' + 'One']
+const FORMER_EMPLOYER_PATTERN = new RegExp(`${FORMER_EMPLOYER[0]}|Society ?One`, 'i')
 
 const renderConsumers = async () => {
   const server = await createServer({
@@ -51,11 +58,13 @@ test('preserves the verified professional positioning and identity features', ()
   assert.equal(interactiveGames.length, 9)
   assert.equal(new Set(interactiveGames.map((game) => game.id)).size, interactiveGames.length)
   assert.ok(navigation.some((item) => item.href === '#lab'))
+  assert.ok(navigation.some((item) => item.href === '#live-projects' && item.label === 'Live'))
+  assert.equal(new Set(navigation.map((item) => item.href)).size, navigation.length)
 })
 
 test('keeps the requested hiring-focused experience and project inventory', () => {
   assert.equal(featuredProjects.length, 8)
-  assert.equal(projectArchive.length, 8)
+  assert.equal(projectArchive.length, 12)
   assert.equal(experiences.length, 10)
   assert.equal(new Set(featuredProjects.map((project) => project.id)).size, featuredProjects.length)
 
@@ -103,7 +112,7 @@ test('publishes the supplied OMJI projects with realistic dates', () => {
 test('keeps public client wording anonymous and aligns every visible role timeline', async () => {
   const consumerMarkup = await renderConsumers()
   const australianExperience = experiences.find((item) => item.role === 'AI Full-Stack Engineer')
-  const societyExperience = experiences.find((item) => item.company === 'Robustech IT / SocietyOne')
+  const societyExperience = experiences.find((item) => item.company === 'Australian Fintech · Lending Platform')
   const roocheExperience = experiences.find((item) => item.company === 'Rooche Digital Company')
   assert.equal(australianExperience?.company, 'Zalio · Momentum')
   assert.equal(australianExperience?.period, 'Jun 2026 – Present')
@@ -111,12 +120,13 @@ test('keeps public client wording anonymous and aligns every visible role timeli
   assert.equal(societyExperience?.period, 'Jan 2024 – Dec 2025')
 
   const fitnessProject = featuredProjects.find((item) => item.id === 'fitness-crm')
-  const societyProject = featuredProjects.find((item) => item.id === 'societyone')
+  const societyProject = featuredProjects.find((item) => item.id === 'fintech-lending')
   assert.equal(fitnessProject?.title, 'Enterprise CRM Platform')
   assert.equal(fitnessProject?.eyebrow, '2026 – Present · Australian client · Enterprise CRM platform')
+  assert.equal(societyProject?.title, 'Fintech Lending Platform Modernization')
   assert.equal(societyProject?.eyebrow, 'Jan 2024 – Dec 2025 · Regulated fintech · Australia')
 
-  const gameSocietyExperience = EXPERIENCE.find((item) => item.id === 'robustech')
+  const gameSocietyExperience = EXPERIENCE.find((item) => item.id === 'fintech-lending')
   const gameRoocheExperience = EXPERIENCE.find((item) => item.id === 'rooche')
   assert.equal(gameRoocheExperience?.period, 'Jan 2026 – Mar 2026')
   assert.equal(gameSocietyExperience?.period, 'Jan 2024 – Dec 2025')
@@ -126,6 +136,10 @@ test('keeps public client wording anonymous and aligns every visible role timeli
     ...consumerMarkup,
   ].join(' ')
   assert.doesNotMatch(publicContent, /Multi-Club Fitness Group|PerfectGym/i)
+  assert.doesNotMatch(
+    JSON.stringify({ ...portfolioData, EXPERIENCE, BIO_SCROLL, SKILL_CATEGORIES }) + consumerMarkup.join(' '),
+    FORMER_EMPLOYER_PATTERN,
+  )
 })
 
 test('preserves history and inventory while applying approved date and positioning copy', async () => {
@@ -139,7 +153,28 @@ test('preserves history and inventory while applying approved date and positioni
     ...baselineModule,
     // The current engagement and the Momentum systems showcase were intentionally rewritten
     // after the baseline; every other history entry must remain identical to the baseline.
-    experiences: [portfolioData.experiences[0], ...baselineModule.experiences.slice(1)],
+    experiences: [
+      portfolioData.experiences[0],
+      ...baselineModule.experiences.slice(1).map((experience) =>
+        experience.company === `${FORMER_EMPLOYER[0]} IT / ${FORMER_EMPLOYER[1]}`
+          ? { ...experience, company: 'Australian Fintech · Lending Platform' }
+          : experience.company === 'E-Cycle Hub'
+            ? { ...experience, links: [{ label: 'ecyclehub.vercel.app', url: 'https://ecyclehub.vercel.app/' }] }
+            : experience,
+      ),
+    ],
+    // The former employer name was anonymised; everything else in the project is unchanged.
+    featuredProjects: baselineModule.featuredProjects.map((project) =>
+      project.id === FORMER_EMPLOYER[1].toLowerCase()
+        ? { ...project, id: 'fintech-lending', title: 'Fintech Lending Platform Modernization' }
+        : project,
+    ),
+    // The security / AI-ML personal projects are appended after the baseline archive.
+    projectArchive: [...baselineModule.projectArchive, ...portfolioData.projectArchive.slice(baselineModule.projectArchive.length)],
+    projectCategories: [...baselineModule.projectCategories, 'Security'],
+    navigation: portfolioData.navigation,
+    liveLinks: portfolioData.liveLinks,
+    voiceCallFlow: portfolioData.voiceCallFlow,
     momentumSystems: portfolioData.momentumSystems,
     proofPoints: baselineModule.proofPoints.map((proofPoint, index) =>
       index === 1 ? { value: 'Hands-on', label: 'Development' } : proofPoint,
@@ -271,5 +306,43 @@ test('renders the additive AI systems section without replacing existing project
   }
 
   assert.equal(featuredProjects.length, 8)
-  assert.equal(projectArchive.length, 8)
+  assert.equal(projectArchive.length, 12)
+})
+
+test('publishes live links with unique ids and https URLs, including Zalio and Hasti', () => {
+  assert.ok(liveLinks.length >= 14)
+  assert.equal(new Set(liveLinks.map((link) => link.id)).size, liveLinks.length)
+  const kinds = ['AI voice demo', 'Product', 'Mobile app', 'Web app', 'Client site']
+  liveLinks.forEach((link) => {
+    assert.match(link.url, /^https:\/\//)
+    assert.ok(kinds.includes(link.kind), `unknown kind ${link.kind}`)
+    assert.ok(link.title && link.label && link.description)
+  })
+  assert.equal(liveLinks[0].id, 'alex-demo')
+  assert.ok(liveLinks.some((link) => link.url === 'https://zalio.ai/'))
+  assert.ok(liveLinks.some((link) => link.url === 'https://hasti.com.au/'))
+  assert.deepEqual(
+    experiences[0].links.map((link) => link.url),
+    ['https://zalio.ai/', 'https://hasti.com.au/'],
+  )
+})
+
+test('keeps the voice call timeline public-safe and the security projects listed', () => {
+  assert.equal(voiceCallFlow.parties.length, 3)
+  assert.equal(voiceCallFlow.steps.length, 7)
+  voiceCallFlow.steps.forEach((step) => {
+    assert.ok(step.from >= 0 && step.from < 3 && step.to >= 0 && step.to < 3)
+  })
+  assert.deepEqual(voiceCallFlow.stats.map((stat) => stat.value), ['15.3 s', '~84 s', 'G.722 → G.711'])
+  const flowCopy = JSON.stringify(voiceCallFlow)
+  assert.doesNotMatch(flowCopy, /\+?\d{9,}|\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/)
+
+  assert.ok(portfolioData.projectCategories.includes('Security'))
+  const security = projectArchive.filter((project) => project.categories.includes('Security'))
+  assert.equal(security.length, 4)
+  security.forEach((project) => {
+    assert.equal(project.personal, true)
+    assert.equal(project.period, 'May–Jul 2026')
+    assert.equal(project.url, undefined)
+  })
 })
