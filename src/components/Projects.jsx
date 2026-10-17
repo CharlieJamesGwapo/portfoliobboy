@@ -59,7 +59,7 @@ const Projects = () => {
           <SectionHeading
             eyebrow="03 · Product work"
             title="Systems designed around real operational pressure."
-            description="Eight detailed case studies, plus eight additional client and independent builds across web, mobile, and operations."
+            description={`${featuredProjects.length} detailed case studies, plus ${projectArchive.length} additional client and independent builds across web, mobile, and operations.`}
             light
           />
         </ScrollReveal>
@@ -82,6 +82,7 @@ const Projects = () => {
           </div>
         </ScrollReveal>
 
+        {visibleFeatured.length > 0 ? (
         <ScrollReveal variant="up" delay={80}>
           <div className="project-tabs" role="tablist" aria-label="Featured project case studies">
             {visibleFeatured.map((item, index) => (
@@ -103,6 +104,13 @@ const Projects = () => {
             ))}
           </div>
         </ScrollReveal>
+        ) : (
+          // Some filters (Security) only have archive builds; an empty tab
+          // strip and panel would look broken, so point at the archive instead.
+          <p className="project-filter-note">
+            No featured case studies for {activeCategory} — see the {activeCategory} builds in the archive below.
+          </p>
+        )}
 
         {/* Screen readers get told what the filter did; sighted users can see
             the tab strip change, but that change is silent otherwise. */}

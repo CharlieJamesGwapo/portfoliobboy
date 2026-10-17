@@ -21,7 +21,7 @@
 // Bump CACHE_VERSION to evict everything on the next activation.
 // ============================================================================
 
-const CACHE_VERSION = 'v3'
+const CACHE_VERSION = 'v4'
 const SHELL_CACHE = `shell-${CACHE_VERSION}`
 const ASSET_CACHE = `assets-${CACHE_VERSION}`
 const MEDIA_CACHE = `media-${CACHE_VERSION}`
@@ -39,13 +39,16 @@ const MEDIA_PATTERN = /\.(?:png|jpe?g|webp|avif|gif|svg|ico|mp3|wav|ogg|pdf)$/i
 const FONT_PATTERN = /\.(?:woff2?|ttf|otf)$/i
 
 self.addEventListener('install', (event) => {
+  // No skipWaiting here: an updated worker must wait until the visitor accepts
+  // the "update ready" banner (the SKIP_WAITING message below), so a new
+  // version never takes over a page mid-session. A first install has nothing
+  // to wait behind and activates on its own.
   event.waitUntil(
     caches
       .open(SHELL_CACHE)
       // addAll is all-or-nothing: one 404 would abort the whole install and
       // leave the site with no worker. Each entry is fetched independently.
-      .then((cache) => Promise.all(SHELL_ASSETS.map((url) => cache.add(url).catch(() => undefined))))
-      .then(() => self.skipWaiting()),
+      .then((cache) => Promise.all(SHELL_ASSETS.map((url) => cache.add(url).catch(() => undefined)))),
   )
 })
 
@@ -59,6 +62,9 @@ self.addEventListener('activate', (event) => {
       if (self.registration.navigationPreload) {
         await self.registration.navigationPreload.enable().catch(() => undefined)
       }
+      // Only matters on the first install, where the already-open page has no
+      // controller yet; the page ignores that controllerchange (it never had an
+      // old version to replace), so claiming does not reload anything.
       await self.clients.claim()
     })(),
   )

@@ -5,9 +5,9 @@
 // but nothing is quick. This gives keyboard users one shortcut that reaches
 // any section or action, and gives everyone a visible entry point in the nav.
 //
-// Deliberately dependency-free. Matching is a simple subsequence test rather
-// than a fuzzy-search library — the command list is fixed and about twenty
-// items long, so anything heavier would be shipped weight for no benefit.
+// Deliberately dependency-free. Matching is a small tiered score rather than a
+// fuzzy-search library — the command list is fixed and about twenty items
+// long, so anything heavier would be shipped weight for no benefit.
 // ============================================================================
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -39,12 +39,7 @@ const SECTION_ICONS = {
   '#contact': Mail,
 }
 
-// Case-insensitive subsequence match: typing "prj" finds "Projects", which is
-// what people actually expect from a palette, without a scoring library.
-function matches(query, text) {
-  if (!query) return true
-  const haystack = text.toLowerCase()
-  const needle = query.toLowerCase()
+function isSubsequence(needle, haystack) {
   let index = 0
   for (const character of needle) {
     index = haystack.indexOf(character, index)
@@ -52,6 +47,31 @@ function matches(query, text) {
     index += 1
   }
   return true
+}
+
+// Rank how well `query` matches one piece of text: exact > prefix > word
+// prefix > substring > subsequence (typing "prj" still finds "Projects").
+// Subsequence is opt-in because it is only trustworthy on short labels; across
+// longer text it matches almost anything.
+function scoreText(query, text, allowSubsequence) {
+  const haystack = text.toLowerCase()
+  if (haystack === query) return 100
+  if (haystack.startsWith(query)) return 90
+  if (haystack.split(/[^a-z0-9]+/).some((word) => word.startsWith(query))) return 80
+  if (haystack.includes(query)) return 60
+  if (allowSubsequence && isSubsequence(query, haystack)) return 40
+  return 0
+}
+
+// Scored on the label first, then explicit keywords. The hint is descriptive
+// copy ("Jump to section") shared by many commands, so it only ever counts as a
+// substring match and ranks below any label hit; it must never outrank the
+// command the visitor actually named.
+function scoreCommand(query, command) {
+  const labelScore = scoreText(query, command.label, true)
+  const keywordScore = Math.max(0, ...(command.keywords || []).map((word) => scoreText(query, word, false) - 5))
+  const hintScore = command.hint.toLowerCase().includes(query) ? 10 : 0
+  return Math.max(labelScore, keywordScore, hintScore)
 }
 
 export default function CommandPalette({ open, onClose }) {
@@ -108,6 +128,7 @@ export default function CommandPalette({ open, onClose }) {
         id: 'email',
         label: 'Send an email',
         hint: profile.email,
+        keywords: ['mail', 'contact'],
         icon: Mail,
         run: () => { window.location.href = `mailto:${profile.email}` },
       },
@@ -115,6 +136,7 @@ export default function CommandPalette({ open, onClose }) {
         id: 'resume',
         label: 'Open resume (PDF)',
         hint: 'Opens in a new tab',
+        keywords: ['cv', 'pdf', 'download'],
         icon: FileText,
         run: () => window.open(resumeUrl, '_blank', 'noopener,noreferrer'),
       },
@@ -136,6 +158,7 @@ export default function CommandPalette({ open, onClose }) {
         id: 'games',
         label: 'Play the arcade',
         hint: 'Nine playable experiments',
+        keywords: ['games', 'game', 'play'],
         icon: Sparkles,
         run: () => window.dispatchEvent(new CustomEvent('portfolio:open-games')),
       },
@@ -156,14 +179,21 @@ export default function CommandPalette({ open, onClose }) {
     ]
   }, [goTo])
 
-  const results = useMemo(
-    () => commands.filter((command) => matches(query, `${command.label} ${command.hint}`)),
-    [commands, query],
-  )
+  const results = useMemo(() => {
+    const needle = query.trim().toLowerCase()
+    if (!needle) return commands
+    return commands
+      .map((command) => ({ command, score: scoreCommand(needle, command) }))
+      .filter((entry) => entry.score > 0)
+      // Array.prototype.sort is stable, so equal scores keep their listed order.
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.command)
+  }, [commands, query])
 
-  useEffect(() => {
-    setActive(0)
-  }, [query])
+  // `active` is reset in the input handler rather than in an effect: an effect
+  // runs after the render, so an Enter pressed in the same frame as typing
+  // would act on a stale index. The clamp covers any index left past the end.
+  const activeIndex = Math.min(active, Math.max(results.length - 1, 0))
 
   useEffect(() => {
     if (!open) return undefined
@@ -200,8 +230,8 @@ export default function CommandPalette({ open, onClose }) {
   // Keep the highlighted row in view when arrowing past the fold.
   useEffect(() => {
     if (!open) return
-    listRef.current?.children[active]?.scrollIntoView({ block: 'nearest' })
-  }, [active, open])
+    listRef.current?.children[activeIndex]?.scrollIntoView({ block: 'nearest' })
+  }, [activeIndex, open])
 
   if (!open) return null
 
@@ -229,7 +259,7 @@ export default function CommandPalette({ open, onClose }) {
     }
     if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
       event.preventDefault()
-      runCommand(results[active])
+      runCommand(results[activeIndex])
     }
   }
 
@@ -250,11 +280,14 @@ export default function CommandPalette({ open, onClose }) {
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => {
+              setQuery(event.target.value)
+              setActive(0)
+            }}
             placeholder="Search sections and actions…"
             aria-label="Search sections and actions"
             aria-controls="palette-results"
-            aria-activedescendant={results[active] ? `palette-option-${results[active].id}` : undefined}
+            aria-activedescendant={results[activeIndex] ? `palette-option-${results[activeIndex].id}` : undefined}
             role="combobox"
             aria-expanded="true"
             autoComplete="off"
@@ -271,8 +304,8 @@ export default function CommandPalette({ open, onClose }) {
                 key={command.id}
                 id={`palette-option-${command.id}`}
                 role="option"
-                aria-selected={index === active}
-                className={index === active ? 'is-active' : ''}
+                aria-selected={index === activeIndex}
+                className={index === activeIndex ? 'is-active' : ''}
                 onMouseEnter={() => setActive(index)}
                 onClick={() => runCommand(command)}
               >
