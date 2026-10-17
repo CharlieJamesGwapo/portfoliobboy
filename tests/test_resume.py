@@ -56,7 +56,7 @@ class ResumeContentTest(unittest.TestCase):
             ).stdout
 
         normalized = " ".join(extracted.split())
-        self.assertIn("AI Full-Stack Developer (Contract) - Australian Client, Australia 2026 – Present", normalized)
+        self.assertIn("AI Full-Stack Engineer - Zalio · Momentum, Australia · Remote Jun 2026 – Present", normalized)
         self.assertIn("Full-Stack Developer - Rooche Digital Company Jan 2026 – Mar 2026", normalized)
         self.assertIn("Full-Stack Developer - Robustech IT / SocietyOne, Australia Jan 2024 – Dec 2025", normalized)
         self.assertIn("BS in Information Technology - Misamis Oriental Institute of Science and Technology 2022 - 2026", normalized)

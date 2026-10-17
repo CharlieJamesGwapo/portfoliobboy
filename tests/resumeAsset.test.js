@@ -10,5 +10,5 @@ test('the stable resume route is backed by the corrected PDF bytes', () => {
   const digest = createHash('sha256').update(readFileSync(sourcePath)).digest('hex')
 
   assert.equal(resumeUrl, '/charlie-james-abejo-resume.pdf')
-  assert.equal(digest, 'f4e3947a8121b57eb199b96d339530a51524b85957b5806374dadec837c29622')
+  assert.equal(digest, '405938eaf6b9a91b752aebf67e84e003228791a36efad914446235f2211cda6e')
 })

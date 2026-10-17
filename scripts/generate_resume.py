@@ -320,14 +320,16 @@ def build_story():
     story.extend(section("Professional Experience"))
     story.extend([
         experience(
-            "AI Full-Stack Developer (Contract) - Australian Client, Australia",
-            "2026 – Present",
+            "AI Full-Stack Engineer - Zalio · Momentum, Australia · Remote",
+            "Jun 2026 – Present",
             [
-                "Built an enterprise CRM and management platform for an Australian client, unifying member records, subscriptions, payments, visit history, outreach, and revenue/retention dashboards.",
-                "Designed bidirectional Python CRM synchronization with Celery, Redis, durable Postgres jobs, idempotency, bounded retries, and reconciliation against source financial reports.",
-                "Integrated Twilio Voice browser calling and translated plain-language business requirements into technical specifications and production architecture.",
+                "Building Zalio's gym CRM and operations platform, the Alex AI voice agent, and Hasti's AI reception and lead-response products across web, mobile, voice, and automation.",
+                "Lead engineer on the Zalio CRM module (2,000+ commits): omnichannel lead inbox with SLA alerts, forms, campaigns, retention workflows, revenue/retention dashboards, and Twilio browser calling.",
+                "Built Alex, a self-hosted AI voice agent on LiveKit and GPT-Live over Twilio SIP, with evidence-grounded research calls, voicemail detection, a restart-safe call queue, and cited AI call reviews.",
+                "Designed n8n integrations with durable receipts, idempotency keys, and reconciliation linking the voice backend, CRM, GTM engine, calendar, and email.",
+                "Shipped the Hasti Client iOS and Android app (Expo, Fastify, PostgreSQL) in 46 pull requests over nine days, plus bidirectional Python CRM sync (Celery, Redis, durable Postgres jobs) and automated data-migration reconciliation.",
             ],
-            "TypeScript, Next.js 16, React 19, Python, Celery, Redis, Supabase Postgres, Docker, Twilio",
+            "Next.js 16, React 19, TypeScript, Encore.ts, PostgreSQL, LiveKit, Twilio, n8n, Expo, Python",
         ),
         experience(
             "Full-Stack Developer - Rooche Digital Company",

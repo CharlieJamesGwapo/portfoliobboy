@@ -102,11 +102,11 @@ test('publishes the supplied OMJI projects with realistic dates', () => {
 
 test('keeps public client wording anonymous and aligns every visible role timeline', async () => {
   const consumerMarkup = await renderConsumers()
-  const australianExperience = experiences.find((item) => item.role === 'AI Full-Stack Developer')
+  const australianExperience = experiences.find((item) => item.role === 'AI Full-Stack Engineer')
   const societyExperience = experiences.find((item) => item.company === 'Robustech IT / SocietyOne')
   const roocheExperience = experiences.find((item) => item.company === 'Rooche Digital Company')
-  assert.equal(australianExperience?.company, 'Australian client')
-  assert.equal(australianExperience?.period, 'Jun 2026 – Sep 2026')
+  assert.equal(australianExperience?.company, 'Zalio · Momentum')
+  assert.equal(australianExperience?.period, 'Jun 2026 – Present')
   assert.equal(roocheExperience?.period, 'Jan 2026 – Mar 2026')
   assert.equal(societyExperience?.period, 'Jan 2024 – Dec 2025')
 
@@ -137,9 +137,10 @@ test('preserves history and inventory while applying approved date and positioni
   const baselineModule = await import(`data:text/javascript,${encodeURIComponent(baselineSource)}`)
   const expectedExports = {
     ...baselineModule,
-    experiences: baselineModule.experiences.map((experience, index) =>
-      index === 0 ? { ...experience, period: 'Jun 2026 – Sep 2026' } : experience,
-    ),
+    // The current engagement and the Momentum systems showcase were intentionally rewritten
+    // after the baseline; every other history entry must remain identical to the baseline.
+    experiences: [portfolioData.experiences[0], ...baselineModule.experiences.slice(1)],
+    momentumSystems: portfolioData.momentumSystems,
     proofPoints: baselineModule.proofPoints.map((proofPoint, index) =>
       index === 1 ? { value: 'Hands-on', label: 'Development' } : proofPoint,
     ),
@@ -150,6 +151,14 @@ test('preserves history and inventory while applying approved date and positioni
     Object.keys(expectedExports).sort(),
   )
   assert.deepEqual(Object.fromEntries(Object.entries(portfolioData)), expectedExports)
+
+  const [currentRole] = portfolioData.experiences
+  assert.equal(currentRole.role, 'AI Full-Stack Engineer')
+  assert.equal(currentRole.company, 'Zalio · Momentum')
+  assert.equal(currentRole.period, 'Jun 2026 – Present')
+  assert.equal(currentRole.featured, true)
+  assert.equal(currentRole.achievements.length, 9)
+  assert.equal(portfolioData.experiences.length, baselineModule.experiences.length)
 })
 
 test('keeps the original credential inventory and clean resume route', () => {
@@ -215,16 +224,23 @@ test('adds evidence-backed AI, automation, voice, CRM, and integration positioni
 })
 
 test('curates Momentum systems with honest readiness and only verified public links', () => {
-  assert.equal(momentumSystems.length, 8)
+  assert.equal(momentumSystems.length, 13)
   assert.equal(momentumEngineeringGroups.length, 4)
 
   const hasti = momentumSystems.find((system) => system.id === 'hasti')
   assert.equal(hasti?.status, 'Live AI demo')
   assert.equal(hasti?.url, 'https://hasti.com.au/')
 
-  const voiceRuntime = momentumSystems.find((system) => system.id === 'voice-runtime')
-  assert.equal(voiceRuntime?.status, 'Private engineering case study')
-  assert.equal(voiceRuntime?.url, undefined)
+  const alex = momentumSystems.find((system) => system.id === 'alex')
+  assert.equal(alex?.status, 'Live AI demo')
+  assert.equal(alex?.url, 'https://hasti.com.au/')
+  assert.equal(alex?.linkLabel, 'Talk to Alex')
+
+  assert.equal(momentumSystems.some((system) => system.id === 'voice-runtime'), false)
+
+  const gtmEngine = momentumSystems.find((system) => system.id === 'gtm-engine')
+  assert.equal(gtmEngine?.status, 'Private engineering case study')
+  assert.equal(gtmEngine?.url, undefined)
 
   momentumSystems
     .filter((system) => system.url)

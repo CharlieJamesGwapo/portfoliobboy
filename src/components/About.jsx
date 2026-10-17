@@ -19,9 +19,9 @@ const About = () => (
             I build web and mobile applications, focusing on useful features, reliable backends, and clear interfaces.
           </p>
           <p>
-            My recent work includes an enterprise CRM platform built end-to-end for an Australian client: member and payment
-            data, event-driven CRM sync, retention dashboards, and Twilio calling—replacing scattered tools with
-            a single dependable workflow.
+            At Zalio I build the gym CRM and operations platform, Alex—an AI voice agent that researches, calls,
+            and follows up—and Hasti&apos;s AI reception products, connected through n8n workflows that
+            replace scattered tools with a single dependable workflow.
           </p>
           <a href={`mailto:${profile.email}`} className="text-link">
             Discuss a role or project <ArrowUpRight size={17} aria-hidden="true" />
