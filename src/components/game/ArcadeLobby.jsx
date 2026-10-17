@@ -245,48 +245,52 @@ export default function ArcadeLobby({ onClose }) {
       </div>
 
       {/* content */}
-      <div className="relative z-20 h-full overflow-y-auto flex flex-col items-center justify-center px-4 py-20">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 mb-2">
-            🕹 Charlie's Arcade
-          </h1>
-          <p className="text-sm sm:text-base text-gray-400">
-            {playerName ? `Welcome back, ${playerName}.` : 'Nine games. One portfolio. Pick your challenge.'}
-          </p>
-        </div>
+      <div className="relative z-20 h-full overflow-y-auto flex flex-col items-center px-4 py-20">
+        {/* my-auto centres the lobby when it fits and, unlike justify-center,
+            lets it overflow downward so the title stays reachable on phones */}
+        <div className="my-auto w-full flex flex-col items-center">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 mb-2">
+              🕹 Charlie's Arcade
+            </h1>
+            <p className="text-sm sm:text-base text-gray-400">
+              {playerName ? `Welcome back, ${playerName}.` : 'Nine games. One portfolio. Pick your challenge.'}
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl">
-          {GAMES.map((g) => {
-            const best = readBest(g)
-            return (
-              <div
-                key={g.id}
-                className="group flex flex-col bg-white/[0.04] backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:border-white/25 hover:bg-white/[0.07] transition-all duration-300"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className={`text-3xl w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br ${g.accent} shadow-lg`}>
-                    {g.emoji}
-                  </div>
-                  {best != null && (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                      Best: {best}
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-base font-bold text-white mb-1">{g.title}</h3>
-                <p className="text-xs text-gray-400 leading-relaxed flex-1 mb-4">{g.tagline}</p>
-                <button
-                  onClick={() => launch(g.id)}
-                  className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r ${g.accent} text-white text-sm font-semibold hover:shadow-lg transition-all group-hover:scale-[1.02]`}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl">
+            {GAMES.map((g) => {
+              const best = readBest(g)
+              return (
+                <div
+                  key={g.id}
+                  className="group flex flex-col bg-white/[0.04] backdrop-blur-sm border border-white/10 rounded-2xl p-5 hover:border-white/25 hover:bg-white/[0.07] transition-all duration-300"
                 >
-                  <Play size={15} /> Play
-                </button>
-              </div>
-            )
-          })}
-        </div>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`text-3xl w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br ${g.accent} shadow-lg`}>
+                      {g.emoji}
+                    </div>
+                    {best != null && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        Best: {best}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-base font-bold text-white mb-1">{g.title}</h3>
+                  <p className="text-xs text-gray-400 leading-relaxed flex-1 mb-4">{g.tagline}</p>
+                  <button
+                    onClick={() => launch(g.id)}
+                    className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r ${g.accent} text-white text-sm font-semibold hover:shadow-lg transition-all group-hover:scale-[1.02]`}
+                  >
+                    <Play size={15} /> Play
+                  </button>
+                </div>
+              )
+            })}
+          </div>
 
-        <p className="mt-8 text-[11px] text-gray-600">Press ESC to exit · ⚙ in-game for settings</p>
+          <p className="mt-8 text-[11px] text-gray-600">Press ESC to exit · ⚙ in-game for settings</p>
+        </div>
       </div>
 
       {avatarOpen && (

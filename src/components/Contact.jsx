@@ -17,11 +17,21 @@ const validate = (form) => {
   return errors
 }
 
+// Lets a visitor send what they typed from their own mail client when the
+// server could not, instead of retyping it.
+const buildMailto = (form) => {
+  const body = `Name: ${form.name.trim()}\nEmail: ${form.email.trim()}\n\n${form.message.trim()}`
+  return `mailto:${profile.email}?subject=${encodeURIComponent(form.subject.trim())}&body=${encodeURIComponent(body)}`
+}
+
 const Contact = () => {
   const [form, setForm] = useState(initialForm)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
   const [errors, setErrors] = useState({})
+  // Separate from `status`, which editing a field resets: the mail fallback
+  // should stay available (and track the edits) until the visitor resends.
+  const [sendFailed, setSendFailed] = useState(false)
 
   const updateField = (event) => {
     const { name, value } = event.target
@@ -50,6 +60,7 @@ const Contact = () => {
 
     setStatus('sending')
     setMessage('')
+    setSendFailed(false)
 
     // A hung connection would otherwise leave the button on "Sending…" forever.
     const controller = new AbortController()
@@ -69,6 +80,8 @@ const Contact = () => {
       setStatus('success')
       setMessage('Thanks — your message is on its way. I’ll reply as soon as I can.')
     } catch {
+      // The form is deliberately left as typed.
+      setSendFailed(true)
       setStatus('error')
       setMessage(`The form could not send right now. Please email me directly at ${profile.email}.`)
     } finally {
@@ -150,6 +163,11 @@ const Contact = () => {
               {status === 'sending' ? 'Sending…' : 'Send message'}
             </button>
             <p className={`form-status ${status}`} role="status" aria-live="polite">{message}</p>
+            {sendFailed && (
+              <a className="form-fallback" href={buildMailto(form)}>
+                <Mail size={15} aria-hidden="true" /> Open in your email app
+              </a>
+            )}
           </form>
         </ScrollReveal>
       </div>

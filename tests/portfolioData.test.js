@@ -309,6 +309,21 @@ test('renders the additive AI systems section without replacing existing project
   assert.equal(projectArchive.length, 12)
 })
 
+test('derives the Projects heading counts from the data instead of hard-coding them', async () => {
+  const server = await createServer({
+    configFile: resolve(process.cwd(), 'vite.config.js'),
+    server: { middlewareMode: true },
+  })
+  try {
+    const { default: Projects } = await server.ssrLoadModule('/src/components/Projects.jsx')
+    const markup = renderToStaticMarkup(createElement(Projects)).replace(/\s+/g, ' ')
+    assert.match(markup, new RegExp(`${featuredProjects.length} detailed case studies, plus ${projectArchive.length} additional client and independent builds`))
+    assert.match(markup, new RegExp(`Project archive · ${projectArchive.length} additional builds`))
+  } finally {
+    await server.close()
+  }
+})
+
 test('publishes live links with unique ids and https URLs, including Zalio and Hasti', () => {
   assert.ok(liveLinks.length >= 14)
   assert.equal(new Set(liveLinks.map((link) => link.id)).size, liveLinks.length)

@@ -2,8 +2,8 @@
 // AudioManager — public audio API for all arcade games (singleton).
 // PRIMARY system: procedural Web Audio synth (synthAudio.js) — zero files,
 // works everywhere, no network requests, so NO 416 errors.
-// OPTIONAL layer: Howler.js — only activates per-track when a real, non-empty
-// asset file is confirmed present (HEAD probe with content-length > 0).
+// OPTIONAL layer: Howler.js — only loads the tracks listed in AVAILABLE_AUDIO,
+// so a file that is not shipped is never requested (no 404s in the console).
 // Every call is wrapped in try/catch so audio can never crash a game.
 // ============================================================================
 import { Howl, Howler } from 'howler'
@@ -25,6 +25,12 @@ const SFX_FILES = {
   door: '/audio/door_enter.wav',
 }
 
+// Keys (from the two maps above) whose real audio file is shipped. public/audio
+// holds only empty placeholders and is excluded from deploys by .vercelignore,
+// so this is empty and every sound comes from the synth. Add a key here when
+// its file is actually deployed.
+const AVAILABLE_AUDIO = new Set([])
+
 class AudioManagerClass {
   constructor() {
     this.howlMusic = {}
@@ -45,41 +51,28 @@ class AudioManagerClass {
     synth.setSFXMuted(this.sfxMuted)
   }
 
-  // Called from a user gesture. Ensures the synth AudioContext and kicks off a
-  // one-time, non-blocking probe for real audio assets.
+  // Called from a user gesture. Ensures the synth AudioContext and loads any
+  // shipped audio files once.
   init() {
     try { synth.ensure() } catch { /* noop */ }
     if (this.probed) return
     this.probed = true
-    this._probeAssets()
+    this._loadAssets()
   }
 
-  // Best-effort: HEAD each asset; only build a Howl if it exists & is non-empty.
-  async _probeAssets() {
-    const probe = async (url) => {
-      try {
-        const res = await fetch(url, { method: 'HEAD' })
-        if (!res.ok) return false
-        const len = res.headers.get('content-length')
-        return len != null && Number(len) > 0
-      } catch {
-        return false
-      }
-    }
+  _loadAssets() {
     try {
       for (const [key, src] of Object.entries(MUSIC_TRACKS)) {
-        if (await probe(src)) {
-          try {
-            this.howlMusic[key] = new Howl({ src: [src], loop: key !== 'victory', volume: 0, html5: true, onloaderror: () => { delete this.howlMusic[key] } })
-          } catch { /* noop */ }
-        }
+        if (!AVAILABLE_AUDIO.has(key)) continue
+        try {
+          this.howlMusic[key] = new Howl({ src: [src], loop: key !== 'victory', volume: 0, html5: true, onloaderror: () => { delete this.howlMusic[key] } })
+        } catch { /* noop */ }
       }
       for (const [key, src] of Object.entries(SFX_FILES)) {
-        if (await probe(src)) {
-          try {
-            this.howlSfx[key] = new Howl({ src: [src], volume: this.sfxVolume, onloaderror: () => { delete this.howlSfx[key] } })
-          } catch { /* noop */ }
-        }
+        if (!AVAILABLE_AUDIO.has(key)) continue
+        try {
+          this.howlSfx[key] = new Howl({ src: [src], volume: this.sfxVolume, onloaderror: () => { delete this.howlSfx[key] } })
+        } catch { /* noop */ }
       }
     } catch { /* noop */ }
   }

@@ -4,7 +4,7 @@
 // ============================================================================
 import { useEffect, useState } from 'react'
 import { Trophy, Crown, Loader2 } from 'lucide-react'
-import { fetchLeaderboard, isSupabaseConfigured } from '../../lib/supabase'
+import { fetchLeaderboard, isRemoteLeaderboardAvailable, isSupabaseConfigured } from '../../lib/supabase'
 
 function fmtTime(s) {
   if (!s && s !== 0) return '—'
@@ -15,12 +15,16 @@ function fmtTime(s) {
 
 export default function Leaderboard({ limit = 10, refreshSignal = 0, highlightName = '', game = null, metric = 'score' }) {
   const [rows, setRows] = useState(null)
+  const [isLocal, setIsLocal] = useState(false)
 
   useEffect(() => {
     let active = true
     setRows(null)
     fetchLeaderboard(limit, game).then((data) => {
-      if (active) setRows(data || [])
+      if (!active) return
+      // Read after the fetch: a network failure inside it is what flips this.
+      setIsLocal(isSupabaseConfigured && !isRemoteLeaderboardAvailable())
+      setRows(data || [])
     })
     return () => { active = false }
   }, [limit, refreshSignal, game])
@@ -36,6 +40,10 @@ export default function Leaderboard({ limit = 10, refreshSignal = 0, highlightNa
         <p className="text-center text-[11px] text-gray-500 mb-2">
           Supabase not configured — showing local scores. Add VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY to .env.local.
         </p>
+      )}
+
+      {isLocal && (
+        <p className="text-center text-[11px] text-gray-500 mb-2">Showing scores saved on this device</p>
       )}
 
       {rows === null ? (
