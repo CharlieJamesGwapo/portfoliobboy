@@ -1,17 +1,16 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowUp, Loader2, Music2 } from 'lucide-react'
 import { prefetchProps } from './lib/prefetch'
+import { revealSection } from './lib/sectionNavigation'
 import CommandPalette from './components/CommandPalette'
 import UpdateBanner from './components/UpdateBanner'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import LiveProjects from './components/LiveProjects'
 import ProductStudioPreview from './components/ProductStudioPreview'
 import About from './components/About'
 import Experience from './components/Experience'
 import AISystems from './components/AISystems'
 import VoiceAgentDemo from './components/VoiceAgentDemo'
-import Projects from './components/Projects'
 import Skills from './components/Skills'
 import Education from './components/Education'
 import InteractiveLab from './components/InteractiveLab'
@@ -117,7 +116,10 @@ function App() {
 
     // 'instant' overrides the smooth scroll-behavior on <html>: a page-length
     // smooth scroll on arrival is disorienting, and it fights the second pass.
-    const jump = () => target.scrollIntoView({ block: 'start', behavior: 'instant' })
+    const jump = () => {
+      revealSection(target)
+      target.scrollIntoView({ block: 'start', behavior: 'instant' })
+    }
     jump()
     const frame = window.requestAnimationFrame(jump)
     const settle = window.setTimeout(jump, 400)
@@ -125,6 +127,31 @@ function App() {
     return () => {
       window.cancelAnimationFrame(frame)
       window.clearTimeout(settle)
+    }
+  }, [])
+
+  useEffect(() => {
+    const findTarget = (hash) => {
+      if (!hash || hash.length < 2) return null
+      try { return document.querySelector(hash) } catch { return null }
+    }
+    const onAnchorClick = (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+      const anchor = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null
+      const target = findTarget(anchor?.getAttribute('href'))
+      if (target) revealSection(target)
+    }
+    const onHashChange = () => {
+      const target = findTarget(window.location.hash)
+      if (!target) return
+      revealSection(target)
+      target.scrollIntoView({ block: 'start', behavior: 'instant' })
+    }
+    document.addEventListener('click', onAnchorClick)
+    window.addEventListener('hashchange', onHashChange)
+    return () => {
+      document.removeEventListener('click', onAnchorClick)
+      window.removeEventListener('hashchange', onHashChange)
     }
   }, [])
 
@@ -169,12 +196,10 @@ function App() {
       <main id="main-content">
         <Hero />
         <VoiceAgentDemo />
-        <LiveProjects />
         <ProductStudioPreview />
         <About />
         <Experience />
         <AISystems />
-        <Projects />
         <Skills />
         <Education />
         <InteractiveLab />

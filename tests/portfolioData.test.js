@@ -294,8 +294,8 @@ test('renders the additive AI systems section without replacing existing project
     server: { middlewareMode: true },
   })
   try {
-    const { default: AISystems } = await server.ssrLoadModule('/src/components/AISystems.jsx')
-    const markup = renderToStaticMarkup(createElement(AISystems)).replace(/\s+/g, ' ')
+    const { default: AISystems, MomentumSystems } = await server.ssrLoadModule('/src/components/AISystems.jsx')
+    const markup = [AISystems, MomentumSystems].map(Component => renderToStaticMarkup(createElement(Component))).join(' ').replace(/\s+/g, ' ')
     assert.match(markup, /AI systems &amp; automation/i)
     assert.match(markup, /Selected Momentum systems/i)
     assert.match(markup, /Live AI demo/i)

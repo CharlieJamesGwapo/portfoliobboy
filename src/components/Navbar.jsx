@@ -52,16 +52,16 @@ const Navbar = () => {
   useEffect(() => {
     const ids = ['home', ...navigationTargets.map((link) => link.href.slice(1))]
 
-    // Section offsets are cached. Reading `offsetTop` forces a synchronous
-    // layout, and doing that for every section on every scroll frame was the
-    // most expensive thing happening during a scroll. Offsets only change when
-    // the page is re-laid out, so that is when we re-measure.
+    // Cache document-relative positions only when layout changes. Archived
+    // sections may be hidden or nested inside positioned containers.
     let offsets = []
     const measure = () => {
       offsets = ids
         .map((id) => {
           const section = document.getElementById(id)
-          return section ? { id, top: section.offsetTop } : null
+          return section?.getClientRects().length
+            ? { id, top: section.getBoundingClientRect().top + window.scrollY }
+            : null
         })
         .filter(Boolean)
         .sort((a, b) => a.top - b.top) // the early-out below relies on this order

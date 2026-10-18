@@ -38,8 +38,7 @@ const VoiceAgentDemo = () => {
             </div>
             <div className="voice-demo-copy">
               <p>
-                Alex is a self-hosted AI voice agent built on LiveKit Agents and GPT-Live, connected to the phone network over Twilio SIP.
-                Request a callback on hasti.com.au and Alex calls your phone.
+                Listen to a short US or Australian English sample, or request a callback from the live Alex agent on Hasti.
               </p>
               <a className="button button-primary" href={demoUrl} target="_blank" rel="noreferrer">
                 <PhoneCall size={17} aria-hidden="true" />
@@ -55,49 +54,52 @@ const VoiceAgentDemo = () => {
 
         {steps.length > 0 && (
           <ScrollReveal className="vc-reveal" delay={60}>
-            <figure className="vc-figure">
-              <figcaption className="vc-title">
-                <h3 id="vc-title">{flow.title ?? 'Anatomy of a call'}</h3>
-              </figcaption>
+            <details className="voice-engineering">
+              <summary>Explore the voice engineering <span aria-hidden="true">+</span></summary>
+              <figure className="vc-figure">
+                <figcaption className="vc-title">
+                  <h3 id="vc-title">{flow.title ?? 'Anatomy of a call'}</h3>
+                </figcaption>
 
-              <div className="vc-ladder">
-                <div className="vc-parties" aria-hidden="true">
-                  {parties.map((party, index) => (
-                    <span key={party} style={{ gridColumn: `${2 * index + 2} / ${2 * index + 4}` }}>{party}</span>
-                  ))}
+                <div className="vc-ladder">
+                  <div className="vc-parties" aria-hidden="true">
+                    {parties.map((party, index) => (
+                      <span key={party} style={{ gridColumn: `${2 * index + 2} / ${2 * index + 4}` }}>{party}</span>
+                    ))}
+                  </div>
+
+                  <ol className="vc-steps" aria-labelledby="vc-title">
+                    {steps.map((step, index) => {
+                      const [start, end] = messageColumns(step.from, step.to)
+                      const direction = step.from === step.to ? 'self' : step.from < step.to ? 'right' : 'left'
+                      return (
+                        <li key={`${step.t}-${step.label}-${index}`} className="vc-step" style={{ '--vc-i': index }}>
+                          <span className="vc-time">{step.t}</span>
+                          <div className={`vc-msg vc-msg-${direction}`} style={{ gridColumn: `${start} / ${end}` }}>
+                            <span className="vc-label">{step.label}</span>
+                            <span className="vc-arrow" aria-hidden="true" />
+                            <span className="vc-route">
+                              <span className="vc-route-text">{shortName(parties[step.from])} → {shortName(parties[step.to])}</span>
+                            </span>
+                            <span className="vc-detail">{step.detail}</span>
+                          </div>
+                        </li>
+                      )
+                    })}
+                  </ol>
                 </div>
 
-                <ol className="vc-steps" aria-labelledby="vc-title">
-                  {steps.map((step, index) => {
-                    const [start, end] = messageColumns(step.from, step.to)
-                    const direction = step.from === step.to ? 'self' : step.from < step.to ? 'right' : 'left'
-                    return (
-                      <li key={`${step.t}-${step.label}-${index}`} className="vc-step" style={{ '--vc-i': index }}>
-                        <span className="vc-time">{step.t}</span>
-                        <div className={`vc-msg vc-msg-${direction}`} style={{ gridColumn: `${start} / ${end}` }}>
-                          <span className="vc-label">{step.label}</span>
-                          <span className="vc-arrow" aria-hidden="true" />
-                          <span className="vc-route">
-                            <span className="vc-route-text">{shortName(parties[step.from])} → {shortName(parties[step.to])}</span>
-                          </span>
-                          <span className="vc-detail">{step.detail}</span>
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ol>
-              </div>
+                {stats.length > 0 && (
+                  <ul className="vc-stats" aria-label="Call statistics">
+                    {stats.map((stat) => (
+                      <li key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></li>
+                    ))}
+                  </ul>
+                )}
 
-              {stats.length > 0 && (
-                <ul className="vc-stats" aria-label="Call statistics">
-                  {stats.map((stat) => (
-                    <li key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></li>
-                  ))}
-                </ul>
-              )}
-
-              {flow.note && <p className="vc-note">{flow.note}</p>}
-            </figure>
+                {flow.note && <p className="vc-note">{flow.note}</p>}
+              </figure>
+            </details>
           </ScrollReveal>
         )}
       </div>

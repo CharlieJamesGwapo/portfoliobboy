@@ -30,8 +30,7 @@ export default function VoiceSamplePlayer() {
       <div className="voice-listen-heading">
         <span className="voice-listen-icon"><Headphones size={26} aria-hidden="true" /></span>
         <div>
-          <p className="eyebrow">Press play. No callback needed.</p>
-          <h3 id="voice-listen-title">A friendly voice. An easy conversation.</h3>
+          <h3 id="voice-listen-title">Choose your accent.</h3>
         </div>
         <span className="voice-sample-label">Illustrative synthetic audio</span>
       </div>
@@ -66,11 +65,7 @@ export default function VoiceSamplePlayer() {
           ))}
         </ol>
       </details>
-      <div className="voice-languages-note">
-        <div><strong>US and Australian English.</strong><p>Two receptionist demos. Choose an accent and press play.</p></div>
-        <a href="#contact">Discuss your voice experience <ArrowUpRight size={16} aria-hidden="true" /></a>
-      </div>
-      <p className="voice-sample-disclosure" id="voice-sample-disclosure">Scripted samples with AI-generated voices. These are not recordings of Alex or real calls. Use “Talk to Alex” above to try the live agent.</p>
+      <p className="voice-sample-disclosure" id="voice-sample-disclosure">US and Australian English. Scripted samples with AI-generated voices, not recordings of Alex or real calls. “Talk to Alex” opens the live callback demo.</p>
     </div>
   )
 }

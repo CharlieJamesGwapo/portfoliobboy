@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test'
 test('new systems can be filtered and inspected while the existing portfolio remains available', async ({ page }) => {
   await page.goto('/#ai-systems')
   await expect(page.locator('#ai-systems-title')).toBeVisible()
+  await page.getByRole('link', { name: 'Explore the systems' }).click()
   await expect(page.locator('.momentum-card')).toHaveCount(13)
   const filters = page.getByRole('group', { name: 'Filter Momentum systems' })
   await filters.getByRole('button', { name: 'Voice', exact: true }).click()
@@ -28,6 +29,7 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     // by the navigation test above and would compete with lazy-image scrolling.
     await page.goto('/')
     await expect(page.locator('.ai-capability')).toHaveCount(6)
+    await page.locator('#full-project-archive > summary').click()
     await expect(page.locator('.momentum-card')).toHaveCount(width <= 640 ? 3 : 13)
     if (width <= 640) {
       await page.getByRole('button', { name: 'Show all 13 systems', exact: true }).click()

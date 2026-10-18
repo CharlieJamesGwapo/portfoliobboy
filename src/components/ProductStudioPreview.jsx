@@ -1,26 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowUpRight, ChevronRight, ExternalLink, Layers3, Smartphone } from 'lucide-react'
+import { ArrowUpRight, ChevronDown, ChevronRight, Layers3 } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import HeroSystemsScene from './HeroSystemsScene'
-import { featuredProjects, momentumSystems } from '../data/portfolioData'
-import {
-  liveProjectCards,
-  liveProjectLinks,
-  oneRidePreview,
-  secondaryProjectLinks,
-} from '../data/productPreviewData'
+import { oneRidePreview } from '../data/productPreviewData'
+import { selectedCaseStudies } from '../data/selectedCaseStudies'
+import ProjectCollection from './ProjectCollection'
 import './studio-preview.css'
-
-const oneRideProject = featuredProjects.find((project) => project.id === oneRidePreview.projectId)
-
-const sourceProjectById = {
-  hasti: momentumSystems.find((system) => system.id === 'hasti'),
-  gymfactories: momentumSystems.find((system) => system.id === 'gymfactories'),
-  zalio: momentumSystems.find((system) => system.id === 'zalio'),
-}
-
-const oneRideAppLink = liveProjectLinks.find((link) => link.id === 'oneride-app')
-const oneRideSiteLink = liveProjectLinks.find((link) => link.id === 'oneride-site')
+import './selected-work.css'
 
 export function OneRidePhonePreview() {
   const [selectedIndex, setSelectedIndex] = useState(1)
@@ -219,29 +205,6 @@ function StaticOneRideScreenshot() {
   )
 }
 
-function LiveProjectCard({ card }) {
-  const sourceProject = sourceProjectById[card.id]
-  const description = sourceProject?.summary || card.summary
-
-  return (
-    <article className="studio-live-card">
-      <div className="studio-live-card-media">
-        <img src={card.image} alt={card.imageAlt} width="960" height="600" loading="lazy" decoding="async" />
-        <span className="studio-live-card-index" aria-hidden="true">{card.id === 'hasti' ? '02' : card.id === 'gymfactories' ? '03' : '04'}</span>
-      </div>
-      <div className="studio-live-card-copy">
-        <p className="studio-card-eyebrow">{card.eyebrow}</p>
-        <h3>{card.title}</h3>
-        <p>{description}</p>
-        <a className="studio-inline-link" href={card.link.href} target="_blank" rel="noreferrer">
-          {card.link.label}
-          <ArrowUpRight size={16} aria-hidden="true" />
-        </a>
-      </div>
-    </article>
-  )
-}
-
 function SystemsViewDisclosure() {
   const [open, setOpen] = useState(false)
 
@@ -268,83 +231,63 @@ function SystemsViewDisclosure() {
   )
 }
 
+function CaseStudyMedia({ study }) {
+  const [failed, setFailed] = useState(false)
+  return (
+    <figure className={`case-study-media ${study.media === 'oneride' ? 'is-mobile-app' : ''}`}>
+      <div className="case-study-image">
+        {study.media === 'oneride' ? <StaticOneRideScreenshot /> : failed ? (
+          <div className="case-study-image-fallback" role="status"><strong>Website preview unavailable.</strong><span>Use the public product link to explore the work.</span></div>
+        ) : <img src={study.image} alt={study.imageAlt} width="960" height="600" loading="lazy" decoding="async" onError={() => setFailed(true)} />}
+      </div>
+      <figcaption>{study.caption}</figcaption>
+    </figure>
+  )
+}
+
+function SelectedCaseStudy({ study, index }) {
+  return (
+    <article id={`case-${study.id}`} className="selected-case-study" aria-labelledby={`case-${study.id}-title`}>
+      <CaseStudyMedia study={study} />
+      <div className="case-study-copy">
+        <p className="case-study-index"><span>{String(index + 1).padStart(2, '0')}</span>{study.category}</p>
+        <h3 id={`case-${study.id}-title`}>{study.title}</h3>
+        <p className="case-study-overview">{study.overview}</p>
+        <p className="case-study-role">{study.role}</p>
+        <div className="case-study-contribution"><h4>My contribution</h4><p>{study.contribution}</p></div>
+        <div className="case-study-result"><h4>Delivered</h4><p>{study.delivered}</p></div>
+        <div className="case-study-actions">
+          {study.links.map(link => <a key={link.id} href={link.href} target="_blank" rel="noreferrer">{link.label}<ArrowUpRight size={16} aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>)}
+        </div>
+        <p className="case-study-proof">{study.proof}</p>
+        <details className="case-study-engineering">
+          <summary>Read engineering case study<span className="sr-only"> — {study.title}</span><ChevronDown size={17} aria-hidden="true" /></summary>
+          <dl>
+            <div><dt>The problem</dt><dd>{study.problem}</dd></div>
+            <div><dt>Engineering approach</dt><dd>{study.approach}</dd></div>
+            <div><dt>Technical scope</dt><dd><ul>{study.scope.map(item => <li key={item}>{item}</li>)}</ul></dd></div>
+          </dl>
+          <div className="case-study-stack" aria-label="Technologies">{study.stack.map(item => <span key={item}>{item}</span>)}</div>
+        </details>
+      </div>
+    </article>
+  )
+}
+
 export default function ProductStudioPreview() {
   return (
     <section id="product-studio-preview" className="section product-studio-section" aria-labelledby="product-studio-title">
       <div className="page-container">
-        <ScrollReveal variant="up">
-          <div className="studio-heading">
-            <div>
-              <p className="eyebrow">Live projects · public proof</p>
-              <h2 id="product-studio-title">Live product work</h2>
-            </div>
-            <p>
-              A compact look at products you can open now: one official Android app, public product sites, and focused
-              workflows. The full case-study archive remains below.
-            </p>
+        <ScrollReveal>
+          <div className="studio-heading selected-work-heading">
+            <div><p className="eyebrow">Selected work · ownership &amp; delivery</p><h2 id="product-studio-title">Three products.<br />A closer look.</h2></div>
+            <p>What I built, how the systems work, and what was delivered. Start with these three case studies, then explore the full archive.</p>
           </div>
         </ScrollReveal>
-
-        <div className="studio-layout">
-          <ScrollReveal variant="left">
-            <article className="studio-feature-card">
-              <div className="studio-feature-copy">
-                <p className="studio-card-eyebrow">01 · {oneRideProject?.eyebrow || 'Mobile product'}</p>
-                <h3>{oneRideProject?.title || 'OneRide Balingasag'}</h3>
-                <p>{oneRideProject?.overview}</p>
-                <div className="studio-feature-meta">
-                  <span><Smartphone size={15} aria-hidden="true" /> Android app</span>
-                  <span>Official store imagery</span>
-                </div>
-                <div className="studio-action-row">
-                  <a className="button button-dark" href={oneRideAppLink.href} target="_blank" rel="noreferrer">
-                    {oneRideAppLink.label} <ArrowUpRight size={16} aria-hidden="true" />
-                  </a>
-                  <a className="studio-secondary-action" href={oneRideSiteLink.href} target="_blank" rel="noreferrer">
-                    {oneRideSiteLink.label} <ExternalLink size={15} aria-hidden="true" />
-                  </a>
-                </div>
-                <p className="studio-source-note">
-                  App preview · official store screenshots · <a href={oneRidePreview.sourceUrl} target="_blank" rel="noreferrer">source listing</a>
-                </p>
-              </div>
-              <div className="studio-static-phone" aria-label="OneRide official store screenshot preview">
-                <p className="studio-preview-label">A closer look above</p>
-                <StaticOneRideScreenshot />
-                <a href="#home" className="studio-inline-link">See the interactive app preview <ChevronRight size={15} aria-hidden="true" /></a>
-              </div>
-            </article>
-          </ScrollReveal>
-
-          <div className="studio-live-list" aria-label="Other live product previews">
-            {liveProjectCards.map((card, index) => (
-              <ScrollReveal key={card.id} variant="right" delay={index * 55}>
-                <LiveProjectCard card={card} />
-              </ScrollReveal>
-            ))}
-          </div>
+        <div className="selected-case-list">
+          {selectedCaseStudies.map((study, index) => <ScrollReveal key={study.id}><SelectedCaseStudy study={study} index={index} /></ScrollReveal>)}
         </div>
-
-        <ScrollReveal variant="up" delay={90}>
-          <div className="studio-secondary">
-            <div>
-              <p className="studio-card-eyebrow">Secondary collection</p>
-              <h3>More public builds, one click away.</h3>
-            </div>
-            <div className="studio-secondary-links">
-              {secondaryProjectLinks.map((link) => (
-                <a key={link.id} href={link.href} target="_blank" rel="noreferrer">
-                  {link.label} <ArrowUpRight size={15} aria-hidden="true" />
-                </a>
-              ))}
-              <a href="#projects">Open full project archive <ChevronRight size={15} aria-hidden="true" /></a>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        <ScrollReveal variant="fade" delay={120}>
-          <SystemsViewDisclosure />
-        </ScrollReveal>
+        <ProjectCollection><SystemsViewDisclosure /></ProjectCollection>
       </div>
     </section>
   )

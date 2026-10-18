@@ -28,6 +28,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { navigation, profile, resumeUrl } from '../data/portfolioData'
+import { revealSection } from '../lib/sectionNavigation'
 
 const SECTION_ICONS = {
   '#about': User,
@@ -65,6 +66,7 @@ export default function CommandPalette({ open, onClose }) {
   const goTo = useCallback((hash) => {
     const target = document.querySelector(hash)
     if (!target) return
+    revealSection(target)
     // scroll-padding-top on <html> already accounts for the fixed navbar, so
     // scrollIntoView lands the heading in the right place without maths here.
     target.scrollIntoView({ behavior: 'smooth', block: 'start' })

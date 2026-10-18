@@ -39,6 +39,10 @@ Verified portfolio content lives in `src/data/portfolioData.js`, including:
 
 Game-specific narrative content remains in `src/data/gameData.js` because it drives the dungeon experience.
 
+The hiring homepage follows hero → compact voice demo → three selected case studies → about, experience and capabilities. `src/data/selectedCaseStudies.js` curates OneRide, Zalio CRM, and Alex/Hasti from the existing project and resume records. Each study makes personal contribution and delivered capability visible, with problem, engineering approach, and technical scope in a disclosure. Outcomes describe verified functionality; no business-performance metrics are invented. Zalio's imagery is explicitly labelled as its public website, not the private CRM interface.
+
+The full project collection lives inside the collapsed `#full-project-archive` disclosure beneath selected work. It retains the eight original case studies, twelve additional builds, thirteen Momentum systems, live product links, search, filters, and optional systems visualization. Fragment links and the command palette reveal archived destinations before scrolling or transferring focus. The older anonymous Enterprise CRM Platform record remains distinct from the named Zalio CRM case study.
+
 ## Preserved interactive features
 
 - Accessible rotating professional titles
@@ -83,7 +87,7 @@ The selected files are `src/assets/audio/voice-us-natural-v6.m4a` and `src/asset
 
 Scripts and accent tags are in `src/data/voiceSamples.js`. Visitors load only local, content-hashed audio files; there is no runtime speech API, account, paid provider dependency, or model download. Temporary generation models and tooling are removed after verification.
 
-The voice section follows the hero and has a primary navigation link. Vite emits content-hashed audio URLs so previously failed cached URLs are bypassed. A failed recording offers Retry audio and a direct audio link. Native controls use `preload="metadata"` and never autoplay. Switching accents stops the previous sample and updates the transcript. All voices are synthetic, not human recordings, real client calls, or Alex recordings. Vocal naturalness requires listening feedback; browser checks verify playback and interactions. For authentic Alex audio, replace the files with approved, redacted recordings and update the transcripts and disclosure together.
+The compact voice section follows the hero and has a primary navigation link. The real call trace is inside an “Explore the voice engineering” disclosure. Vite emits content-hashed audio URLs so previously failed cached URLs are bypassed. A failed recording offers Retry audio and a direct audio link. Native controls use `preload="metadata"` and never autoplay. Switching accents stops the previous sample and updates the transcript. All voices are synthetic, not human recordings, real client calls, or Alex recordings. Vocal naturalness requires listening feedback; browser checks verify playback and interactions. For authentic Alex audio, replace the files with approved, redacted recordings and update the transcripts and disclosure together.
 
 ## Verification
 
