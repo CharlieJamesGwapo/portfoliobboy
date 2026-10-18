@@ -168,12 +168,12 @@ function App() {
       <Navbar />
       <main id="main-content">
         <Hero />
+        <VoiceAgentDemo />
         <LiveProjects />
         <ProductStudioPreview />
         <About />
         <Experience />
         <AISystems />
-        <VoiceAgentDemo />
         <Projects />
         <Skills />
         <Education />

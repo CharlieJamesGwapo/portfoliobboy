@@ -6,6 +6,7 @@ import './navbar-preview.css'
 const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
 
 const primaryNavigation = [
+  { label: 'Voice demo', href: '#voice-demo' },
   { label: 'Work', href: '#product-studio-preview' },
   { label: 'About', href: '#about' },
   { label: 'Experience', href: '#experience' },
@@ -17,7 +18,6 @@ const moreNavigation = [
   { label: 'Skills', href: '#skills' },
   { label: 'Credentials', href: '#education' },
   { label: 'Interactive Lab', href: '#lab' },
-  { label: 'Voice demo', href: '#voice-demo' },
   { label: 'AI systems', href: '#ai-systems' },
 ]
 
@@ -25,9 +25,9 @@ const moreNavigation = [
 // systems anchors added as additive entries rather than rewriting the source
 // navigation export in portfolioData.js.
 const mobileNavigation = [
+  { label: 'Voice demo', href: '#voice-demo' },
   { label: 'Work', href: '#product-studio-preview' },
   ...links,
-  { label: 'Voice demo', href: '#voice-demo' },
   { label: 'AI systems', href: '#ai-systems' },
 ]
 

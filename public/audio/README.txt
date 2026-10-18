@@ -1,3 +1,5 @@
+Selected voice recordings live in src/assets/audio/ and are emitted with content hashes by Vite.
+
 Portfolio voice samples
 
 Current player: US English and Australian English only.

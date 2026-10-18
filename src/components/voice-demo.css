@@ -130,6 +130,8 @@
 .voice-transcript { padding-bottom: 16px; max-width: 80ch; }
 .voice-sample-disclosure { color: var(--mist); font-size: .75rem; line-height: 1.65; max-width: 100ch; }
 .voice-audio-error { padding: 12px 0; color: var(--paper); font-size: .85rem; }
+.voice-audio-error p { margin-bottom: 12px; }
+.voice-audio-error a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-left: 16px; color: var(--mint); }
 @media (max-width: 640px) {
   .voice-listen-heading { gap: 12px; }
   .voice-listen-heading > div { min-width: 0; }

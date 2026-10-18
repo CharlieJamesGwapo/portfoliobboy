@@ -6,12 +6,22 @@ export default function VoiceSamplePlayer() {
   const [selectedId, setSelectedId] = useState(voiceSamples[0].id)
   const selected = voiceSamples.find((sample) => sample.id === selectedId) || voiceSamples[0]
   const [failed, setFailed] = useState(false)
+  const [retry, setRetry] = useState(0)
   const audioRef = useRef(null)
-
-  const selectSample = (sample) => {
-    if (sample.id === selected.id) return
+  const retrySample = () => {
     audioRef.current?.pause()
     setFailed(false)
+    setRetry((value) => value + 1)
+  }
+
+  const selectSample = (sample) => {
+    if (sample.id === selected.id) {
+      if (failed) retrySample()
+      return
+    }
+    audioRef.current?.pause()
+    setFailed(false)
+    setRetry(0)
     setSelectedId(sample.id)
   }
 
@@ -37,11 +47,15 @@ export default function VoiceSamplePlayer() {
           <h4>{selected.title}</h4>
           <p>{selected.description}</p>
         </div>
-        <audio key={selected.id} ref={audioRef} src={selected.src} controls preload="metadata" aria-label={`${selected.title} synthetic voice sample`} aria-describedby="voice-sample-disclosure" onError={() => setFailed(true)}>
+        <audio key={`${selected.id}-${retry}`} ref={audioRef} src={retry ? `${selected.src}?retry=${retry}` : selected.src} controls preload="metadata" aria-label={`${selected.title} synthetic voice sample`} aria-describedby="voice-sample-disclosure" onError={() => setFailed(true)}>
           Your browser does not support audio playback. Read the sample transcript below.
         </audio>
       </div>
-      {failed && <p className="voice-audio-error" role="status">Audio could not load. Read the transcript below or reload the page to try again.</p>}
+      {failed && <div className="voice-audio-error">
+        <p role="status">Audio could not load. Retry the recording or read the transcript below.</p>
+        <button type="button" className="button button-primary" onClick={retrySample}>Retry audio</button>
+        <a href={selected.src} target="_blank" rel="noreferrer">Open audio directly <ArrowUpRight size={16} aria-hidden="true" /></a>
+      </div>}
       <details className="voice-transcript-disclosure">
         <summary>Read sample transcript</summary>
         <ol className="voice-transcript" lang={selected.lang} aria-label="Sample transcript">

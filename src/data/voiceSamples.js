@@ -1,5 +1,7 @@
 // Two scripted English receptionist demos generated with Chatterbox Turbo.
 // Synthetic voice references only; not real people or client calls.
+import usAudio from '../assets/audio/voice-us-chatterbox-v5.m4a'
+import auAudio from '../assets/audio/voice-au-chatterbox-v5.m4a'
 export const voiceSamples = [
   {
     "id": "us",
@@ -21,7 +23,7 @@ export const voiceSamples = [
         "text": "Sure, let me check Thursday for you. Would morning or afternoon work better?"
       }
     ],
-    "src": "/audio/voice-us-chatterbox-v5.m4a"
+    "src": usAudio
   },
   {
     "id": "au",
@@ -43,6 +45,6 @@ export const voiceSamples = [
         "text": "Yeah, absolutely. Happy to help with that. Have you got a day in mind?"
       }
     ],
-    "src": "/audio/voice-au-chatterbox-v5.m4a"
+    "src": auAudio
   }
 ]

@@ -1,5 +1,24 @@
 import { test, expect } from '@playwright/test'
 
+test('US audio can retry after a failed load without reloading the page', async ({ page }) => {
+  let available = false
+  await page.route(/voice-us-chatterbox.*\.m4a/, (route) => available || route.request().resourceType() === 'script' ? route.continue() : route.abort())
+  await page.goto('/#voice-demo')
+  const demo = page.locator('#voice-demo')
+  await demo.locator('audio').evaluate((element) => element.load())
+  await expect(demo.getByRole('status')).toContainText('Audio could not load')
+  available = true
+  await demo.getByRole('button', { name: 'Retry audio', exact: true }).click()
+  await expect(demo.getByRole('status')).toHaveCount(0)
+  await demo.locator('audio').evaluate((element) => element.play())
+  await expect.poll(() => demo.locator('audio').evaluate((element) => element.currentTime)).toBeGreaterThan(0)
+})
+
+test('voice demo is the first section after the hero', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.locator('main > section').nth(1)).toHaveAttribute('id', 'voice-demo')
+})
+
 test('language selector plays distinct regional audio and updates transcript language', async ({ page }) => {
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
@@ -7,8 +26,8 @@ test('language selector plays distinct regional audio and updates transcript lan
   await expect(options.getByRole('button')).toHaveCount(2)
   await demo.getByText('Read sample transcript', { exact: true }).click()
   for (const [title, lang, src] of [
-    ['US English', 'en-US', '/audio/voice-us-chatterbox-v5.m4a'],
-    ['Australian English', 'en-AU', '/audio/voice-au-chatterbox-v5.m4a'],
+    ['US English', 'en-US', /voice-us-chatterbox-v5(?:-[\w-]+)?\.m4a$/],
+    ['Australian English', 'en-AU', /voice-au-chatterbox-v5(?:-[\w-]+)?\.m4a$/],
   ]) {
     await options.getByRole('button', { name: title, exact: true }).click()
     await expect(options.getByRole('button', { name: title, exact: true })).toHaveAttribute('aria-pressed', 'true')
@@ -30,7 +49,7 @@ test('language selector plays distinct regional audio and updates transcript lan
 })
 
 test('a failed language sample can recover by choosing another voice', async ({ page }) => {
-  await page.route('**/voice-au-chatterbox-v5.m4a', (route) => route.abort())
+  await page.route(/voice-au-chatterbox.*\.m4a/, (route) => route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
   await demo.getByRole('button', { name: 'Australian English', exact: true }).click()
