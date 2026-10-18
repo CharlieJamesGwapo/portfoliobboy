@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test('US audio can retry after a failed load without reloading the page', async ({ page }) => {
   let available = false
-  await page.route(/voice-us-chatterbox.*\.m4a/, (route) => available || route.request().resourceType() === 'script' ? route.continue() : route.abort())
+  await page.route(/voice-us-[^/]+\.m4a/, (route) => available || route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
   await demo.locator('audio').evaluate((element) => element.load())
@@ -26,19 +26,21 @@ test('language selector plays distinct regional audio and updates transcript lan
   await expect(options.getByRole('button')).toHaveCount(2)
   await demo.getByText('Read sample transcript', { exact: true }).click()
   for (const [title, lang, src] of [
-    ['US English', 'en-US', /voice-us-chatterbox-v5(?:-[\w-]+)?\.m4a$/],
-    ['Australian English', 'en-AU', /voice-au-chatterbox-v5(?:-[\w-]+)?\.m4a$/],
+    ['US English', 'en-US', /voice-us-natural-v6(?:-[\w-]+)?\.m4a$/],
+    ['Australian English', 'en-AU', /voice-au-natural-v6(?:-[\w-]+)?\.m4a$/],
   ]) {
     await options.getByRole('button', { name: title, exact: true }).click()
     await expect(options.getByRole('button', { name: title, exact: true })).toHaveAttribute('aria-pressed', 'true')
     await expect(demo.locator('.voice-transcript')).toHaveAttribute('lang', lang)
-    await expect(demo.locator('.voice-transcript li')).toHaveCount(3)
+    await expect(demo.locator('.voice-transcript li')).toHaveCount(6)
+    await expect(demo.locator('.voice-transcript')).toContainText('Thursday')
     await expect(demo.locator('.voice-transcript')).toContainText('Customer')
     const audio = demo.locator('audio')
     await expect(audio).toHaveAttribute('src', src)
     await audio.evaluate((element) => element.play())
     await expect.poll(() => audio.evaluate((element) => element.currentTime)).toBeGreaterThan(0)
-    expect(await audio.evaluate((element) => element.duration)).toBeGreaterThan(5)
+    expect(await audio.evaluate((element) => element.duration)).toBeGreaterThan(20)
+    expect(await audio.evaluate((element) => element.duration)).toBeLessThan(60)
   }
   await expect(demo.getByRole('button', { name: 'Filipino / Taglish', exact: true })).toHaveCount(0)
   await expect(demo).toContainText('US and Australian English')
@@ -49,7 +51,7 @@ test('language selector plays distinct regional audio and updates transcript lan
 })
 
 test('a failed language sample can recover by choosing another voice', async ({ page }) => {
-  await page.route(/voice-au-chatterbox.*\.m4a/, (route) => route.request().resourceType() === 'script' ? route.continue() : route.abort())
+  await page.route(/voice-au-[^/]+\.m4a/, (route) => route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
   await demo.getByRole('button', { name: 'Australian English', exact: true }).click()
@@ -58,4 +60,26 @@ test('a failed language sample can recover by choosing another voice', async ({ 
   await expect(demo.getByRole('status')).toHaveCount(0)
   await demo.locator('audio').evaluate((element) => element.play())
   await expect.poll(() => demo.locator('audio').evaluate((element) => element.currentTime)).toBeGreaterThan(0)
+})
+
+test('both voices play, pause and seek within a mobile screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/#voice-demo')
+  const demo = page.locator('#voice-demo')
+  await demo.scrollIntoViewIfNeeded()
+  for (const title of ['US English', 'Australian English']) {
+    await demo.getByRole('button', { name: title, exact: true }).click()
+    const audio = demo.locator('audio')
+    await audio.evaluate((element) => element.play())
+    await expect.poll(() => audio.evaluate((element) => element.currentTime)).toBeGreaterThan(0)
+    await audio.evaluate((element) => { element.pause(); element.currentTime = element.duration - 1 })
+    await expect(audio).toHaveJSProperty('paused', true)
+    await audio.evaluate((element) => element.play())
+    await expect.poll(() => audio.evaluate((element) => element.ended)).toBe(true)
+    const bounds = await audio.boundingBox()
+    expect(bounds.x).toBeGreaterThanOrEqual(0)
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(390)
+    await expect(demo.getByRole('status')).toHaveCount(0)
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
 })

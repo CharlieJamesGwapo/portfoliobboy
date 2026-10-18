@@ -1,26 +1,38 @@
-// Two scripted English receptionist demos generated with Chatterbox Turbo.
-// Synthetic voice references only; not real people or client calls.
-import usAudio from '../assets/audio/voice-us-chatterbox-v5.m4a'
-import auAudio from '../assets/audio/voice-au-chatterbox-v5.m4a'
+// Scripted synthetic conversations; no real people, client calls or reference recordings.
+import usAudio from '../assets/audio/voice-us-natural-v6.m4a'
+import auAudio from '../assets/audio/voice-au-natural-v6.m4a'
+
 export const voiceSamples = [
   {
     "id": "us",
     "title": "US English",
     "lang": "en-US",
     "region": "US",
-    "description": "A US receptionist helps a caller arrange an appointment.",
+    "description": "A US receptionist helps a caller book a studio visit.",
     "dialogue": [
       {
         "speaker": "Receptionist",
-        "text": "Hi, thanks for calling. What can I help you with today?"
+        "text": "Hi, thanks for calling. Emma speaking. How can I help?"
       },
       {
         "speaker": "Customer",
-        "text": "Hi! I'd like to make an appointment. Do you have anything on Thursday?"
+        "text": "Hi, I'm thinking about joining. Could I come in and have a look around?"
       },
       {
         "speaker": "Receptionist",
-        "text": "Sure, let me check Thursday for you. Would morning or afternoon work better?"
+        "text": "Absolutely. I've got Thursday at ten thirty, or Friday afternoon. What works better for you?"
+      },
+      {
+        "speaker": "Customer",
+        "text": "Thursday at ten thirty sounds good."
+      },
+      {
+        "speaker": "Receptionist",
+        "text": "Thursday it is. I'll send you the details, and we'll see you then."
+      },
+      {
+        "speaker": "Customer",
+        "text": "Perfect, thanks so much."
       }
     ],
     "src": usAudio
@@ -30,19 +42,31 @@ export const voiceSamples = [
     "title": "Australian English",
     "lang": "en-AU",
     "region": "AU",
-    "description": "A receptionist helps an Australian caller arrange a visit.",
+    "description": "An Australian receptionist helps a caller book a studio visit.",
     "dialogue": [
       {
         "speaker": "Receptionist",
-        "text": "Hi there, thanks for calling! How can I help?"
+        "text": "Hi, you've reached the studio. Emma speaking. How can I help?"
       },
       {
         "speaker": "Customer",
-        "text": "Hi! I was hoping to have a look around before I sign up. Is that something I can do?"
+        "text": "Hi, I was hoping to pop in for a look around before I sign up. Is that alright?"
       },
       {
         "speaker": "Receptionist",
-        "text": "Yeah, absolutely. Happy to help with that. Have you got a day in mind?"
+        "text": "Yeah, of course. We've got Thursday at half past ten, or Friday arvo. Which suits you?"
+      },
+      {
+        "speaker": "Customer",
+        "text": "Thursday at half past ten would be great."
+      },
+      {
+        "speaker": "Receptionist",
+        "text": "Lovely, you're booked in for Thursday. I'll send you the details. See you then."
+      },
+      {
+        "speaker": "Customer",
+        "text": "Thanks for your help. See you Thursday."
       }
     ],
     "src": auAudio
