@@ -45,7 +45,13 @@ for (const hash of ['projects', 'momentum-work', 'live-projects']) {
 
 test('command palette reveals a closed archive and transfers focus', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Open command palette to search sections and actions' }).click()
+  const mobileMenu = page.getByRole('button', { name: 'Open navigation menu', exact: true })
+  if (await mobileMenu.isVisible()) {
+    await mobileMenu.click()
+    await page.getByRole('button', { name: 'Search sections and actions', exact: true }).click()
+  } else {
+    await page.getByRole('button', { name: 'Open command palette to search sections and actions' }).click()
+  }
   await page.getByRole('combobox').fill('Projects')
   await page.getByRole('combobox').press('Enter')
   await expect(page.locator('#full-project-archive')).toHaveAttribute('open', '')
