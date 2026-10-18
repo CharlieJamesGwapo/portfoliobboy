@@ -5,7 +5,7 @@ import SectionHeading from './SectionHeading'
 import { certifications, education, recognitions } from '../data/portfolioData'
 import './education.css'
 
-// Records shown per credential panel before the mobile "Show all" toggle (CSS-only; desktop shows all).
+// Keep long credential lists compact until the visitor expands them.
 const MOBILE_VISIBLE_RECORDS = 4
 
 const aiCredentials = certifications.filter((credential) => credential.issuer === 'Anthropic')

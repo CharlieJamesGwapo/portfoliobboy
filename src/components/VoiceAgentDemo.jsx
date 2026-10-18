@@ -1,5 +1,6 @@
 import { ArrowUpRight, PhoneCall } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
+import VoiceSamplePlayer from './VoiceSamplePlayer'
 import { liveLinks, voiceCallFlow } from '../data/portfolioData'
 import './voice-demo.css'
 
@@ -33,7 +34,7 @@ const VoiceAgentDemo = () => {
           <div className="voice-demo-intro">
             <div>
               <p className="eyebrow">Voice agent demo</p>
-              <h2 id="voice-demo-title">Hear Alex for yourself.</h2>
+              <h2 id="voice-demo-title">Hear the conversation.</h2>
             </div>
             <div className="voice-demo-copy">
               <p>
@@ -49,6 +50,8 @@ const VoiceAgentDemo = () => {
             </div>
           </div>
         </ScrollReveal>
+
+        <ScrollReveal><VoiceSamplePlayer /></ScrollReveal>
 
         {steps.length > 0 && (
           <ScrollReveal className="vc-reveal" delay={60}>

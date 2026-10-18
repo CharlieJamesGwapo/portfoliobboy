@@ -42,8 +42,12 @@ Game-specific narrative content remains in `src/data/gameData.js` because it dri
 ## Preserved interactive features
 
 - Accessible rotating professional titles
-- Eight-game Interactive Lab
+- Nine-game Interactive Lab
 - Optional YouTube playlist music player with no autoplay
+- Searchable project case studies and archive, with category filters and empty-state recovery
+- A featured receptionist/customer conversation with native playback controls, transcript, and audio-error recovery
+- Official OneRide screenshots in the project case study
+- Compact expandable project archive and credential lists
 - Project, experience, and credential statistics
 - Active sticky navigation and accessible mobile menu
 - Validated contact form using the existing real submission endpoint
@@ -69,4 +73,25 @@ Do not send test contact submissions during QA.
 
 ## Missing media
 
-Five authentic Anthropic certificate images are included and shown in the credentials gallery. The repository still does not contain authentic project screenshots, images for the remaining text-only credentials, individual repository URLs for private or unlinked work, or real dungeon audio. The UI reports unavailable media honestly and does not substitute stock images, dummy credentials, or fabricated links.
+Five authentic Anthropic certificate images are included and shown in the credentials gallery. Official OneRide app screenshots and public Momentum product previews are included. Other project case studies still need authentic screenshots, images for the remaining text-only credentials, individual repository URLs for private or unlinked work, or real dungeon audio. The UI reports unavailable media honestly and does not substitute stock images, dummy credentials, or fabricated links.
+
+## Voice samples
+
+The player offers exactly two English demos: US English and Australian English. Both selected recordings are now freshly generated with Resemble AI's free, open-source [Chatterbox Turbo](https://huggingface.co/ResembleAI/chatterbox-turbo), run locally through MLX Audio 0.5.9 using the [MLX 4-bit conversion](https://huggingface.co/mlx-community/chatterbox-turbo-4bit). The base model is MIT-licensed; the conversion's model card specifies Apache 2.0. The hosted demo failed to produce audio, so local generation was used. There is no paid provider account or runtime speech API dependency.
+
+The selected files are `public/audio/voice-us-chatterbox-v5.m4a` and `public/audio/voice-au-chatterbox-v5.m4a`, exported as mono AAC at 128 kbps. Both conversations were generated anew, rather than using a tempo adjustment of an earlier recording. Synthetic US reference voices came from the prior Kokoro conversation; synthetic AU reference voices came from the prior Qwen conversation. No actual person's recording was used for voice conditioning. Generation used temperature 0.8, top-p 0.95, repetition penalty 1.2, and connected speech for each complete turn. There are no forced laughs or added breath effects. Detailed provenance is in `public/audio/README.txt`.
+
+Scripts and accent tags are in `src/data/voiceSamples.js`. Visitors load only local audio files; model weights and generation tools are outside the app. Older English recordings remain as unused alternatives. Filipino has been removed from the selector and its public audio files have been removed.
+
+Native controls use `preload="metadata"` and never autoplay. Switching accents stops the previous sample and updates the transcript. All voices are synthetic, not human recordings, real client calls, or Alex recordings. Vocal naturalness requires listening feedback; browser checks verify playback and interactions. For authentic Alex audio, replace the files with approved, redacted recordings and update the transcripts and disclosure together.
+
+## Verification
+
+Run `npm test`, `npm run build`, and `npx playwright test`. Browser checks need `npx playwright install` once. The Python resume check needs ReportLab and `pdftotext`; use the bundled Codex Python runtime if the system Python lacks ReportLab. Contact browser tests intercept requests so they do not send real email.
+
+## Recommended next content
+
+- Add approved screenshots for the remaining case studies.
+- The authenticated Momentum review found 34 private repositories. Members, Campaigns, and Drive are candidates for deeper case studies beyond their current group-level mentions; confirm personal contribution and public-safe screenshots before expanding the published copy. Some other repositories still have starter-template READMEs, so repository existence alone should not be presented as a delivered product.
+- Add measured outcomes with supporting evidence and client-approved testimonials.
+- Replace illustrative voice scripts with an approved Alex recording when available.

@@ -66,19 +66,18 @@ test('shows an honest official-listing state when every OneRide screenshot fails
 })
 
 test('retries a failed OneRide screenshot after a deliberate selection', async ({ page }) => {
-  let failedOnce = false
-  await page.route('**/projects/oneride/official-screen-03.png', (route) => {
-    if (!failedOnce) {
-      failedOnce = true
-      return route.abort()
-    }
-    return route.continue()
-  })
+  let imageAvailable = false
+  // The same image also appears in the case-study gallery. Keep it unavailable
+  // until the preview has exercised its fallback, regardless of request order.
+  await page.route('**/projects/oneride/official-screen-03.png', (route) => (
+    imageAvailable ? route.continue() : route.abort()
+  ))
   await page.goto('/#home')
   const preview = page.locator('[data-testid="oneride-preview"]')
   const orders = preview.getByRole('button', { name: /Show OneRide screenshot 3: Orders/i })
   await orders.click()
   await expect(orders).toHaveAttribute('aria-pressed', 'false')
+  imageAvailable = true
   await orders.click()
   await expect(orders).toHaveAttribute('aria-pressed', 'true')
   await expect(preview.locator('img[data-testid="oneride-screen"]')).toHaveAttribute('alt', /screenshot 3 showing the orders screen/i)

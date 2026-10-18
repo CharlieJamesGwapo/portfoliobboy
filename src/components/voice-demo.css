@@ -108,3 +108,52 @@
   .motion-ready .vc-reveal:not(.is-visible) .vc-label,
   .motion-ready .vc-reveal:not(.is-visible) .vc-detail { opacity: 1 !important; }
 }
+
+/* Listening comes before the engineering detail; files load on user request. */
+.voice-listen-card { margin-bottom: 32px; padding: clamp(20px, 3vw, 36px); border: 1px solid rgba(103,224,193,.35); border-radius: 20px; background: radial-gradient(ellipse at top right, rgba(103,224,193,.09), transparent 65%), var(--ink-soft); }
+.voice-listen-heading { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+.voice-listen-icon { display: grid; place-items: center; flex: 0 0 52px; height: 52px; border-radius: 15px; background: rgba(103,224,193,.1); color: var(--mint); }
+.voice-listen-heading h3 { margin-top: 6px; font-size: clamp(1.25rem, 2.5vw, 1.8rem); letter-spacing: -.035em; line-height: 1.2; }
+.voice-sample-label { margin-left: auto; padding: 7px 12px; border: 1px solid var(--line-dark); border-radius: 999px; font-size: .72rem; color: var(--mist); }
+.voice-sample-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 28px; }
+.voice-sample-options button { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 16px; border: 1px solid var(--line-dark); border-radius: 10px; text-align: left; background: transparent; color: var(--mist); font-size: .85rem; line-height: 1.4; cursor: pointer; }
+.voice-sample-options button > span { color: var(--mint); font-size: .68rem; }
+.voice-sample-options button[aria-pressed='true'] { color: var(--paper); border-color: var(--mint); background: rgba(103,224,193,.09); }
+.voice-sample-options button:hover { border-color: var(--mint); }
+.voice-sample-options button:focus-visible, .voice-transcript-disclosure summary:focus-visible { outline: 2px solid var(--mint); outline-offset: 4px; }
+.voice-sample-body { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 24px; padding: 26px 0; }
+.voice-sample-body h4 { font-size: 1.1rem; font-weight: 650; margin-bottom: 8px; }
+.voice-sample-body p, .voice-transcript { font-size: .9rem; color: var(--mist); line-height: 1.75; }
+.voice-sample-body audio { display: block; width: 100%; min-width: 0; color-scheme: light; border-radius: 999px; }
+.voice-transcript-disclosure { border-top: 1px solid var(--line-dark); }
+.voice-transcript-disclosure summary { cursor: pointer; padding: 15px 0; min-height: 48px; color: var(--mint); font-size: .85rem; }
+.voice-transcript { padding-bottom: 16px; max-width: 80ch; }
+.voice-sample-disclosure { color: var(--mist); font-size: .75rem; line-height: 1.65; max-width: 100ch; }
+.voice-audio-error { padding: 12px 0; color: var(--paper); font-size: .85rem; }
+@media (max-width: 640px) {
+  .voice-listen-heading { gap: 12px; }
+  .voice-listen-heading > div { min-width: 0; }
+  .voice-sample-label { margin-left: 0; }
+  .voice-sample-options { grid-template-columns: 1fr; margin-top: 20px; gap: 8px; }
+  .voice-sample-options button { min-height: 48px; }
+  .voice-sample-body { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 22px 0; }
+}
+
+/* Keep the disclosure badge from squeezing the heading on narrow screens. */
+@media (max-width: 640px) {
+  .voice-listen-heading { grid-template-columns: 44px minmax(0, 1fr); }
+  .voice-listen-icon { width: 44px; height: 44px; }
+  .voice-sample-label { grid-column: 1 / -1; justify-self: start; margin-top: 4px; }
+}
+
+.voice-transcript { list-style: none; margin: 0; padding: 0 0 16px; display: grid; gap: 12px; }
+.voice-transcript li { padding: 12px 16px; border-radius: 10px; background: rgba(255,255,255,.04); border-left: 2px solid var(--mint); }
+.voice-transcript li[data-speaker='Caller'] { margin-left: 24px; border-left-color: var(--mist); }
+.voice-transcript strong { display: block; margin-bottom: 4px; font-size: .7rem; color: var(--mint); }
+.voice-transcript li[data-speaker='Caller'] strong { color: var(--paper); }
+.voice-transcript p { margin: 0; }
+
+.voice-languages-note { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding: 20px 0; border-top: 1px solid var(--line-dark); }
+.voice-languages-note strong { display: block; margin-bottom: 6px; color: var(--paper); font-size: .93rem; line-height: 1.5; }
+.voice-languages-note p { color: var(--mist); font-size: .8rem; line-height: 1.65; }
+.voice-languages-note a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--mint); font-size: .8rem; }

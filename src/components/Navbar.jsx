@@ -17,6 +17,7 @@ const moreNavigation = [
   { label: 'Skills', href: '#skills' },
   { label: 'Credentials', href: '#education' },
   { label: 'Interactive Lab', href: '#lab' },
+  { label: 'Voice demo', href: '#voice-demo' },
   { label: 'AI systems', href: '#ai-systems' },
 ]
 
@@ -26,6 +27,7 @@ const moreNavigation = [
 const mobileNavigation = [
   { label: 'Work', href: '#product-studio-preview' },
   ...links,
+  { label: 'Voice demo', href: '#voice-demo' },
   { label: 'AI systems', href: '#ai-systems' },
 ]
 
@@ -201,7 +203,12 @@ const Navbar = () => {
   const closeMenu = () => setOpen(false)
   const closeMore = () => setMoreOpen(false)
   const handleMoreFocusOut = (event) => {
-    if (!event.currentTarget.contains(event.relatedTarget)) closeMore()
+    if (event.currentTarget.contains(event.relatedTarget)) return
+    // WebKit blurs the desktop disclosure as CSS hides it, before resize.
+    if (!event.relatedTarget && window.innerWidth <= 860) {
+      window.setTimeout(() => toggleRef.current?.focus(), 0)
+    }
+    closeMore()
   }
   const moreIsActive = moreNavigation.some((link) => active === link.href.slice(1))
 

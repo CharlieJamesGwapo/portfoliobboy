@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, Briefcase, Github, Linkedin, Mail, MapPin } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, Briefcase, Headphones, Github, Linkedin, Mail, MapPin } from 'lucide-react'
 import { aiCapabilityRibbon, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import AnimatedStat from './AnimatedStat'
 import { OneRidePhonePreview } from './ProductStudioPreview'
@@ -48,6 +48,7 @@ const Hero = () => (
           <a className="hero-contact-link" href="#contact">
             <Briefcase size={16} aria-hidden="true" /> Get in touch <ArrowUpRight size={14} aria-hidden="true" />
           </a>
+          <a className="hero-contact-link" href="#voice-demo"><Headphones size={16} aria-hidden="true" /> Listen to a voice demo <ArrowDown size={14} aria-hidden="true" /></a>
         </div>
 
         <div className="hero-socials hero-enter hero-enter-7" aria-label="Profile links">
