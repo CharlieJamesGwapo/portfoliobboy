@@ -63,14 +63,34 @@ function AvatarBadge({ size = 40 }) {
   return <canvas ref={ref} width={size} height={size} className="rounded-lg" style={{ imageRendering: 'pixelated' }} />
 }
 
-function LeaderboardModal({ onClose }) {
+function LeaderboardModal({ onClose, returnFocusRef }) {
   const [tab, setTab] = useState('dungeon')
+  const modalRef = useRef(null)
+  const closeRef = useRef(null)
+  useEffect(() => {
+    const opener = returnFocusRef.current || document.activeElement
+    closeRef.current?.focus()
+    return () => opener?.focus?.()
+  }, [returnFocusRef])
+  const trapFocus = (event) => {
+    if (event.key !== 'Tab') return
+    const buttons = Array.from(modalRef.current.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex="0"]'))
+      .filter((element) => element.offsetParent !== null)
+    if (!buttons.length) return
+    // Explicit cycling also supports Safari's default button-tab behavior.
+    event.preventDefault()
+    const current = buttons.indexOf(document.activeElement)
+    const next = event.shiftKey
+      ? (current <= 0 ? buttons.length - 1 : current - 1)
+      : (current + 1) % buttons.length
+    buttons[next].focus()
+  }
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div ref={modalRef} role="dialog" aria-modal="true" aria-label="Arcade leaderboards" onKeyDown={trapFocus} className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
       <div className="w-full max-w-lg max-h-[88vh] overflow-hidden flex flex-col bg-gradient-to-br from-gray-900 to-gray-950 border border-amber-500/30 rounded-2xl shadow-2xl">
         <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
           <h3 className="text-lg font-bold text-white flex items-center gap-2"><Trophy size={18} className="text-amber-400" /> Leaderboards</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10" aria-label="Close"><X size={18} /></button>
+          <button ref={closeRef} onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10" aria-label="Close"><X size={18} /></button>
         </div>
         <div className="flex gap-1 px-3 py-2 overflow-x-auto border-b border-white/10">
           {GAMES.map((g) => (
@@ -93,6 +113,7 @@ function LeaderboardModal({ onClose }) {
 
 export default function ArcadeLobby({ onClose }) {
   const exitRef = useRef(null)
+  const leaderboardButtonRef = useRef(null)
   const lobbyRef = useRef(null)
   const [activeGame, setActiveGame] = useState(null)
   const [avatarOpen, setAvatarOpen] = useState(false)
@@ -123,7 +144,7 @@ export default function ArcadeLobby({ onClose }) {
   }, [])
 
   useEffect(() => {
-    if (activeGame) return undefined
+    if (activeGame || lbOpen) return undefined
     const trapFocus = (event) => {
       if (event.key !== 'Tab' || !lobbyRef.current) return
       const focusable = Array.from(lobbyRef.current.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'))
@@ -141,7 +162,7 @@ export default function ArcadeLobby({ onClose }) {
     }
     window.addEventListener('keydown', trapFocus)
     return () => window.removeEventListener('keydown', trapFocus)
-  }, [activeGame])
+  }, [activeGame, lbOpen])
 
   // ESC handling — game → lobby, modals close, lobby → portfolio.
   useEffect(() => {
@@ -229,6 +250,7 @@ export default function ArcadeLobby({ onClose }) {
             <X size={14} /> Exit Arcade
           </button>
           <button
+            ref={leaderboardButtonRef}
             onClick={() => setLbOpen(true)}
             className="min-h-[44px] px-3 py-1.5 rounded-lg bg-black/60 border border-amber-500/30 text-amber-200 hover:bg-white/10 text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
@@ -237,6 +259,7 @@ export default function ArcadeLobby({ onClose }) {
         </div>
         <button
           onClick={() => setAvatarOpen(true)}
+          aria-label="My Avatar"
           className="min-h-[44px] px-3 py-1.5 rounded-lg bg-black/60 border border-cyan-500/30 text-cyan-200 hover:bg-white/10 text-xs font-semibold flex items-center gap-2 transition-colors"
         >
           <AvatarBadge size={28} />
@@ -245,8 +268,8 @@ export default function ArcadeLobby({ onClose }) {
       </div>
 
       {/* content */}
-      <div className="relative z-20 h-full overflow-y-auto flex flex-col items-center justify-center px-4 py-20">
-        <div className="text-center mb-8">
+      <div className="relative z-20 h-full overflow-y-auto flex flex-col items-center px-4 py-20" style={{ justifyContent: 'safe center' }}>
+        <div className="text-center mb-8 shrink-0">
           <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 mb-2">
             🕹 Charlie's Arcade
           </h1>
@@ -255,7 +278,7 @@ export default function ArcadeLobby({ onClose }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-6xl shrink-0">
           {GAMES.map((g) => {
             const best = readBest(g)
             return (
@@ -286,7 +309,7 @@ export default function ArcadeLobby({ onClose }) {
           })}
         </div>
 
-        <p className="mt-8 text-[11px] text-gray-600">Press ESC to exit · ⚙ in-game for settings</p>
+        <p className="mt-8 text-[11px] text-gray-600 shrink-0">Press ESC to exit · ⚙ in-game for settings</p>
       </div>
 
       {avatarOpen && (
@@ -294,7 +317,7 @@ export default function ArcadeLobby({ onClose }) {
           <AvatarCustomizer onClose={() => setAvatarOpen(false)} />
         </Suspense>
       )}
-      {lbOpen && <LeaderboardModal onClose={() => setLbOpen(false)} />}
+      {lbOpen && <LeaderboardModal returnFocusRef={leaderboardButtonRef} onClose={() => setLbOpen(false)} />}
     </div>
   )
 }

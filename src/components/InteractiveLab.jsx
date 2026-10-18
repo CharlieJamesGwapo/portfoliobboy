@@ -18,14 +18,19 @@ export default function InteractiveLab() {
   const launchButton = useRef(null)
   const returnFocus = useRef(null)
 
-  const launch = useCallback(() => {
-    returnFocus.current = document.activeElement
+  const launch = useCallback((event) => {
+    // Safari does not focus buttons on pointer clicks.
+    returnFocus.current = event?.currentTarget instanceof HTMLElement ? event.currentTarget : document.activeElement
     setOpen(true)
   }, [])
 
   const close = useCallback(() => {
     setOpen(false)
-    window.setTimeout(() => returnFocus.current?.focus?.(), 0)
+    window.setTimeout(() => {
+      const opener = returnFocus.current
+      if (opener?.isConnected && opener !== document.body) opener.focus?.()
+      else launchButton.current?.focus()
+    }, 0)
   }, [])
 
   useEffect(() => {
