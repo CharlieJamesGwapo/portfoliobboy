@@ -45,11 +45,13 @@ export function registerServiceWorker() {
         // works identically without it, so this is not worth surfacing.
       })
 
+    // First-time activation claims the page without replacing an older app.
+    const wasControlled = Boolean(navigator.serviceWorker.controller)
     let reloading = false
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       // Guard against the reload loop that happens if two tabs both activate
       // the new worker.
-      if (reloading) return
+      if (!wasControlled || reloading) return
       reloading = true
       window.location.reload()
     })

@@ -1,6 +1,8 @@
 node_modules
 .superpowers
-public/audio
+public/audio/*
+!public/audio/voice-us-chatterbox-v5.m4a
+!public/audio/voice-au-chatterbox-v5.m4a
 *.md
 # Note: do NOT add "*.txt" here — it would also strip public/robots.txt.
 COMPLETE_SUMMARY.txt
