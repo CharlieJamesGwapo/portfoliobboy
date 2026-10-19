@@ -65,7 +65,7 @@ export default function VoiceSamplePlayer() {
           ))}
         </ol>
       </details>
-      <p className="voice-sample-disclosure" id="voice-sample-disclosure">US and Australian English. Scripted samples with AI-generated voices, not recordings of Alex or real calls. “Talk to Alex” opens the live callback demo.</p>
+      <p className="voice-sample-disclosure" id="voice-sample-disclosure">US and Australian English. Fictional conversations with synthetic voices. No real appointment is made. “Talk to Alex” opens the live callback demo.</p>
     </div>
   )
 }

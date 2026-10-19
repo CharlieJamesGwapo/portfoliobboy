@@ -150,9 +150,9 @@
 
 .voice-transcript { list-style: none; margin: 0; padding: 0 0 16px; display: grid; gap: 12px; }
 .voice-transcript li { padding: 12px 16px; border-radius: 10px; background: rgba(255,255,255,.04); border-left: 2px solid var(--mint); }
-.voice-transcript li[data-speaker='Caller'] { margin-left: 24px; border-left-color: var(--mist); }
+.voice-transcript li[data-speaker='Customer'] { margin-left: 24px; border-left-color: var(--mist); }
 .voice-transcript strong { display: block; margin-bottom: 4px; font-size: .7rem; color: var(--mint); }
-.voice-transcript li[data-speaker='Caller'] strong { color: var(--paper); }
+.voice-transcript li[data-speaker='Customer'] strong { color: var(--paper); }
 .voice-transcript p { margin: 0; }
 
 .voice-languages-note { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding: 20px 0; border-top: 1px solid var(--line-dark); }

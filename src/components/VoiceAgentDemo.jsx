@@ -38,7 +38,7 @@ const VoiceAgentDemo = () => {
             </div>
             <div className="voice-demo-copy">
               <p>
-                Listen to a short US or Australian English sample, or request a callback from the live Alex agent on Hasti.
+                Hear a complete studio enquiry in US or Australian English, or request a callback from the live Alex agent on Hasti.
               </p>
               <a className="button button-primary" href={demoUrl} target="_blank" rel="noreferrer">
                 <PhoneCall size={17} aria-hidden="true" />

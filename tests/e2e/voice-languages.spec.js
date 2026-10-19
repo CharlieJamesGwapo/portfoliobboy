@@ -26,21 +26,21 @@ test('language selector plays distinct regional audio and updates transcript lan
   await expect(options.getByRole('button')).toHaveCount(2)
   await demo.getByText('Read sample transcript', { exact: true }).click()
   for (const [title, lang, src] of [
-    ['US English', 'en-US', /voice-us-natural-v6(?:-[\w-]+)?\.m4a$/],
-    ['Australian English', 'en-AU', /voice-au-natural-v6(?:-[\w-]+)?\.m4a$/],
+    ['US English', 'en-US', /voice-us-professional-v7(?:-[\w-]+)?\.m4a$/],
+    ['Australian English', 'en-AU', /voice-au-professional-v7(?:-[\w-]+)?\.m4a$/],
   ]) {
     await options.getByRole('button', { name: title, exact: true }).click()
     await expect(options.getByRole('button', { name: title, exact: true })).toHaveAttribute('aria-pressed', 'true')
     await expect(demo.locator('.voice-transcript')).toHaveAttribute('lang', lang)
-    await expect(demo.locator('.voice-transcript li')).toHaveCount(6)
+    await expect(demo.locator('.voice-transcript li')).toHaveCount(16)
     await expect(demo.locator('.voice-transcript')).toContainText('Thursday')
     await expect(demo.locator('.voice-transcript')).toContainText('Customer')
     const audio = demo.locator('audio')
     await expect(audio).toHaveAttribute('src', src)
     await audio.evaluate((element) => element.play())
     await expect.poll(() => audio.evaluate((element) => element.currentTime)).toBeGreaterThan(0)
-    expect(await audio.evaluate((element) => element.duration)).toBeGreaterThan(20)
-    expect(await audio.evaluate((element) => element.duration)).toBeLessThan(60)
+    expect(await audio.evaluate((element) => element.duration)).toBeGreaterThan(60)
+    expect(await audio.evaluate((element) => element.duration)).toBeLessThan(120)
   }
   await expect(demo.getByRole('button', { name: 'Filipino / Taglish', exact: true })).toHaveCount(0)
   await expect(demo).toContainText('US and Australian English')
