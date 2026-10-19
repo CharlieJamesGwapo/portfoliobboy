@@ -30,7 +30,8 @@ test('voice engineering stays collapsed while audio remains directly playable', 
   await expect(demo.locator('audio')).toBeVisible()
   await engineering.locator('summary').press('Enter')
   await expect(demo.locator('.vc-figure')).toBeVisible()
-  await expect(demo).toContainText('not recordings of Alex or real calls')
+  await expect(demo.locator('#voice-sample-disclosure')).toContainText('Fictional conversations with synthetic voices.')
+  await expect(demo.locator('#voice-sample-disclosure')).toContainText('No real appointment is made.')
 })
 
 for (const hash of ['projects', 'momentum-work', 'live-projects']) {
