@@ -27,13 +27,14 @@ test('voice audio errors offer a readable alternative', async ({ page }) => {
 
 test('project search handles archive matches and empty results', async ({ page }) => {
   await page.goto('/#projects')
-  const autoFlowTab = page.locator('#projects').getByRole('tab', { name: /AutoFlow AI Pro/ })
-  const autoFlowPreview = page.locator('.product-media--project')
-  await expect(autoFlowTab).toHaveAttribute('aria-selected', 'true')
+  const autoFlowCard = page.locator('#projects .project-discovery-card').filter({ has: page.getByRole('heading', { name: 'AutoFlow AI Pro', exact: true }) })
+  const autoFlowPreview = autoFlowCard.locator('.project-card-preview')
+  await expect(autoFlowCard).toBeVisible()
   await expect(autoFlowPreview.locator('img')).toHaveAttribute('src', /\/projects\/autoflow\/home\.webp$/)
   await expect(autoFlowPreview.locator('img')).toHaveAttribute('alt', /AutoFlow AI Pro promotional concept preview/)
-  await expect(autoFlowPreview).toContainText('Promotional concept preview')
-  await expect(page.locator('.project-product-meta')).toContainText('In development')
+  await expect(autoFlowPreview).toContainText('Home')
+  await expect(autoFlowCard.locator('.project-card-status')).toContainText('In development')
+  await expect(autoFlowCard.getByRole('link', { name: 'Read the AutoFlow AI Pro case study' })).toHaveAttribute('href', '/projects/autoflow-ai-pro')
 
   const search = page.getByRole('searchbox', { name: 'Search projects' })
   await search.fill('ReflectiCSS')
@@ -42,8 +43,8 @@ test('project search handles archive matches and empty results', async ({ page }
   await search.fill('no-such-project-987')
   await expect(page.getByText('No projects match your search.')).toBeVisible()
   await page.getByRole('button', { name: 'Clear search' }).click()
-  await expect(page.locator('#projects [role="tab"]')).toHaveCount(13)
-  await expect(autoFlowTab).toHaveAttribute('aria-selected', 'true')
+  await expect(page.locator('#projects .project-discovery-card')).toHaveCount(18)
+  await expect(autoFlowCard).toBeVisible()
   await expect(autoFlowPreview.locator('img')).toHaveAttribute('src', /\/projects\/autoflow\/home\.webp$/)
 })
 

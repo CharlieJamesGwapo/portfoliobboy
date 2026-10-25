@@ -162,7 +162,10 @@ test('preserves the existing mobile menu and project filters', async ({ page }) 
   await page.locator('#full-project-archive > summary').click()
   await page.locator('#projects').scrollIntoViewIfNeeded()
   await page.locator('#projects').getByRole('button', { name: /^Mobile/ }).click()
-  await expect(page.locator('#projects [role="tab"]')).toHaveCount(3)
+  const mobileProjects = page.locator('#projects .project-discovery-card')
+  await expect(mobileProjects).toHaveCount(4)
+  const oneRide = mobileProjects.filter({ has: page.getByRole('heading', { name: 'One Ride Balingasag (OMJI)', exact: true }) })
+  await expect(oneRide.getByRole('link', { name: 'Read the One Ride Balingasag (OMJI) case study' })).toHaveAttribute('href', '/projects/oneride')
 })
 
 for (const width of [320, 390, 768, 1024, 1440]) {

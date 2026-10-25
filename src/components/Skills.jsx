@@ -101,9 +101,9 @@ const Skills = () => {
               </div>
               <span className="capability-count">{String(activeGroup.skills.length).padStart(2, '0')} listed</span>
             </div>
-            <div className="skill-cloud" aria-label={`${activeGroup.title} technologies and practices`}>
-              {activeGroup.skills.map((skill) => <span key={skill}>{skill}</span>)}
-            </div>
+            <ul className="skill-cloud" aria-label={`${activeGroup.title} technologies and practices`}>
+              {activeGroup.skills.map((skill) => <li key={skill}>{skill}</li>)}
+            </ul>
           </div>
         </div>
       </div>

@@ -25,8 +25,9 @@
       html { background: #0b2528; color-scheme: dark; }
       html[data-theme="light"], html[data-theme="light"] body, html[data-theme="light"] #root:empty { background: #f5f8f6; }
       body { margin: 0; background: #0b2528; }
+      #root { display: flow-root; min-height: 100vh; }
       #root:empty {
-        display: block;
+        display: flow-root;
         min-height: 100svh;
         background:
           radial-gradient(circle at 78% 26%, rgba(103, 224, 193, 0.09), transparent 42%),
@@ -51,8 +52,8 @@
 
     <!-- Preload the above-the-fold hero image (WebP) for faster LCP -->
     <link rel="preload" as="image" href="/profile-2026.webp" type="image/webp" fetchpriority="high" />
-    <!-- Self-hosted variable Inter; preloaded so the swap happens before first paint of the hero -->
-    <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-var-latin.woff2" crossorigin />
+    <!-- Self-hosted Geist Sans; a single preloaded variable font for the interface -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/geist-sans-variable.woff2" crossorigin />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />

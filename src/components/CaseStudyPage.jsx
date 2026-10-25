@@ -240,6 +240,8 @@ export default function CaseStudyPage({ slug, study: providedStudy }) {
             </>
           )}
 
+          <details className="case-study-engineering-disclosure" open>
+            <summary>Engineering & reliability details</summary>
           <div className="case-study-engineering-grid">
             <section className="case-study-section" aria-labelledby="case-study-challenges-title">
               <p className="case-study-section-index">06 / Engineering</p>
@@ -252,6 +254,7 @@ export default function CaseStudyPage({ slug, study: providedStudy }) {
               <p>{study.securityReliability}</p>
             </section>
           </div>
+          </details>
 
           <section className="case-study-outcome" aria-labelledby="case-study-outcome-title">
             <div>

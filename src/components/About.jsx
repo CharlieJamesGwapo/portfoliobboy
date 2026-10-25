@@ -2,6 +2,7 @@ import { ArrowUpRight, Blocks, Bot, Radio, ShieldCheck } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { fitHighlights, profile } from '../data/portfolioData'
+import './section-polish.css'
 
 const icons = [Bot, Radio, ShieldCheck, Blocks]
 
@@ -11,7 +12,7 @@ const About = () => (
       <ScrollReveal className="about-intro" variant="left">
         <SectionHeading
           eyebrow="01 · About"
-          title="A product-minded engineer for systems that have to work."
+          title="A product-minded engineer building systems that work."
           light
         />
         <div className="about-copy">

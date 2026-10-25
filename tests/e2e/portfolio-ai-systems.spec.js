@@ -19,7 +19,10 @@ test('new systems can be filtered and inspected while the existing portfolio rem
   for (const id of ['home', 'about', 'experience', 'projects', 'skills', 'education', 'lab', 'contact']) {
     await expect(page.locator(`#${id}`)).toHaveCount(1)
   }
-  await expect(page.locator('#projects [role="tab"]')).toHaveCount(13)
+  const projectCards = page.locator('#projects .project-discovery-card')
+  await expect(projectCards).toHaveCount(18)
+  const autoFlow = projectCards.filter({ has: page.getByRole('heading', { name: 'AutoFlow AI Pro', exact: true }) })
+  await expect(autoFlow.getByRole('link', { name: 'Read the AutoFlow AI Pro case study' })).toHaveAttribute('href', '/projects/autoflow-ai-pro')
 })
 
 for (const width of [320, 390, 768, 1024, 1440]) {

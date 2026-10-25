@@ -81,6 +81,7 @@ const Experience = () => {
                           ))}
                         </ul>
                       )}
+                      <h3 className="experience-detail-label">Selected contributions</h3>
                       <ul id={listId} className={extraCount > 0 && !allShown ? 'is-collapsed' : ''}>
                         {experience.achievements.map((achievement, achievementIndex) => (
                           <li
@@ -103,6 +104,7 @@ const Experience = () => {
                           <ChevronDown size={16} aria-hidden="true" />
                         </button>
                       )}
+                      <h3 className="experience-detail-label experience-stack-label">Tools and technologies</h3>
                       <div className="tag-list">
                         {experience.stack.map((item) => <span key={item}>{item}</span>)}
                       </div>

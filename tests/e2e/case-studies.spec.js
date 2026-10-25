@@ -55,7 +55,9 @@ test('preserves unrelated query parameters while project technology filters chan
   await expect(search).toHaveValue('member')
   await expect(category).toHaveAttribute('aria-pressed', 'true')
   await expect(technology).toHaveValue('Postgres')
-  await expect(page.getByRole('tab', { name: /Enterprise CRM Platform/i })).toBeVisible()
+  const enterpriseCrm = page.locator('#projects .project-discovery-card').filter({ has: page.getByRole('heading', { name: 'Enterprise CRM Platform', exact: true }) })
+  await expect(enterpriseCrm).toBeVisible()
+  await expect(enterpriseCrm.getByRole('link', { name: 'Read the Enterprise CRM Platform case study' })).toHaveAttribute('href', '/projects/fitness-crm')
 
   await technology.selectOption('Next.js')
   await expect(page).toHaveURL(/campaign=portfolio/)
@@ -82,8 +84,12 @@ test('shows matching case-study links from the featured project explorer', async
   await page.goto('/projects?category=AI&tech=TypeScript')
   const projects = page.locator('#projects')
 
-  await projects.getByRole('tab', { name: /AgentForge/ }).click()
-  await expect(projects.getByRole('link', { name: /Read the AgentForge case study/i })).toHaveAttribute('href', '/projects/agentforge')
+  const agentForge = projects.locator('.project-discovery-card').filter({ has: page.getByRole('heading', { name: 'AgentForge', exact: true }) })
+  const caseStudyLink = agentForge.getByRole('link', { name: 'Read the AgentForge case study' })
+  await expect(caseStudyLink).toHaveAttribute('href', '/projects/agentforge')
+  await caseStudyLink.click()
+  await expect(page).toHaveURL('/projects/agentforge')
+  await expect(page.getByRole('heading', { level: 1, name: 'AgentForge' })).toBeVisible()
 })
 
 for (const width of [320, 390, 768, 1440]) {

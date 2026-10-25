@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import { Archive, ArrowLeft, ArrowRight, ArrowUpRight, FolderGit2, ImageOff, LockKeyhole, Search, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Archive, ArrowUpRight, FolderGit2, LockKeyhole, Search, X } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
-import { ProductMedia } from './IndependentProducts'
+import { AgentArchitectureDiagram } from './IndependentProducts'
 import { oneRidePreview } from '../data/productPreviewData'
 import './project-discovery.css'
 import { featuredProjects, projectArchive, projectCategories } from '../data/portfolioData'
@@ -89,6 +89,86 @@ const categoryCounts = Object.fromEntries(
   ]),
 )
 
+function ProjectCardPreview({ project }) {
+  const isOneRide = project.id === oneRidePreview.projectId
+  const media = isOneRide ? oneRidePreview.screenshots[0] : project.media?.[0]
+
+  if (project.visual === 'agent-architecture') {
+    return (
+      <div className="project-card-preview project-card-preview--architecture">
+        <AgentArchitectureDiagram compact />
+      </div>
+    )
+  }
+
+  if (media) {
+    return (
+      <div className={`project-card-preview${project.mediaLayout === 'portrait' || isOneRide ? ' is-portrait' : ''}`}>
+        <span className="project-card-preview-fallback" aria-hidden="true">Preview unavailable</span>
+        <img
+          src={media.src}
+          alt={media.alt}
+          width={media.width}
+          height={media.height}
+          loading="lazy"
+          decoding="async"
+          onError={(event) => event.currentTarget.closest('.project-card-preview')?.classList.add('is-failed')}
+        />
+        <span className="project-card-preview-label">
+          {isOneRide ? 'Official Google Play preview' : media.label || 'Project preview'}
+        </span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="project-card-preview project-card-preview--placeholder" aria-hidden="true">
+      <span className="project-card-placeholder-index">{project.categories?.[0] || 'Case study'}</span>
+      <strong>{project.title}</strong>
+      <span className="project-card-placeholder-note">Project profile</span>
+    </div>
+  )
+}
+
+function ProjectCard({ project, index }) {
+  const caseStudySlug = caseStudySlugByProjectId[project.id]
+  const caseStudyUrl = caseStudySlug ? `/projects/${caseStudySlug}` : null
+  const technologies = project.stack || []
+
+  return (
+    <article className="project-discovery-card" aria-labelledby={`project-card-title-${project.id}`}>
+      <ProjectCardPreview project={project} />
+      <div className="project-card-content">
+        <div className="project-card-copy">
+          <p className="project-card-eyebrow">{project.eyebrow || project.categories?.join(' · ') || 'Product case study'}</p>
+          <h3 id={`project-card-title-${project.id}`}>{project.title}</h3>
+          <p className="project-card-overview">{project.overview}</p>
+          <p className="project-card-status">{project.status || 'Case study available'}</p>
+        </div>
+
+        <ul className="project-card-technologies" aria-label={`Technologies used for ${project.title}`}>
+          {technologies.slice(0, 4).map((technology) => <li key={technology}>{technology}</li>)}
+          {technologies.length > 4 && <li className="project-card-more-technologies">+{technologies.length - 4} more</li>}
+        </ul>
+
+        <div className="project-card-actions">
+          {caseStudyUrl && (
+            <a className="project-card-action project-card-action--primary" href={caseStudyUrl} aria-label={`Read the ${project.title} case study`}>
+              Case study <ArrowUpRight size={16} aria-hidden="true" />
+            </a>
+          )}
+          {project.url && (
+            <a className="project-card-action project-card-action--secondary" href={project.url} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live product in a new tab`}>
+              Live product <ArrowUpRight size={16} aria-hidden="true" />
+            </a>
+          )}
+        </div>
+        <span className="sr-only">Featured project {String(index + 1).padStart(2, '0')} of {featuredProjects.length}</span>
+      </div>
+    </article>
+  )
+}
+
 const Projects = () => {
   const [initialFilters] = useState(readProjectFilters)
   const [query, setQuery] = useState(initialFilters.query)
@@ -99,18 +179,12 @@ const Projects = () => {
   const visibleFeatured = featuredProjects.filter((item) => projectMatches(item, activeFilters))
   const visibleArchive = projectArchive.filter((item) => projectMatches(item, activeFilters))
   const shownArchive = archiveOpen || query.trim() || activeCategory !== 'All' || activeTechnology ? visibleArchive : visibleArchive.slice(0, 3)
-  const initialFeatured = featuredProjects.find((item) => projectMatches(item, initialFilters))
-  const [activeProjectId, setActiveProjectId] = useState(initialFeatured?.id ?? null)
-  const project = visibleFeatured.find((item) => item.id === activeProjectId) || visibleFeatured[0]
-  const activeProject = project ? visibleFeatured.findIndex((item) => item.id === project.id) : -1
-
   useEffect(() => {
     const syncFromLocation = () => {
       const filters = readProjectFilters()
       setQuery(filters.query)
       setActiveCategory(filters.category)
       setActiveTechnology(filters.technology)
-      setActiveProjectId(featuredProjects.find((item) => projectMatches(item, filters))?.id ?? null)
     }
     window.addEventListener('popstate', syncFromLocation)
     return () => window.removeEventListener('popstate', syncFromLocation)
@@ -122,7 +196,6 @@ const Projects = () => {
     setActiveCategory(filters.category)
     setActiveTechnology(filters.technology)
     writeProjectFilters(filters)
-    setActiveProjectId(featuredProjects.find((item) => projectMatches(item, filters))?.id ?? null)
   }
 
   const selectCategory = (category) => {
@@ -134,20 +207,6 @@ const Projects = () => {
     updateFilters({ query: '', category: 'All', technology: '' })
     setArchiveOpen(false)
   }
-
-  const handleTabKeyDown = (event, index) => {
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
-    event.preventDefault()
-    const nextIndex = event.key === 'Home'
-      ? 0
-        : event.key === 'End'
-        ? visibleFeatured.length - 1
-        : (index + (event.key === 'ArrowRight' ? 1 : -1) + visibleFeatured.length) % visibleFeatured.length
-    setActiveProjectId(visibleFeatured[nextIndex].id)
-    document.getElementById(`project-tab-${nextIndex}`)?.focus()
-  }
-
-  const projectTabsRef = useRef(null)
 
   return (
     <section id="projects" className="section section-paper projects-section">
@@ -199,37 +258,7 @@ const Projects = () => {
           </div>
         </ScrollReveal>
 
-        <ScrollReveal variant="up" delay={80}>
-          <div className="project-browser-heading">
-            <div><span className="eyebrow">Project explorer</span><p>Select a project to explore its story.</p></div>
-            <div className="project-browser-controls">
-              <button type="button" aria-label="Scroll projects left" onClick={() => projectTabsRef.current?.scrollBy({ left: -460, behavior: 'smooth' })}><ArrowLeft size={18} /></button>
-              <button type="button" aria-label="Scroll projects right" onClick={() => projectTabsRef.current?.scrollBy({ left: 460, behavior: 'smooth' })}><ArrowRight size={18} /></button>
-            </div>
-          </div>
-          <div ref={projectTabsRef} className="project-tabs" role="tablist" aria-label="Featured project case studies">
-            {visibleFeatured.map((item, index) => (
-              <button
-                key={item.id}
-                id={`project-tab-${index}`}
-                type="button"
-                role="tab"
-                aria-selected={activeProject === index}
-                aria-controls="active-project-panel"
-                tabIndex={activeProject === index ? 0 : -1}
-                className={activeProject === index ? 'is-active' : ''}
-                onClick={() => setActiveProjectId(item.id)}
-                onKeyDown={(event) => handleTabKeyDown(event, index)}
-              >
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                {item.title}
-              </button>
-            ))}
-          </div>
-        </ScrollReveal>
-
-        {/* Screen readers get told what the filter did; sighted users can see
-            the tab strip change, but that change is silent otherwise. */}
+        {/* Screen readers get a concise update when filters change. */}
         <p className="sr-only" aria-live="polite">
           {`${visibleFeatured.length} featured ${visibleFeatured.length === 1 ? 'project' : 'projects'} and ${visibleArchive.length} archived ${visibleArchive.length === 1 ? 'project' : 'projects'} match the selected filters.`}
         </p>
@@ -242,109 +271,10 @@ const Projects = () => {
           </div>
         )}
 
-        {project && (
-        <div
-          key={project.id}
-          id="active-project-panel"
-          className="project-showcase"
-          role="tabpanel"
-          aria-labelledby={`project-tab-${activeProject}`}
-        >
-          <div className="project-story">
-            <div className="project-story-heading">
-              <p className="project-eyebrow">{project.eyebrow}</p>
-              <h3>{project.title}</h3>
-              <p className="project-overview">{project.overview}</p>
-              {project.status && (
-                <div className="independent-product-meta project-product-meta">
-                  <span className="independent-product-status">{project.status}</span>
-                  {project.license && <span className="independent-product-license">{project.license} license</span>}
-                </div>
-              )}
-            </div>
-
-            <div className="project-story-grid">
-              <div>
-                <span>Context</span>
-                <p>{project.context}</p>
-              </div>
-              <div>
-                <span>Implementation</span>
-                <p>{project.implementation}</p>
-              </div>
-              <div>
-                <span>Engineering scope</span>
-                <p>{project.engineering}</p>
-              </div>
-              <div className="project-result">
-                <span>Delivered</span>
-                <p>{project.delivered}</p>
-              </div>
-            </div>
-
-            <div className="project-detail-row">
-              <div>
-                <span>Architecture</span>
-                <ul>{project.architecture.map((item) => <li key={item}>{item}</li>)}</ul>
-              </div>
-              <div>
-                <span>Product features</span>
-                <ul>{project.features.map((item) => <li key={item}>{item}</li>)}</ul>
-              </div>
-            </div>
-
-            <div className="project-showcase-footer">
-              <div className="tag-list tag-list-dark">
-                {project.stack.map((item) => <span key={item}>{item}</span>)}
-              </div>
-              <div className="project-links">
-                {project.url && (
-                  <a href={project.url} target="_blank" rel="noreferrer">
-                    Live product <ArrowUpRight size={16} aria-hidden="true" />
-                  </a>
-                )}
-                {project.repositoryUrl ? (
-                  <a href={project.repositoryUrl} target="_blank" rel="noreferrer">View source on GitHub <ArrowUpRight size={16} aria-hidden="true" /></a>
-                ) : project.sourceVisibility === 'private-personal' ? (
-                  <span><LockKeyhole size={14} aria-hidden="true" /> Private personal source</span>
-                ) : project.sourceVisibility === 'not-linked' ? (
-                  <span><FolderGit2 size={14} aria-hidden="true" /> Source link not provided</span>
-                ) : project.private ? (
-                  <span><LockKeyhole size={14} aria-hidden="true" /> Repository · Private client code</span>
-                ) : (
-                  <span><FolderGit2 size={14} aria-hidden="true" /> Repository · Asset pending</span>
-                )}
-                {caseStudySlugByProjectId[project.id] && (
-                  <a href={`/projects/${caseStudySlugByProjectId[project.id]}`} aria-label={`Read the ${project.title} case study`}>
-                    Read case study <ArrowUpRight size={16} aria-hidden="true" />
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {project.id === oneRidePreview.projectId ? (
-            <aside className="project-official-gallery" aria-label="OneRide official product screenshots">
-              <p className="eyebrow">Inside the product</p>
-              <h4>From home screen to everyday errands.</h4>
-              <div className="project-official-screens">
-                {oneRidePreview.screenshots.map((screen) => <a key={screen.id} href={screen.src} target="_blank" rel="noreferrer" aria-label={`View full OneRide ${screen.label} screenshot`}><img src={screen.src} alt={screen.alt} loading="lazy" decoding="async" /><span>{screen.label}</span></a>)}
-              </div>
-              <a className="project-gallery-source" href={oneRidePreview.sourceUrl} target="_blank" rel="noreferrer">Official Google Play screenshots <ArrowUpRight size={15} aria-hidden="true" /></a>
-            </aside>
-          ) : project.media?.length || project.visual ? (
-            <ProductMedia product={project} variant="project" />
-          ) : (
-          <aside className="project-media-pending" aria-label={`${project.title} gallery status`}>
-            <div className="asset-pending-mark"><ImageOff size={25} aria-hidden="true" /></div>
-            <p>Product gallery</p>
-            <h4>Authentic media pending</h4>
-            <span>
-              Screenshots will be added when original project assets are available. No placeholder or stock imagery is used.
-            </span>
-          </aside>
-          )}
-        </div>
+        {visibleFeatured.length > 0 && (
+          <section className="project-discovery-grid" aria-label="Featured project case studies">
+            {visibleFeatured.map((item, index) => <ProjectCard key={item.id} project={item} index={index} />)}
+          </section>
         )}
 
         {visibleArchive.length > 0 && (
