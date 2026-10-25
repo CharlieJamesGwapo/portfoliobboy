@@ -23,6 +23,11 @@ const caseStudySlugByProjectId = {
   'filtra-pos': 'filtra-pos',
   'ecycle-hub': 'ecycle-hub',
   'mobile-booking': 'mobile-booking',
+  'scale-with-accounting': 'scale-with-accounting',
+  'st-john-baptist': 'st-john-baptist',
+  freelancepath: 'freelancepath',
+  idealink: 'idealink',
+  'zero-to-hero-dev': 'zero-to-hero-dev',
 }
 
 function readProjectFilters() {

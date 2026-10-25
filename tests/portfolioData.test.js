@@ -29,6 +29,7 @@ import {
 } from '../src/data/portfolioData.js'
 import { BIO_SCROLL, EXPERIENCE, OWNER, SKILL_CATEGORIES } from '../src/data/gameData.js'
 import { independentProducts } from '../src/data/independentProducts.js'
+import { getCaseStudyBySlug } from '../src/data/caseStudies.js'
 
 const renderConsumers = async () => {
   const server = await createServer({
@@ -66,12 +67,13 @@ test('aligns public profile identity, role, location, and education with the sup
 })
 
 test('keeps the original featured and archived projects while prepending independent products', () => {
-  assert.equal(featuredProjects.length, independentProducts.length + 8)
+  assert.equal(featuredProjects.length, independentProducts.length + 13)
   assert.deepEqual(featuredProjects.slice(0, independentProducts.length).map((project) => project.id),
     independentProducts.map((project) => project.id))
   assert.deepEqual(featuredProjects.slice(independentProducts.length).map((project) => project.id), [
     'one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending',
     'moist-alumni', 'filtra-pos', 'ecycle-hub', 'mobile-booking',
+    'scale-with-accounting', 'st-john-baptist', 'freelancepath', 'idealink', 'zero-to-hero-dev',
   ])
   assert.equal(projectArchive.length, 12)
   assert.equal(experiences.length, 12)
@@ -136,8 +138,89 @@ test('publishes the supplied OMJI projects with realistic dates', () => {
 
   const billing = featuredProjects.find((project) => project.id === 'omji-billing')
   assert.equal(billing?.eyebrow, 'Apr–Jun 2026 · Internet access and billing')
+  assert.equal(billing?.url, 'https://www.omji-net.com/')
   assert.ok(billing?.stack.includes('TypeScript'))
   assert.ok(billing?.stack.includes('Go'))
+  assert.ok(billing?.stack.includes('WireGuard'))
+  assert.ok(billing?.stack.includes('SQL'))
+  assert.match(billing?.engineering ?? '', /usage-ledger/i)
+  assert.match(billing?.engineering ?? '', /migrations/i)
+  assert.doesNotMatch(JSON.stringify({ architecture: billing?.architecture, implementation: billing?.implementation, stack: billing?.stack }), /\b(?:React|Flutter|Expo|PostgreSQL|MySQL|SQLite|MongoDB|Firebase|Swift|Kotlin|Android)\b/i)
+})
+
+test('publishes the five supplied client projects with their case studies and media labels', () => {
+  const projects = [
+    ['scale-with-accounting', 'scale-with-accounting', 'https://scalewithaccounting.com/', '/projects/scale-with-accounting/showcase.webp'],
+    ['st-john-baptist', 'st-john-baptist', 'https://stjohnbaptisthighschoolinc.com/', '/projects/st-john-baptist/showcase.webp'],
+    ['freelancepath', 'freelancepath', 'https://freelancepath.vercel.app/', '/projects/freelancepath/showcase.webp'],
+    ['idealink', 'idealink', 'https://ascb-idealink.vercel.app/', '/projects/idealink/showcase.webp'],
+    ['zero-to-hero-dev', 'zero-to-hero-dev', 'https://zerotoherodev.vercel.app/', '/projects/zero-to-hero-dev/showcase.webp'],
+  ]
+
+  assert.deepEqual(featuredProjects.slice(independentProducts.length + 8).map((project) => project.id), projects.map(([id]) => id))
+  for (const [id, slug, url, image] of projects) {
+    const project = featuredProjects.find((item) => item.id === id)
+    const study = getCaseStudyBySlug(slug)
+    assert.ok(project, `missing featured project ${id}`)
+    assert.ok(study, `missing case study ${slug}`)
+    assert.equal(project?.url, url)
+    assert.equal(project?.media?.[0]?.src, image)
+    assert.equal(project?.mediaLayout, 'wide')
+    assert.equal(study?.projectId, id)
+    assert.equal(study?.mediaProduct?.id, id)
+    assert.ok(study?.overview)
+    assert.ok(study?.implementationDecision)
+    assert.ok(study?.mediaCaption)
+    assert.doesNotMatch(study?.securityReliability ?? '', /source project record does not document/i)
+  }
+
+  for (const id of ['scale-with-accounting', 'st-john-baptist', 'freelancepath']) {
+    const project = featuredProjects.find((item) => item.id === id)
+    assert.match(project?.mediaCaption ?? '', /promotional concept/i)
+    assert.match(project?.mediaCaption ?? '', /illustrative data/i)
+  }
+  for (const id of ['idealink', 'zero-to-hero-dev']) {
+    const project = featuredProjects.find((item) => item.id === id)
+    assert.match(project?.media?.[0]?.alt ?? '', /actual website screenshot/i)
+  }
+
+  const scaleWithAccounting = featuredProjects.find((project) => project.id === 'scale-with-accounting')
+  assert.deepEqual(scaleWithAccounting?.stack, ['Next.js', 'React', 'TypeScript', 'Node.js', 'Neon PostgreSQL', 'GoHighLevel', 'Vercel Cron', 'Vitest', 'Playwright'])
+  assert.match(JSON.stringify(scaleWithAccounting), /manual student payment verification/i)
+  assert.match(JSON.stringify(scaleWithAccounting), /consent/i)
+  assert.match(JSON.stringify(scaleWithAccounting), /rate limit/i)
+  assert.match(JSON.stringify(scaleWithAccounting), /durable CRM retries/i)
+
+  const school = featuredProjects.find((project) => project.id === 'st-john-baptist')
+  assert.ok(['PHP', 'MySQL', 'HTML', 'CSS', 'JavaScript', 'Flutter', 'Dart', 'RFID', 'PWA', 'OneSignal', 'CSRF', 'reCAPTCHA', 'RBAC'].every((technology) => school?.stack.includes(technology)))
+
+  const freelancePath = featuredProjects.find((project) => project.id === 'freelancepath')
+  assert.match(JSON.stringify(freelancePath), /38 lessons.*5 tracks.*16 careers.*12 challenges.*3 capstones.*15 document generators.*21 resources/i)
+  assert.match(JSON.stringify(freelancePath), /no account.*database.*paid API/i)
+  assert.match(freelancePath?.overview ?? '', /aspiring virtual assistants and freelancers/i)
+  assert.doesNotMatch(JSON.stringify(freelancePath), /freelance developers|coding challenges/i)
+
+  const ideaLink = featuredProjects.find((project) => project.id === 'idealink')
+  assert.match(JSON.stringify(ideaLink), /weekly limits/i)
+  assert.match(JSON.stringify(ideaLink), /Admin.*Registrar.*Finance/i)
+  assert.match(JSON.stringify(ideaLink), /Registrar.*Finance/i)
+  assert.match(JSON.stringify(ideaLink), /moderation.*audit.*reports.*email/i)
+
+  const zeroHero = featuredProjects.find((project) => project.id === 'zero-to-hero-dev')
+  assert.match(JSON.stringify(zeroHero), /12 levels.*8 paths/i)
+  assert.match(JSON.stringify(zeroHero), /5 project briefs/i)
+  assert.match(JSON.stringify(zeroHero), /no model calls/i)
+
+  const liveProjectIds = new Set(liveLinks.map((link) => link.id))
+  for (const id of ['omji-billing', ...projects.map(([id]) => id)]) {
+    assert.ok(liveProjectIds.has(id), `missing live-project link ${id}`)
+  }
+
+  assert.match(getCaseStudyBySlug('scale-with-accounting')?.securityReliability ?? '', /consent.*rate limit.*retr(?:y|ies)/i)
+  assert.match(getCaseStudyBySlug('st-john-baptist')?.securityReliability ?? '', /RBAC.*CSRF.*reCAPTCHA/i)
+  assert.match(getCaseStudyBySlug('freelancepath')?.securityReliability ?? '', /localStorage.*JSON backups.*no account.*database.*paid API/i)
+  assert.match(getCaseStudyBySlug('idealink')?.securityReliability ?? '', /JWT.*Admin.*Registrar.*Finance.*weekly limits.*audit/i)
+  assert.match(getCaseStudyBySlug('zero-to-hero-dev')?.securityReliability ?? '', /local.*backups.*no model calls/i)
 })
 
 test('publishes the supplied work history with completed dates and synchronized game data', async () => {
@@ -200,7 +283,7 @@ test('preserves earlier portfolio experience records and historical project iden
     assert.ok(experiences.some((item) => item.company === company), `missing experience record ${company}`)
   }
   assert.deepEqual(
-    featuredProjects.slice(independentProducts.length).map((project) => project.id),
+    featuredProjects.slice(independentProducts.length, independentProducts.length + 8).map((project) => project.id),
     ['one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending', 'moist-alumni', 'filtra-pos', 'ecycle-hub', 'mobile-booking'],
   )
   assert.equal(projectArchive.length, 12)
@@ -316,7 +399,7 @@ test('renders the additive AI systems section without replacing existing project
     await server.close()
   }
 
-  assert.equal(featuredProjects.length, independentProducts.length + 8)
+  assert.equal(featuredProjects.length, independentProducts.length + 13)
   assert.equal(projectArchive.length, 12)
 })
 

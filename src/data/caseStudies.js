@@ -216,16 +216,18 @@ const routeDefinitions = [
     slug: 'omji-billing',
     projectId: 'omji-billing',
     experienceCompany: 'OMJI',
-    implementationDecision: 'TypeScript and Go services support web, mobile, and endpoint-agent clients, with MikroTik RouterOS integration and Docker-based deployment.',
+    implementationDecision: 'Node.js and TypeScript services plus Go components connect with the MikroTik RouterOS API and WireGuard. The system uses SQL and Docker Compose.',
     workflows: [
-      'Time-based prepaid billing and voucher generation',
-      'Station, account, and branch administration',
-      'MikroTik access control',
-      'Revenue reports and operational analytics',
+      'Customer session management',
+      'Prepaid voucher management',
+      'Billing operations',
+      'Station management',
+      'Reports',
+      'Role-based access control (RBAC)',
     ],
-    engineeringChallenges: 'Usage-ledger billing needs to account for plan changes and voucher workflows while reflecting network activity. Database migrations and repeatable deployment support ongoing operations.',
-    securityReliability: 'The documented controls include per-account permissions, an explicit usage ledger, database migrations, and repeatable container deployment.',
-    status: 'Private operational platform · Source link not provided',
+    engineeringChallenges: 'The documented operations cover sessions, vouchers, billing, stations, and reports, with RouterOS API and WireGuard integration.',
+    securityReliability: 'The supplied project scope includes role-based access control, WireGuard, and Docker Compose deployment.',
+    status: 'Client platform · Public website',
   },
   {
     slug: 'fitness-crm',
@@ -288,6 +290,31 @@ const routeDefinitions = [
     engineeringChallenges: 'The two booking products needed mobile-first states for scheduling and active bookings, with live application data and notifications.',
     securityReliability: 'Authentication and live data use Supabase or Firebase, with messaging and push notifications. No additional operational controls are specified in the project record.',
     status: 'Completed mobile project engagements · Source link not provided',
+  },
+  {
+    slug: 'scale-with-accounting',
+    projectId: 'scale-with-accounting',
+    securityReliability: 'Forms validate consent and use rate limits; durable retries support CRM handoff.',
+  },
+  {
+    slug: 'st-john-baptist',
+    projectId: 'st-john-baptist',
+    securityReliability: 'The documented access and form controls include RBAC, CSRF protection, and reCAPTCHA.',
+  },
+  {
+    slug: 'freelancepath',
+    projectId: 'freelancepath',
+    securityReliability: 'Progress stays in localStorage; JSON backups support portability, and the product requires no account, database, or paid API.',
+  },
+  {
+    slug: 'idealink',
+    projectId: 'idealink',
+    securityReliability: 'The supplied scope lists JWT authentication, Admin/Registrar/Finance moderation, weekly limits on feedback, and audit records.',
+  },
+  {
+    slug: 'zero-to-hero-dev',
+    projectId: 'zero-to-hero-dev',
+    securityReliability: 'Progress stays local, with JSON backups; AI guides and the prompt builder make no model calls.',
   },
 ]
 
