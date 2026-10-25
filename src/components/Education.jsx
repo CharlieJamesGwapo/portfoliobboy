@@ -79,8 +79,8 @@ const Education = () => (
       <ScrollReveal variant="left">
         <SectionHeading
           eyebrow="05 · Credentials"
-          title="Education and verified continued learning."
-          description="Twenty-three certificates and technical training records, plus two academic recognitions. Credential URLs are omitted where none were supplied."
+          title="Education and continued learning."
+          description="Twenty-three certificates and technical training records from the supplied portfolio materials, plus two academic recognitions. Credential URLs are omitted where none were supplied."
           light
         />
       </ScrollReveal>
@@ -133,8 +133,9 @@ const Education = () => (
               href={credential.image}
               target="_blank"
               rel="noreferrer"
-              aria-label={`View full certificate: ${credential.title}`}
+              aria-labelledby={`certificate-view-label-${index} certificate-title-${index} certificate-issuer-${index}`}
             >
+              <span id={`certificate-view-label-${index}`} className="sr-only">View full certificate:</span>
               <span className="certificate-image-frame">
                 {/* Gallery uses a 900px WebP thumbnail (~13 kB); the full
                     1800px WebP is only fetched when the card is opened. */}
@@ -150,8 +151,8 @@ const Education = () => (
                 <span className="certificate-view"><Eye size={16} aria-hidden="true" /> View certificate</span>
               </span>
               <span className="certificate-image-copy">
-                <strong>{credential.title}</strong>
-                <small>{credential.issuer} · {credential.issued}</small>
+                <strong id={`certificate-title-${index}`}>{credential.title}</strong>
+                <small id={`certificate-issuer-${index}`}>{credential.issuer} · {credential.issued}</small>
               </span>
             </a>
           </ScrollReveal>
@@ -163,7 +164,7 @@ const Education = () => (
           id="ai"
           icon={Award}
           eyebrow="AI & Anthropic"
-          title={`${aiCredentials.length} verified learning records`}
+          title={`${aiCredentials.length} learning records`}
           credentials={aiCredentials}
           getKey={(credential) => `${credential.title}-${credential.credentialId || credential.issuer}`}
           variant="left"

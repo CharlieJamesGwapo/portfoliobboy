@@ -1,0 +1,600 @@
+/* The hero now shares the first screen between the person and a real project
+   preview, so keep its content at the top of the section instead of vertically
+   centering it in a viewport-sized blank area. */
+.hero-section {
+  min-height: 0;
+  padding-top: 124px;
+}
+
+section.hero-section .hero-layout {
+  grid-template-columns: minmax(0, 1.03fr) minmax(0, 0.97fr);
+  align-items: start;
+  gap: clamp(30px, 5vw, 72px);
+  min-height: 0;
+  padding-bottom: 36px;
+}
+
+.hero-section .hero-copy {
+  max-width: 680px;
+}
+
+.hero-section .hero-profile-intro {
+  display: grid;
+  grid-template-columns: clamp(242px, calc(20vw + 2px), 302px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(18px, 2vw, 28px);
+  margin-bottom: 22px;
+}
+
+.hero-section .hero-profile-intro picture {
+  width: clamp(242px, calc(20vw + 2px), 302px);
+  height: clamp(282px, calc(24vw + 2px), 342px);
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  background: var(--ink-soft);
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.26);
+}
+
+.hero-section .hero-profile-intro img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 24%;
+}
+
+.hero-section .hero-profile-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.hero-section .hero-profile-copy h1 {
+  width: 100%;
+  margin-top: 14px;
+  font-size: clamp(2.35rem, 3.1vw, 2.9rem);
+  line-height: 0.98;
+}
+
+.hero-section .hero-profile-copy h1 .hero-line {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.hero-section .hero-profile-copy h1 .hero-line-note {
+  margin-top: 0.24em;
+  color: #b9c7c6;
+  font-size: 0.46em;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.hero-section .hero-profile-details {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.hero-section .hero-profile-details .hero-kicker {
+  margin-bottom: 0;
+  color: var(--paper);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+}
+
+.hero-section .hero-profile-details > span {
+  display: block;
+  max-width: 260px;
+  font-size: 0.77rem;
+}
+
+.hero-section .hero-visual {
+  width: 100%;
+  min-width: 0;
+}
+
+.hero-project-carousel {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+  padding: clamp(14px, 1.8vw, 21px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(103, 224, 193, 0.08), transparent 35%),
+    rgba(255, 255, 255, 0.035);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+}
+
+.hero-project-carousel-header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.hero-project-carousel-heading {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.hero-project-carousel-heading > span {
+  color: #d9e8e3;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-project-carousel-heading > strong {
+  color: var(--mint);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-project-carousel-heading > strong i {
+  color: #829b97;
+  font-style: normal;
+  font-weight: 650;
+}
+
+.hero-project-carousel-controls {
+  display: flex;
+  gap: 7px;
+}
+
+.hero-project-carousel-controls button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--paper);
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.hero-project-carousel-controls button:hover {
+  border-color: var(--mint);
+  background: var(--mint);
+  color: var(--ink);
+}
+
+.hero-project-carousel-controls button:focus-visible,
+.hero-project-tabs button:focus-visible,
+.hero-project-panel:focus-visible,
+.hero-project-details:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 3px;
+}
+
+.hero-project-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.hero-project-tabs button {
+  display: grid;
+  min-width: 0;
+  min-height: 60px;
+  align-content: center;
+  gap: 3px;
+  padding: 8px 7px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #c7d5d1;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.hero-project-tabs button > span {
+  font-size: clamp(0.75rem, 0.85vw, 0.85rem);
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.hero-project-tabs button > small {
+  color: #91a8a3;
+  font-size: clamp(0.62rem, 0.68vw, 0.72rem);
+  font-weight: 650;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.hero-project-tabs button:hover,
+.hero-project-tabs button.is-active {
+  border-color: rgba(103, 224, 193, 0.7);
+  background: rgba(103, 224, 193, 0.12);
+  color: var(--paper);
+}
+
+.hero-project-tabs button.is-active > small,
+.hero-project-tabs button:hover > small {
+  color: var(--mint);
+}
+
+.hero-project-panel {
+  display: grid;
+  min-width: 0;
+  gap: 13px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.11);
+}
+
+.hero-project-media {
+  min-width: 0;
+}
+
+.hero-project-media .product-media {
+  gap: 7px;
+}
+
+.hero-project-media .product-media-stage {
+  height: clamp(270px, 26vw, 340px);
+  aspect-ratio: auto;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 52% 10%, rgba(103, 224, 193, 0.14), transparent 34%),
+    #102d30;
+}
+
+.hero-project-media .product-media-stage > img {
+  object-fit: contain;
+}
+
+.hero-project-media .product-media figcaption {
+  color: #9cb1ad;
+  font-size: 0.68rem;
+  text-align: right;
+}
+
+.hero-project-media .studio-phone-column {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 7px;
+  min-width: 0;
+}
+
+.hero-project-media .studio-preview-label {
+  margin-bottom: 0;
+  color: var(--mint);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+.hero-project-media .studio-phone-stage {
+  height: clamp(270px, 26vw, 340px);
+  min-height: 0;
+  padding: 10px;
+  border-color: rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(103, 224, 193, 0.17), transparent 42%),
+    #102d30;
+}
+
+.hero-project-media .studio-phone {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 310px;
+}
+
+.hero-project-media .studio-screen-controls {
+  gap: 6px;
+  margin-top: 0;
+}
+
+.hero-project-media .studio-screen-controls button {
+  min-width: 0;
+  padding-inline: 8px;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.045);
+  color: #c7d5d1;
+  font-size: 0.7rem;
+}
+
+.hero-project-media .studio-screen-controls button span {
+  color: var(--mint);
+}
+
+.hero-project-media .studio-screen-controls button:hover,
+.hero-project-media .studio-screen-controls button.is-selected {
+  border-color: var(--mint);
+  background: var(--mint);
+  color: var(--ink);
+}
+
+.hero-project-media .studio-screen-controls button.is-selected span {
+  color: var(--ink);
+}
+
+.hero-project-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 1px 2px 3px;
+}
+
+.hero-project-copy-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-project-eyebrow {
+  color: var(--mint);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+
+.hero-project-copy-meta > span {
+  display: inline-flex;
+  min-height: 25px;
+  align-items: center;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 999px;
+  color: #b9c7c6;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.hero-project-copy h2 {
+  color: var(--paper);
+  font-size: clamp(1.45rem, 2.2vw, 1.9rem);
+  font-weight: 640;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.hero-project-copy > p:not(.hero-project-eyebrow) {
+  color: #b9c7c6;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.hero-project-details {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  color: var(--mint);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.hero-project-details:hover {
+  color: #9af0db;
+}
+
+@media (max-width: 860px) {
+  .hero-section {
+    padding-top: 96px;
+  }
+
+  section.hero-section .hero-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding-bottom: 28px;
+  }
+
+  .hero-section .hero-visual {
+    width: min(100%, 580px);
+    margin-inline: auto;
+  }
+
+  .hero-section .hero-profile-intro {
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .hero-section .hero-profile-intro picture {
+    width: 212px;
+    height: 242px;
+  }
+
+  .hero-section .hero-profile-copy h1 {
+    font-size: clamp(2.35rem, 5vw, 3.2rem);
+  }
+
+  .hero-project-carousel {
+    gap: 10px;
+  }
+
+  .hero-project-media .product-media-stage,
+  .hero-project-media .studio-phone-stage {
+    height: clamp(250px, 38vw, 300px);
+  }
+
+  .hero-project-media .studio-phone {
+    max-height: 270px;
+  }
+
+  .hero-project-media .studio-phone-column {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-project-media .studio-preview-label {
+    grid-column: auto;
+  }
+
+  .hero-project-media .studio-phone-stage {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .hero-project-media .studio-screen-controls {
+    grid-column: auto;
+    grid-row: auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 861px) and (max-width: 1099px) {
+  .hero-section .hero-profile-intro {
+    grid-template-columns: 222px minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .hero-section .hero-profile-intro picture {
+    width: 222px;
+    height: 262px;
+  }
+
+  .hero-section .hero-profile-copy h1 {
+    font-size: clamp(2rem, 3.3vw, 2.6rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-section .hero-profile-intro {
+    grid-template-columns: clamp(162px, calc(42vw + 2px), 212px) minmax(0, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .hero-section .hero-profile-intro picture {
+    width: clamp(162px, calc(42vw + 2px), 212px);
+    height: clamp(182px, calc(48vw + 2px), 222px);
+    border-radius: 20px;
+  }
+
+  .hero-section .hero-profile-details {
+    gap: 3px;
+  }
+
+  .hero-section .hero-profile-details .hero-kicker {
+    font-size: 0.75rem;
+    letter-spacing: 0.035em;
+  }
+
+  .hero-section .hero-profile-details > span {
+    font-size: 0.68rem;
+  }
+
+  .hero-section .hero-profile-copy h1 {
+    margin-top: 10px;
+    font-size: clamp(1.8rem, 7.3vw, 2.15rem);
+    line-height: 1;
+  }
+
+  .hero-section .hero-socials > span {
+    display: none;
+  }
+
+  .hero-project-carousel {
+    padding: 12px;
+    border-radius: 17px;
+  }
+
+  .hero-project-carousel-heading {
+    gap: 7px;
+  }
+
+  .hero-project-carousel-heading > span {
+    font-size: 0.64rem;
+  }
+
+  .hero-project-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .hero-project-tabs button {
+    min-height: 58px;
+    padding: 7px 8px;
+  }
+
+  .hero-project-tabs button > span {
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-project-tabs button > small {
+    font-size: 0.64rem;
+  }
+
+  .hero-project-panel {
+    gap: 11px;
+    padding: 8px;
+  }
+
+  .hero-project-media .product-media-stage,
+  .hero-project-media .studio-phone-stage {
+    height: clamp(238px, 70vw, 286px);
+  }
+
+  .hero-project-media .studio-phone {
+    max-height: 260px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-section .hero-profile-copy h1 {
+    font-size: 1.85rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .hero-section .hero-profile-intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .hero-section .hero-profile-intro picture {
+    width: clamp(182px, calc(42vw + 2px), 202px);
+    height: clamp(202px, calc(48vw + 2px), 222px);
+  }
+}
+
+@media (min-width: 380px) and (max-width: 640px) {
+  .hero-section .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .hero-section .hero-actions .button {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 145px;
+    padding-inline: 12px;
+    font-size: 0.77rem;
+    white-space: nowrap;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-project-carousel-controls button,
+  .hero-project-tabs button {
+    transition-duration: 0.01ms;
+  }
+}

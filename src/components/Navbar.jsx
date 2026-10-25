@@ -1,37 +1,54 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronRight, Menu, Search, X } from 'lucide-react'
-import { navigation as links, profile } from '../data/portfolioData'
+import { profile, resumeUrl } from '../data/portfolioData'
+import ThemeToggle from './ThemeToggle'
 import './navbar-preview.css'
+import './theme.css'
+import './homepage-refresh.css'
 
 const openPalette = () => window.dispatchEvent(new CustomEvent('portfolio:open-palette'))
 
 const primaryNavigation = [
-  { label: 'Voice demo', href: '#voice-demo' },
-  { label: 'Work', href: '#product-studio-preview' },
-  { label: 'About', href: '#about' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Featured work', href: '#product-studio-preview', activeId: 'product-studio-preview' },
+  { label: 'Projects', href: '/projects', activeId: 'projects-route', route: true },
+  { label: 'AI & Automation', href: '#ai-systems', activeId: 'ai-systems' },
+  { label: 'Experience', href: '#experience', activeId: 'experience' },
+  { label: 'Contact', href: '#contact', activeId: 'contact' },
 ]
 
 const moreNavigation = [
-  { label: 'Project archive', href: '#projects' },
-  { label: 'Skills', href: '#skills' },
-  { label: 'Credentials', href: '#education' },
-  { label: 'Interactive Lab', href: '#lab' },
-  { label: 'AI systems', href: '#ai-systems' },
+  { label: 'About', href: '#about', activeId: 'about' },
+  { label: 'Skills', href: '#skills', activeId: 'skills' },
+  { label: 'Credentials', href: '#education', activeId: 'education' },
+  { label: 'Voice demo', href: '#voice-demo', activeId: 'voice-demo' },
+  { label: 'Interactive Lab', href: '/lab', activeId: 'lab-route', route: true },
+  { label: 'Resume PDF', href: resumeUrl, activeId: 'resume', download: 'charlie-james-abejo-resume.pdf' },
 ]
 
-// Keep every existing mobile destination, with the new live-work and AI
-// systems anchors added as additive entries rather than rewriting the source
-// navigation export in portfolioData.js.
 const mobileNavigation = [
-  { label: 'Voice demo', href: '#voice-demo' },
-  { label: 'Work', href: '#product-studio-preview' },
-  ...links,
-  { label: 'AI systems', href: '#ai-systems' },
+  { label: 'Home', href: '/', activeId: 'home', route: true },
+  ...primaryNavigation,
+  ...moreNavigation,
 ]
 
 const navigationTargets = [...primaryNavigation, ...moreNavigation]
+
+const normalizedPathname = () => {
+  if (typeof window === 'undefined') return '/'
+  return window.location.pathname.replace(/\/+$/, '') || '/'
+}
+
+const routeActiveId = () => {
+  const pathname = normalizedPathname()
+  if (pathname === '/projects' || pathname.startsWith('/projects/')) return 'projects-route'
+  if (pathname === '/lab') return 'lab-route'
+  return null
+}
+
+const resolveHref = (href) => {
+  if (!href.startsWith('#') || normalizedPathname() === '/') return href
+  return `/${href}`
+}
 
 // Apple keyboards label the key ⌘; everywhere else it is Ctrl. Reading the
 // platform lets the hint match the key the visitor actually has to press.
@@ -50,13 +67,10 @@ const Navbar = () => {
   const scrollFrame = useRef(null)
 
   useEffect(() => {
-    const ids = ['home', ...navigationTargets.map((link) => link.href.slice(1))]
-
-    // Cache document-relative positions only when layout changes. Archived
-    // sections may be hidden or nested inside positioned containers.
+    const sectionIds = ['home', ...navigationTargets.filter((link) => link.href.startsWith('#')).map((link) => link.href.slice(1))]
     let offsets = []
     const measure = () => {
-      offsets = ids
+      offsets = sectionIds
         .map((id) => {
           const section = document.getElementById(id)
           return section?.getClientRects().length
@@ -64,29 +78,29 @@ const Navbar = () => {
             : null
         })
         .filter(Boolean)
-        .sort((a, b) => a.top - b.top) // the early-out below relies on this order
+        .sort((a, b) => a.top - b.top)
     }
 
-    // Cheap refs avoid re-rendering the whole navbar on frames where nothing
-    // actually changed.
     let lastScrolled = null
     let lastActive = null
 
     const updateNavigation = () => {
       scrollFrame.current = null
       const y = window.scrollY
-
       const nextScrolled = y > 20
       if (nextScrolled !== lastScrolled) {
         lastScrolled = nextScrolled
         setScrolled(nextScrolled)
       }
 
-      const marker = y + 180
-      let current = 'home'
-      for (let i = 0; i < offsets.length; i += 1) {
-        if (offsets[i].top <= marker) current = offsets[i].id
-        else break
+      const routeId = routeActiveId()
+      let current = routeId || 'home'
+      if (!routeId) {
+        const marker = y + 180
+        for (let index = 0; index < offsets.length; index += 1) {
+          if (offsets[index].top <= marker) current = offsets[index].id
+          else break
+        }
       }
       if (current !== lastActive) {
         lastActive = current
@@ -109,15 +123,14 @@ const Navbar = () => {
     window.addEventListener('scroll', scheduleNavigationUpdate, { passive: true })
     window.addEventListener('resize', onResize)
 
-    // Sections grow as images and lazy content settle, which moves the offsets.
-    const resizeObserver = new ResizeObserver(onResize)
-    resizeObserver.observe(document.documentElement)
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onResize)
+    resizeObserver?.observe(document.documentElement)
 
     return () => {
       if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current)
       window.removeEventListener('scroll', scheduleNavigationUpdate)
       window.removeEventListener('resize', onResize)
-      resizeObserver.disconnect()
+      resizeObserver?.disconnect()
     }
   }, [])
 
@@ -140,7 +153,7 @@ const Navbar = () => {
 
       if (event.key === 'Tab' && open) {
         const focusable = [toggleRef.current, ...Array.from(menuRef.current?.querySelectorAll('a, button') || [])]
-          .filter(Boolean)
+          .filter((element) => element && !element.disabled)
         const first = focusable[0]
         const last = focusable[focusable.length - 1]
         if (event.shiftKey && document.activeElement === first) {
@@ -204,18 +217,48 @@ const Navbar = () => {
   const closeMore = () => setMoreOpen(false)
   const handleMoreFocusOut = (event) => {
     if (event.currentTarget.contains(event.relatedTarget)) return
-    // WebKit blurs the desktop disclosure as CSS hides it, before resize.
     if (!event.relatedTarget && window.innerWidth <= 860) {
       window.setTimeout(() => toggleRef.current?.focus(), 0)
     }
     closeMore()
   }
-  const moreIsActive = moreNavigation.some((link) => active === link.href.slice(1))
+  const moreIsActive = moreNavigation.some((link) => active === link.activeId)
+  const isHome = normalizedPathname() === '/'
+
+  const renderLink = (link, index, mobile = false) => {
+    const isRouteActive = Boolean(link.route && active === link.activeId)
+    const isSectionActive = !link.route && active === link.activeId
+    const current = isRouteActive ? 'page' : isSectionActive ? 'location' : undefined
+    return (
+      <a
+        key={`${link.activeId}-${link.label}`}
+        href={resolveHref(link.href)}
+        className={`${isRouteActive || isSectionActive ? 'active' : ''}${link.download ? ' nav-resume-link' : ''}`}
+        aria-current={current}
+        onClick={() => {
+          setActive(link.activeId)
+          closeMenu()
+          closeMore()
+        }}
+        style={mobile ? { '--menu-index': index } : undefined}
+        {...(link.download ? { download: link.download } : {})}
+      >
+        {mobile && <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>}
+        {link.label}
+        {!mobile && <ChevronRight size={13} aria-hidden="true" />}
+      </a>
+    )
+  }
 
   return (
     <header className={`navbar ${scrolled ? 'is-scrolled' : ''}`}>
       <div className="nav-inner">
-        <a href="#home" className="wordmark" onClick={() => { setActive('home'); closeMenu(); closeMore() }} aria-label={`${profile.shortName}, home`}>
+        <a
+          href={isHome ? '#home' : '/'}
+          className="wordmark"
+          onClick={() => { setActive('home'); closeMenu(); closeMore() }}
+          aria-label={`${profile.shortName}, home`}
+        >
           <span className="wordmark-mark" aria-hidden="true">CA</span>
           <span>{profile.shortName}</span>
         </a>
@@ -223,11 +266,11 @@ const Navbar = () => {
         <nav className="desktop-nav" aria-label="Primary navigation">
           {primaryNavigation.map((link) => (
             <a
-              key={link.href}
-              href={link.href}
-              onClick={() => { setActive(link.href.slice(1)); closeMore() }}
-              className={active === link.href.slice(1) ? 'active' : ''}
-              aria-current={active === link.href.slice(1) ? 'location' : undefined}
+              key={link.activeId}
+              href={resolveHref(link.href)}
+              onClick={() => { setActive(link.activeId); closeMore() }}
+              className={active === link.activeId ? 'active' : ''}
+              aria-current={link.route && active === link.activeId ? 'page' : !link.route && active === link.activeId ? 'location' : undefined}
             >
               {link.label}
             </a>
@@ -252,16 +295,7 @@ const Navbar = () => {
             </button>
             {moreOpen && (
               <div id="more-navigation-menu" className="more-navigation-menu">
-                {moreNavigation.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => { setActive(link.href.slice(1)); closeMore() }}
-                  >
-                    {link.label}
-                    <ChevronRight size={13} aria-hidden="true" />
-                  </a>
-                ))}
+                {moreNavigation.map((link, index) => renderLink(link, index))}
               </div>
             )}
           </div>
@@ -278,6 +312,7 @@ const Navbar = () => {
             <span>Search</span>
             <kbd aria-hidden="true">{isApplePlatform() ? '⌘' : 'Ctrl'} K</kbd>
           </button>
+          <ThemeToggle />
           <a className="nav-cta desktop-cta" href={`mailto:${profile.email}`}>Let’s talk</a>
         </div>
 
@@ -296,22 +331,11 @@ const Navbar = () => {
 
       <div ref={menuRef} id="mobile-navigation" className={`mobile-menu ${open ? 'is-open' : ''}`}>
         <nav aria-label="Mobile navigation">
-          {mobileNavigation.map((link, index) => (
-            <a key={link.href} href={link.href} onClick={() => { setActive(link.href.slice(1)); closeMenu() }} style={{ '--menu-index': index }}>
-              <span aria-hidden="true">0{index + 1}</span>
-              {link.label}
-            </a>
-          ))}
+          {mobileNavigation.map((link, index) => renderLink(link, index, true))}
           <div className="mobile-menu-actions">
             <a className="mobile-contact" href={`mailto:${profile.email}`} onClick={closeMenu}>Start a conversation</a>
-            <button
-              type="button"
-              className="mobile-music"
-              onClick={() => {
-                closeMenu()
-                openPalette()
-              }}
-            >
+            <ThemeToggle className="mobile-theme-toggle" />
+            <button type="button" className="mobile-music" onClick={() => { closeMenu(); openPalette() }}>
               Search sections and actions
             </button>
             <button

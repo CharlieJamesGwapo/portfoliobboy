@@ -1,6 +1,6 @@
 # Charlie James Z. Abejo — Portfolio
 
-Production-focused portfolio for an AI Developer and Full-Stack Engineer. The site presents verified experience, projects, skills, credentials, and contact details while preserving the original interactive arcade and optional music player.
+Portfolio for Charlie James Z. Abejo, Lead Full-Stack Developer | AI, Web & Mobile. The site presents resume-aligned experience, project engineering, skills, credentials, and contact details while preserving the interactive arcade and optional music player.
 
 ## Stack
 
@@ -28,7 +28,7 @@ npm run preview
 
 ## Content architecture
 
-Verified portfolio content lives in `src/data/portfolioData.js`, including:
+Core portfolio content lives in `src/data/portfolioData.js`, including:
 
 - Personal details and professional titles
 - Navigation and statistics
@@ -39,9 +39,23 @@ Verified portfolio content lives in `src/data/portfolioData.js`, including:
 
 Game-specific narrative content remains in `src/data/gameData.js` because it drives the dungeon experience.
 
-The hiring homepage follows hero → compact voice demo → three selected case studies → about, experience and capabilities. `src/data/selectedCaseStudies.js` curates OneRide, Zalio CRM, and Alex/Hasti from the existing project and resume records. Each study makes personal contribution and delivered capability visible, with problem, engineering approach, and technical scope in a disclosure. Outcomes describe verified functionality; no business-performance metrics are invented. Zalio's imagery is explicitly labelled as its public website, not the private CRM interface.
+The hiring homepage follows the portrait and six-project hero carousel → compact voice demo → three selected client case studies → independent products → about, experience and capabilities. `src/data/selectedCaseStudies.js` curates OneRide, Zalio CRM, and Alex/Hasti from the existing project and resume records. Each study makes personal contribution and delivered capability visible, with problem, engineering approach, and technical scope in a disclosure. Outcomes describe verified functionality; no business-performance metrics are invented. Zalio's imagery is explicitly labelled as its public website, not the private CRM interface.
 
 The full project collection lives inside the collapsed `#full-project-archive` disclosure beneath selected work. It retains the eight original case studies, twelve additional builds, thirteen Momentum systems, live product links, search, filters, and optional systems visualization. Fragment links and the command palette reveal archived destinations before scrolling or transferring focus. The older anonymous Enterprise CRM Platform record remains distinct from the named Zalio CRM case study.
+
+## Routes, themes, and project evidence
+
+- `/` — refreshed homepage, authentic prominent portrait, manual six-project carousel, AI/voice engineering, and five independent products.
+- `/projects` — complete project explorer with URL-persisted search/category/technology filters.
+- `/projects/:slug` — fifteen case studies with architecture, engineering challenges, contribution, outcomes, and clearly labelled authentic or concept media.
+- `/lab` — all nine original games behind an explicit launch control.
+- `/charlie-james-abejo-resume.pdf` — the supplied updated resume, copied without rewriting it.
+
+Project data is separated into `independentProducts.js`, `selectedCaseStudies.js`, and `caseStudies.js`. AgentForge is described as a CLI; its GUI artwork is a concept. ContextPilot's proposed voice experience and AutoFlow's planned integrations are clearly distinguished from current features. Missing private app screenshots use honest explanatory diagrams rather than invented screens.
+
+The light/dark system uses semantic CSS variables, system preference, persistent manual selection, and a CSP-compatible script before first paint. Builds emit route-specific HTML metadata and a sitemap; client navigation updates titles, canonical URLs, and structured data. These static documents provide metadata rather than server-rendered React content.
+
+See [the implementation and verification report](docs/portfolio-upgrade-report.md) for delivery details and deployment requirements.
 
 ## Preserved interactive features
 
@@ -91,7 +105,7 @@ The compact voice section follows the hero and has a primary navigation link. Th
 
 ## Verification
 
-Run `npm test`, `npm run build`, and `npx playwright test`. Browser checks need `npx playwright install` once. The Python resume check needs ReportLab and `pdftotext`; use the bundled Codex Python runtime if the system Python lacks ReportLab. Contact browser tests intercept requests so they do not send real email.
+Run `npm test`, `npx playwright test --project=chromium`, and `npm run test:production`. Browser checks need `npx playwright install chromium` once. The Python checks use the standard library and verify that resume exports preserve the supplied PDF. Contact browser tests intercept requests so they do not send real email.
 
 ## Recommended next content
 

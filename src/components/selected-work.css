@@ -54,3 +54,9 @@
   .full-project-archive > summary > svg { flex-shrink: 0; }
   .full-project-archive-content .page-container { width: calc(100% - 32px); }
 }
+
+@media (min-width: 900px) {
+  .selected-case-list > .reveal:nth-child(even) .selected-case-study { grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); }
+  .selected-case-list > .reveal:nth-child(even) .case-study-media { order: 2; border-right: 0; border-left: 1px solid var(--line-light); }
+  .selected-case-list > .reveal:nth-child(even) .case-study-copy { order: 1; }
+}

@@ -1,0 +1,16 @@
+.route-page { padding-top: 112px; background: var(--paper); color: var(--ink); min-height: 75svh; }
+.route-page-heading { padding-block: 24px 52px; }
+.route-page-heading > .text-link { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; margin-bottom: 28px; font-size: .85rem; }
+.route-page-heading .eyebrow { color: var(--mint-deep); margin-bottom: 16px; }
+.route-page-heading h1 { max-width: 850px; font-size: clamp(2.8rem, 6vw, 5.3rem); line-height: 1.03; letter-spacing: -.06em; }
+.route-page-heading > p:last-child { max-width: 650px; color: var(--slate); margin-top: 22px; font-size: 1.05rem; line-height: 1.75; }
+.projects-page > .projects-section { padding-top: 24px; }
+.lab-page > .lab-section { padding-top: 20px; }
+.lab-preview-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 36px; border-block: 1px solid var(--line-light); padding-block: 42px; }
+.lab-preview h2 { margin-top: 16px; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.1; letter-spacing: -.04em; }
+.lab-preview p:last-child { margin-top: 18px; color: var(--slate); max-width: 620px; line-height: 1.8; }
+.route-not-found { min-height: 65svh; padding-block: 160px 80px; }
+.route-not-found h1 { font-size: clamp(2.6rem, 5vw, 4.5rem); }
+.route-not-found p { margin-block: 20px; color: var(--slate); }
+.route-loading { display: grid; min-height: 65svh; place-items: center; padding: 140px 24px 70px; color: var(--mint-deep); background: var(--paper); }
+@media(max-width: 760px) { .route-page { padding-top: 92px; } .lab-preview-card { grid-template-columns: minmax(0, 1fr); gap: 26px; } .lab-preview-card .button { width: fit-content; } }

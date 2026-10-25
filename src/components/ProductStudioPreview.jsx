@@ -4,6 +4,7 @@ import ScrollReveal from './ScrollReveal'
 import HeroSystemsScene from './HeroSystemsScene'
 import { oneRidePreview } from '../data/productPreviewData'
 import { selectedCaseStudies } from '../data/selectedCaseStudies'
+import IndependentProducts from './IndependentProducts'
 import ProjectCollection from './ProjectCollection'
 import './studio-preview.css'
 import './selected-work.css'
@@ -257,6 +258,7 @@ function SelectedCaseStudy({ study, index }) {
         <div className="case-study-contribution"><h4>My contribution</h4><p>{study.contribution}</p></div>
         <div className="case-study-result"><h4>Delivered</h4><p>{study.delivered}</p></div>
         <div className="case-study-actions">
+          <a href={`/projects/${study.id}`}>Full project case study <ArrowUpRight size={16} aria-hidden="true" /></a>
           {study.links.map(link => <a key={link.id} href={link.href} target="_blank" rel="noreferrer">{link.label}<ArrowUpRight size={16} aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>)}
         </div>
         <p className="case-study-proof">{study.proof}</p>
@@ -280,13 +282,14 @@ export default function ProductStudioPreview() {
       <div className="page-container">
         <ScrollReveal>
           <div className="studio-heading selected-work-heading">
-            <div><p className="eyebrow">Selected work · ownership &amp; delivery</p><h2 id="product-studio-title">Three products.<br />A closer look.</h2></div>
-            <p>What I built, how the systems work, and what was delivered. Start with these three case studies, then explore the full archive.</p>
+            <div><p className="eyebrow">Selected client work · ownership &amp; delivery</p><h2 id="product-studio-title">Client work.<br />A closer look.</h2></div>
+            <p>Three evidence-backed client studies showing what I built, how the systems work, and what was delivered. Then explore the full archive.</p>
           </div>
         </ScrollReveal>
         <div className="selected-case-list">
           {selectedCaseStudies.map((study, index) => <ScrollReveal key={study.id}><SelectedCaseStudy study={study} index={index} /></ScrollReveal>)}
         </div>
+        <IndependentProducts />
         <ProjectCollection><SystemsViewDisclosure /></ProjectCollection>
       </div>
     </section>

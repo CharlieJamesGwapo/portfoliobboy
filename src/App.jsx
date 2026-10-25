@@ -2,6 +2,8 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowUp, Loader2, Music2 } from 'lucide-react'
 import { prefetchProps } from './lib/prefetch'
 import { revealSection } from './lib/sectionNavigation'
+import { usePortfolioRoute } from './lib/portfolioRoute'
+import { updateRouteMetadata } from './lib/routeMetadata'
 import CommandPalette from './components/CommandPalette'
 import UpdateBanner from './components/UpdateBanner'
 import Navbar from './components/Navbar'
@@ -13,15 +15,40 @@ import AISystems from './components/AISystems'
 import VoiceAgentDemo from './components/VoiceAgentDemo'
 import Skills from './components/Skills'
 import Education from './components/Education'
-import InteractiveLab from './components/InteractiveLab'
+import LabPreview from './components/LabPreview'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
 const loadMusicPlayer = () => import('./components/MusicPlayer')
 const MusicPlayer = lazy(loadMusicPlayer)
 const warmMusicPlayer = prefetchProps('music', loadMusicPlayer)
+const LabPage = lazy(() => import('./components/LabPage'))
+const ProjectsPage = lazy(() => import('./components/ProjectsPage'))
+const CaseStudyPage = lazy(() => import('./components/CaseStudyPage'))
+
+function RouteFocus({ pathname, hash }) {
+  useEffect(() => {
+    if (hash) {
+      let target
+      try { target = document.getElementById(decodeURIComponent(hash.slice(1))) } catch { return }
+      if (target) {
+        revealSection(target)
+        target.scrollIntoView({ block: 'start', behavior: 'instant' })
+        target.setAttribute('tabindex', '-1')
+        target.focus({ preventScroll: true })
+      }
+      return
+    }
+    document.getElementById('main-content')?.focus({ preventScroll: true })
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [pathname, hash])
+  return null
+}
 
 function App() {
+  const route = usePortfolioRoute()
+  const isHome = route.pathname === '/'
+  const caseMatch = route.pathname.match(/^\/projects\/([^/]+)$/)
   const [showTop, setShowTop] = useState(false)
   const [musicOpen, setMusicOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
@@ -87,6 +114,18 @@ function App() {
   }, [])
 
   useEffect(() => {
+    updateRouteMetadata(route.pathname)
+    let target = null
+    try { target = route.hash ? document.getElementById(decodeURIComponent(route.hash.slice(1))) : null } catch { /* Invalid encoded fragment. */ }
+    if (target) {
+      revealSection(target)
+      target.scrollIntoView({ block: 'start', behavior: 'instant' })
+    } else if (!route.hash) {
+      window.scrollTo({ top: 0, behavior: 'instant' })
+    }
+  }, [route.pathname])
+
+  useEffect(() => {
     const openMusic = () => setMusicOpen(true)
     window.addEventListener('portfolio:open-music', openMusic)
     document.body.classList.toggle('music-open', musicOpen)
@@ -128,7 +167,7 @@ function App() {
       window.cancelAnimationFrame(frame)
       window.clearTimeout(settle)
     }
-  }, [])
+  }, [route.pathname])
 
   useEffect(() => {
     const findTarget = (hash) => {
@@ -192,8 +231,9 @@ function App() {
     <div className="site-shell">
       <a href="#main-content" className="skip-link">Skip to content</a>
       <div ref={progressRef} className="scroll-progress" aria-hidden="true" />
-      <Navbar />
-      <main id="main-content">
+      <Navbar key={route.pathname} />
+      <main id="main-content" tabIndex={-1}>
+        {isHome ? <>
         <Hero />
         <VoiceAgentDemo />
         <ProductStudioPreview />
@@ -202,8 +242,15 @@ function App() {
         <AISystems />
         <Skills />
         <Education />
-        <InteractiveLab />
+        <LabPreview />
         <Contact />
+        </> : <Suspense fallback={<div className="route-loading" role="status"><Loader2 className="spin" aria-hidden="true" /> Loading the portfolio…</div>}>
+          {route.pathname === '/lab' ? <LabPage />
+            : route.pathname === '/projects' ? <ProjectsPage />
+              : caseMatch ? <CaseStudyPage slug={caseMatch[1]} />
+                : <section className="page-container route-not-found"><h1>Page not found.</h1><p>Explore the portfolio or browse the project collection.</p><a className="button button-primary" href="/">Back to the portfolio</a></section>}
+          <RouteFocus pathname={route.pathname} hash={route.hash} />
+        </Suspense>}
       </main>
       <Footer />
 

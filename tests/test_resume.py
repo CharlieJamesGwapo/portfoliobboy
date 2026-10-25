@@ -1,76 +1,29 @@
-from __future__ import annotations
-
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
-GENERATOR = REPO_ROOT / "scripts" / "generate_resume.py"
-
-EXPECTED_CERTIFICATES = [
-    "Model Context Protocol: Advanced Topics",
-    "Introduction to Agent Skills",
-    "AI Fluency for Builders",
-    "Introduction to Model Context Protocol",
-    "AI Capabilities and Limitations",
-    "Claude Code in Action",
-    "Introduction to Subagents",
-    "Teaching the AI Fluency Framework",
-    "Claude 101",
-    "Building with the Claude API",
-    "AI Fluency: Framework & Foundations",
-    "Java SE 8 Programmer I",
-    "Go Programming",
-    "Programming in HTML5 with JavaScript and CSS3",
-    "Full-Stack Web Development Certification",
-    "Databases with SQL",
-    "Manage AD DS Domain Controllers & FSMO Roles",
-    "Windows Server 2012 Training",
-    "Active Directory",
-    "MongoDB Database Training",
-    "PHP for Web Development",
-    "JavaScript Programming",
-    "HTML and CSS",
-]
+SOURCE = REPO_ROOT / 'ABEJO_CHARLIE_JAMES_RESUME.pdf'
+GENERATOR = REPO_ROOT / 'scripts' / 'generate_resume.py'
 
 
-class ResumeContentTest(unittest.TestCase):
-    def test_generated_resume_matches_portfolio_dates_and_certificates(self) -> None:
+class ResumeExportTest(unittest.TestCase):
+    def test_export_preserves_the_supplied_resume_byte_for_byte(self):
+        original = SOURCE.read_bytes()
+        self.assertTrue(original.startswith(b'%PDF-'))
         with tempfile.TemporaryDirectory() as temporary_directory:
-            output_path = Path(temporary_directory) / "resume.pdf"
-            subprocess.run(
-                [sys.executable, str(GENERATOR), str(output_path)],
-                cwd=REPO_ROOT,
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-            extracted = subprocess.run(
-                ["pdftotext", "-layout", str(output_path), "-"],
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout
+            output = Path(temporary_directory) / 'nested' / 'resume.pdf'
+            subprocess.run([sys.executable, str(GENERATOR), str(output)], cwd=REPO_ROOT, check=True, capture_output=True)
+            self.assertEqual(output.read_bytes(), original)
+        self.assertEqual(SOURCE.read_bytes(), original)
 
-        normalized = " ".join(extracted.split())
-        self.assertIn("AI Full-Stack Engineer - Zalio · Momentum, Australia · Remote Jun 2026 – Present", normalized)
-        self.assertIn("Full-Stack Developer - Rooche Digital Company Jan 2026 – Mar 2026", normalized)
-        self.assertIn("Full-Stack Developer - Australian Fintech · Lending Platform Jan 2024 – Dec 2025", normalized)
-        self.assertIn("Live Products & Demos".upper(), normalized)
-        self.assertIn("zalio.ai", normalized)
-        self.assertIn("hasti.com.au", normalized)
-        self.assertNotIn("SocietyOne", normalized)
-        self.assertNotIn("Robustech", normalized)
-        self.assertIn("BS in Information Technology - Misamis Oriental Institute of Science and Technology 2022 - 2026", normalized)
-        self.assertNotIn("Multi-Club Fitness Group", normalized)
-        self.assertNotIn("PerfectGym", normalized)
-        for certificate in EXPECTED_CERTIFICATES:
-            with self.subTest(certificate=certificate):
-                self.assertIn(certificate, normalized)
+    def test_exporting_to_source_does_not_overwrite_the_resume(self):
+        original = SOURCE.read_bytes()
+        subprocess.run([sys.executable, str(GENERATOR), str(SOURCE)], cwd=REPO_ROOT, check=True, capture_output=True)
+        self.assertEqual(SOURCE.read_bytes(), original)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

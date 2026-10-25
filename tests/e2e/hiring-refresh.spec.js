@@ -81,7 +81,7 @@ for (const [id, image, href] of [
     const study = page.locator(`#case-${id}`)
     await study.scrollIntoViewIfNeeded()
     await expect(study.getByRole('status')).toContainText('Website preview unavailable')
-    await expect(study.locator('.case-study-actions a')).toHaveAttribute('href', href)
+    await expect(study.locator(`.case-study-actions a[href="${href}"]`)).toHaveAttribute('href', href)
     await expect(study.locator('img')).toHaveCount(0)
   })
 }

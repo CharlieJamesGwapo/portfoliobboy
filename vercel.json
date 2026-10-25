@@ -9,60 +9,153 @@
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/projects/:slug",
+      "destination": "/projects/:slug/index.html"
+    },
+    {
+      "source": "/projects",
+      "destination": "/projects/index.html"
+    },
+    {
+      "source": "/lab",
+      "destination": "/lab/index.html"
+    }
   ],
   "headers": [
     {
+      "source": "/(.*).(png|webp|jpg|jpeg|svg|ico|pdf|woff2)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
       "source": "/assets/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/sw.js",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
       ]
     },
     {
       "source": "/(index.html|offline.html|manifest.json|robots.txt|sitemap.xml)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     },
     {
       "source": "/fonts/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
       ]
     },
     {
       "source": "/certificates/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=2592000, stale-while-revalidate=86400" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+        }
       ]
     },
     {
       "source": "/audio/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=2592000, stale-while-revalidate=86400" }
-      ]
-    },
-    {
-      "source": "/(.*).(png|webp|jpg|jpeg|svg|ico|pdf|woff2)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=2592000, stale-while-revalidate=86400" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+        }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com https://img.youtube.com; font-src 'self'; media-src 'self' blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+        }
+      ]
+    },
+    {
+      "source": "/charlie-james-abejo-resume.pdf",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "CDN-Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "Vercel-CDN-Cache-Control",
+          "value": "no-store"
+        }
       ]
     }
   ]

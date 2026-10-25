@@ -11,9 +11,16 @@ INSTALL_INSTRUCTIONS.txt
 # They are kept in the repo as the source of truth, but the build now serves
 # pre-optimised WebP from public/certificates/, so they never need uploading.
 *.jpg
+!public/social-preview.jpg
 image.png
 artifacts
 tests
 test-results
 playwright-report
 supabase
+
+test-results-production
+playwright.production.config.js
+
+# Local generated verification captures
+output

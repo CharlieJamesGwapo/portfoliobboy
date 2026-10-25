@@ -32,11 +32,11 @@ const Experience = () => {
             const allShown = Boolean(showAll[index])
             return (
               <ScrollReveal key={`${experience.company}-${experience.period}`} delay={(index % 4) * 55} variant="right">
-                {index === 4 && (
+                {experience.company === 'MOIST Alumni Online Tracking System' && (
                   <div className="timeline-chapter">
-                    <span>2021—2023</span>
-                    <strong>Earlier product engagements</strong>
-                    <p>Project-based experience across point of sale, scheduling, mobile, and real-time products.</p>
+                    <span>2021—2025</span>
+                    <strong>Earlier project engagements</strong>
+                    <p>Project work across alumni systems, point of sale, scheduling, mobile, and real-time products.</p>
                   </div>
                 )}
                 <article className={`experience-item ${experience.featured ? 'is-featured' : ''}`}>
@@ -117,7 +117,7 @@ const Experience = () => {
         <ScrollReveal variant="fade">
           <div className="experience-summary-strip" aria-label="Experience summary">
             <div><strong>Hands-on</strong><span>Development</span></div>
-            <div><strong>10</strong><span>Roles and engagements</span></div>
+            <div><strong>{experiences.length}</strong><span>Roles and engagements</span></div>
             <div><strong>Web + mobile</strong><span>Product coverage</span></div>
             <div><strong>Remote</strong><span>Australia and US overlap</span></div>
           </div>

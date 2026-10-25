@@ -1,0 +1,697 @@
+/*
+ * The portfolio's original CSS uses --ink and --paper for both text and panel
+ * colors. Keep those legacy tokens intact and use these semantic tokens for
+ * the palette boundary; focused selectors below adapt each surface without
+ * turning every dark panel into a light one (or vice versa).
+ */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --theme-page: #0b2528;
+  --theme-surface: #102f32;
+  --theme-surface-raised: #15383a;
+  --theme-text: #eef6f3;
+  --theme-muted: #b3c5c1;
+  --theme-accent: #72e1c3;
+  --theme-line: rgba(231, 246, 241, 0.15);
+  --theme-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --theme-page: #f4f9f7;
+  --theme-surface: #fffefa;
+  --theme-surface-raised: #eaf3f0;
+  --theme-text: #102f31;
+  --theme-muted: #506966;
+  --theme-accent: #0f806d;
+  --theme-line: rgba(11, 37, 40, 0.15);
+  --theme-shadow: 0 24px 70px rgba(7, 30, 32, 0.1);
+}
+
+html[data-theme='dark'] { background: var(--theme-page); }
+html[data-theme='light'] { background: var(--theme-page); }
+html[data-theme='dark'] body { background: var(--theme-page); color: var(--theme-text); }
+html[data-theme='light'] body { background: var(--theme-page); color: var(--theme-text); }
+
+/* Navigation and theme control */
+html[data-theme='light'] .navbar.is-scrolled {
+  border-color: rgba(11, 37, 40, 0.12);
+  background: rgba(248, 252, 250, 0.94);
+  box-shadow: 0 10px 34px rgba(16, 47, 49, 0.08);
+}
+html[data-theme='light'] .wordmark,
+html[data-theme='light'] .nav-cta { color: var(--theme-text); }
+html[data-theme='light'] .wordmark-mark,
+html[data-theme='light'] .footer-mark { border-color: rgba(15, 128, 109, 0.42); color: var(--theme-accent); }
+html[data-theme='light'] .desktop-nav a,
+html[data-theme='light'] .more-toggle { color: #405a58; }
+html[data-theme='light'] .desktop-nav a:hover,
+html[data-theme='light'] .desktop-nav a.active,
+html[data-theme='light'] .more-toggle:hover,
+html[data-theme='light'] .more-toggle:focus-visible,
+html[data-theme='light'] .more-toggle.is-active,
+html[data-theme='light'] .more-navigation.is-open .more-toggle { color: var(--theme-text); }
+html[data-theme='light'] .nav-search { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.58); color: #405a58; }
+html[data-theme='light'] .nav-search kbd { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .nav-search:hover { color: var(--theme-text); }
+html[data-theme='light'] .nav-cta { border-color: rgba(11, 37, 40, 0.23); }
+html[data-theme='light'] .nav-cta:hover { border-color: var(--theme-accent); background: var(--theme-accent); color: #fff; }
+html[data-theme='light'] .more-navigation-menu { border-color: var(--theme-line); background: rgba(255, 254, 250, 0.98); box-shadow: 0 18px 40px rgba(16, 47, 49, 0.16); }
+html[data-theme='light'] .more-navigation-menu::before { border-color: var(--theme-line); background: var(--theme-surface); }
+html[data-theme='light'] .more-navigation-menu a { color: var(--theme-muted); }
+html[data-theme='light'] .more-navigation-menu a:hover,
+html[data-theme='light'] .more-navigation-menu a:focus-visible { background: rgba(15, 128, 109, 0.08); color: var(--theme-text); }
+html[data-theme='light'] .theme-toggle { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.7); color: var(--theme-text); }
+html[data-theme='light'] .theme-toggle:hover { border-color: rgba(15, 128, 109, 0.48); background: rgba(15, 128, 109, 0.08); color: var(--theme-accent); }
+
+html[data-theme='light'] .menu-toggle { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.7); color: var(--theme-text); }
+html[data-theme='light'] .mobile-menu { border-top: 1px solid var(--theme-line); background: #f7fbf9; }
+html[data-theme='light'] .mobile-menu nav > a:not(.mobile-contact) { color: var(--theme-text); }
+html[data-theme='light'] .mobile-menu nav > a span { color: var(--theme-accent); }
+html[data-theme='light'] .mobile-menu-actions .mobile-music { border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='light'] .mobile-menu-actions .theme-toggle { border-color: var(--theme-line); background: #fff; color: var(--theme-text); }
+
+/* Light mode hero: paper white, soft mint atmosphere, crisp dark lettering. */
+html[data-theme='light'] .hero-section {
+  background:
+    radial-gradient(ellipse at 78% 8%, rgba(72, 190, 161, 0.16), transparent 38%),
+    linear-gradient(138deg, #f7fbf9 0%, #edf7f3 57%, #e6f2ee 100%);
+  color: var(--theme-text);
+}
+html[data-theme='light'] .hero-grid {
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(11, 55, 53, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(11, 55, 53, 0.045) 1px, transparent 1px);
+}
+html[data-theme='light'] .hero-orbit { border-color: rgba(15, 128, 109, 0.18); }
+html[data-theme='light'] .availability-pill { border-color: rgba(15, 128, 109, 0.22); background: rgba(255, 255, 255, 0.65); color: #285b53; }
+html[data-theme='light'] .status-dot { background: var(--theme-accent); box-shadow: 0 0 0 5px rgba(15, 128, 109, 0.1); }
+html[data-theme='light'] .status-dot::after { border-color: var(--theme-accent); }
+html[data-theme='light'] .hero-kicker { color: var(--theme-accent); }
+html[data-theme='light'] .hero-copy h1 .hero-line-primary,
+html[data-theme='light'] .hero-profile-details .hero-kicker { color: var(--theme-text); }
+html[data-theme='light'] .hero-copy h1 .hero-line-accent { color: var(--theme-accent); }
+html[data-theme='light'] .hero-profile-copy h1 .hero-line-note { color: #506966; }
+html[data-theme='light'] .hero-profile-details > span,
+html[data-theme='light'] .hero-intro { color: #405d59; }
+html[data-theme='light'] .button-secondary { border-color: rgba(11, 37, 40, 0.28); color: var(--theme-text); }
+html[data-theme='light'] .button-secondary:hover { border-color: rgba(15, 128, 109, 0.55); background: rgba(15, 128, 109, 0.07); }
+html[data-theme='light'] .hero-contact-link,
+html[data-theme='light'] .hero-socials { color: var(--theme-muted); }
+html[data-theme='light'] .hero-contact-link:hover,
+html[data-theme='light'] .hero-socials > a:hover { color: var(--theme-accent); }
+html[data-theme='light'] .hero-socials > a { border-color: var(--theme-line); }
+html[data-theme='light'] .hero-socials > span { color: var(--theme-muted); }
+html[data-theme='light'] .hero-profile-intro picture { border-color: rgba(15, 128, 109, 0.2); background: #d8e9e3; box-shadow: 0 22px 52px rgba(20, 65, 58, 0.16); }
+html[data-theme='light'] .proof-strip { border-color: var(--theme-line); }
+html[data-theme='light'] .proof-strip > div + div { border-color: var(--theme-line); }
+html[data-theme='light'] .proof-strip strong { color: var(--theme-text); }
+html[data-theme='light'] .proof-strip span { color: var(--theme-muted); }
+html[data-theme='light'] .ai-hero-ribbon { border-color: var(--theme-line); }
+html[data-theme='light'] .ai-hero-ribbon > a { color: var(--theme-accent); }
+html[data-theme='light'] .ai-hero-ribbon ul { color: #385653; }
+
+/* The carousel frame follows the selected theme; embedded product screenshots stay authentic. */
+html[data-theme='light'] .hero-project-carousel { border-color: rgba(11, 37, 40, 0.14); background: radial-gradient(circle at 88% 0%, rgba(103, 224, 193, 0.15), transparent 38%), rgba(255, 254, 250, 0.82); box-shadow: 0 24px 70px rgba(18, 57, 51, 0.12); }
+html[data-theme='light'] .hero-project-carousel-heading > span,
+html[data-theme='light'] .hero-project-carousel-controls button { color: var(--theme-text); }
+html[data-theme='light'] .hero-project-carousel-heading > strong { color: var(--theme-accent); }
+html[data-theme='light'] .hero-project-carousel-heading > strong i { color: #647b78; }
+html[data-theme='light'] .hero-project-carousel-controls button,
+html[data-theme='light'] .hero-project-tabs button,
+html[data-theme='light'] .hero-project-panel { border-color: rgba(11, 37, 40, 0.13); }
+html[data-theme='light'] .hero-project-carousel-controls button { background: rgba(255, 255, 255, 0.8); }
+html[data-theme='light'] .hero-project-tabs button { background: rgba(255, 255, 255, 0.68); color: #405d59; }
+html[data-theme='light'] .hero-project-tabs button:hover,
+html[data-theme='light'] .hero-project-tabs button.is-active { border-color: rgba(15, 128, 109, 0.42); background: rgba(15, 128, 109, 0.08); color: var(--theme-text); }
+html[data-theme='light'] .hero-project-tabs button > small { color: #5d7772; }
+html[data-theme='light'] .hero-project-tabs button.is-active > small,
+html[data-theme='light'] .hero-project-tabs button:hover > small { color: var(--theme-accent); }
+html[data-theme='light'] .hero-project-panel { background: rgba(255, 255, 255, 0.6); }
+html[data-theme='light'] .hero-project-media .product-media-stage,
+html[data-theme='light'] .hero-project-media .studio-phone-stage { background: #e5efeb; }
+html[data-theme='light'] .hero-project-media .product-media figcaption { color: #536e69; }
+html[data-theme='light'] .hero-project-media .studio-preview-label { color: var(--theme-accent); }
+html[data-theme='light'] .hero-project-media .studio-screen-controls button { border-color: var(--theme-line); background: #fff; color: var(--theme-text); }
+
+/* Light palette for every original dark section, including its explicit text colors. */
+html[data-theme='light'] .section-dark {
+  background: linear-gradient(145deg, #edf6f3 0%, #e7f1ed 100%);
+  color: var(--theme-text);
+}
+html[data-theme='light'] .skills-section { background: radial-gradient(circle at 8% 24%, rgba(70, 178, 151, 0.13), transparent 31%), linear-gradient(145deg, #edf6f3, #e7f1ed); }
+html[data-theme='light'] .section-dark .eyebrow { color: var(--theme-accent); }
+html[data-theme='light'] .section-dark .section-heading h2,
+html[data-theme='light'] .section-dark h2,
+html[data-theme='light'] .section-dark h3 { color: var(--theme-text); }
+html[data-theme='light'] .principles span { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .skill-groups,
+html[data-theme='light'] .skill-group { border-color: var(--theme-line); }
+html[data-theme='light'] .skill-group h3 { color: var(--theme-text); }
+html[data-theme='light'] .skill-group-heading span { color: var(--theme-accent); }
+html[data-theme='light'] .skill-cloud span { background: rgba(255, 255, 255, 0.74); color: #385653; }
+html[data-theme='light'] .skill-cloud span:hover { background: rgba(15, 128, 109, 0.1); color: var(--theme-accent); }
+html[data-theme='light'] .capability-context { color: var(--theme-muted); }
+html[data-theme='light'] .capability-tab { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.7); color: #405d59; }
+html[data-theme='light'] .capability-tab svg { color: var(--theme-accent); }
+html[data-theme='light'] .capability-tab small,
+html[data-theme='light'] .capability-count { color: #5d7772; }
+html[data-theme='light'] .capability-tab:hover,
+html[data-theme='light'] .capability-tab.is-active { border-color: rgba(15, 128, 109, 0.42); background: rgba(15, 128, 109, 0.08); color: var(--theme-text); }
+html[data-theme='light'] .capability-tab.is-active { box-shadow: inset 3px 0 0 var(--theme-accent); }
+html[data-theme='light'] .capability-panel { border-color: var(--theme-line); background: rgba(255, 254, 250, 0.84); }
+html[data-theme='light'] .capability-panel-icon { border-color: rgba(15, 128, 109, 0.25); background: rgba(15, 128, 109, 0.08); color: var(--theme-accent); }
+html[data-theme='light'] .capability-panel-heading h3 { color: var(--theme-text); }
+html[data-theme='light'] .capability-panel .skill-cloud span { border-color: var(--theme-line); background: #f1f7f4; color: #365653; }
+html[data-theme='light'] .capability-panel .skill-cloud span:hover { border-color: rgba(15, 128, 109, 0.4); background: rgba(15, 128, 109, 0.08); color: var(--theme-accent); }
+
+html[data-theme='light'] #experience .experience-list,
+html[data-theme='light'] #experience .experience-item,
+html[data-theme='light'] #experience .experience-summary-strip > div + div { border-color: var(--theme-line); }
+html[data-theme='light'] #experience .experience-title strong { color: var(--theme-text); }
+html[data-theme='light'] #experience .experience-title > span,
+html[data-theme='light'] #experience .experience-index,
+html[data-theme='light'] #experience .experience-toggle { color: var(--theme-accent); }
+html[data-theme='light'] #experience .experience-meta,
+html[data-theme='light'] #experience .experience-panel ul,
+html[data-theme='light'] #experience .earlier-work > p:last-child,
+html[data-theme='light'] #experience .experience-summary { color: var(--theme-muted); }
+html[data-theme='light'] #experience .experience-summary { color: #365552; }
+html[data-theme='light'] #experience .experience-toggle { border-color: var(--theme-line); }
+html[data-theme='light'] #experience .experience-trigger:hover { background: rgba(15, 128, 109, 0.045); }
+html[data-theme='light'] #experience .tag-list span { border-color: var(--theme-line); color: #45625e; }
+html[data-theme='light'] #experience .earlier-work { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.52); }
+html[data-theme='light'] #experience .experience-summary-strip strong { color: var(--theme-accent); }
+html[data-theme='light'] #experience .experience-summary-strip span { color: var(--theme-muted); }
+
+html[data-theme='light'] .live-projects-section { background: linear-gradient(135deg, #eaf4f0, #f2f8f5); color: var(--theme-text); }
+html[data-theme='light'] .live-projects-heading > p:last-child,
+html[data-theme='light'] .live-feature-host { color: var(--theme-muted); }
+html[data-theme='light'] .live-feature { border-color: rgba(15, 128, 109, 0.26); background: radial-gradient(circle at 12% 0%, rgba(103, 224, 193, 0.16), transparent 45%), rgba(255, 254, 250, 0.82); box-shadow: 0 20px 54px rgba(7, 30, 32, 0.08); }
+html[data-theme='light'] .live-feature-copy > p:last-child { color: #405d59; }
+html[data-theme='light'] .live-kind { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .live-kind-accent { border-color: rgba(15, 128, 109, 0.35); color: var(--theme-accent); }
+html[data-theme='light'] .live-filters button { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .live-filters button:hover { color: var(--theme-text); }
+html[data-theme='light'] .live-filters button[aria-pressed='true'] { background: var(--theme-accent); border-color: var(--theme-accent); color: #fff; }
+html[data-theme='light'] .live-toolbar > p { color: var(--theme-muted); }
+html[data-theme='light'] .live-grid { border-color: var(--theme-line); }
+html[data-theme='light'] .live-card { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.76); color: var(--theme-text); }
+html[data-theme='light'] .live-card:hover { border-color: rgba(15, 128, 109, 0.42); background: #fff; }
+html[data-theme='light'] .live-card-desc,
+html[data-theme='light'] .live-host { color: var(--theme-muted); }
+html[data-theme='light'] .live-card-icon { color: var(--theme-accent); }
+
+html[data-theme='light'] .voice-demo-section.section {
+  --vc-line: rgba(11, 37, 40, 0.2);
+  --vc-arrow: #0f806d;
+  --vc-arrow-back: #b35435;
+  --vc-text: #405d59;
+  --vc-surface: #fffefa;
+  background: radial-gradient(ellipse at 80% 8%, rgba(103, 224, 193, 0.16), transparent 34%), linear-gradient(145deg, #edf6f3, #e8f2ef);
+  color: var(--theme-text);
+}
+html[data-theme='light'] .voice-demo-section .eyebrow { color: var(--theme-accent); }
+html[data-theme='light'] .voice-demo-copy > p,
+html[data-theme='light'] .vc-time,
+html[data-theme='light'] .vc-note { color: var(--theme-muted); }
+html[data-theme='light'] .vc-figure,
+html[data-theme='light'] .voice-listen-card { border-color: var(--theme-line); background: rgba(255, 254, 250, 0.9); }
+html[data-theme='light'] .vc-parties > span { border-color: rgba(15, 128, 109, 0.25); background: #fff; color: var(--theme-accent); }
+html[data-theme='light'] .vc-label { color: var(--theme-text); }
+html[data-theme='light'] .vc-detail,
+html[data-theme='light'] .vc-stats span { color: var(--theme-muted); }
+html[data-theme='light'] .vc-stats li { border-color: var(--theme-line); background: rgba(15, 128, 109, 0.035); }
+html[data-theme='light'] .vc-stats strong { color: var(--theme-accent); }
+html[data-theme='light'] .voice-listen-icon { background: rgba(15, 128, 109, 0.09); color: var(--theme-accent); }
+html[data-theme='light'] .voice-listen-heading h3,
+html[data-theme='light'] .voice-sample-body h4,
+html[data-theme='light'] .voice-languages-note strong { color: var(--theme-text); }
+html[data-theme='light'] .voice-sample-label { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .voice-sample-options button { border-color: var(--theme-line); background: #fff; color: #46615e; }
+html[data-theme='light'] .voice-sample-options button > span { color: var(--theme-accent); }
+html[data-theme='light'] .voice-sample-options button[aria-pressed='true'] { border-color: var(--theme-accent); background: rgba(15, 128, 109, 0.08); color: var(--theme-text); }
+html[data-theme='light'] .voice-sample-body p,
+html[data-theme='light'] .voice-transcript,
+html[data-theme='light'] .voice-sample-disclosure,
+html[data-theme='light'] .voice-languages-note p { color: var(--theme-muted); }
+html[data-theme='light'] .voice-transcript-disclosure,
+html[data-theme='light'] .voice-engineering { border-color: var(--theme-line); }
+html[data-theme='light'] .voice-transcript-disclosure summary,
+html[data-theme='light'] .voice-engineering > summary { color: var(--theme-accent); }
+html[data-theme='light'] .voice-transcript li { background: #edf5f2; }
+html[data-theme='light'] .voice-transcript li[data-speaker='Customer'] strong { color: var(--theme-text); }
+
+/* Contact stays the mint conversion moment in light mode; in dark mode it becomes a deep teal anchor. */
+html[data-theme='light'] .contact-section { background: linear-gradient(135deg, #8fe2cb, #a8ecd9); color: var(--theme-text); }
+html[data-theme='light'] .contact-section .eyebrow { color: #174942; }
+html[data-theme='light'] .contact-copy h2 { color: var(--theme-text); }
+html[data-theme='light'] .contact-copy > p:nth-of-type(2),
+html[data-theme='light'] .contact-details { color: #285154; }
+html[data-theme='light'] .contact-path { border-color: rgba(11, 37, 40, 0.22); background: rgba(255, 254, 250, 0.55); color: var(--theme-text); }
+html[data-theme='light'] .contact-path:hover,
+html[data-theme='light'] .contact-path.is-selected { border-color: rgba(11, 37, 40, 0.5); background: rgba(255, 254, 250, 0.9); }
+html[data-theme='light'] .contact-path small { color: #285154; }
+
+html[data-theme='dark'] .contact-section { background: radial-gradient(ellipse at 5% 4%, rgba(103, 224, 193, 0.14), transparent 36%), linear-gradient(135deg, #0c3235, #102f32); color: var(--theme-text); }
+html[data-theme='dark'] .contact-section .eyebrow,
+html[data-theme='dark'] .contact-copy h2 { color: var(--theme-text); }
+html[data-theme='dark'] .contact-copy > p:nth-of-type(2),
+html[data-theme='dark'] .contact-details { color: #c1d2ce; }
+html[data-theme='dark'] .contact-email { border-color: rgba(231, 246, 241, 0.32); color: var(--theme-text); }
+html[data-theme='dark'] .contact-email:hover { border-color: var(--theme-accent); }
+html[data-theme='dark'] .contact-socials a,
+html[data-theme='dark'] .contact-details a { color: #d3e1dd; }
+html[data-theme='dark'] .contact-form { border-color: var(--theme-line); background: #102f32; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.24); }
+html[data-theme='dark'] .contact-form:hover { border-color: rgba(114, 225, 195, 0.34); }
+html[data-theme='dark'] .contact-form label > span { color: #d4e2de; }
+html[data-theme='dark'] .contact-form input,
+html[data-theme='dark'] .contact-form textarea { border-color: rgba(231, 246, 241, 0.18); background: #0a2528; color: var(--theme-text); }
+html[data-theme='dark'] .contact-form input::placeholder,
+html[data-theme='dark'] .contact-form textarea::placeholder { color: #93aaa5; }
+html[data-theme='dark'] .contact-form input:focus,
+html[data-theme='dark'] .contact-form textarea:focus { border-color: var(--theme-accent); box-shadow: 0 0 0 3px rgba(114, 225, 195, 0.18); }
+html[data-theme='dark'] .contact-path { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.055); color: var(--theme-text); }
+html[data-theme='dark'] .contact-path:hover,
+html[data-theme='dark'] .contact-path.is-selected { border-color: rgba(114, 225, 195, 0.55); background: rgba(114, 225, 195, 0.1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16); }
+html[data-theme='dark'] .contact-path small { color: #c0d0cc; }
+html[data-theme='dark'] .field-error { color: #ffb8ad; }
+html[data-theme='dark'] .form-status { color: #b7cac5; }
+html[data-theme='dark'] .form-status.success { color: #94e8cc; }
+
+/* Credential panels and the archive retain every original image and record. */
+html[data-theme='dark'] .credentials-section { background: radial-gradient(circle at 8% 52%, rgba(103, 224, 193, 0.08), transparent 26%), #0d292c; color: var(--theme-text); }
+html[data-theme='dark'] .credentials-section .section-heading h2,
+html[data-theme='dark'] .credentials-section h3 { color: var(--theme-text); }
+html[data-theme='dark'] .credentials-section .section-heading > p:last-child,
+html[data-theme='dark'] .certificate-gallery-heading > p { color: var(--theme-muted); }
+html[data-theme='dark'] .foundation-card,
+html[data-theme='dark'] .credential-panel,
+html[data-theme='dark'] .recognition-card { border-color: var(--theme-line); background: var(--theme-surface); color: var(--theme-text); }
+html[data-theme='dark'] .foundation-card-primary { background: #153c3d; }
+html[data-theme='dark'] .foundation-card-primary > p:last-child,
+html[data-theme='dark'] .foundation-card-primary .foundation-place { color: #c2d2ce; }
+html[data-theme='dark'] .foundation-card:not(.foundation-card-primary) > p:last-child,
+html[data-theme='dark'] .foundation-place { color: var(--theme-muted); }
+html[data-theme='dark'] .foundation-card h3,
+html[data-theme='dark'] .credential-record strong,
+html[data-theme='dark'] .certificate-image-copy strong { color: var(--theme-text); }
+html[data-theme='dark'] .credential-record small,
+html[data-theme='dark'] .certificate-image-copy small { color: var(--theme-muted); }
+html[data-theme='dark'] .credential-record code { color: #b2c8c2; }
+html[data-theme='dark'] .credential-record { border-color: var(--theme-line); }
+html[data-theme='dark'] .certificate-gallery-heading { border-color: var(--theme-line); }
+html[data-theme='dark'] .certificate-image-card { border-color: var(--theme-line); background: #173537; }
+html[data-theme='dark'] #education .credential-more { border-color: var(--theme-line); color: var(--theme-accent); }
+
+/* Dark palette for the project archive, product stories, and searchable controls. */
+html[data-theme='dark'] .projects-section,
+html[data-theme='dark'] .product-studio-section,
+html[data-theme='dark'] .route-page .projects-section { background: radial-gradient(ellipse at 84% 8%, rgba(103, 224, 193, 0.08), transparent 28%), #0d292c; color: var(--theme-text); }
+html[data-theme='dark'] .product-studio-section::before { background-image: linear-gradient(rgba(235, 249, 245, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(235, 249, 245, 0.035) 1px, transparent 1px); }
+html[data-theme='dark'] .project-search,
+html[data-theme='dark'] .project-technology-filter { border-color: var(--theme-line); background: var(--theme-surface); color: var(--theme-muted); }
+html[data-theme='dark'] .project-search input,
+html[data-theme='dark'] .project-technology-filter select { color: var(--theme-text); }
+html[data-theme='dark'] .project-search input::placeholder { color: #9bb0ac; }
+html[data-theme='dark'] .project-search-count { color: var(--theme-muted); }
+html[data-theme='dark'] .project-search-clear,
+html[data-theme='dark'] .project-filter-reset,
+html[data-theme='dark'] .project-archive-toggle { border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='dark'] .project-filters button { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='dark'] .project-filters button:hover { color: var(--theme-text); }
+html[data-theme='dark'] .project-filters button.is-active { border-color: var(--theme-accent); background: var(--theme-accent); color: #082c2a; }
+html[data-theme='dark'] .project-filters button.is-active small { color: #082c2a; background: rgba(255, 255, 255, 0.32); }
+html[data-theme='dark'] .project-tabs,
+html[data-theme='dark'] .project-showcase,
+html[data-theme='dark'] .selected-case-study,
+html[data-theme='dark'] .full-project-archive,
+html[data-theme='dark'] .project-empty { border-color: var(--theme-line); background: var(--theme-surface); color: var(--theme-text); }
+html[data-theme='dark'] .project-tabs button { color: var(--theme-muted); }
+html[data-theme='dark'] .project-tabs button + button { border-color: var(--theme-line); }
+html[data-theme='dark'] .project-tabs button.is-active { background: #173b3d; color: var(--theme-text); }
+html[data-theme='dark'] .project-story-heading h3,
+html[data-theme='dark'] .project-story-grid p,
+html[data-theme='dark'] .archive-project h4 { color: var(--theme-text); }
+html[data-theme='dark'] .project-overview,
+html[data-theme='dark'] .project-description,
+html[data-theme='dark'] .project-result,
+html[data-theme='dark'] .project-archive-heading > p,
+html[data-theme='dark'] .archive-project > div > span { color: var(--theme-muted); }
+html[data-theme='dark'] .project-story-grid,
+html[data-theme='dark'] .project-story-grid > div { border-color: var(--theme-line); background: #173537; }
+html[data-theme='dark'] .project-story-grid .project-result { background: #082124; }
+html[data-theme='dark'] .project-story-grid .project-result p { color: #d2e0dc; }
+html[data-theme='dark'] .project-detail-row li,
+html[data-theme='dark'] .archive-stack span { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='dark'] .project-archive,
+html[data-theme='dark'] .archive-project,
+html[data-theme='dark'] .full-project-archive-content { border-color: var(--theme-line); }
+html[data-theme='dark'] .archive-project:hover { background: rgba(255, 255, 255, 0.035); }
+html[data-theme='dark'] .archive-project > a { border-color: var(--theme-line); background: #173b3d; color: var(--theme-accent); }
+html[data-theme='dark'] .project-official-gallery { background: #173537; }
+html[data-theme='dark'] .project-official-screens a { color: var(--theme-text); }
+html[data-theme='dark'] .selected-case-study .case-study-media { background: #153537; border-color: var(--theme-line); }
+html[data-theme='dark'] .case-study-media figcaption,
+html[data-theme='dark'] .case-study-index,
+html[data-theme='dark'] .case-study-overview,
+html[data-theme='dark'] .case-study-contribution p,
+html[data-theme='dark'] .case-study-engineering dd,
+html[data-theme='dark'] .case-study-proof,
+html[data-theme='dark'] .case-study-stack span { color: var(--theme-muted); }
+html[data-theme='dark'] .case-study-role { background: #204749; color: var(--theme-text); }
+html[data-theme='dark'] .case-study-result p { color: var(--theme-text); }
+html[data-theme='dark'] .case-study-engineering { border-color: var(--theme-line); }
+html[data-theme='dark'] .case-study-stack span { border-color: var(--theme-line); }
+html[data-theme='dark'] .full-project-archive > summary span > span { color: var(--theme-muted); }
+html[data-theme='dark'] .project-empty p { color: var(--theme-muted); }
+html[data-theme='dark'] .project-technology-filter select option { background: #102f32; color: var(--theme-text); }
+
+/* AI, systems, and shared card surfaces. */
+html[data-theme='dark'] .ai-systems-section { background: #0d292c; color: var(--theme-text); }
+html[data-theme='dark'] .ai-systems-intro-copy > p,
+html[data-theme='dark'] .momentum-toolbar > p,
+html[data-theme='dark'] .momentum-index-heading > p:last-child,
+html[data-theme='dark'] .momentum-index article > p { color: var(--theme-muted); }
+html[data-theme='dark'] .ai-capability,
+html[data-theme='dark'] .momentum-card { border-color: var(--theme-line); background: var(--theme-surface); color: var(--theme-text); }
+html[data-theme='dark'] .ai-capability > p,
+html[data-theme='dark'] .momentum-summary,
+html[data-theme='dark'] .momentum-details > p { color: var(--theme-muted); }
+html[data-theme='dark'] .ai-capability-stack,
+html[data-theme='dark'] .momentum-details { border-color: var(--theme-line); }
+html[data-theme='dark'] .ai-capability-stack span,
+html[data-theme='dark'] .momentum-stack span { background: #1a3c3d; color: #c1d0cd; }
+html[data-theme='dark'] .momentum-preview { border-color: var(--theme-line); }
+html[data-theme='dark'] .momentum-filters button { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='dark'] .momentum-filters button.is-active { border-color: var(--theme-accent); background: var(--theme-accent); color: #082c2a; }
+html[data-theme='dark'] .momentum-engineering-visual { background: #071c1f; }
+html[data-theme='dark'] .momentum-toggle { border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='dark'] .momentum-toggle:hover,
+html[data-theme='dark'] .momentum-toggle:focus-visible { background: var(--theme-accent); color: #082c2a; }
+
+/* The case-study page uses paper/ink as page-level colors; invert its surface locally in dark mode. */
+html[data-theme='dark'] .case-study-page {
+  --ink: #eef6f3;
+  --ink-soft: #d9e7e3;
+  --paper: #0b2528;
+  --paper-deep: #15383a;
+  --white: #102f32;
+  --slate: #b5c7c3;
+  --mist: #c5d2cf;
+  --mint-deep: #75dfc2;
+  --line-light: rgba(231, 246, 241, 0.15);
+  --line-dark: rgba(231, 246, 241, 0.13);
+  background: #0b2528;
+  color: #eef6f3;
+}
+html[data-theme='dark'] .case-study-page .case-study-role { background: #183c3e; color: #eef6f3; }
+html[data-theme='dark'] .case-study-page .case-study-status { border-color: rgba(114, 225, 195, 0.32); background: rgba(114, 225, 195, 0.1); color: #b9f0df; }
+html[data-theme='dark'] .case-study-page .case-study-status > span { background: #72e1c3; }
+html[data-theme='dark'] .case-study-page .case-study-button-primary { border-color: #72e1c3; background: #72e1c3; color: #082c2a; }
+html[data-theme='dark'] .case-study-page .case-study-button-secondary { border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='dark'] .case-study-page .case-study-button-secondary:hover { border-color: var(--theme-accent); color: var(--theme-accent); }
+html[data-theme='dark'] .case-study-page .case-study-flow,
+html[data-theme='dark'] .case-study-page .case-study-components,
+html[data-theme='dark'] .case-study-page .case-study-next-card,
+html[data-theme='dark'] .case-study-page .case-study-not-found-card { border-color: var(--theme-line); background: var(--theme-surface); }
+html[data-theme='dark'] .case-study-page .case-study-flow li > span { border-color: rgba(114, 225, 195, 0.25); background: rgba(114, 225, 195, 0.09); color: var(--theme-text); }
+html[data-theme='dark'] .case-study-page .case-study-components li { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='dark'] .case-study-page .case-study-proposed { border-color: var(--theme-line); background: linear-gradient(145deg, rgba(114, 225, 195, 0.1), rgba(16, 47, 50, 0.94)); }
+html[data-theme='dark'] .case-study-page .case-study-proposed .case-study-section-index { color: #f0b6a0; }
+html[data-theme='dark'] .case-study-page .case-study-outcome { background: #15383a; color: var(--theme-text); }
+html[data-theme='dark'] .case-study-page .case-study-outcome > div > p:not(.case-study-section-index) { color: #d0deda; }
+html[data-theme='dark'] .case-study-page .case-study-outcome-status strong { color: var(--theme-text); }
+html[data-theme='dark'] .case-study-page .case-study-next-card > small { color: var(--theme-muted); }
+html[data-theme='dark'] .case-study-page .case-study-documentation-map > div { border-color: var(--theme-line); background: radial-gradient(circle at 85% 12%, rgba(114, 225, 195, 0.11), transparent 34%), #102f32; color: var(--theme-text); }
+html[data-theme='dark'] .case-study-page .case-study-documentation-map > div > p { color: var(--theme-accent); }
+html[data-theme='dark'] .case-study-page .case-study-documentation-map li::before { background: var(--theme-accent); }
+html[data-theme='dark'] .case-study-page .case-study-documentation-map li { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.035); color: var(--theme-muted); }
+html[data-theme='dark'] .case-study-page .case-study-documentation-map figcaption { color: var(--theme-muted); }
+html[data-theme='dark'] .case-study-page .case-study-image-figure img,
+html[data-theme='dark'] .case-study-page .case-study-gallery-item img { background: #173537; }
+
+/* Independent product panels are dark cards in dark mode, so their title and delivery text stay clear. */
+html[data-theme='dark'] .independent-product-tabs button { border-color: var(--theme-line); background: rgba(255, 255, 255, 0.035); color: var(--theme-muted); }
+html[data-theme='dark'] .independent-product-tab-number,
+html[data-theme='dark'] .independent-product-tabs button.is-active .independent-product-tab-number,
+html[data-theme='dark'] .independent-product-tabs button:hover .independent-product-tab-number,
+html[data-theme='dark'] .independent-product-tabs button.is-active .independent-product-tab-copy small,
+html[data-theme='dark'] .independent-product-tabs button:hover .independent-product-tab-copy small { color: var(--theme-accent); }
+html[data-theme='dark'] .independent-product-tabs button:hover,
+html[data-theme='dark'] .independent-product-tabs button.is-active { border-color: rgba(114, 225, 195, 0.42); background: #153b3d; color: var(--theme-text); }
+html[data-theme='dark'] .independent-product-tabs button:focus-visible,
+html[data-theme='dark'] .independent-product-panel:focus-visible { outline-color: var(--theme-accent); }
+html[data-theme='dark'] .independent-product-panel { border-color: var(--theme-line); background: radial-gradient(circle at 96% 0%, rgba(114, 225, 195, 0.08), transparent 26%), var(--theme-surface); color: var(--theme-text); box-shadow: var(--theme-shadow); }
+html[data-theme='dark'] .independent-product-intro { border-color: var(--theme-line); }
+html[data-theme='dark'] .independent-product-eyebrow,
+html[data-theme='dark'] .independent-product-copy h4 { color: var(--theme-accent); }
+html[data-theme='dark'] .independent-product-intro h3 { color: var(--theme-text); }
+html[data-theme='dark'] .independent-product-tagline { color: #a3ead5; }
+html[data-theme='dark'] .independent-product-role,
+html[data-theme='dark'] .independent-product-context p,
+html[data-theme='dark'] .independent-product-engineering p,
+html[data-theme='dark'] .independent-product-overview,
+html[data-theme='dark'] .independent-product-features li,
+html[data-theme='dark'] .independent-product-architecture li,
+html[data-theme='dark'] .independent-product-stack span,
+html[data-theme='dark'] .independent-product-evidence { color: var(--theme-muted); }
+html[data-theme='dark'] .independent-product-status { border-color: rgba(114, 225, 195, 0.28); background: rgba(114, 225, 195, 0.1); color: #b9f0df; }
+html[data-theme='dark'] .independent-product-license { border-color: var(--theme-line); background: #173b3d; color: var(--theme-muted); }
+html[data-theme='dark'] .independent-product-direct-link { border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='dark'] .independent-product-direct-link:hover { border-color: var(--theme-accent); background: rgba(114, 225, 195, 0.1); color: var(--theme-accent); }
+html[data-theme='dark'] .independent-product-detail-grid { border-color: var(--theme-line); }
+html[data-theme='dark'] .independent-product-delivered { border-left-color: var(--theme-accent); background: #0b3a3a; }
+html[data-theme='dark'] .independent-product-delivered h4 { color: var(--theme-accent); }
+html[data-theme='dark'] .independent-product-delivered p { color: var(--theme-text); }
+html[data-theme='dark'] .independent-product-stack span { border-color: var(--theme-line); }
+
+/* Dedicated project and lab routes share the same readable surface rules. */
+html[data-theme='dark'] .route-page { background: #0b2528; color: var(--theme-text); }
+html[data-theme='dark'] .route-page-heading > p:last-child,
+html[data-theme='dark'] .route-not-found p { color: var(--theme-muted); }
+html[data-theme='dark'] .route-page-heading .text-link { color: var(--theme-accent); }
+html[data-theme='dark'] .lab-preview h2 { color: var(--theme-text); }
+html[data-theme='dark'] .lab-preview .text-link { color: var(--theme-accent); }
+html[data-theme='dark'] .route-loading { background: #0b2528; color: var(--theme-accent); }
+html[data-theme='dark'] .lab-preview-card { border-color: var(--theme-line); }
+html[data-theme='dark'] .lab-preview p:last-child { color: var(--theme-muted); }
+
+/* Light mode route pages already use the portfolio's paper tokens; tune them toward the new palette. */
+html[data-theme='light'] .route-page,
+html[data-theme='light'] .case-study-page { background: var(--theme-page); color: var(--theme-text); }
+html[data-theme='light'] .route-page-heading > p:last-child,
+html[data-theme='light'] .route-not-found p,
+html[data-theme='light'] .lab-preview p:last-child { color: var(--theme-muted); }
+html[data-theme='light'] .route-loading { background: var(--theme-page); color: var(--theme-accent); }
+html[data-theme='light'] .case-study-page .case-study-hero { border-color: var(--theme-line); }
+
+/* Command palette follows the chosen surface and retains a strong overlay. */
+html[data-theme='light'] .palette { border-color: var(--theme-line); background: rgba(255, 254, 250, 0.99); color: var(--theme-text); box-shadow: 0 40px 90px rgba(16, 47, 49, 0.22); }
+html[data-theme='light'] .palette-search { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .palette-search input { color: var(--theme-text); }
+html[data-theme='light'] .palette-search input::placeholder { color: #667c78; }
+html[data-theme='light'] .palette-search kbd,
+html[data-theme='light'] .palette-footer kbd { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .palette-results li { color: #405d59; }
+html[data-theme='light'] .palette-results li small,
+html[data-theme='light'] .palette-footer { color: #5d7470; }
+html[data-theme='light'] .palette-results li.is-active { background: rgba(15, 128, 109, 0.1); color: var(--theme-text); }
+html[data-theme='light'] .palette-results li.is-active svg { color: var(--theme-accent); }
+html[data-theme='light'] .palette-footer { border-color: var(--theme-line); }
+
+/* Dark theme for formerly paper-only sections and their interactive surfaces. */
+html[data-theme='dark'] .section-light,
+html[data-theme='dark'] .section-paper { background: #0d292c; color: var(--theme-text); }
+html[data-theme='dark'] .section-light .section-heading h2,
+html[data-theme='dark'] .section-paper .section-heading h2 { color: var(--theme-text); }
+html[data-theme='dark'] .section-light .section-heading > p:last-child,
+html[data-theme='dark'] .section-paper .section-heading > p:last-child { color: var(--theme-muted); }
+html[data-theme='dark'] .section-light .eyebrow,
+html[data-theme='dark'] .section-paper .eyebrow { color: var(--theme-accent); }
+html[data-theme='dark'] .fit-card,
+html[data-theme='dark'] .project-card,
+html[data-theme='dark'] .project-showcase,
+html[data-theme='dark'] .project-tabs,
+html[data-theme='dark'] .project-empty,
+html[data-theme='dark'] .selected-case-study,
+html[data-theme='dark'] .full-project-archive,
+html[data-theme='dark'] .full-project-archive > summary,
+html[data-theme='dark'] .ai-capability,
+html[data-theme='dark'] .momentum-card,
+html[data-theme='dark'] .certificate-image-card,
+html[data-theme='dark'] .credential-panel,
+html[data-theme='dark'] .foundation-card { border-color: var(--theme-line); background: var(--theme-surface); color: var(--theme-text); }
+html[data-theme='dark'] .foundation-card-primary { background: #153c3d; }
+html[data-theme='dark'] .fit-card p,
+html[data-theme='dark'] .project-description,
+html[data-theme='dark'] .project-outcome,
+html[data-theme='dark'] .project-archive-heading > p,
+html[data-theme='dark'] .project-overview,
+html[data-theme='dark'] .ai-capability > p,
+html[data-theme='dark'] .momentum-summary,
+html[data-theme='dark'] .momentum-index article > p { color: var(--theme-muted); }
+html[data-theme='dark'] .fit-card > span,
+html[data-theme='dark'] .private-label,
+html[data-theme='dark'] .archive-private { color: #a2b6b1; }
+html[data-theme='dark'] .fit-card-icon { background: #071d20; color: var(--theme-accent); }
+html[data-theme='dark'] .fit-card:hover { background: #15383a; }
+html[data-theme='dark'] .project-card h3,
+html[data-theme='dark'] .project-story-heading h3,
+html[data-theme='dark'] .archive-project h4,
+html[data-theme='dark'] .momentum-card h3 { color: var(--theme-text); }
+html[data-theme='dark'] .project-story-grid > div { background: #173537; }
+html[data-theme='dark'] .project-story-grid p { color: #d4e0dc; }
+html[data-theme='dark'] .project-story-grid .project-result { background: #071d20; }
+html[data-theme='dark'] .project-story-grid .project-result p { color: #d4e0dc; }
+html[data-theme='dark'] .project-detail-row li,
+html[data-theme='dark'] .archive-stack span { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='dark'] .project-filters button,
+html[data-theme='dark'] .project-search-clear,
+html[data-theme='dark'] .project-filter-reset,
+html[data-theme='dark'] .project-archive-toggle { border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='dark'] .project-filters button.is-active { border-color: var(--theme-accent); background: var(--theme-accent); color: #082c2a; }
+html[data-theme='dark'] .project-search,
+html[data-theme='dark'] .project-technology-filter { border-color: var(--theme-line); background: var(--theme-surface); color: var(--theme-muted); }
+html[data-theme='dark'] .project-search input,
+html[data-theme='dark'] .project-technology-filter select { color: var(--theme-text); }
+html[data-theme='dark'] .project-technology-filter select option { background: #102f32; color: var(--theme-text); }
+html[data-theme='dark'] .project-archive,
+html[data-theme='dark'] .archive-project,
+html[data-theme='dark'] .full-project-archive-content,
+html[data-theme='dark'] .certificate-gallery-heading,
+html[data-theme='dark'] .credential-record,
+html[data-theme='dark'] .certificate-gallery-heading { border-color: var(--theme-line); }
+html[data-theme='dark'] .archive-project > div > span,
+html[data-theme='dark'] .credential-record small,
+html[data-theme='dark'] .certificate-image-copy small { color: var(--theme-muted); }
+html[data-theme='dark'] .archive-project:hover { background: rgba(255, 255, 255, 0.035); }
+html[data-theme='dark'] .archive-project > a { border-color: var(--theme-line); background: #173b3d; color: var(--theme-accent); }
+html[data-theme='dark'] .project-official-gallery { background: #173537; }
+html[data-theme='dark'] .project-official-screens a { color: var(--theme-text); }
+html[data-theme='dark'] .project-official-gallery h4,
+html[data-theme='dark'] .certificate-image-copy strong,
+html[data-theme='dark'] .credential-record strong { color: var(--theme-text); }
+html[data-theme='dark'] .project-card-top > a:hover,
+html[data-theme='dark'] .archive-project > a:hover { background: var(--theme-accent); color: #082c2a; }
+html[data-theme='dark'] .case-study-media { background: #153537; }
+html[data-theme='dark'] .case-study-copy h3,
+html[data-theme='dark'] .case-study-copy h4 { color: var(--theme-text); }
+html[data-theme='dark'] .case-study-index,
+html[data-theme='dark'] .case-study-media figcaption,
+html[data-theme='dark'] .case-study-contribution p,
+html[data-theme='dark'] .case-study-result p,
+html[data-theme='dark'] .case-study-proof,
+html[data-theme='dark'] .case-study-engineering dd { color: var(--theme-muted); }
+html[data-theme='dark'] .case-study-role { background: #204749; color: var(--theme-text); }
+html[data-theme='dark'] .case-study-stack span { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='dark'] .case-study-engineering { border-color: var(--theme-line); }
+html[data-theme='dark'] .lab-section { background: radial-gradient(circle at 92% 10%, rgba(103, 224, 193, 0.08), transparent 30%), #0d292c; }
+html[data-theme='dark'] .lab-game-list,
+html[data-theme='dark'] .lab-game-list .reveal:nth-child(odd) { border-color: var(--theme-line); }
+html[data-theme='dark'] .lab-game-row { border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='dark'] .lab-game-row:hover { background: #15383a; }
+html[data-theme='dark'] .lab-game-row small { color: var(--theme-muted); }
+html[data-theme='dark'] .lab-game-row > svg { color: var(--theme-accent); }
+html[data-theme='dark'] .lab-preview-card { border-color: var(--theme-line); }
+html[data-theme='dark'] .lab-preview p:last-child { color: var(--theme-muted); }
+
+/* Footer grounding and compact responsive resource grid. */
+html[data-theme='light'] .footer { border-color: var(--theme-line); background: #e7f1ed; color: var(--theme-muted); }
+html[data-theme='light'] .footer-name,
+html[data-theme='light'] .footer-resource-grid a,
+html[data-theme='light'] .footer-socials a,
+html[data-theme='light'] .footer-bottom a { color: var(--theme-text); }
+html[data-theme='light'] .footer-role,
+html[data-theme='light'] .footer-byline,
+html[data-theme='light'] .footer-bottom { color: var(--theme-muted); }
+html[data-theme='light'] .footer-bottom { border-color: var(--theme-line); }
+html[data-theme='light'] .footer-resource-heading { color: var(--theme-accent); }
+html[data-theme='light'] .footer-resource-grid a:hover,
+html[data-theme='light'] .footer-socials a:hover,
+html[data-theme='light'] .footer-bottom a:hover { color: var(--theme-accent); }
+
+/* Respect reduced motion for the theme's own controls and themed surfaces. */
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme] .theme-toggle,
+  html[data-theme] .navbar,
+  html[data-theme] .mobile-menu { transition-duration: 0.01ms !important; }
+}
+
+/* Stable media controls must remain legible on the dark card surfaces. */
+html[data-theme='dark'] .product-media-thumbnails button { border-color: var(--theme-line); background: #173b3d; color: var(--theme-text); }
+html[data-theme='dark'] .product-media-thumbnails button > span { color: var(--theme-accent); }
+html[data-theme='dark'] .product-media-thumbnails button.is-selected,
+html[data-theme='dark'] .product-media-thumbnails button:hover { border-color: var(--theme-accent); background: #72e1c3; color: #082c2a; }
+html[data-theme='dark'] .product-media-thumbnails button.is-selected > span,
+html[data-theme='dark'] .product-media-thumbnails button:hover > span { color: #082c2a; }
+html[data-theme='dark'] .product-media figcaption { color: var(--theme-muted); }
+
+/* The carousel copy uses the same semantic text colors in the light palette. */
+html[data-theme='light'] .hero-project-copy h2 { color: var(--theme-text); }
+html[data-theme='light'] .hero-project-copy > p:not(.hero-project-eyebrow),
+html[data-theme='light'] .hero-project-copy-meta > span { color: var(--theme-muted); }
+html[data-theme='light'] .hero-project-eyebrow,
+html[data-theme='light'] .hero-project-details { color: var(--theme-accent); }
+html[data-theme='light'] .hero-project-copy-meta > span { border-color: var(--theme-line); }
+html[data-theme='light'] .hero-project-media .studio-screen-controls button { background: #fffefa; border-color: var(--theme-line); color: var(--theme-text); }
+html[data-theme='light'] .hero-project-media .studio-screen-controls button > span { color: var(--theme-accent); }
+html[data-theme='light'] .hero-project-media .studio-screen-controls button.is-selected,
+html[data-theme='light'] .hero-project-media .studio-screen-controls button:hover { background: #0f806d; color: #fffefa; border-color: #0f806d; }
+html[data-theme='light'] .hero-project-media .studio-screen-controls button.is-selected > span,
+html[data-theme='light'] .hero-project-media .studio-screen-controls button:hover > span { color: #fffefa; }
+
+/* Route pages load their project discovery styles lazily; keep dark-mode text
+   and controls explicit at the section boundary so those styles cannot fall
+   back to the original paper palette. */
+html[data-theme='dark'] .route-page-heading .eyebrow { color: var(--theme-accent); }
+html[data-theme='dark'] #projects .project-eyebrow,
+html[data-theme='dark'] #projects .project-story-grid > div > span,
+html[data-theme='dark'] #projects .project-detail-row > div > span,
+html[data-theme='dark'] #projects .project-official-gallery > .eyebrow { color: var(--theme-accent); }
+html[data-theme='dark'] #projects .project-overview { color: #d5e6e2; }
+html[data-theme='dark'] #projects .project-story-grid > div > p,
+html[data-theme='dark'] #projects .project-detail-row li { color: var(--theme-text); }
+html[data-theme='dark'] #projects .independent-product-status {
+  border-color: rgba(114, 225, 195, 0.4);
+  background: #173b3d;
+  color: #d7fff0;
+}
+html[data-theme='dark'] #projects .tag-list-dark span {
+  border-color: var(--theme-line);
+  background: #173b3d;
+  color: var(--theme-text);
+}
+html[data-theme='dark'] #projects .project-links a {
+  border-color: var(--theme-line);
+  background: #173b3d;
+  color: var(--theme-accent);
+}
+html[data-theme='dark'] #projects .project-links a:hover {
+  border-color: var(--theme-accent);
+  background: var(--theme-accent);
+  color: #082c2a;
+}
+html[data-theme='light'] #projects .project-links > span { color: var(--theme-muted); }
+html[data-theme='dark'] #projects .project-links > span { color: var(--theme-muted); }
+html[data-theme='dark'] #projects .product-media-thumbnails button {
+  border-color: var(--theme-line);
+  background: #173b3d;
+  color: var(--theme-text);
+}
+html[data-theme='dark'] #projects .product-media-thumbnails button > span { color: var(--theme-accent); }
+html[data-theme='dark'] #projects .product-media-thumbnails button.is-selected,
+html[data-theme='dark'] #projects .product-media-thumbnails button:hover {
+  border-color: var(--theme-accent);
+  background: var(--theme-accent);
+  color: #082c2a;
+}
+html[data-theme='dark'] #projects .product-media-thumbnails button.is-selected > span,
+html[data-theme='dark'] #projects .product-media-thumbnails button:hover > span { color: #082c2a; }
+html[data-theme='dark'] #projects .product-media-thumbnails button:focus-visible { outline-color: var(--theme-accent); }
+html[data-theme='dark'] #projects .product-media figcaption { color: var(--theme-muted); }
+
+/* Small labels on the warmer paper panels need a deeper mint than links on white. */
+html[data-theme='light'] #projects .project-story-grid > div:not(.project-result) > span,
+html[data-theme='light'] #projects .project-archive-heading .eyebrow { color: #0a6b5c; }

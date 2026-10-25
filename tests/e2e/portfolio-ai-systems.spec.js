@@ -19,7 +19,7 @@ test('new systems can be filtered and inspected while the existing portfolio rem
   for (const id of ['home', 'about', 'experience', 'projects', 'skills', 'education', 'lab', 'contact']) {
     await expect(page.locator(`#${id}`)).toHaveCount(1)
   }
-  await expect(page.locator('#projects [role="tab"]')).toHaveCount(8)
+  await expect(page.locator('#projects [role="tab"]')).toHaveCount(13)
 })
 
 for (const width of [320, 390, 768, 1024, 1440]) {

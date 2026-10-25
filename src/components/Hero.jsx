@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUpRight, Briefcase, Headphones, Github, Linkedin, Mail, MapPin } from 'lucide-react'
 import { aiCapabilityRibbon, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import AnimatedStat from './AnimatedStat'
-import { OneRidePhonePreview } from './ProductStudioPreview'
+import HeroProjectCarousel from './HeroProjectCarousel'
 
 const Hero = () => (
   <section id="home" className="hero-section">
@@ -16,20 +16,32 @@ const Hero = () => (
           Available for remote AI, full-stack, and backend opportunities
         </div>
 
-        <div className="hero-identity hero-enter hero-enter-2">
+        <div className="hero-identity hero-profile-intro hero-enter hero-enter-2">
           <picture>
-            <source srcSet="/profile.webp" type="image/webp" />
-            <img src="/profile.png" alt="" width="56" height="56" fetchpriority="high" decoding="async" />
+            <source srcSet="/profile-2026.webp" type="image/webp" />
+            <img
+              src="/profile-2026.png"
+              alt="Portrait of Charlie James Z. Abejo"
+              width="640"
+              height="640"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
           </picture>
-          <div>
-            <p className="hero-kicker">Charlie Abejo</p>
-            <span>Philippines · Working globally</span>
+          <div className="hero-profile-copy">
+            <div className="hero-profile-details">
+              <p className="hero-kicker">Charlie James Z. Abejo</p>
+              <span>Cebu City, Philippines · Working globally</span>
+            </div>
+            <h1>
+              <span className="hero-line hero-line-primary">Lead</span>{' '}
+              <span className="hero-line hero-line-primary">Full-Stack</span>{' '}
+              <span className="hero-line hero-line-accent">Developer.</span>{' '}
+              <span className="hero-line hero-line-note">AI, web &amp; mobile.</span>
+            </h1>
           </div>
         </div>
-        <h1>
-          <span className="hero-line hero-line-primary">AI Developer &amp;</span>{' '}
-          <span className="hero-line hero-line-accent">Full-Stack Engineer.</span>
-        </h1>
 
         <p className="hero-intro hero-enter hero-enter-5">
           I build AI systems, CRM workflows, mobile apps, and APIs that move products from idea to reliable operation.
@@ -60,7 +72,7 @@ const Hero = () => (
       </div>
 
       <div className="hero-visual hero-enter hero-enter-visual">
-        <OneRidePhonePreview />
+        <HeroProjectCarousel />
       </div>
     </div>
 

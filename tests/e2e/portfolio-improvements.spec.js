@@ -27,6 +27,14 @@ test('voice audio errors offer a readable alternative', async ({ page }) => {
 
 test('project search handles archive matches and empty results', async ({ page }) => {
   await page.goto('/#projects')
+  const autoFlowTab = page.locator('#projects').getByRole('tab', { name: /AutoFlow AI Pro/ })
+  const autoFlowPreview = page.locator('.product-media--project')
+  await expect(autoFlowTab).toHaveAttribute('aria-selected', 'true')
+  await expect(autoFlowPreview.locator('img')).toHaveAttribute('src', /\/projects\/autoflow\/home\.webp$/)
+  await expect(autoFlowPreview.locator('img')).toHaveAttribute('alt', /AutoFlow AI Pro promotional concept preview/)
+  await expect(autoFlowPreview).toContainText('Promotional concept preview')
+  await expect(page.locator('.project-product-meta')).toContainText('In development')
+
   const search = page.getByRole('searchbox', { name: 'Search projects' })
   await search.fill('ReflectiCSS')
   await expect(page.locator('.archive-project')).toHaveCount(1)
@@ -34,8 +42,9 @@ test('project search handles archive matches and empty results', async ({ page }
   await search.fill('no-such-project-987')
   await expect(page.getByText('No projects match your search.')).toBeVisible()
   await page.getByRole('button', { name: 'Clear search' }).click()
-  await expect(page.locator('#projects [role="tab"]')).toHaveCount(8)
-  await expect(page.locator('.project-official-gallery img')).toHaveCount(3)
+  await expect(page.locator('#projects [role="tab"]')).toHaveCount(13)
+  await expect(autoFlowTab).toHaveAttribute('aria-selected', 'true')
+  await expect(autoFlowPreview.locator('img')).toHaveAttribute('src', /\/projects\/autoflow\/home\.webp$/)
 })
 
 for (const width of [320, 390, 768, 1440]) {

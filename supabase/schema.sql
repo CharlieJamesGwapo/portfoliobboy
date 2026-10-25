@@ -57,24 +57,12 @@ create index if not exists game_saves_player_idx
 
 alter table public.game_saves enable row level security;
 
--- Public read
+-- Saves stay local until an authenticated ownership model is introduced.
+-- Public policies formerly exposed every player's saves to every visitor.
 drop policy if exists "game_saves_public_read" on public.game_saves;
-create policy "game_saves_public_read"
-  on public.game_saves for select
-  using (true);
-
--- Public insert
 drop policy if exists "game_saves_public_insert" on public.game_saves;
-create policy "game_saves_public_insert"
-  on public.game_saves for insert
-  with check (true);
-
--- Public update
 drop policy if exists "game_saves_public_update" on public.game_saves;
-create policy "game_saves_public_update"
-  on public.game_saves for update
-  using (true)
-  with check (true);
+revoke all on table public.game_saves from anon, authenticated;
 
 -- ---------------------------------------------------------------------------
 -- tutorials

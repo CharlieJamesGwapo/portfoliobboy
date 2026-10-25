@@ -7,6 +7,7 @@
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <meta name="theme-color" content="#0b2528" />
+    <script src="/theme-init.js"></script>
 
     <!--
       Boot styles, inlined so they apply before the stylesheet has been
@@ -22,6 +23,7 @@
     -->
     <style>
       html { background: #0b2528; color-scheme: dark; }
+      html[data-theme="light"], html[data-theme="light"] body, html[data-theme="light"] #root:empty { background: #f5f8f6; }
       body { margin: 0; background: #0b2528; }
       #root:empty {
         display: block;
@@ -48,7 +50,7 @@
     </style>
 
     <!-- Preload the above-the-fold hero image (WebP) for faster LCP -->
-    <link rel="preload" as="image" href="/profile.webp" type="image/webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/profile-2026.webp" type="image/webp" fetchpriority="high" />
     <!-- Self-hosted variable Inter; preloaded so the swap happens before first paint of the hero -->
     <link rel="preload" as="font" type="font/woff2" href="/fonts/inter-var-latin.woff2" crossorigin />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -57,25 +59,28 @@
     <meta name="apple-mobile-web-app-title" content="CJ Portfolio" />
     
     <!-- Primary Meta Tags -->
-    <title>Charlie James Abejo | AI Developer &amp; Full-Stack Engineer</title>
-    <meta name="title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
-    <meta name="description" content="AI developer and full-stack engineer building intelligent products, scalable APIs, CRM integrations, SaaS platforms, and production backend systems." />
-    <meta name="keywords" content="Charlie James Abejo, AI Developer, Full-Stack Engineer, Backend Engineer, Python Developer, Go Developer, SaaS Developer, CRM Integration Developer, React, Next.js, .NET, Remote Developer" />
+    <title>Charlie James Abejo | Lead Full-Stack Developer — AI, Web &amp; Mobile</title>
+    <meta name="title" content="Charlie James Abejo | Lead Full-Stack Developer — AI, Web &amp; Mobile" />
+    <meta name="description" content="Lead full-stack developer building AI voice agents, custom CRM platforms, lending applications, and web and mobile business systems." />
+    <meta name="keywords" content="Charlie James Abejo, Lead Full-Stack Developer, AI, Web, Mobile, Backend Engineer, Python, Go, .NET, CRM, React, Next.js, Expo, Remote Developer" />
     <meta name="author" content="Charlie James Z. Abejo" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://portfoliobboy.vercel.app/" />
-    <meta property="og:title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
-    <meta property="og:description" content="Intelligent products, scalable APIs, SaaS platforms, CRM integrations, and production backend systems." />
-    <meta property="og:image" content="https://portfoliobboy.vercel.app/profile.png" />
+    <meta property="og:title" content="Charlie James Abejo | Lead Full-Stack Developer — AI, Web &amp; Mobile" />
+    <meta property="og:description" content="Lead full-stack developer building AI voice agents, custom CRM platforms, lending applications, and web and mobile business systems." />
+    <meta property="og:image" content="https://portfoliobboy.vercel.app/social-preview.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Charlie James Abejo and selected software projects in his professional portfolio" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://portfoliobboy.vercel.app/" />
-    <meta property="twitter:title" content="Charlie James Abejo | AI Developer &amp; Full-Stack Engineer" />
-    <meta property="twitter:description" content="Intelligent products, scalable APIs, SaaS platforms, CRM integrations, and production backend systems." />
-    <meta property="twitter:image" content="https://portfoliobboy.vercel.app/profile.png" />
+    <meta property="twitter:title" content="Charlie James Abejo | Lead Full-Stack Developer — AI, Web &amp; Mobile" />
+    <meta property="twitter:description" content="Lead full-stack developer building AI voice agents, custom CRM platforms, lending applications, and web and mobile business systems." />
+    <meta property="twitter:image" content="https://portfoliobboy.vercel.app/social-preview.jpg" />
     
     <!-- Additional Meta Tags -->
     <meta name="robots" content="index, follow" />
@@ -90,11 +95,12 @@
         "@type": "Person",
         "name": "Charlie James Z. Abejo",
         "url": "https://portfoliobboy.vercel.app/",
-        "image": "https://portfoliobboy.vercel.app/profile.png",
-        "jobTitle": "AI Developer & Full-Stack Engineer",
+        "image": "https://portfoliobboy.vercel.app/profile-2026.png",
+        "jobTitle": "Lead Full-Stack Developer | AI, Web & Mobile",
         "address": {
           "@type": "PostalAddress",
-          "addressRegion": "Misamis Oriental",
+          "addressLocality": "Cebu City",
+          "addressRegion": "Cebu",
           "addressCountry": "PH"
         },
         "knowsAbout": [
@@ -112,7 +118,7 @@
         "email": "capstonee2@gmail.com",
         "sameAs": [
           "https://github.com/CharlieJamesGwapo",
-          "https://www.linkedin.com/in/charlie-james-abejo-26362638a/"
+          "https://www.linkedin.com/in/charlie-james-abejo-2b625a3a5/"
         ]
       }
     </script>

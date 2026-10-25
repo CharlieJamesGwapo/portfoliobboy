@@ -1,5 +1,5 @@
-import { featuredProjects, momentumSystems } from './portfolioData'
-import { liveProjectLinks, oneRidePreview } from './productPreviewData'
+import { featuredProjects, momentumSystems } from './portfolioData.js'
+import { liveProjectLinks, oneRidePreview } from './productPreviewData.js'
 
 const oneRide = featuredProjects.find(project => project.id === oneRidePreview.projectId)
 const crm = momentumSystems.find(system => system.id === 'zalio-crm')
@@ -7,7 +7,7 @@ const hasti = momentumSystems.find(system => system.id === 'hasti')
 
 // Editorial summaries of the existing project and resume records. No measured
 // business outcomes are claimed; public product imagery is labelled as such.
-export const selectedCaseStudies = [
+const clientCaseStudies = [
   {
     id: 'oneride',
     title: 'OneRide Balingasag',
@@ -62,3 +62,5 @@ export const selectedCaseStudies = [
     links: liveProjectLinks.filter(link => link.id === 'hasti'),
   },
 ]
+
+export const selectedCaseStudies = ['alex-hasti', 'zalio-crm', 'oneride'].map(id => clientCaseStudies.find(study => study.id === id))

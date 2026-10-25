@@ -1,20 +1,22 @@
+import { independentProducts } from './independentProducts.js'
+
 export const profile = {
   name: 'Charlie James Z. Abejo',
   shortName: 'Charlie Abejo',
-  role: 'AI Developer & Full-Stack Engineer',
-  location: 'Misamis Oriental, Philippines',
+  role: 'Lead Full-Stack Developer | AI, Web & Mobile',
+  location: 'Cebu City, Philippines',
   email: 'capstonee2@gmail.com',
   phoneDisplay: '+63 985 612 2843',
   phoneHref: 'tel:+639856122843',
   github: 'https://github.com/CharlieJamesGwapo',
-  linkedin: 'https://www.linkedin.com/in/charlie-james-abejo-26362638a/',
+  linkedin: 'https://www.linkedin.com/in/charlie-james-abejo-2b625a3a5/',
   portfolio: 'https://portfoliobboy.vercel.app',
 }
 
 export const resumeUrl = '/charlie-james-abejo-resume.pdf'
 
 export const professionalTitles = [
-  'AI Developer',
+  'Lead Full-Stack Developer',
   'Full-Stack Developer',
   'Python and Go Developer',
   'Backend Engineer',
@@ -36,9 +38,9 @@ export const navigation = [
 ]
 
 export const proofPoints = [
-  { value: '17+', label: 'Genuine products and client builds', numericValue: 17, suffix: '+' },
+  { value: '22+', label: 'Genuine products and client builds', numericValue: 22, suffix: '+' },
   { value: 'Hands-on', label: 'Development' },
-  { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
+  { value: '25', label: 'Credentials and recognitions', numericValue: 25, suffix: '' },
   { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },
 ]
 
@@ -360,29 +362,38 @@ export const momentumEngineeringGroups = [
 
 export const experiences = [
   {
-    role: 'AI Full-Stack Engineer',
+    role: 'Lead Full-Stack Developer — AI & CRM Systems',
     company: 'Zalio · Momentum',
     location: 'Australia · Remote',
-    period: 'Jun 2026 – Present',
+    period: 'Jun 2026 – Sep 2026',
     featured: true,
     summary:
-      "Building Zalio's gym CRM and operations platform, the Alex AI voice agent, and Hasti's AI reception and lead-response products across web, mobile, voice, and automation.",
+      'Led custom CRM and gym-management delivery spanning lead enquiries, memberships, bookings, payments, operational dashboards, and React/Next.js interfaces.',
     achievements: [
-      'Lead engineer on the Zalio CRM module with 2,000+ commits: omnichannel lead inbox with SLA alerts, forms, campaigns, retention workflows, and Twilio browser calling.',
-      'Built Alex, a self-hosted AI voice agent on LiveKit and GPT-Live over Twilio SIP, with evidence-grounded research calls, voicemail detection, a restart-safe call queue, and cited AI call reviews.',
-      'Designed n8n integrations with durable receipts, idempotency keys, and reconciliation linking the voice backend, CRM, GTM engine, calendar, and email.',
-      'Shipped the Hasti Client iOS and Android app (Expo, Fastify, PostgreSQL) in 46 pull requests over nine days, and the live Alex demo on hasti.com.au.',
-      "Built the bulk Alex calling workflow in the GTM engine, Zalio's design system, and employee features in the Expo mobile app.",
-      'Delivered revenue, retention, profiling, and win-back dashboards with Next.js 16, React 19, TypeScript, and TanStack Query.',
-      'Designed bidirectional Python CRM synchronization using Celery, Redis, durable Postgres jobs, leases, idempotency keys, bounded retries, and recovery workflows.',
-      'Led member, contract, visit, and payment-history migration with automated reconciliation against source-of-truth financial reports.',
-      'Ship daily with Claude Code using repo-level instructions, custom agents, skills, and GitHub, Linear, and Supabase MCP integrations.',
+      'Led custom CRM and gym-management delivery across lead enquiries, memberships, bookings, payments, operational dashboards, and React/Next.js interfaces.',
+      'Built Alex/Hasti voice AI with LiveKit, OpenAI, Twilio, and n8n, linking calls with CRM, calendar, email, and human-approved follow-up workflows.',
+      'Delivered Expo mobile features and Python/Celery/Redis/PostgreSQL synchronization with idempotency, retries, and financial-record reconciliation.',
     ],
-    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Encore.ts', 'PostgreSQL', 'LiveKit', 'Twilio', 'n8n', 'Expo', 'Python'],
+    stack: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'LiveKit', 'OpenAI', 'Twilio', 'n8n', 'Expo', 'Python'],
     links: [
       { label: 'zalio.ai', url: 'https://zalio.ai/' },
       { label: 'hasti.com.au — live Alex demo', url: 'https://hasti.com.au/' },
     ],
+  },
+  {
+    role: 'Founding Engineer & Lead Full-Stack Developer',
+    company: 'OMJI',
+    location: 'Remote',
+    period: 'Mar 2024 – May 2026',
+    summary:
+      'Led ISP, school, employee, and mobility application delivery across subscriber billing, payment verification, RFID attendance, and network operations.',
+    achievements: [
+      'Built subscriber billing, payment-verification, and customer-portal workflows with MikroTik integration.',
+      'Developed Expo attendance tools and school applications, including the St. John Baptist High School website and RFID entry/exit monitoring.',
+      'Built One Ride mobile, web, and administrative workflows for rides, delivery, and local-store orders with React Native/Expo, Go/Gin, and PostgreSQL; the customer app was published on Google Play.',
+      'Built Piso Wi-Fi/vendo and LAN/site-monitoring tools with online/offline visibility and operational administration.',
+    ],
+    stack: ['React Native', 'Expo', 'Go', 'Gin', 'PostgreSQL', 'MikroTik', 'RFID', 'Piso Wi-Fi', 'LAN monitoring'],
   },
   {
     role: 'Full-Stack Developer',
@@ -400,17 +411,32 @@ export const experiences = [
   },
   {
     role: 'Full-Stack Developer',
-    company: 'Australian Fintech · Lending Platform',
+    company: 'Super Deal · Australian Fintech',
     location: 'Australia · Remote',
     period: 'Jan 2024 – Dec 2025',
     summary:
-      'Modernized services and integrations for a regulated Australian personal-loan platform.',
+      'Delivered lending web and mobile applications and service modernization for an Australian fintech platform.',
     achievements: [
-      'Re-platformed Golang and Node.js microservices to .NET, standardizing logging, error handling, and deployment.',
-      'Built Python and .NET AWS Lambda functions for event-driven partner banking and lending workflows.',
-      'Owned JSON-RPC, WebSocket, and webhook integrations plus Python reconciliation and reporting automation.',
+      'Developed lending web and mobile applications, integrating Vue.js interfaces with Node.js and C#/.NET services through REST APIs.',
+      'Developed C#/.NET microservices as part of Go and Node.js migration work, including logging, error handling, and deployment workflows.',
+      'Built AWS Lambda integrations, webhooks, WebSockets, and reconciliation/reporting automation for banking and loan workflows.',
     ],
-    stack: ['C# / .NET', 'Python', 'Go', 'Node.js', 'AWS Lambda', 'PostgreSQL', 'Buddy CI/CD'],
+    stack: ['Vue.js', 'C# / .NET', 'Python', 'Go', 'Node.js', 'AWS Lambda', 'PostgreSQL', 'REST APIs', 'WebSockets'],
+  },
+  {
+    role: 'Freelance Full-Stack Developer',
+    company: 'Independent client engagements & personal products',
+    location: 'Remote · Project-based',
+    period: '2023 – Present',
+    summary:
+      'Continue project-based client delivery while developing independent AI, desktop, and mobile products at distinct stages.',
+    achievements: [
+      'Built EasyAppy, a local-first macOS job-application tracker with interview planning and optional read-only Gmail OAuth.',
+      'Developed AgentForge as a TypeScript developer/AI workflow toolkit and BBOY as a native macOS AI assistant, currently at version 0.7.0.',
+      'Develop AutoFlow AI Pro as an in-development mobile productivity and automation product with planned integrations.',
+      'Delivered personal and client products including G2 POS, ReflectiCSS, Study Pulse, and responsive websites and portfolios.',
+    ],
+    stack: ['TypeScript', 'React Native', 'Expo', 'Electron', 'Swift', 'AppKit', 'Node.js', 'Gmail API'],
   },
   {
     role: 'Full-Stack Developer',
@@ -506,7 +532,7 @@ export const experiences = [
   },
 ]
 
-export const featuredProjects = [
+const originalFeaturedProjects = [
   {
     id: 'one-ride-balingasag',
     categories: ['Mobile', 'Full Stack', 'Backend', 'API'],
@@ -542,7 +568,7 @@ export const featuredProjects = [
     id: 'fitness-crm',
     categories: ['AI', 'SaaS', 'Backend', 'Full Stack', 'API', 'CRM'],
     title: 'Enterprise CRM Platform',
-    eyebrow: '2026 – Present · Australian client · Enterprise CRM platform',
+    eyebrow: 'Jun–Sep 2026 · Australian client · Enterprise CRM platform',
     overview: 'An enterprise CRM platform for an Australian client, unifying member data, subscriptions, payments, visits, retention, and browser-based calling.',
     context: 'An Australian client needed one dependable workflow for member operations, outreach, and financial history.',
     implementation: 'Next.js dashboards backed by bidirectional CRM synchronization, durable jobs, retries, and reconciliation.',
@@ -630,6 +656,8 @@ export const featuredProjects = [
   },
 ]
 
+export const featuredProjects = [...independentProducts, ...originalFeaturedProjects]
+
 export const projectArchive = [
   { title: 'Luxury Construction Utah', type: 'Client website', categories: ['Full Stack'], description: 'Responsive construction company website with service showcases and contact integration.', stack: ['React', 'Tailwind CSS'], status: 'Archived site' },
   { title: 'G2 POS System', type: 'Full-stack product', categories: ['SaaS', 'Backend', 'Full Stack'], description: 'Point-of-sale dashboard for order processing, sales tracking, inventory, and operational reporting.', stack: ['Go', 'Next.js', 'PostgreSQL', 'Docker'], url: 'https://g2possystem.vercel.app/landing' },
@@ -645,7 +673,7 @@ export const projectArchive = [
   { title: 'Shopify & Cloudflare anti-bot development', type: 'E-commerce security', categories: ['Security', 'Full Stack'], description: 'Custom Shopify solutions and Cloudflare-based anti-bot protections for e-commerce storefronts.', stack: ['Shopify', 'Cloudflare', 'Anti-bot'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
 ]
 
-export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'API', 'Fintech', 'CRM', 'Security']
+export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'Desktop', 'API', 'Fintech', 'CRM', 'Security', 'Developer Tools']
 
 export const skillGroups = [
   {
@@ -662,7 +690,11 @@ export const skillGroups = [
   },
   {
     title: 'Mobile & real time',
-    skills: ['React Native', 'Android', 'Java', 'Kotlin', 'Firebase Auth', 'Firebase real-time data', 'Push notifications', 'Offline-tolerant sync'],
+    skills: ['React Native', 'Expo', 'Expo Router', 'NativeWind', 'Reanimated', 'Expo SQLite', 'Android', 'Java', 'Kotlin', 'Firebase Auth', 'Firebase real-time data', 'Push notifications', 'Offline-tolerant sync'],
+  },
+  {
+    title: 'Desktop & macOS',
+    skills: ['Electron', 'Swift', 'AppKit', 'WebKit', 'macOS Keychain', 'Gmail OAuth', 'GitHub Actions'],
   },
   {
     title: 'Data & infrastructure',
@@ -677,7 +709,7 @@ export const skillGroups = [
 export const education = {
   institution: 'Misamis Oriental Institute of Science and Technology',
   degree: 'Bachelor of Science in Information Technology',
-  period: '2022 — 2026',
+  period: '2022 — May 2026',
   details: "Dean's Lister, 2nd and 3rd Year (Ranked 2) · TOPCIT participant (2024–2025)",
 }
 

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 720 }]) {
   test(`all arcade choices are reachable at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport)
-    await page.goto('/')
+    await page.goto('/lab')
     await page.getByRole('button', { name: 'Enter interactive lab', exact: true }).click()
     const arcade = page.getByRole('dialog', { name: "Charlie's interactive game arcade" })
     await expect(arcade).toBeVisible()
@@ -25,7 +25,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 720 
 
 test('arcade leaderboard contains keyboard focus and restores its opener', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/')
+  await page.goto('/lab')
   await page.getByRole('button', { name: 'Enter interactive lab', exact: true }).click()
   const arcade = page.getByRole('dialog', { name: "Charlie's interactive game arcade" })
   await expect(arcade.getByRole('button', { name: 'My Avatar', exact: true })).toBeVisible()

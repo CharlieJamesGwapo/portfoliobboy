@@ -7,6 +7,18 @@ import { profile, resumeUrl } from '../data/portfolioData'
 // fill every field they can find. The server drops any submission that has it
 // set, and reports success so the bot has nothing to tune against.
 const initialForm = { name: '', email: '', subject: '', message: '', company: '' }
+const contactPaths = [
+  {
+    label: 'Hire me',
+    subject: 'Remote role enquiry',
+    description: 'Remote AI, full-stack, backend, or technical leadership roles.',
+  },
+  {
+    label: 'Build with me',
+    subject: 'Product collaboration enquiry',
+    description: 'SaaS, CRM, voice-agent, and workflow automation projects.',
+  },
+]
 
 const validate = (form) => {
   const errors = {}
@@ -33,6 +45,17 @@ const Contact = () => {
       setStatus('idle')
       setMessage('')
     }
+  }
+
+  const chooseContactPath = (subject) => {
+    if (status === 'sending') return
+    setForm((current) => ({ ...current, subject }))
+    setErrors((current) => ({ ...current, subject: '' }))
+    if (status === 'error' || status === 'success') {
+      setStatus('idle')
+      setMessage('')
+    }
+    document.getElementById('contact-subject')?.focus()
   }
 
   const handleSubmit = async (event) => {
@@ -86,6 +109,27 @@ const Contact = () => {
             Have an AI product, SaaS platform, backend system, or mobile application to build? Let’s discuss
             the product, architecture, and delivery plan. I work remotely and can overlap US business hours.
           </p>
+
+          <div className="contact-paths" aria-label="Choose how you would like to work together">
+            {contactPaths.map((path) => (
+              <button
+                key={path.label}
+                className={`contact-path ${form.subject === path.subject ? 'is-selected' : ''}`}
+                type="button"
+                aria-label={path.label}
+                aria-describedby={`contact-path-${path.label.toLowerCase().replaceAll(' ', '-')}`}
+                aria-pressed={form.subject === path.subject}
+                disabled={status === 'sending'}
+                onClick={() => chooseContactPath(path.subject)}
+              >
+                <span className="contact-path-heading">
+                  <strong>{path.label}</strong>
+                  <ArrowUpRight size={17} aria-hidden="true" />
+                </span>
+                <small id={`contact-path-${path.label.toLowerCase().replaceAll(' ', '-')}`}>{path.description}</small>
+              </button>
+            ))}
+          </div>
 
           <a className="contact-email" href={`mailto:${profile.email}`}>
             <span>{profile.email}</span>

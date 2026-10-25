@@ -21,7 +21,7 @@ test('shows the live product showcase before the existing about section', async 
   expect(await studio.boundingBox()).not.toBeNull()
   expect((await studio.boundingBox()).y).toBeGreaterThanOrEqual((await hero.boundingBox()).y)
   expect((await about.boundingBox()).y).toBeGreaterThan((await studio.boundingBox()).y)
-  await expect(studio.getByRole('heading', { name: /Three products/i })).toBeVisible()
+  await expect(studio.getByRole('heading', { name: /Independent products.*Built for real life/i })).toBeVisible()
   await expect(studio.locator('.selected-case-study')).toHaveCount(3)
   await page.locator('#full-project-archive > summary').click()
 
@@ -119,7 +119,7 @@ test('keeps the systems view available and keeps More keyboard-operable', async 
   await expect(more).toBeFocused()
 
   await more.press('Enter')
-  const lastMoreLink = page.getByRole('link', { name: 'AI systems', exact: true })
+  const lastMoreLink = page.locator('#more-navigation-menu').getByRole('link', { name: 'Resume PDF', exact: true })
   await lastMoreLink.focus()
   await page.keyboard.press('Tab')
   await expect(more).toHaveAttribute('aria-expanded', 'false')
@@ -150,7 +150,7 @@ test('preserves the existing mobile menu and project filters', async ({ page }) 
   const toggle = page.getByRole('button', { name: 'Open navigation menu' })
   await toggle.click()
   await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Work', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Featured work', exact: true })).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.getByRole('button', { name: 'Open navigation menu' })).toBeFocused()
 
@@ -162,7 +162,7 @@ test('preserves the existing mobile menu and project filters', async ({ page }) 
   await page.locator('#full-project-archive > summary').click()
   await page.locator('#projects').scrollIntoViewIfNeeded()
   await page.locator('#projects').getByRole('button', { name: /^Mobile/ }).click()
-  await expect(page.locator('#projects [role="tab"]')).toHaveCount(2)
+  await expect(page.locator('#projects [role="tab"]')).toHaveCount(3)
 })
 
 for (const width of [320, 390, 768, 1024, 1440]) {
