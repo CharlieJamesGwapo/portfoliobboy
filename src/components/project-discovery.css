@@ -34,3 +34,32 @@
   .project-official-screens { gap: 6px; }
   .project-official-gallery { padding: 18px; }
 }
+
+/* Keep the growing catalog readable without pushing the selected project away. */
+#projects .section-heading { margin-bottom: 36px; column-gap: 48px; }
+#projects .section-heading h2 { font-size: clamp(2.4rem, 4.5vw, 4rem); max-width: 720px; line-height: 1.08; }
+#projects .section-heading > p:last-child { max-width: 440px; }
+#projects .project-search-row { margin: 0 0 20px; gap: 12px; }
+#projects .project-search { max-width: none; }
+#projects .project-filters { margin: 0 0 32px; gap: 8px; flex-wrap: wrap; }
+#projects .project-filters button { font-size: .76rem; font-weight: 650; }
+#projects .project-browser-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+#projects .project-browser-heading p { margin-top: 6px; color: var(--theme-muted, var(--slate)); font-size: .85rem; }
+#projects .project-browser-controls { display: flex; gap: 8px; }
+#projects .project-browser-controls button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--theme-line, var(--line-light)); border-radius: 50%; background: transparent; color: inherit; cursor: pointer; }
+#projects .project-browser-controls button:hover { background: rgba(103,224,193,.12); }
+#projects .project-tabs { display: flex; flex-wrap: nowrap; gap: 10px; overflow-x: auto; padding: 0 0 12px; margin-bottom: 20px; border: 0; border-radius: 0; background: transparent; scroll-snap-type: x proximity; scrollbar-width: thin; scrollbar-color: var(--mint-deep) transparent; }
+#projects .project-tabs button:nth-child(n) { flex: 0 0 210px; min-height: 88px; padding: 16px 18px; border: 1px solid var(--theme-line, var(--line-light)); border-radius: 12px; font-size: .84rem; line-height: 1.4; scroll-snap-align: start; align-content: start; gap: 9px; }
+#projects .project-tabs button > span { color: var(--theme-accent, var(--mint-deep)); font-size: .68rem; }
+#projects .project-tabs button.is-active { border-color: var(--theme-accent, var(--mint-deep)); }
+#projects .project-tabs button::after { display: none; }
+#projects .project-showcase { padding: clamp(24px, 3vw, 44px); gap: 32px; }
+#projects .project-story-heading h3 { font-size: clamp(2rem, 3.2vw, 3rem); }
+@media (max-width: 640px) {
+  #projects .section-heading { margin-bottom: 28px; }
+  #projects .project-filters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 10px; margin-bottom: 22px; scrollbar-width: thin; }
+  #projects .project-filters button { flex-shrink: 0; }
+  #projects .project-tabs button:nth-child(n) { flex-basis: 190px; }
+  #projects .project-search-count { width: auto; }
+  #projects .project-technology-filter { flex-basis: 100%; }
+}

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Archive, ArrowUpRight, FolderGit2, ImageOff, LockKeyhole, Search, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Archive, ArrowLeft, ArrowRight, ArrowUpRight, FolderGit2, ImageOff, LockKeyhole, Search, X } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { ProductMedia } from './IndependentProducts'
@@ -147,13 +147,15 @@ const Projects = () => {
     document.getElementById(`project-tab-${nextIndex}`)?.focus()
   }
 
+  const projectTabsRef = useRef(null)
+
   return (
     <section id="projects" className="section section-paper projects-section">
       <div className="page-container">
         <ScrollReveal variant="left">
           <SectionHeading
             eyebrow="03 · Product work"
-            title="Systems designed around real operational pressure."
+            title="Explore the work."
             description={`${featuredProjects.length} detailed case studies and ${projectArchive.length} additional builds. Explore the product, the engineering decisions, and what was delivered.`}
             light
           />
@@ -198,7 +200,14 @@ const Projects = () => {
         </ScrollReveal>
 
         <ScrollReveal variant="up" delay={80}>
-          <div className="project-tabs" role="tablist" aria-label="Featured project case studies">
+          <div className="project-browser-heading">
+            <div><span className="eyebrow">Project explorer</span><p>Select a project to explore its story.</p></div>
+            <div className="project-browser-controls">
+              <button type="button" aria-label="Scroll projects left" onClick={() => projectTabsRef.current?.scrollBy({ left: -460, behavior: 'smooth' })}><ArrowLeft size={18} /></button>
+              <button type="button" aria-label="Scroll projects right" onClick={() => projectTabsRef.current?.scrollBy({ left: 460, behavior: 'smooth' })}><ArrowRight size={18} /></button>
+            </div>
+          </div>
+          <div ref={projectTabsRef} className="project-tabs" role="tablist" aria-label="Featured project case studies">
             {visibleFeatured.map((item, index) => (
               <button
                 key={item.id}
