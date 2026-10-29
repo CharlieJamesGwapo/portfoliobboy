@@ -13,7 +13,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -23,8 +22,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
-config.bat
 
 # Local agent tooling
 .superpowers/
-.env*
+config.bat
