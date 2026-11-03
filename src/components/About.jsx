@@ -2,6 +2,7 @@ import { ArrowUpRight, Blocks, Bot, Radio, ShieldCheck } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { fitHighlights, profile } from '../data/portfolioData'
+import './section-polish.css'
 
 const icons = [Bot, Radio, ShieldCheck, Blocks]
 
@@ -11,17 +12,23 @@ const About = () => (
       <ScrollReveal className="about-intro" variant="left">
         <SectionHeading
           eyebrow="01 · About"
-          title="A product-minded engineer for systems that have to work."
+          title="A product-minded engineer building systems that work."
           light
         />
         <div className="about-copy">
           <p>
-            I build web and mobile applications, focusing on useful features, reliable backends, and clear interfaces.
+            I build AI voice agents, custom CRM platforms, lending applications, and web and mobile business systems,
+            combining technical leadership, backend and API development, service modernization, and project delivery.
           </p>
           <p>
-            At Zalio I build the gym CRM and operations platform, Alex—an AI voice agent that researches, calls,
-            and follows up—and Hasti&apos;s AI reception products, connected through n8n workflows that
-            replace scattered tools with a single dependable workflow.
+            At Zalio, I led delivery of a gym CRM and operations platform, built Alex/Hasti voice AI with LiveKit,
+            OpenAI, Twilio, and n8n, and delivered Expo mobile features with reliable financial-record
+            synchronization. That engagement ran from June through September 2026.
+          </p>
+          <p>
+            I&apos;m also building independent products: AutoFlow AI Pro is in development with planned integrations;
+            EasyAppy is a local-first Mac application; AgentForge is a TypeScript developer and AI workflow toolkit;
+            and BBOY is a native macOS AI assistant at version 0.7.0.
           </p>
           <a href={`mailto:${profile.email}`} className="text-link">
             Discuss a role or project <ArrowUpRight size={17} aria-hidden="true" />
