@@ -100,7 +100,6 @@ const LiveProjects = () => {
                   href={item.url}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label={`${item.title}, ${item.kind}${host ? `, ${host}` : ''} (opens in a new tab)`}
                 >
                   <span className="live-card-title">{item.title}</span>
                   <span className="live-card-desc">{item.description}</span>

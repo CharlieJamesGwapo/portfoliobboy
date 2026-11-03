@@ -14,8 +14,6 @@
 // offer a refresh rather than swapping the page out from under the visitor.
 const UPDATE_EVENT = 'portfolio:sw-update'
 
-let updateRequested = false
-
 export function registerServiceWorker() {
   if (!import.meta.env.PROD) return
   if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return
@@ -47,15 +45,13 @@ export function registerServiceWorker() {
         // works identically without it, so this is not worth surfacing.
       })
 
+    // First-time activation claims the page without replacing an older app.
+    const wasControlled = Boolean(navigator.serviceWorker.controller)
     let reloading = false
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      // Reload only for an update this visitor accepted from the banner. The
-      // first install's claim (no old version to replace), or another tab
-      // activating a new worker, would otherwise wipe form and game state nobody
-      // asked to lose. The banner is only ever offered to a controlled page, so
-      // `updateRequested` can never be set by a first install. The `reloading`
-      // guard also stops a reload loop if two tabs both activate the worker.
-      if (!updateRequested || reloading) return
+      // Guard against the reload loop that happens if two tabs both activate
+      // the new worker.
+      if (!wasControlled || reloading) return
       reloading = true
       window.location.reload()
     })
@@ -66,10 +62,7 @@ function announceUpdate(registration) {
   window.dispatchEvent(
     new CustomEvent(UPDATE_EVENT, {
       detail: {
-        apply: () => {
-          updateRequested = true
-          registration.waiting?.postMessage('SKIP_WAITING')
-        },
+        apply: () => registration.waiting?.postMessage('SKIP_WAITING'),
       },
     }),
   )

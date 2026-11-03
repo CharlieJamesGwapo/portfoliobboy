@@ -45,7 +45,7 @@ export const EXPERIENCE = [
   {
     id: 'fintech-lending',
     hp: 150,
-    company: 'Australian Fintech · Lending Platform',
+    company: 'Super Deal · Australian Fintech',
     role: 'Full Stack Developer',
     period: 'Jan 2024 – Dec 2025',
     location: 'Australia (Remote)',
@@ -206,12 +206,12 @@ export const OWNER = {
   name: 'Charlie James',
   email: 'capstonee2@gmail.com',
   github: 'https://github.com/CharlieJamesGwapo',
-  linkedin: 'https://www.linkedin.com/in/charlie-james-abejo-26362638a/',
+  linkedin: 'https://www.linkedin.com/in/charlie-james-abejo-2b625a3a5/',
   portfolioContactHref: '#contact',
 }
 
 export const BIO_SCROLL = [
-  "Welcome, traveler. You stand in the dungeon of Charlie James — Full Stack Developer & Backend Engineer.",
+  "Welcome, traveler. You stand in the dungeon of Charlie James — Lead Full-Stack Developer · AI, Web & Mobile.",
   "Hands-on development across Python, Go, .NET, Node.js, and PHP.",
   "Venture deeper: defeat the Skills, plunder the Projects Vault, study the Certs, and slay The Bug King to claim victory.",
 ]

@@ -1,5 +1,4 @@
-/* Credentials: compact mobile layout. Desktop (>768px) is untouched; toggles are hidden there. */
-.credential-more { display: none; }
+/* Credential layouts and shared expandable records. */
 
 @media (max-width: 768px) {
   #education.section { padding: 56px 0; }
@@ -64,3 +63,9 @@
   .certificate-image-card,
   .certificate-image-frame img { transition: none !important; }
 }
+
+/* The existing disclosure now keeps long credential lists compact on desktop too. */
+#education .credential-records.is-collapsed > .credential-record.is-extra { display: none; }
+#education .credential-more { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; margin-top: 12px; padding: 10px 18px; border: 1px solid var(--line-light); border-radius: 999px; background: transparent; color: var(--mint-deep); font: inherit; font-size: .8rem; font-weight: 650; cursor: pointer; }
+#education .credential-more[aria-expanded='true'] svg { transform: rotate(180deg); }
+#education .credential-more:focus-visible { outline: 2px solid var(--mint-deep); outline-offset: 3px; }
