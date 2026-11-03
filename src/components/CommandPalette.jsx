@@ -27,7 +27,10 @@ import {
   User,
   Wrench,
 } from 'lucide-react'
-import { navigation, profile, resumeUrl } from '../data/portfolioData'
+import { featuredProjects, navigation, profile, resumeUrl } from '../data/portfolioData'
+import { caseStudySlug } from '../data/routeMetadata'
+import { navigatePortfolio } from '../lib/portfolioRoute'
+import { revealSection } from '../lib/sectionNavigation'
 
 const SECTION_ICONS = {
   '#about': User,
@@ -83,8 +86,10 @@ export default function CommandPalette({ open, onClose }) {
   const returnFocusRef = useRef(null)
 
   const goTo = useCallback((hash) => {
+    if (hash === '#lab') { navigatePortfolio('/lab'); return }
     const target = document.querySelector(hash)
-    if (!target) return
+    if (!target) { navigatePortfolio(hash === '#projects' ? '/projects' : `/${hash}`); return }
+    revealSection(target)
     // scroll-padding-top on <html> already accounts for the fixed navbar, so
     // scrollIntoView lands the heading in the right place without maths here.
     target.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -105,6 +110,16 @@ export default function CommandPalette({ open, onClose }) {
 
     return [
       ...sections,
+      ...featuredProjects.map(project => ({
+        id: `project-${project.id}`,
+        label: project.title,
+        hint: `Case study · ${project.stack.join(' · ')}`,
+        icon: Layers,
+        run: () => navigatePortfolio(`/projects/${caseStudySlug(project.id)}`),
+      })),
+      { id: 'case-alex-hasti', label: 'Alex / Hasti voice engineering', hint: 'Case study · LiveKit · Twilio · OpenAI · n8n', icon: Sparkles, run: () => navigatePortfolio('/projects/alex-hasti') },
+      { id: 'case-zalio-crm', label: 'Zalio CRM', hint: 'Case study · Conversations · Calling · Retention', icon: Layers, run: () => navigatePortfolio('/projects/zalio-crm') },
+      { id: 'go-voice-demo', label: 'Listen to the voice demos', hint: 'US and Australian English', icon: Music2, run: () => goTo('#voice-demo') },
       { id: 'go-ai-systems', label: 'AI agents, voice & automation', hint: 'Explore capabilities and live demos', icon: Sparkles, run: () => goTo('#ai-systems') },
       {
         id: 'copy-email',
@@ -160,7 +175,7 @@ export default function CommandPalette({ open, onClose }) {
         hint: 'Nine playable experiments',
         keywords: ['games', 'game', 'play'],
         icon: Sparkles,
-        run: () => window.dispatchEvent(new CustomEvent('portfolio:open-games')),
+        run: () => navigatePortfolio('/lab'),
       },
       {
         id: 'music',

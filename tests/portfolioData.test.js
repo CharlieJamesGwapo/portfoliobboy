@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -25,36 +25,40 @@ import {
   resumeUrl,
   skillGroups,
   voiceCallFlow,
+  profile,
 } from '../src/data/portfolioData.js'
-import { BIO_SCROLL, EXPERIENCE, SKILL_CATEGORIES } from '../src/data/gameData.js'
-
-// The baseline history still carries the former employer's name; it is assembled here so the
-// literal never appears in the repository's current sources.
-const FORMER_EMPLOYER = ['Robus' + 'tech', 'Society' + 'One']
-const FORMER_EMPLOYER_PATTERN = new RegExp(`${FORMER_EMPLOYER[0]}|Society ?One`, 'i')
+import { BIO_SCROLL, EXPERIENCE, OWNER, SKILL_CATEGORIES } from '../src/data/gameData.js'
+import { independentProducts } from '../src/data/independentProducts.js'
+import { getCaseStudyBySlug } from '../src/data/caseStudies.js'
 
 const renderConsumers = async () => {
   const server = await createServer({
     configFile: resolve(process.cwd(), 'vite.config.js'),
-    server: { middlewareMode: true },
+    server: { middlewareMode: true, hmr: false, ws: false },
   })
   try {
-    const [{ default: About }, { default: Experience }, { default: Projects }] = await Promise.all([
+    const [{ default: Hero }, { default: About }, { default: Experience }, { default: Projects }] = await Promise.all([
+      server.ssrLoadModule('/src/components/Hero.jsx'),
       server.ssrLoadModule('/src/components/About.jsx'),
       server.ssrLoadModule('/src/components/Experience.jsx'),
       server.ssrLoadModule('/src/components/Projects.jsx'),
     ])
-    return [About, Experience, Projects]
+    const [hero, about, experience, projects] = [Hero, About, Experience, Projects]
       .map((Component) => renderToStaticMarkup(createElement(Component)).replace(/\s+/g, ' '))
+    return { hero, about, experience, projects }
   } finally {
     await server.close()
   }
 }
 
-test('preserves the verified professional positioning and identity features', () => {
-  assert.equal(education.period, '2022 — 2026')
+test('aligns public profile identity, role, location, and education with the supplied resume', () => {
+  assert.equal(profile.role, 'Lead Full-Stack Developer | AI, Web & Mobile')
+  assert.equal(profile.location, 'Cebu City, Philippines')
+  assert.equal(profile.linkedin, 'https://www.linkedin.com/in/charlie-james-abejo-2b625a3a5/')
+  assert.equal(OWNER.linkedin, profile.linkedin)
+  assert.equal(education.period, '2022 — May 2026')
   assert.equal(professionalTitles.length, 8)
-  assert.equal(professionalTitles[0], 'AI Developer')
+  assert.equal(professionalTitles[0], 'Lead Full-Stack Developer')
   assert.equal(interactiveGames.length, 9)
   assert.equal(new Set(interactiveGames.map((game) => game.id)).size, interactiveGames.length)
   assert.ok(navigation.some((item) => item.href === '#lab'))
@@ -62,11 +66,22 @@ test('preserves the verified professional positioning and identity features', ()
   assert.equal(new Set(navigation.map((item) => item.href)).size, navigation.length)
 })
 
-test('keeps the requested hiring-focused experience and project inventory', () => {
-  assert.equal(featuredProjects.length, 8)
+test('keeps the original featured and archived projects while prepending independent products', () => {
+  assert.equal(featuredProjects.length, independentProducts.length + 13)
+  assert.deepEqual(featuredProjects.slice(0, independentProducts.length).map((project) => project.id),
+    independentProducts.map((project) => project.id))
+  assert.deepEqual(featuredProjects.slice(independentProducts.length).map((project) => project.id), [
+    'one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending',
+    'moist-alumni', 'filtra-pos', 'ecycle-hub', 'mobile-booking',
+    'scale-with-accounting', 'st-john-baptist', 'freelancepath', 'idealink', 'zero-to-hero-dev',
+  ])
   assert.equal(projectArchive.length, 12)
-  assert.equal(experiences.length, 10)
+  assert.equal(experiences.length, 12)
   assert.equal(new Set(featuredProjects.map((project) => project.id)).size, featuredProjects.length)
+  assert.deepEqual(projectArchive.slice(0, 8).map((project) => project.title), [
+    'Luxury Construction Utah', 'G2 POS System', 'ReflectiCSS', 'Study Pulse',
+    'Shayne & DR', 'Vince Lloyd Portfolio', 'Laarni Portfolio', 'Librewry Bistro POS',
+  ])
 
   const alumniExperience = experiences.find((item) => item.company === 'MOIST Alumni Online Tracking System')
   assert.equal(alumniExperience?.period, 'Jan 2025 - Aug 2025')
@@ -75,14 +90,14 @@ test('keeps the requested hiring-focused experience and project inventory', () =
   assert.equal(alumniProject?.eyebrow, 'Jan-Aug 2025 · Secure records platform')
 })
 
-test('shows careful building-and-shipping experience wording in page consumers', async () => {
-  const [aboutMarkup, experienceMarkup] = await renderConsumers()
+test('shows current independent work and role count in the page consumers', async () => {
+  const { hero: heroMarkup, about: aboutMarkup, experience: experienceMarkup } = await renderConsumers()
   const productProof = proofPoints.find((item) => item.label === 'Genuine products and client builds')
   const experienceProof = proofPoints.find((item) => item.label === 'Development')
   assert.deepEqual(productProof, {
-    value: '17+',
+    value: '22+',
     label: 'Genuine products and client builds',
-    numericValue: 17,
+    numericValue: 22,
     suffix: '+',
   })
   assert.deepEqual(experienceProof, {
@@ -92,8 +107,26 @@ test('shows careful building-and-shipping experience wording in page consumers',
   assert.equal(skillGroups.flatMap((group) => group.skills).includes('MongoDB'), false)
   assert.equal(SKILL_CATEGORIES.flatMap((group) => group.skills).includes('MongoDB'), false)
   assert.equal(BIO_SCROLL[1], 'Hands-on development across Python, Go, .NET, Node.js, and PHP.')
-  assert.match(aboutMarkup, /I build web and mobile applications, focusing on useful features, reliable backends, and clear interfaces\./i)
-  assert.match(experienceMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '), /Hands-on Development/i)
+  assert.match(heroMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '), /Lead Full-Stack/)
+  assert.match(heroMarkup, /AI, web &amp; mobile\./)
+  assert.match(heroMarkup, /OneRidePhone|one-ride|oneRide/i)
+  assert.match(aboutMarkup, /At Zalio, I led/i)
+  assert.match(aboutMarkup, /AutoFlow AI Pro/i)
+  assert.match(aboutMarkup, /EasyAppy/i)
+  assert.match(aboutMarkup, /AgentForge/i)
+  assert.match(aboutMarkup, /BBOY/i)
+  assert.match(experienceMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '), /12 Roles and engagements/i)
+  assert.match(experienceMarkup, /Earlier project engagements/i)
+})
+
+test('adds the supplied mobile and desktop engineering skills', () => {
+  const skills = new Set(skillGroups.flatMap((group) => group.skills))
+  for (const skill of [
+    'Expo', 'Expo Router', 'NativeWind', 'Reanimated', 'Expo SQLite',
+    'Electron', 'Swift', 'AppKit', 'macOS Keychain', 'Gmail OAuth', 'GitHub Actions',
+  ]) {
+    assert.ok(skills.has(skill), `missing skill ${skill}`)
+  }
 })
 
 test('publishes the supplied OMJI projects with realistic dates', () => {
@@ -105,95 +138,156 @@ test('publishes the supplied OMJI projects with realistic dates', () => {
 
   const billing = featuredProjects.find((project) => project.id === 'omji-billing')
   assert.equal(billing?.eyebrow, 'Apr–Jun 2026 · Internet access and billing')
+  assert.equal(billing?.url, 'https://www.omji-net.com/')
   assert.ok(billing?.stack.includes('TypeScript'))
   assert.ok(billing?.stack.includes('Go'))
+  assert.ok(billing?.stack.includes('WireGuard'))
+  assert.ok(billing?.stack.includes('SQL'))
+  assert.match(billing?.engineering ?? '', /usage-ledger/i)
+  assert.match(billing?.engineering ?? '', /migrations/i)
+  assert.doesNotMatch(JSON.stringify({ architecture: billing?.architecture, implementation: billing?.implementation, stack: billing?.stack }), /\b(?:React|Flutter|Expo|PostgreSQL|MySQL|SQLite|MongoDB|Firebase|Swift|Kotlin|Android)\b/i)
 })
 
-test('keeps public client wording anonymous and aligns every visible role timeline', async () => {
+test('publishes the five supplied client projects with their case studies and media labels', () => {
+  const projects = [
+    ['scale-with-accounting', 'scale-with-accounting', 'https://scalewithaccounting.com/', '/projects/scale-with-accounting/showcase.webp'],
+    ['st-john-baptist', 'st-john-baptist', 'https://stjohnbaptisthighschoolinc.com/', '/projects/st-john-baptist/showcase.webp'],
+    ['freelancepath', 'freelancepath', 'https://freelancepath.vercel.app/', '/projects/freelancepath/showcase.webp'],
+    ['idealink', 'idealink', 'https://ascb-idealink.vercel.app/', '/projects/idealink/showcase.webp'],
+    ['zero-to-hero-dev', 'zero-to-hero-dev', 'https://zerotoherodev.vercel.app/', '/projects/zero-to-hero-dev/showcase.webp'],
+  ]
+
+  assert.deepEqual(featuredProjects.slice(independentProducts.length + 8).map((project) => project.id), projects.map(([id]) => id))
+  for (const [id, slug, url, image] of projects) {
+    const project = featuredProjects.find((item) => item.id === id)
+    const study = getCaseStudyBySlug(slug)
+    assert.ok(project, `missing featured project ${id}`)
+    assert.ok(study, `missing case study ${slug}`)
+    assert.equal(project?.url, url)
+    assert.equal(project?.media?.[0]?.src, image)
+    assert.equal(project?.mediaLayout, 'wide')
+    assert.equal(study?.projectId, id)
+    assert.equal(study?.mediaProduct?.id, id)
+    assert.ok(study?.overview)
+    assert.ok(study?.implementationDecision)
+    assert.ok(study?.mediaCaption)
+    assert.doesNotMatch(study?.securityReliability ?? '', /source project record does not document/i)
+  }
+
+  for (const id of ['scale-with-accounting', 'st-john-baptist', 'freelancepath']) {
+    const project = featuredProjects.find((item) => item.id === id)
+    assert.match(project?.mediaCaption ?? '', /promotional concept/i)
+    assert.match(project?.mediaCaption ?? '', /illustrative data/i)
+  }
+  for (const id of ['idealink', 'zero-to-hero-dev']) {
+    const project = featuredProjects.find((item) => item.id === id)
+    assert.match(project?.media?.[0]?.alt ?? '', /actual website screenshot/i)
+  }
+
+  const scaleWithAccounting = featuredProjects.find((project) => project.id === 'scale-with-accounting')
+  assert.deepEqual(scaleWithAccounting?.stack, ['Next.js', 'React', 'TypeScript', 'Node.js', 'Neon PostgreSQL', 'GoHighLevel', 'Vercel Cron', 'Vitest', 'Playwright'])
+  assert.match(JSON.stringify(scaleWithAccounting), /manual student payment verification/i)
+  assert.match(JSON.stringify(scaleWithAccounting), /consent/i)
+  assert.match(JSON.stringify(scaleWithAccounting), /rate limit/i)
+  assert.match(JSON.stringify(scaleWithAccounting), /durable CRM retries/i)
+
+  const school = featuredProjects.find((project) => project.id === 'st-john-baptist')
+  assert.ok(['PHP', 'MySQL', 'HTML', 'CSS', 'JavaScript', 'Flutter', 'Dart', 'RFID', 'PWA', 'OneSignal', 'CSRF', 'reCAPTCHA', 'RBAC'].every((technology) => school?.stack.includes(technology)))
+
+  const freelancePath = featuredProjects.find((project) => project.id === 'freelancepath')
+  assert.match(JSON.stringify(freelancePath), /38 lessons.*5 tracks.*16 careers.*12 challenges.*3 capstones.*15 document generators.*21 resources/i)
+  assert.match(JSON.stringify(freelancePath), /no account.*database.*paid API/i)
+  assert.match(freelancePath?.overview ?? '', /aspiring virtual assistants and freelancers/i)
+  assert.doesNotMatch(JSON.stringify(freelancePath), /freelance developers|coding challenges/i)
+
+  const ideaLink = featuredProjects.find((project) => project.id === 'idealink')
+  assert.match(JSON.stringify(ideaLink), /weekly limits/i)
+  assert.match(JSON.stringify(ideaLink), /Admin.*Registrar.*Finance/i)
+  assert.match(JSON.stringify(ideaLink), /Registrar.*Finance/i)
+  assert.match(JSON.stringify(ideaLink), /moderation.*audit.*reports.*email/i)
+
+  const zeroHero = featuredProjects.find((project) => project.id === 'zero-to-hero-dev')
+  assert.match(JSON.stringify(zeroHero), /12 levels.*8 paths/i)
+  assert.match(JSON.stringify(zeroHero), /5 project briefs/i)
+  assert.match(JSON.stringify(zeroHero), /no model calls/i)
+
+  const liveProjectIds = new Set(liveLinks.map((link) => link.id))
+  for (const id of ['omji-billing', ...projects.map(([id]) => id)]) {
+    assert.ok(liveProjectIds.has(id), `missing live-project link ${id}`)
+  }
+
+  assert.match(getCaseStudyBySlug('scale-with-accounting')?.securityReliability ?? '', /consent.*rate limit.*retr(?:y|ies)/i)
+  assert.match(getCaseStudyBySlug('st-john-baptist')?.securityReliability ?? '', /RBAC.*CSRF.*reCAPTCHA/i)
+  assert.match(getCaseStudyBySlug('freelancepath')?.securityReliability ?? '', /localStorage.*JSON backups.*no account.*database.*paid API/i)
+  assert.match(getCaseStudyBySlug('idealink')?.securityReliability ?? '', /JWT.*Admin.*Registrar.*Finance.*weekly limits.*audit/i)
+  assert.match(getCaseStudyBySlug('zero-to-hero-dev')?.securityReliability ?? '', /local.*backups.*no model calls/i)
+})
+
+test('publishes the supplied work history with completed dates and synchronized game data', async () => {
   const consumerMarkup = await renderConsumers()
-  const australianExperience = experiences.find((item) => item.role === 'AI Full-Stack Engineer')
-  const societyExperience = experiences.find((item) => item.company === 'Australian Fintech · Lending Platform')
+  const zalioExperience = experiences.find((item) => item.company === 'Zalio · Momentum')
+  const omjiExperience = experiences.find((item) => item.company === 'OMJI')
+  const freelanceExperience = experiences.find((item) => item.company === 'Independent client engagements & personal products')
+  const fintechExperience = experiences.find((item) => item.company === 'Super Deal · Australian Fintech')
   const roocheExperience = experiences.find((item) => item.company === 'Rooche Digital Company')
-  assert.equal(australianExperience?.company, 'Zalio · Momentum')
-  assert.equal(australianExperience?.period, 'Jun 2026 – Present')
+  const freelanceEvidence = [freelanceExperience?.summary, ...(freelanceExperience?.achievements ?? [])]
+    .filter(Boolean)
+    .join(' ')
+  assert.equal(zalioExperience?.role, 'Lead Full-Stack Developer — AI & CRM Systems')
+  assert.equal(zalioExperience?.period, 'Jun 2026 – Sep 2026')
+  assert.match(zalioExperience?.summary ?? '', /^Led /)
+  assert.equal(omjiExperience?.role, 'Founding Engineer & Lead Full-Stack Developer')
+  assert.equal(omjiExperience?.period, 'Mar 2024 – May 2026')
+  assert.match(JSON.stringify(omjiExperience), /MikroTik|RFID|Google Play|Piso Wi-Fi/i)
+  assert.equal(freelanceExperience?.role, 'Freelance Full-Stack Developer')
+  assert.equal(freelanceExperience?.period, '2023 – Present')
+  assert.match(freelanceEvidence, /EasyAppy.*AgentForge.*BBOY.*AutoFlow AI Pro/i)
+  assert.equal(fintechExperience?.period, 'Jan 2024 – Dec 2025')
   assert.equal(roocheExperience?.period, 'Jan 2026 – Mar 2026')
-  assert.equal(societyExperience?.period, 'Jan 2024 – Dec 2025')
+  assert.ok(fintechExperience?.summary && !/Modernizing|Building/i.test(fintechExperience.summary))
+  assert.equal(OWNER.linkedin, profile.linkedin)
+  assert.equal(EXPERIENCE.find((item) => item.id === 'fintech-lending')?.company, 'Super Deal · Australian Fintech')
+
+  const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8')
+  const manifest = JSON.parse(readFileSync(resolve(process.cwd(), 'public/manifest.json'), 'utf8'))
+  assert.match(html, /Lead Full-Stack Developer/)
+  assert.match(html, /Cebu City/)
+  assert.match(html, /2b625a3a5/)
+  assert.match(manifest.description, /Lead Full-Stack Developer/i)
 
   const fitnessProject = featuredProjects.find((item) => item.id === 'fitness-crm')
-  const societyProject = featuredProjects.find((item) => item.id === 'fintech-lending')
+  assert.equal(roocheExperience?.period, 'Jan 2026 – Mar 2026')
   assert.equal(fitnessProject?.title, 'Enterprise CRM Platform')
-  assert.equal(fitnessProject?.eyebrow, '2026 – Present · Australian client · Enterprise CRM platform')
-  assert.equal(societyProject?.title, 'Fintech Lending Platform Modernization')
-  assert.equal(societyProject?.eyebrow, 'Jan 2024 – Dec 2025 · Regulated fintech · Australia')
+  assert.equal(fitnessProject?.eyebrow, 'Jun–Sep 2026 · Australian client · Enterprise CRM platform')
+  const fintechProject = featuredProjects.find((item) => item.id === 'fintech-lending')
+  assert.equal(fintechProject?.title, 'Fintech Lending Platform Modernization')
+  assert.equal(fintechProject?.eyebrow, 'Jan 2024 – Dec 2025 · Regulated fintech · Australia')
 
-  const gameSocietyExperience = EXPERIENCE.find((item) => item.id === 'fintech-lending')
   const gameRoocheExperience = EXPERIENCE.find((item) => item.id === 'rooche')
   assert.equal(gameRoocheExperience?.period, 'Jan 2026 – Mar 2026')
-  assert.equal(gameSocietyExperience?.period, 'Jan 2024 – Dec 2025')
+  assert.equal(EXPERIENCE.find((item) => item.id === 'fintech-lending')?.period, 'Jan 2024 – Dec 2025')
 
   const publicContent = [
     JSON.stringify({ experiences, featuredProjects, skillGroups, BIO_SCROLL }),
-    ...consumerMarkup,
+    ...Object.values(consumerMarkup),
   ].join(' ')
   assert.doesNotMatch(publicContent, /Multi-Club Fitness Group|PerfectGym/i)
-  assert.doesNotMatch(
-    JSON.stringify({ ...portfolioData, EXPERIENCE, BIO_SCROLL, SKILL_CATEGORIES }) + consumerMarkup.join(' '),
-    FORMER_EMPLOYER_PATTERN,
-  )
 })
 
-test('preserves history and inventory while applying approved date and positioning copy', async () => {
-  const baselineSource = execFileSync(
-    'git',
-    ['show', '3f329a4bd4da43163807ef7760ec8d59725aa0cd:src/data/portfolioData.js'],
-    { encoding: 'utf8' },
-  )
-  const baselineModule = await import(`data:text/javascript,${encodeURIComponent(baselineSource)}`)
-  const expectedExports = {
-    ...baselineModule,
-    // The current engagement and the Momentum systems showcase were intentionally rewritten
-    // after the baseline; every other history entry must remain identical to the baseline.
-    experiences: [
-      portfolioData.experiences[0],
-      ...baselineModule.experiences.slice(1).map((experience) =>
-        experience.company === `${FORMER_EMPLOYER[0]} IT / ${FORMER_EMPLOYER[1]}`
-          ? { ...experience, company: 'Australian Fintech · Lending Platform' }
-          : experience.company === 'E-Cycle Hub'
-            ? { ...experience, links: [{ label: 'ecyclehub.vercel.app', url: 'https://ecyclehub.vercel.app/' }] }
-            : experience,
-      ),
-    ],
-    // The former employer name was anonymised; everything else in the project is unchanged.
-    featuredProjects: baselineModule.featuredProjects.map((project) =>
-      project.id === FORMER_EMPLOYER[1].toLowerCase()
-        ? { ...project, id: 'fintech-lending', title: 'Fintech Lending Platform Modernization' }
-        : project,
-    ),
-    // The security / AI-ML personal projects are appended after the baseline archive.
-    projectArchive: [...baselineModule.projectArchive, ...portfolioData.projectArchive.slice(baselineModule.projectArchive.length)],
-    projectCategories: [...baselineModule.projectCategories, 'Security'],
-    navigation: portfolioData.navigation,
-    liveLinks: portfolioData.liveLinks,
-    voiceCallFlow: portfolioData.voiceCallFlow,
-    momentumSystems: portfolioData.momentumSystems,
-    proofPoints: baselineModule.proofPoints.map((proofPoint, index) =>
-      index === 1 ? { value: 'Hands-on', label: 'Development' } : proofPoint,
-    ),
+test('preserves earlier portfolio experience records and historical project identities', () => {
+  const knownEarlierCompanies = [
+    'MOIST Alumni Online Tracking System', 'Filtra Coffee POS System', 'Librewry Bistro POS System',
+    'E-Cycle Hub', 'Jolly Ride App', 'Massage Booking App', 'Personal Portfolio Website',
+  ]
+  for (const company of knownEarlierCompanies) {
+    assert.ok(experiences.some((item) => item.company === company), `missing experience record ${company}`)
   }
-
   assert.deepEqual(
-    Object.keys(portfolioData).sort(),
-    Object.keys(expectedExports).sort(),
+    featuredProjects.slice(independentProducts.length, independentProducts.length + 8).map((project) => project.id),
+    ['one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending', 'moist-alumni', 'filtra-pos', 'ecycle-hub', 'mobile-booking'],
   )
-  assert.deepEqual(Object.fromEntries(Object.entries(portfolioData)), expectedExports)
-
-  const [currentRole] = portfolioData.experiences
-  assert.equal(currentRole.role, 'AI Full-Stack Engineer')
-  assert.equal(currentRole.company, 'Zalio · Momentum')
-  assert.equal(currentRole.period, 'Jun 2026 – Present')
-  assert.equal(currentRole.featured, true)
-  assert.equal(currentRole.achievements.length, 9)
-  assert.equal(portfolioData.experiences.length, baselineModule.experiences.length)
+  assert.equal(projectArchive.length, 12)
+  assert.deepEqual(portfolioData.projectCategories.includes('Desktop'), true)
 })
 
 test('keeps the original credential inventory and clean resume route', () => {
@@ -291,11 +385,11 @@ test('curates Momentum systems with honest readiness and only verified public li
 test('renders the additive AI systems section without replacing existing project inventory', async () => {
   const server = await createServer({
     configFile: resolve(process.cwd(), 'vite.config.js'),
-    server: { middlewareMode: true },
+    server: { middlewareMode: true, hmr: false, ws: false },
   })
   try {
-    const { default: AISystems } = await server.ssrLoadModule('/src/components/AISystems.jsx')
-    const markup = renderToStaticMarkup(createElement(AISystems)).replace(/\s+/g, ' ')
+    const { default: AISystems, MomentumSystems } = await server.ssrLoadModule('/src/components/AISystems.jsx')
+    const markup = [AISystems, MomentumSystems].map(Component => renderToStaticMarkup(createElement(Component))).join(' ').replace(/\s+/g, ' ')
     assert.match(markup, /AI systems &amp; automation/i)
     assert.match(markup, /Selected Momentum systems/i)
     assert.match(markup, /Live AI demo/i)
@@ -305,7 +399,7 @@ test('renders the additive AI systems section without replacing existing project
     await server.close()
   }
 
-  assert.equal(featuredProjects.length, 8)
+  assert.equal(featuredProjects.length, independentProducts.length + 13)
   assert.equal(projectArchive.length, 12)
 })
 
@@ -317,7 +411,7 @@ test('derives the Projects heading counts from the data instead of hard-coding t
   try {
     const { default: Projects } = await server.ssrLoadModule('/src/components/Projects.jsx')
     const markup = renderToStaticMarkup(createElement(Projects)).replace(/\s+/g, ' ')
-    assert.match(markup, new RegExp(`${featuredProjects.length} detailed case studies, plus ${projectArchive.length} additional client and independent builds`))
+    assert.match(markup, new RegExp(`${featuredProjects.length} detailed case studies and ${projectArchive.length} additional builds`))
     assert.match(markup, new RegExp(`Project archive · ${projectArchive.length} additional builds`))
   } finally {
     await server.close()

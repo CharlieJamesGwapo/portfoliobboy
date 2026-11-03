@@ -1,20 +1,22 @@
+import { independentProducts } from './independentProducts.js'
+
 export const profile = {
   name: 'Charlie James Z. Abejo',
   shortName: 'Charlie Abejo',
-  role: 'AI Developer & Full-Stack Engineer',
-  location: 'Misamis Oriental, Philippines',
+  role: 'Lead Full-Stack Developer | AI, Web & Mobile',
+  location: 'Cebu City, Philippines',
   email: 'capstonee2@gmail.com',
   phoneDisplay: '+63 985 612 2843',
   phoneHref: 'tel:+639856122843',
   github: 'https://github.com/CharlieJamesGwapo',
-  linkedin: 'https://www.linkedin.com/in/charlie-james-abejo-26362638a/',
+  linkedin: 'https://www.linkedin.com/in/charlie-james-abejo-2b625a3a5/',
   portfolio: 'https://portfoliobboy.vercel.app',
 }
 
 export const resumeUrl = '/charlie-james-abejo-resume.pdf'
 
 export const professionalTitles = [
-  'AI Developer',
+  'Lead Full-Stack Developer',
   'Full-Stack Developer',
   'Python and Go Developer',
   'Backend Engineer',
@@ -36,9 +38,9 @@ export const navigation = [
 ]
 
 export const proofPoints = [
-  { value: '17+', label: 'Genuine products and client builds', numericValue: 17, suffix: '+' },
+  { value: '22+', label: 'Genuine products and client builds', numericValue: 22, suffix: '+' },
   { value: 'Hands-on', label: 'Development' },
-  { value: '25', label: 'Verified credentials and recognitions', numericValue: 25, suffix: '' },
+  { value: '25', label: 'Credentials and recognitions', numericValue: 25, suffix: '' },
   { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },
 ]
 
@@ -360,29 +362,38 @@ export const momentumEngineeringGroups = [
 
 export const experiences = [
   {
-    role: 'AI Full-Stack Engineer',
+    role: 'Lead Full-Stack Developer — AI & CRM Systems',
     company: 'Zalio · Momentum',
     location: 'Australia · Remote',
-    period: 'Jun 2026 – Present',
+    period: 'Jun 2026 – Sep 2026',
     featured: true,
     summary:
-      "Building Zalio's gym CRM and operations platform, the Alex AI voice agent, and Hasti's AI reception and lead-response products across web, mobile, voice, and automation.",
+      'Led custom CRM and gym-management delivery spanning lead enquiries, memberships, bookings, payments, operational dashboards, and React/Next.js interfaces.',
     achievements: [
-      'Lead engineer on the Zalio CRM module with 2,000+ commits: omnichannel lead inbox with SLA alerts, forms, campaigns, retention workflows, and Twilio browser calling.',
-      'Built Alex, a self-hosted AI voice agent on LiveKit and GPT-Live over Twilio SIP, with evidence-grounded research calls, voicemail detection, a restart-safe call queue, and cited AI call reviews.',
-      'Designed n8n integrations with durable receipts, idempotency keys, and reconciliation linking the voice backend, CRM, GTM engine, calendar, and email.',
-      'Shipped the Hasti Client iOS and Android app (Expo, Fastify, PostgreSQL) in 46 pull requests over nine days, and the live Alex demo on hasti.com.au.',
-      "Built the bulk Alex calling workflow in the GTM engine, Zalio's design system, and employee features in the Expo mobile app.",
-      'Delivered revenue, retention, profiling, and win-back dashboards with Next.js 16, React 19, TypeScript, and TanStack Query.',
-      'Designed bidirectional Python CRM synchronization using Celery, Redis, durable Postgres jobs, leases, idempotency keys, bounded retries, and recovery workflows.',
-      'Led member, contract, visit, and payment-history migration with automated reconciliation against source-of-truth financial reports.',
-      'Ship daily with Claude Code using repo-level instructions, custom agents, skills, and GitHub, Linear, and Supabase MCP integrations.',
+      'Led custom CRM and gym-management delivery across lead enquiries, memberships, bookings, payments, operational dashboards, and React/Next.js interfaces.',
+      'Built Alex/Hasti voice AI with LiveKit, OpenAI, Twilio, and n8n, linking calls with CRM, calendar, email, and human-approved follow-up workflows.',
+      'Delivered Expo mobile features and Python/Celery/Redis/PostgreSQL synchronization with idempotency, retries, and financial-record reconciliation.',
     ],
-    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Encore.ts', 'PostgreSQL', 'LiveKit', 'Twilio', 'n8n', 'Expo', 'Python'],
+    stack: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'LiveKit', 'OpenAI', 'Twilio', 'n8n', 'Expo', 'Python'],
     links: [
       { label: 'zalio.ai', url: 'https://zalio.ai/' },
       { label: 'hasti.com.au — live Alex demo', url: 'https://hasti.com.au/' },
     ],
+  },
+  {
+    role: 'Founding Engineer & Lead Full-Stack Developer',
+    company: 'OMJI',
+    location: 'Remote',
+    period: 'Mar 2024 – May 2026',
+    summary:
+      'Led ISP, school, employee, and mobility application delivery across subscriber billing, payment verification, RFID attendance, and network operations.',
+    achievements: [
+      'Built subscriber billing, payment-verification, and customer-portal workflows with MikroTik integration.',
+      'Developed Expo attendance tools and school applications, including the St. John Baptist High School website and RFID entry/exit monitoring.',
+      'Built One Ride mobile, web, and administrative workflows for rides, delivery, and local-store orders with React Native/Expo, Go/Gin, and PostgreSQL; the customer app was published on Google Play.',
+      'Built Piso Wi-Fi/vendo and LAN/site-monitoring tools with online/offline visibility and operational administration.',
+    ],
+    stack: ['React Native', 'Expo', 'Go', 'Gin', 'PostgreSQL', 'MikroTik', 'RFID', 'Piso Wi-Fi', 'LAN monitoring'],
   },
   {
     role: 'Full-Stack Developer',
@@ -400,17 +411,32 @@ export const experiences = [
   },
   {
     role: 'Full-Stack Developer',
-    company: 'Australian Fintech · Lending Platform',
+    company: 'Super Deal · Australian Fintech',
     location: 'Australia · Remote',
     period: 'Jan 2024 – Dec 2025',
     summary:
-      'Modernized services and integrations for a regulated Australian personal-loan platform.',
+      'Delivered lending web and mobile applications and service modernization for an Australian fintech platform.',
     achievements: [
-      'Re-platformed Golang and Node.js microservices to .NET, standardizing logging, error handling, and deployment.',
-      'Built Python and .NET AWS Lambda functions for event-driven partner banking and lending workflows.',
-      'Owned JSON-RPC, WebSocket, and webhook integrations plus Python reconciliation and reporting automation.',
+      'Developed lending web and mobile applications, integrating Vue.js interfaces with Node.js and C#/.NET services through REST APIs.',
+      'Developed C#/.NET microservices as part of Go and Node.js migration work, including logging, error handling, and deployment workflows.',
+      'Built AWS Lambda integrations, webhooks, WebSockets, and reconciliation/reporting automation for banking and loan workflows.',
     ],
-    stack: ['C# / .NET', 'Python', 'Go', 'Node.js', 'AWS Lambda', 'PostgreSQL', 'Buddy CI/CD'],
+    stack: ['Vue.js', 'C# / .NET', 'Python', 'Go', 'Node.js', 'AWS Lambda', 'PostgreSQL', 'REST APIs', 'WebSockets'],
+  },
+  {
+    role: 'Freelance Full-Stack Developer',
+    company: 'Independent client engagements & personal products',
+    location: 'Remote · Project-based',
+    period: '2023 – Present',
+    summary:
+      'Continue project-based client delivery while developing independent AI, desktop, and mobile products at distinct stages.',
+    achievements: [
+      'Built EasyAppy, a local-first macOS job-application tracker with interview planning and optional read-only Gmail OAuth.',
+      'Developed AgentForge as a TypeScript developer/AI workflow toolkit and BBOY as a native macOS AI assistant, currently at version 0.7.0.',
+      'Develop AutoFlow AI Pro as an in-development mobile productivity and automation product with planned integrations.',
+      'Delivered personal and client products including G2 POS, ReflectiCSS, Study Pulse, and responsive websites and portfolios.',
+    ],
+    stack: ['TypeScript', 'React Native', 'Expo', 'Electron', 'Swift', 'AppKit', 'Node.js', 'Gmail API'],
   },
   {
     role: 'Full-Stack Developer',
@@ -506,7 +532,7 @@ export const experiences = [
   },
 ]
 
-export const featuredProjects = [
+const originalFeaturedProjects = [
   {
     id: 'one-ride-balingasag',
     categories: ['Mobile', 'Full Stack', 'Backend', 'API'],
@@ -528,21 +554,25 @@ export const featuredProjects = [
     categories: ['SaaS', 'Backend', 'Full Stack', 'API'],
     title: 'OMJI Internet Access & Billing System',
     eyebrow: 'Apr–Jun 2026 · Internet access and billing',
-    overview: 'A web-based operations system for internet cafés, hotspots, and small ISPs combining prepaid access, billing, network control, and reporting.',
-    context: 'Small internet operators need a practical way to manage timed access, vouchers, customer sessions, connected stations, and daily revenue.',
-    implementation: 'TypeScript and Go services with web, mobile, and endpoint-agent clients, MikroTik RouterOS integration, and Docker-based deployment.',
-    architecture: ['TypeScript services', 'Go services', 'Web + mobile clients', 'Endpoint agent', 'MikroTik RouterOS', 'Docker Compose'],
-    features: ['Time-based prepaid billing', 'Voucher generation', 'Multi-station management', 'Revenue reports and analytics', 'MikroTik access control', 'Tablet-ready administration'],
-    engineering: 'Usage-ledger billing, plan changes, voucher workflows, per-account permissions, network integration, database migrations, and repeatable container deployment.',
-    delivered: 'A private operational platform covering access control, billing, reporting, administration, and multi-branch network support.',
-    stack: ['TypeScript', 'Go', 'React', 'Docker', 'MikroTik RouterOS', 'Web + mobile'],
+    overview: 'An internet access and billing operations system covering customer sessions, vouchers, stations, reports, and role-based administration.',
+    context: 'Internet operators need a way to manage sessions, prepaid vouchers, billing, connected stations, and operational reports.',
+    implementation: 'Node.js and TypeScript services plus Go components connect to the MikroTik RouterOS API and WireGuard, with SQL and Docker Compose.',
+    architecture: ['Node.js + TypeScript', 'Go services', 'MikroTik RouterOS API', 'WireGuard', 'SQL data store', 'Docker Compose'],
+    features: ['Customer session management', 'Prepaid voucher generation and management', 'Billing operations', 'Station management', 'Reports', 'Role-based access control (RBAC)'],
+    engineering: 'Usage-ledger billing, plan changes, voucher workflows, per-account permissions, network integration, SQL migrations, and repeatable Docker Compose deployment.',
+    delivered: 'Operations for customer sessions, vouchers, billing, stations, reporting, and role-based access.',
+    stack: ['Node.js', 'TypeScript', 'Go', 'MikroTik RouterOS API', 'WireGuard', 'Docker Compose', 'SQL'],
+    url: 'https://www.omji-net.com/',
     private: true,
+    mediaLayout: 'wide',
+    media: [{ id: 'showcase', label: 'Overview', src: '/projects/omji-billing/showcase.webp', alt: 'Promotional concept preview for the OMJI Internet Access & Billing System.', width: 1440, height: 810 }],
+    mediaCaption: 'Promotional concept · Illustrative data, not a production screenshot',
   },
   {
     id: 'fitness-crm',
     categories: ['AI', 'SaaS', 'Backend', 'Full Stack', 'API', 'CRM'],
     title: 'Enterprise CRM Platform',
-    eyebrow: '2026 – Present · Australian client · Enterprise CRM platform',
+    eyebrow: 'Jun–Sep 2026 · Australian client · Enterprise CRM platform',
     overview: 'An enterprise CRM platform for an Australian client, unifying member data, subscriptions, payments, visits, retention, and browser-based calling.',
     context: 'An Australian client needed one dependable workflow for member operations, outreach, and financial history.',
     implementation: 'Next.js dashboards backed by bidirectional CRM synchronization, durable jobs, retries, and reconciliation.',
@@ -630,6 +660,111 @@ export const featuredProjects = [
   },
 ]
 
+const additionalFeaturedProjects = [
+  {
+    id: 'scale-with-accounting',
+    categories: ['Full Stack', 'SaaS', 'CRM'],
+    title: 'Scale With Accounting',
+    eyebrow: 'Accounting services · Client platform',
+    overview: 'An accounting-services website with partner inquiries, training and coaching, and student payment verification workflows.',
+    context: 'The platform brings accounting services, partner inquiries, and training and coaching into one experience, with a manual process for verifying student payments.',
+    implementation: 'Next.js, React, and TypeScript with Node.js workflows and Neon PostgreSQL connect with GoHighLevel CRM. Vercel Cron supports durable CRM retries; Vitest and Playwright are included in the stack.',
+    architecture: ['Next.js + React + TypeScript', 'Node.js workflows', 'Neon PostgreSQL', 'GoHighLevel CRM', 'Vercel Cron', 'Vitest + Playwright'],
+    features: ['Accounting services', 'Partner inquiries', 'Training and coaching', 'Manual student payment verification', 'Consent-validated and rate-limited forms', 'Durable CRM retries'],
+    engineering: 'Forms validate consent and apply rate limits. Durable retries support CRM handoff, and student payments are verified manually.',
+    delivered: 'Accounting services, partner inquiry, training and coaching, and a manual student payment-verification workflow.',
+    stack: ['Next.js', 'React', 'TypeScript', 'Node.js', 'Neon PostgreSQL', 'GoHighLevel', 'Vercel Cron', 'Vitest', 'Playwright'],
+    url: 'https://scalewithaccounting.com/',
+    sourceVisibility: 'not-linked',
+    status: 'Client website · Public project link',
+    mediaLayout: 'wide',
+    media: [{ id: 'showcase', label: 'Overview', src: '/projects/scale-with-accounting/showcase.webp', alt: 'Promotional concept preview for the Scale With Accounting website.', width: 1440, height: 960 }],
+    mediaCaption: 'Promotional concept · Illustrative data, not a production screenshot',
+  },
+  {
+    id: 'st-john-baptist',
+    categories: ['Full Stack', 'SaaS', 'Mobile'],
+    title: 'St. John Baptist High School',
+    eyebrow: 'School operations · Attendance and portals',
+    overview: 'A school operations system combining RFID attendance, administrator, student, and parent portals, and reports.',
+    context: 'School staff, students, and parents use attendance, portal, and reporting workflows for school operations.',
+    implementation: 'PHP and MySQL power web workflows using HTML, CSS, and JavaScript, alongside Flutter and Dart, RFID attendance, PWA delivery, and OneSignal notifications.',
+    architecture: ['PHP application', 'MySQL', 'HTML + CSS + JavaScript', 'Flutter + Dart', 'RFID attendance kiosk', 'PWA', 'OneSignal notifications', 'RBAC, CSRF protection, and reCAPTCHA'],
+    features: ['RFID attendance kiosk', 'Administrator portal', 'Student portal', 'Parent portal', 'Attendance and school reports', 'OneSignal notifications'],
+    engineering: 'The documented application controls include CSRF protection, reCAPTCHA, and role-based access control (RBAC).',
+    delivered: 'RFID attendance, school administration, student and parent portals, and reporting workflows.',
+    stack: ['PHP', 'MySQL', 'HTML', 'CSS', 'JavaScript', 'Flutter', 'Dart', 'RFID', 'PWA', 'OneSignal', 'CSRF', 'reCAPTCHA', 'RBAC'],
+    url: 'https://stjohnbaptisthighschoolinc.com/',
+    sourceVisibility: 'not-linked',
+    status: 'School operations project · Public website',
+    mediaLayout: 'wide',
+    media: [{ id: 'showcase', label: 'Overview', src: '/projects/st-john-baptist/showcase.webp', alt: 'Promotional concept preview for the St. John Baptist High School platform.', width: 1440, height: 810 }],
+    mediaCaption: 'Promotional concept · Illustrative data, not a production screenshot',
+  },
+  {
+    id: 'freelancepath',
+    categories: ['Full Stack', 'Developer Tools'],
+    title: 'FreelancePath',
+    eyebrow: 'Freelance career learning · Local-first',
+    overview: 'A local-first career learning workspace for aspiring virtual assistants and freelancers, with structured lessons, career exploration, guided practice, and exportable work.',
+    context: 'Aspiring virtual assistants and freelancers can use career tracks, role exploration, guided practice, document generators, and resource collections in one local-first workspace.',
+    implementation: 'Next.js and React with TypeScript, Tailwind CSS, Radix, Motion, and Fuse.js. LocalStorage keeps the workspace on-device; the application is a PWA with Playwright coverage and Vercel hosting.',
+    architecture: ['Next.js + React + TypeScript', 'Tailwind CSS + Radix + Motion', 'Fuse.js search', 'LocalStorage persistence', 'PWA', 'Playwright', 'Vercel'],
+    features: ['38 lessons', '5 learning tracks', '16 freelance careers', '12 challenges', '3 capstones', '15 document generators', '21 resources', 'Portfolio export', 'JSON backups', 'No account, database, or paid API is required'],
+    engineering: 'Progress and workspace data stay in localStorage. Portfolio export and JSON backups support taking work out of the browser; no account, database, or paid API is required.',
+    delivered: 'A local-first learning platform covering 38 lessons, 5 tracks, 16 careers, 12 challenges, 3 capstones, 15 document generators, and 21 resources.',
+    stack: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Radix', 'Motion', 'Fuse.js', 'localStorage', 'PWA', 'Playwright', 'Vercel'],
+    url: 'https://freelancepath.vercel.app/',
+    sourceVisibility: 'not-linked',
+    status: 'Independent learning product · No account required',
+    mediaLayout: 'wide',
+    media: [{ id: 'showcase', label: 'Overview', src: '/projects/freelancepath/showcase.webp', alt: 'Promotional concept preview for the FreelancePath learning workspace.', width: 1440, height: 960 }],
+    mediaCaption: 'Promotional concept · Illustrative data, not a production screenshot',
+  },
+  {
+    id: 'idealink',
+    categories: ['Full Stack', 'SaaS', 'Backend'],
+    title: 'IdeaLink',
+    eyebrow: 'ASCB · Student feedback platform',
+    overview: 'A student feedback platform for ASCB with office-specific moderation workflows, audit records, reports, and email notifications.',
+    context: 'ASCB needs student feedback workflows with weekly submission limits and moderation tailored to administrative offices.',
+    implementation: 'React 19, TypeScript, and Vite work with a Go and Gin API backed by PostgreSQL. JWT authentication, SMTP/Brevo email, and Vercel, Railway, and GitHub Actions are in the supplied stack.',
+    architecture: ['React 19 + TypeScript + Vite', 'Go + Gin API', 'PostgreSQL', 'JWT authentication', 'SMTP + Brevo email', 'Vercel + Railway', 'GitHub Actions'],
+    features: ['Student feedback with weekly limits', 'Office-specific Admin, Registrar, and Finance moderation', 'Audit trail', 'Reports', 'Email notifications'],
+    engineering: 'The supplied workflow includes weekly feedback limits, office-specific Admin, Registrar, and Finance moderation, audit records, reporting, and email notifications.',
+    delivered: 'ASCB student feedback intake and office-specific Admin, Registrar, and Finance moderation with audit, reports, and email workflows.',
+    stack: ['React 19', 'TypeScript', 'Vite', 'Go', 'Gin', 'PostgreSQL', 'JWT', 'SMTP', 'Brevo', 'Vercel', 'Railway', 'GitHub Actions'],
+    url: 'https://ascb-idealink.vercel.app/',
+    sourceVisibility: 'not-linked',
+    status: 'ASCB student feedback platform · Public website',
+    mediaLayout: 'wide',
+    media: [{ id: 'showcase', label: 'Website', src: '/projects/idealink/showcase.webp', alt: 'Actual website screenshot of the IdeaLink student feedback platform.', width: 1440, height: 586 }],
+    mediaCaption: 'Actual website screenshot · IdeaLink',
+  },
+  {
+    id: 'zero-to-hero-dev',
+    categories: ['Full Stack', 'Developer Tools'],
+    title: 'ZERO → HERO DEV',
+    eyebrow: 'Developer learning · Interactive curriculum',
+    overview: 'A developer learning platform with structured paths, browser-based coding practice, project briefs, and local progress.',
+    context: 'The learning experience combines programming fundamentals, web workshops, practical project briefs, and AI-assisted learning guides.',
+    implementation: 'Next.js 16 and React 19 with TypeScript, Tailwind CSS 4, and MDX organize the curriculum. Web Workers and Pyodide support in-browser Python exercises, while progress and JSON backups stay local. AI guides and a prompt builder make no model calls.',
+    architecture: ['Next.js 16 + React 19 + TypeScript', 'Tailwind CSS 4', 'MDX curriculum', 'Web Workers', 'Pyodide', 'Local progress and JSON backups', 'Node.js tests'],
+    features: ['12 levels', '8 learning paths', 'JavaScript, TypeScript, and Python exercises', 'HTML and CSS workshop', '5 project briefs', 'Progress backups', 'AI guides and prompt builder; no model calls'],
+    engineering: 'Web Workers and Pyodide support browser-based exercises. Progress and backups remain local, and the AI guides and prompt builder do not call a model.',
+    delivered: 'A learning platform with 12 levels, 8 paths, coding exercises, an HTML/CSS workshop, 5 project briefs, backups, and AI learning guides without model calls.',
+    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Tailwind CSS 4', 'MDX', 'Web Workers', 'Pyodide', 'Node.js tests'],
+    url: 'https://zerotoherodev.vercel.app/',
+    sourceVisibility: 'not-linked',
+    status: 'Developer learning platform · No model calls',
+    mediaLayout: 'wide',
+    media: [{ id: 'showcase', label: 'Website', src: '/projects/zero-to-hero-dev/showcase.webp', alt: 'Actual website screenshot of ZERO → HERO DEV.', width: 1440, height: 542 }],
+    mediaCaption: 'Actual website screenshot · ZERO → HERO DEV',
+  },
+]
+
+export const featuredProjects = [...independentProducts, ...originalFeaturedProjects, ...additionalFeaturedProjects]
+
 export const projectArchive = [
   { title: 'Luxury Construction Utah', type: 'Client website', categories: ['Full Stack'], description: 'Responsive construction company website with service showcases and contact integration.', stack: ['React', 'Tailwind CSS'], status: 'Archived site' },
   { title: 'G2 POS System', type: 'Full-stack product', categories: ['SaaS', 'Backend', 'Full Stack'], description: 'Point-of-sale dashboard for order processing, sales tracking, inventory, and operational reporting.', stack: ['Go', 'Next.js', 'PostgreSQL', 'Docker'], url: 'https://g2possystem.vercel.app/landing' },
@@ -645,7 +780,7 @@ export const projectArchive = [
   { title: 'Shopify & Cloudflare anti-bot development', type: 'E-commerce security', categories: ['Security', 'Full Stack'], description: 'Custom Shopify solutions and Cloudflare-based anti-bot protections for e-commerce storefronts.', stack: ['Shopify', 'Cloudflare', 'Anti-bot'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
 ]
 
-export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'API', 'Fintech', 'CRM', 'Security']
+export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'Desktop', 'API', 'Fintech', 'CRM', 'Security', 'Developer Tools']
 
 export const skillGroups = [
   {
@@ -662,7 +797,11 @@ export const skillGroups = [
   },
   {
     title: 'Mobile & real time',
-    skills: ['React Native', 'Android', 'Java', 'Kotlin', 'Firebase Auth', 'Firebase real-time data', 'Push notifications', 'Offline-tolerant sync'],
+    skills: ['React Native', 'Expo', 'Expo Router', 'NativeWind', 'Reanimated', 'Expo SQLite', 'Android', 'Java', 'Kotlin', 'Firebase Auth', 'Firebase real-time data', 'Push notifications', 'Offline-tolerant sync'],
+  },
+  {
+    title: 'Desktop & macOS',
+    skills: ['Electron', 'Swift', 'AppKit', 'WebKit', 'macOS Keychain', 'Gmail OAuth', 'GitHub Actions'],
   },
   {
     title: 'Data & infrastructure',
@@ -677,7 +816,7 @@ export const skillGroups = [
 export const education = {
   institution: 'Misamis Oriental Institute of Science and Technology',
   degree: 'Bachelor of Science in Information Technology',
-  period: '2022 — 2026',
+  period: '2022 — May 2026',
   details: "Dean's Lister, 2nd and 3rd Year (Ranked 2) · TOPCIT participant (2024–2025)",
 }
 
@@ -835,6 +974,12 @@ export const liveLinks = [
   { id: 'momentum-strength', title: 'Momentum Strength', url: 'https://momentum-strength.vercel.app/', label: 'Open Momentum Strength', kind: 'Web app', description: 'A commercial gym-equipment experience that combines product discovery with an interactive 3D configuration direction.' },
   { id: 'hsie', title: 'HSIE Site Scoring', url: 'https://health-dev-three.vercel.app/', label: 'Open HSIE Site Scoring', kind: 'Web app', description: 'A structured property and acquisition scoring workspace covering site quality, red flags, and evidence-backed review.' },
   { id: 'omji', title: 'One Ride Balingasag (OMJI)', url: 'https://play.google.com/store/apps/details?id=com.oneridebalingasag.app&hl=en', label: 'Get it on Google Play', kind: 'Mobile app', description: 'A unified ride-hailing, delivery, pickup, and local-store platform built for everyday transport and errands in Balingasag.' },
+  { id: 'omji-billing', title: 'OMJI Internet Access & Billing System', url: 'https://www.omji-net.com/', label: 'Visit omji-net.com', kind: 'Web app', description: 'Internet access operations covering customer sessions, vouchers, billing, stations, and reports.' },
+  { id: 'scale-with-accounting', title: 'Scale With Accounting', url: 'https://scalewithaccounting.com/', label: 'Visit Scale With Accounting', kind: 'Client site', description: 'Accounting services, partner inquiries, and training and coaching information.' },
+  { id: 'st-john-baptist', title: 'St. John Baptist High School', url: 'https://stjohnbaptisthighschoolinc.com/', label: 'Visit St. John Baptist High School', kind: 'Client site', description: 'School attendance, administration, student and parent portals, and reports.' },
+  { id: 'freelancepath', title: 'FreelancePath', url: 'https://freelancepath.vercel.app/', label: 'Open FreelancePath', kind: 'Web app', description: 'A local-first career learning workspace for aspiring virtual assistants and freelancers.' },
+  { id: 'idealink', title: 'IdeaLink', url: 'https://ascb-idealink.vercel.app/', label: 'Open IdeaLink', kind: 'Web app', description: 'An ASCB student feedback platform with office-specific moderation, audit records, reports, and email notifications.' },
+  { id: 'zero-to-hero-dev', title: 'ZERO → HERO DEV', url: 'https://zerotoherodev.vercel.app/', label: 'Open ZERO → HERO DEV', kind: 'Web app', description: 'A developer learning platform with local progress, programming exercises, and learning guides that make no model calls.' },
   { id: 'ecycle', title: 'E-Cycle Hub', url: 'https://ecyclehub.vercel.app/', label: 'Open E-Cycle Hub', kind: 'Web app', description: 'Waste-pickup scheduling with real-time updates, webhook integrations, and a Go API on serverless Postgres.' },
   { id: 'g2-pos', title: 'G2 POS System', url: 'https://g2possystem.vercel.app/landing', label: 'Open G2 POS', kind: 'Web app', description: 'Point-of-sale dashboard for order processing, sales tracking, inventory, and operational reporting.' },
   { id: 'reflecticss', title: 'ReflectiCSS', url: 'https://reflecticss.vercel.app/', label: 'Open ReflectiCSS', kind: 'Web app', description: 'Interactive interface for exploring and generating CSS styles.' },

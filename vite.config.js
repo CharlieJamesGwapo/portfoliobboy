@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 // The resume lives at the repo root with a name we don't want in the URL, so
@@ -41,6 +41,18 @@ function verifiedAssetPlugin() {
     },
     configurePreviewServer(server) {
       server.middlewares.use(serveAsset)
+      // Vercel rewrites these URLs to generated static documents. Mirror that
+      // mapping in local production preview so crawlers receive route metadata
+      // before React loads, rather than the generic SPA fallback document.
+      server.middlewares.use((request, response, next) => {
+        const pathname = request.url?.split('?')[0] || '/'
+        if (!/^\/(?:projects(?:\/[a-z0-9-]+)?|lab)\/?$/.test(pathname)) return next()
+        const file = resolve(server.config.root, server.config.build.outDir, pathname.replace(/^\//, ''), 'index.html')
+        if (!existsSync(file)) return next()
+        response.setHeader('Content-Type', 'text/html; charset=utf-8')
+        response.setHeader('Cache-Control', 'public, max-age=0, must-revalidate')
+        response.end(readFileSync(file))
+      })
     },
     buildStart() {
       if (!isBuild) return

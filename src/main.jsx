@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import { registerServiceWorker } from './lib/registerServiceWorker'
 import './index.css'
+import './components/studio-polish.css'
 
 // Entrance animations are opt-in. The stylesheet only hides content behind an
 // animation when <html> carries `motion-ready`, so a JS failure, a blocked

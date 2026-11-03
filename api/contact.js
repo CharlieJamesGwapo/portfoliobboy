@@ -1,28 +1,52 @@
-// Contact form handler — sends via Resend's REST API (no SDK, zero imports,
-// so Vercel's bundler never hangs).
+import { createHash } from 'node:crypto'
 
-// This endpoint sends mail on the site owner's Resend account. It previously
-// answered `Access-Control-Allow-Origin: *`, which let any site on the web POST
-// to it — an open relay for spam billed to this account. Only the portfolio's
-// own origins may call it now. Same-origin form posts send no Origin header on
-// some browsers, so a missing Origin is allowed; a foreign one is not.
+// Exact origins only: accepting arbitrary *.vercel.app also accepts attackers.
 const ALLOWED_ORIGINS = new Set([
   'https://portfoliobboy.vercel.app',
   'http://localhost:5173',
   'http://localhost:4173',
+  'http://127.0.0.1:5175',
 ])
 
 const isAllowedOrigin = (origin) => {
-  if (!origin) return true
+  if (typeof origin !== 'string') return false
   if (ALLOWED_ORIGINS.has(origin)) return true
-  // Vercel preview deployments for this project.
-  return /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(origin)
+  return [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
+    .some((host) => host && origin === `https://${host}`)
 }
 
 const LIMITS = { name: 120, email: 254, subject: 200, message: 5000 }
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+const MAX_BODY_BYTES = 32768
+const WINDOW_MS = 10 * 60 * 1000
+const submissions = new Map()
+
+// A bounded, per-instance abuse backstop. Distributed enforcement belongs in
+// the Vercel Firewall; this is deliberately not described as a global limit.
+function retryAfter(req) {
+  const now = Date.now()
+  for (const [key, entry] of submissions) {
+    if (entry.reset <= now) submissions.delete(key)
+  }
+  const forwarded = process.env.VERCEL === '1' ? req.headers['x-vercel-forwarded-for'] : null
+  const address = (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : null)
+    || req.socket?.remoteAddress || 'unknown'
+  const key = createHash('sha256').update(address).digest('hex')
+  let entry = submissions.get(key)
+  if (!entry) {
+    if (submissions.size >= 1000) return 60
+    entry = { count: 0, reset: now + WINDOW_MS }
+    submissions.set(key, entry)
+  }
+  if (entry.count >= 5) return Math.max(1, Math.ceil((entry.reset - now) / 1000))
+  entry.count++
+  return 0
+}
 
 export default async function handler(req, res) {
+  res.setHeader('Cache-Control', 'private, no-store')
+  res.setHeader('CDN-Cache-Control', 'no-store')
+  res.setHeader('Vercel-CDN-Cache-Control', 'no-store')
   const origin = req.headers.origin
 
   if (!isAllowedOrigin(origin)) {
@@ -41,11 +65,21 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST, OPTIONS')
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
+    if (Number(req.headers['content-length']) > MAX_BODY_BYTES) {
+      return res.status(413).json({ error: 'Request too large' })
+    }
+    if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) {
+      return res.status(415).json({ error: 'Expected application/json' })
+    }
     const body = req.body && typeof req.body === 'object' ? req.body : {}
+    if (Buffer.byteLength(JSON.stringify(body)) > MAX_BODY_BYTES) {
+      return res.status(413).json({ error: 'Request too large' })
+    }
     const name = typeof body.name === 'string' ? body.name.trim() : ''
     const email = typeof body.email === 'string' ? body.email.trim() : ''
     const subject = typeof body.subject === 'string' ? body.subject.trim() : ''
@@ -81,6 +115,12 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Server configuration error' })
     }
 
+    const seconds = retryAfter(req)
+    if (seconds) {
+      res.setHeader('Retry-After', String(seconds))
+      return res.status(429).json({ error: 'Too many messages. Please try again later.' })
+    }
+
     // Sanitize inputs for HTML
     const sanitize = (str) => str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
@@ -107,6 +147,7 @@ export default async function handler(req, res) {
 
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
+      signal: AbortSignal.timeout(8000),
       headers: {
         Authorization: 'Bearer ' + process.env.RESEND_API_KEY,
         'Content-Type': 'application/json',
@@ -123,8 +164,7 @@ export default async function handler(req, res) {
     })
 
     if (!response.ok) {
-      const errorBody = await response.text()
-      console.error('Resend API error:', response.status, errorBody)
+      console.error('Resend API error:', response.status)
       return res.status(500).json({ error: 'Failed to send email' })
     }
 

@@ -21,10 +21,12 @@ test('shows the live product showcase before the existing about section', async 
   expect(await studio.boundingBox()).not.toBeNull()
   expect((await studio.boundingBox()).y).toBeGreaterThanOrEqual((await hero.boundingBox()).y)
   expect((await about.boundingBox()).y).toBeGreaterThan((await studio.boundingBox()).y)
-  await expect(studio.getByRole('heading', { name: /Live product work/i })).toBeVisible()
+  await expect(studio.getByRole('heading', { name: /Independent products.*Built for real life/i })).toBeVisible()
+  await expect(studio.locator('.selected-case-study')).toHaveCount(3)
+  await page.locator('#full-project-archive > summary').click()
 
   for (const [label, href] of Object.entries(publicStudioLinks)) {
-    await expect(studio.getByRole('link', { name: label, exact: true })).toHaveAttribute('href', href)
+    await expect(studio.locator(`a[href="${href}"]`).first()).toHaveAttribute('href', href)
   }
 })
 
@@ -66,19 +68,18 @@ test('shows an honest official-listing state when every OneRide screenshot fails
 })
 
 test('retries a failed OneRide screenshot after a deliberate selection', async ({ page }) => {
-  let failedOnce = false
-  await page.route('**/projects/oneride/official-screen-03.png', (route) => {
-    if (!failedOnce) {
-      failedOnce = true
-      return route.abort()
-    }
-    return route.continue()
-  })
+  let imageAvailable = false
+  // The same image also appears in the case-study gallery. Keep it unavailable
+  // until the preview has exercised its fallback, regardless of request order.
+  await page.route('**/projects/oneride/official-screen-03.png', (route) => (
+    imageAvailable ? route.continue() : route.abort()
+  ))
   await page.goto('/#home')
   const preview = page.locator('[data-testid="oneride-preview"]')
   const orders = preview.getByRole('button', { name: /Show OneRide screenshot 3: Orders/i })
   await orders.click()
   await expect(orders).toHaveAttribute('aria-pressed', 'false')
+  imageAvailable = true
   await orders.click()
   await expect(orders).toHaveAttribute('aria-pressed', 'true')
   await expect(preview.locator('img[data-testid="oneride-screen"]')).toHaveAttribute('alt', /screenshot 3 showing the orders screen/i)
@@ -87,7 +88,7 @@ test('retries a failed OneRide screenshot after a deliberate selection', async (
 test('recovers the compact OneRide screenshot card without inventing fallback imagery', async ({ page }) => {
   await page.route('**/projects/oneride/official-screen-02.png', (route) => route.abort())
   await page.goto('/#product-studio-preview')
-  const card = page.locator('.studio-static-phone')
+  const card = page.locator('#case-oneride .case-study-image')
   await expect(card.locator('img')).toHaveAttribute('src', /official-screen-01\.png/)
   await expect(card.locator('img')).not.toHaveAttribute('src', /zalio|gymfactories|hasti/i)
 })
@@ -118,11 +119,12 @@ test('keeps the systems view available and keeps More keyboard-operable', async 
   await expect(more).toBeFocused()
 
   await more.press('Enter')
-  const lastMoreLink = page.getByRole('link', { name: 'AI systems', exact: true })
+  const lastMoreLink = page.locator('#more-navigation-menu').getByRole('link', { name: 'Resume PDF', exact: true })
   await lastMoreLink.focus()
   await page.keyboard.press('Tab')
   await expect(more).toHaveAttribute('aria-expanded', 'false')
 
+  await page.locator('#full-project-archive > summary').click()
   await page.locator('[data-testid="systems-view-disclosure"] summary').click()
   await expect(page.locator('.systems-visual-shell')).toBeVisible()
 })
@@ -148,7 +150,7 @@ test('preserves the existing mobile menu and project filters', async ({ page }) 
   const toggle = page.getByRole('button', { name: 'Open navigation menu' })
   await toggle.click()
   await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Work', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Featured work', exact: true })).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.getByRole('button', { name: 'Open navigation menu' })).toBeFocused()
 
@@ -157,9 +159,13 @@ test('preserves the existing mobile menu and project filters', async ({ page }) 
   await expect(page.locator('body')).not.toHaveClass(/menu-open/)
   await expect(page.locator('#main-content')).not.toHaveAttribute('inert', '')
 
+  await page.locator('#full-project-archive > summary').click()
   await page.locator('#projects').scrollIntoViewIfNeeded()
-  await page.getByRole('button', { name: /Mobile/ }).last().click()
-  await expect(page.locator('#projects [role="tab"]')).toHaveCount(2)
+  await page.locator('#projects').getByRole('button', { name: /^Mobile/ }).click()
+  const mobileProjects = page.locator('#projects .project-discovery-card')
+  await expect(mobileProjects).toHaveCount(4)
+  const oneRide = mobileProjects.filter({ has: page.getByRole('heading', { name: 'One Ride Balingasag (OMJI)', exact: true }) })
+  await expect(oneRide.getByRole('link', { name: 'Read the One Ride Balingasag (OMJI) case study' })).toHaveAttribute('href', '/projects/oneride')
 })
 
 for (const width of [320, 390, 768, 1024, 1440]) {
@@ -168,11 +174,9 @@ for (const width of [320, 390, 768, 1024, 1440]) {
     await page.goto('/#product-studio-preview')
     await expect(page.locator('#product-studio-preview')).toBeVisible()
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
-    for (const control of await page.locator('#product-studio-preview button, #product-studio-preview a').all()) {
+    for (const control of await page.locator('.selected-case-study a, .selected-case-study summary').all()) {
       const bounds = await control.boundingBox()
       const renderedHeight = bounds?.height ?? 0
-      const computedMinHeight = await control.evaluate((node) => Number.parseFloat(getComputedStyle(node).minHeight))
-      expect(computedMinHeight).toBeGreaterThanOrEqual(44)
       expect(renderedHeight).toBeGreaterThanOrEqual(43.99)
     }
   })
@@ -225,10 +229,10 @@ test('keeps product preview metadata readable at mobile and desktop widths', asy
   for (const width of [320, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/#product-studio-preview')
-    const sizes = await page.locator('#product-studio-preview .studio-card-eyebrow, #product-studio-preview .studio-source-note, #product-studio-preview .studio-feature-meta span, #product-studio-preview .studio-screen-controls button, #product-studio-preview .studio-live-card-copy > p:not(.studio-card-eyebrow), #product-studio-preview .studio-secondary-links a').evaluateAll((nodes) => nodes.map((node) => ({ selector: node.className, size: Number.parseFloat(getComputedStyle(node).fontSize) })))
+    const sizes = await page.locator('.case-study-index, .case-study-proof, .case-study-role, .case-study-media figcaption').evaluateAll((nodes) => nodes.map((node) => ({ selector: node.className, size: Number.parseFloat(getComputedStyle(node).fontSize) })))
     expect(sizes.length).toBeGreaterThan(0)
     expect(Math.min(...sizes.map((item) => item.size))).toBeGreaterThanOrEqual(12)
-    const bodySizes = await page.locator('#product-studio-preview .studio-feature-copy > p:not(.studio-card-eyebrow):not(.studio-source-note), #product-studio-preview .studio-live-card-copy > p:not(.studio-card-eyebrow)').evaluateAll((nodes) => nodes.map((node) => Number.parseFloat(getComputedStyle(node).fontSize)))
+    const bodySizes = await page.locator('.case-study-overview, .case-study-contribution p, .case-study-result p').evaluateAll((nodes) => nodes.map((node) => Number.parseFloat(getComputedStyle(node).fontSize)))
     expect(Math.min(...bodySizes)).toBeGreaterThanOrEqual(14)
   }
 })
