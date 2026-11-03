@@ -45,6 +45,23 @@ if (resolvedUrl && resolvedKey) {
 export const supabase = client
 export const isSupabaseConfigured = Boolean(client)
 
+// Set after the first network-level failure (DNS, offline, blocked host). The
+// remote board is then treated as down for the rest of the session, so every
+// leaderboard tab and score submission stops firing a request that cannot
+// succeed. A reload tries again.
+let remoteUnavailable = false
+
+/** True when the remote board is configured and has not failed this session. */
+export function isRemoteLeaderboardAvailable() {
+  return isSupabaseConfigured && !remoteUnavailable
+}
+
+// supabase-js reports a failed fetch as an error result with status 0, as
+// opposed to a reachable server answering with an error (RLS, bad query).
+function noteNetworkFailure(status) {
+  if (status === 0) remoteUnavailable = true
+}
+
 const LEADERBOARD_TABLE = 'leaderboard'
 const SAVES_TABLE = 'game_saves'
 
@@ -81,10 +98,13 @@ export async function submitScore({ player_name, score, boss_defeated, time_seco
     game,
   }
 
-  if (isSupabaseConfigured) {
+  if (isRemoteLeaderboardAvailable()) {
     try {
-      const { error } = await supabase.from(LEADERBOARD_TABLE).insert(entry)
-      if (error) throw error
+      const { error, status } = await supabase.from(LEADERBOARD_TABLE).insert(entry)
+      if (error) {
+        noteNetworkFailure(status)
+        throw error
+      }
       return { ok: true, source: 'supabase' }
     } catch (err) {
       console.warn('[supabase] submitScore failed, using local fallback:', err?.message)
@@ -104,16 +124,22 @@ export async function submitScore({ player_name, score, boss_defeated, time_seco
  * Always resolves with an array.
  */
 export async function fetchLeaderboard(limit = 10, game = null) {
-  if (isSupabaseConfigured) {
+  if (isRemoteLeaderboardAvailable()) {
     try {
       let query = supabase
         .from(LEADERBOARD_TABLE)
         .select('id, player_name, score, boss_defeated, time_seconds, created_at, game')
         .order('score', { ascending: false })
         .limit(limit)
+        // supabase-js retries failed GETs three times by default; the session
+        // flag below already stops repeat attempts, so one failure = one request.
+        .retry(false)
       if (game) query = query.eq('game', game)
-      const { data, error } = await query
-      if (error) throw error
+      const { data, error, status } = await query
+      if (error) {
+        noteNetworkFailure(status)
+        throw error
+      }
       if (data) return data
     } catch (err) {
       console.warn('[supabase] fetchLeaderboard failed, using local fallback:', err?.message)
@@ -131,12 +157,15 @@ export async function fetchLeaderboard(limit = 10, game = null) {
  * in gameStorage.js. Never throws.
  */
 export async function saveGameCloud(player_name, save_data) {
-  if (!isSupabaseConfigured) return { ok: false, source: 'none' }
+  if (!isRemoteLeaderboardAvailable()) return { ok: false, source: 'none' }
   try {
-    const { error } = await supabase
+    const { error, status } = await supabase
       .from(SAVES_TABLE)
       .insert({ player_name: player_name || 'Anonymous', save_data, updated_at: new Date().toISOString() })
-    if (error) throw error
+    if (error) {
+      noteNetworkFailure(status)
+      throw error
+    }
     return { ok: true, source: 'supabase' }
   } catch (err) {
     console.warn('[supabase] saveGameCloud failed:', err?.message)

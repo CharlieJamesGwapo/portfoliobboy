@@ -350,19 +350,24 @@ export default function BlockBlast({ onExit, onContact, onOpenSettings, paused }
       if (!tray[trayIdx]) return
       ensureAudio()
       setSelected(trayIdx)
-      dragRef.current = { trayIdx, moved: false }
+      // wasSelected lets pointerup turn a tap on the already-selected piece into
+      // a deselect; deciding it here avoids a separate click handler undoing the
+      // selection pointerdown just made.
+      dragRef.current = { trayIdx, moved: false, wasSelected: selected === trayIdx, x: e.clientX, y: e.clientY }
       setDragGhost({ trayIdx, x: e.clientX, y: e.clientY })
       try {
         e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId)
       } catch (err) {}
     },
-    [tray, paused, gameOver, ensureAudio]
+    [tray, selected, paused, gameOver, ensureAudio]
   )
 
   const onPiecePointerMove = useCallback(
     (e) => {
-      if (!dragRef.current) return
-      dragRef.current.moved = true
+      const d = dragRef.current
+      if (!d) return
+      // A few px of finger jitter is still a tap.
+      if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6) d.moved = true
       setDragGhost((g) => (g ? { ...g, x: e.clientX, y: e.clientY } : g))
       const cell = cellFromPoint(e.clientX, e.clientY)
       setHover(cell)
@@ -380,7 +385,9 @@ export default function BlockBlast({ onExit, onContact, onOpenSettings, paused }
       if (d.moved && cell) {
         placePiece(d.trayIdx, cell.r, cell.c)
       }
-      // if not moved, it's a tap-select (selected already set) — keep selection
+      // Not moved: a tap. pointerdown already selected the piece; tapping the
+      // selected one again deselects it.
+      if (!d.moved && d.wasSelected) setSelected(null)
     },
     [cellFromPoint, placePiece]
   )
@@ -548,11 +555,6 @@ export default function BlockBlast({ onExit, onContact, onOpenSettings, paused }
               onPointerDown={(e) => onPiecePointerDown(e, idx)}
               onPointerMove={onPiecePointerMove}
               onPointerUp={onPiecePointerUp}
-              onClick={() => {
-                if (paused || gameOver || !piece) return
-                ensureAudio()
-                setSelected((s) => (s === idx ? null : idx))
-              }}
             />
           ))}
         </div>
@@ -745,13 +747,12 @@ function MiniShape({ piece, cellSize = 22 }) {
   )
 }
 
-function TrayPiece({ piece, selected, onPointerDown, onPointerMove, onPointerUp, onClick }) {
+function TrayPiece({ piece, selected, onPointerDown, onPointerMove, onPointerUp }) {
   return (
     <div
       onPointerDown={piece ? onPointerDown : undefined}
       onPointerMove={piece ? onPointerMove : undefined}
       onPointerUp={piece ? onPointerUp : undefined}
-      onClick={onClick}
       className={`flex items-center justify-center rounded-xl p-2 transition-all ${
         piece ? 'cursor-grab active:cursor-grabbing' : 'opacity-20'
       } ${selected ? 'bg-cyan-400/20 ring-2 ring-cyan-400 scale-105' : 'bg-white/5'}`}

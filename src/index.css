@@ -1771,6 +1771,18 @@ img {
 .form-status.error { color: #a3392e; }
 .form-status.success { color: var(--mint-deep); }
 
+.form-fallback {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .spin {
   animation: spin 850ms linear infinite;
 }
@@ -3317,6 +3329,13 @@ img {
   flex-wrap: wrap;
   gap: 8px;
   margin: -34px 0 32px;
+}
+
+.project-filter-note {
+  margin: 0 0 8px;
+  color: var(--slate);
+  font-size: 0.78rem;
+  line-height: 1.65;
 }
 
 .project-filters button {
