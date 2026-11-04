@@ -1,15 +1,16 @@
 import { useState } from 'react'
-import { Award, BadgeCheck, ChevronDown, Eye, GraduationCap } from 'lucide-react'
+import { Award, BadgeCheck, ChevronDown, Eye, GraduationCap, Search } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
 import { certifications, education, recognitions } from '../data/portfolioData'
+import { credentialCategories, filterCredentials, isAiCredential } from '../lib/credentialFilter'
 import './education.css'
 
 // Keep long credential lists compact until the visitor expands them.
 const MOBILE_VISIBLE_RECORDS = 4
 
-const aiCredentials = certifications.filter((credential) => credential.issuer === 'Anthropic')
-const technicalCredentials = certifications.filter((credential) => credential.issuer !== 'Anthropic')
+const aiTotal = certifications.filter(isAiCredential).length
+const technicalTotal = certifications.length - aiTotal
 const certificateImages = certifications.filter((credential) => credential.image)
 
 function CredentialRecord({ credential, extra = false }) {
@@ -32,10 +33,11 @@ function CredentialRecord({ credential, extra = false }) {
   )
 }
 
-function CredentialPanel({ id, icon: Icon, eyebrow, title, credentials, getKey, delay, variant }) {
+function CredentialPanel({ id, icon: Icon, eyebrow, title, credentials, getKey, delay, variant, filtering }) {
   const [showAll, setShowAll] = useState(false)
   const listId = `credential-records-${id}`
-  const extraCount = Math.max(0, credentials.length - MOBILE_VISIBLE_RECORDS)
+  // While a search or category is active, show every match instead of collapsing.
+  const extraCount = filtering ? 0 : Math.max(0, credentials.length - MOBILE_VISIBLE_RECORDS)
 
   return (
     <ScrollReveal delay={delay} variant={variant}>
@@ -73,7 +75,54 @@ function CredentialPanel({ id, icon: Icon, eyebrow, title, credentials, getKey, 
   )
 }
 
-const Education = () => (
+function CredentialToolbar({ query, category, onQueryChange, onCategoryChange, matchCount }) {
+  return (
+    <div className="credential-toolbar" role="search" aria-label="Filter credentials">
+      <label className="credential-search">
+        <Search size={17} aria-hidden="true" />
+        <span className="sr-only">Search credentials</span>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => onQueryChange(event.target.value)}
+          placeholder="Search by title, issuer or credential ID"
+          autoComplete="off"
+          spellCheck="false"
+        />
+      </label>
+      <div className="credential-filters" role="group" aria-label="Credential category">
+        {credentialCategories.map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={category === id}
+            onClick={() => onCategoryChange(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <p className="credential-result-count" aria-live="polite">
+        Showing {matchCount} of {certifications.length} records
+      </p>
+    </div>
+  )
+}
+
+const Education = () => {
+  const [query, setQuery] = useState('')
+  const [category, setCategory] = useState('all')
+  const filtering = query.trim() !== '' || category !== 'all'
+  const matches = filterCredentials(certifications, { query, category })
+  const aiMatches = matches.filter(isAiCredential)
+  const technicalMatches = matches.filter((credential) => !isAiCredential(credential))
+  const countLabel = (count, total) => (filtering ? `${count} of ${total}` : `${total}`)
+  const clearFilters = () => {
+    setQuery('')
+    setCategory('all')
+  }
+
+  return (
   <section id="education" className="section section-light credentials-section">
     <div className="page-container">
       <ScrollReveal variant="left">
@@ -159,29 +208,51 @@ const Education = () => (
         ))}
       </div>
 
-      <div className="credential-columns">
-        <CredentialPanel
-          id="ai"
-          icon={Award}
-          eyebrow="AI & Anthropic"
-          title={`${aiCredentials.length} learning records`}
-          credentials={aiCredentials}
-          getKey={(credential) => `${credential.title}-${credential.credentialId || credential.issuer}`}
-          variant="left"
-        />
-        <CredentialPanel
-          id="technical"
-          icon={BadgeCheck}
-          eyebrow="Technical & professional"
-          title={`${technicalCredentials.length} certifications and training records`}
-          credentials={technicalCredentials}
-          getKey={(credential) => `${credential.title}-${credential.issuer}`}
-          delay={80}
-          variant="right"
-        />
-      </div>
+      <CredentialToolbar
+        query={query}
+        category={category}
+        onQueryChange={setQuery}
+        onCategoryChange={setCategory}
+        matchCount={matches.length}
+      />
+
+      {matches.length === 0 ? (
+        <div className="credential-empty">
+          <p>No credentials match{query.trim() ? ` "${query.trim()}"` : ''} in this category.</p>
+          <button type="button" className="credential-more" onClick={clearFilters}>Clear filters</button>
+        </div>
+      ) : (
+        <div className={`credential-columns ${aiMatches.length && technicalMatches.length ? '' : 'is-single'}`.trim()}>
+          {aiMatches.length > 0 && (
+            <CredentialPanel
+              id="ai"
+              icon={Award}
+              eyebrow="AI & Anthropic"
+              title={`${countLabel(aiMatches.length, aiTotal)} learning records`}
+              credentials={aiMatches}
+              getKey={(credential) => `${credential.title}-${credential.credentialId || credential.issuer}`}
+              variant="left"
+              filtering={filtering}
+            />
+          )}
+          {technicalMatches.length > 0 && (
+            <CredentialPanel
+              id="technical"
+              icon={BadgeCheck}
+              eyebrow="Technical & professional"
+              title={`${countLabel(technicalMatches.length, technicalTotal)} certifications and training records`}
+              credentials={technicalMatches}
+              getKey={(credential) => `${credential.title}-${credential.issuer}`}
+              delay={80}
+              variant="right"
+              filtering={filtering}
+            />
+          )}
+        </div>
+      )}
     </div>
   </section>
-)
+  )
+}
 
 export default Education
