@@ -1,0 +1,159 @@
+/* ==========================================================================
+   Alex — floating portfolio assistant. Bottom-left, so it never shares the
+   bottom-right corner with Music and back-to-top. Uses the site tokens.
+   ========================================================================== */
+.alex-root {
+  --alex-surface: rgba(9, 33, 36, 0.96);
+  --alex-line: rgba(255, 255, 255, 0.1);
+  --alex-muted: #a3b6b3;
+  --alex-gap: calc(24px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Launcher ---------- */
+.alex-launcher {
+  position: fixed;
+  left: calc(24px + env(safe-area-inset-left));
+  bottom: var(--alex-gap);
+  z-index: 84;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 5px 18px 5px 5px;
+  border: 1px solid rgba(103, 224, 193, 0.32);
+  border-radius: 999px;
+  background: var(--alex-surface);
+  color: var(--paper);
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: transform 180ms var(--ease-out), border-color 180ms, opacity 200ms, visibility 0s;
+  animation: alex-rise 420ms var(--ease-out) both;
+}
+.alex-launcher:hover { transform: translateY(-2px); border-color: rgba(103, 224, 193, 0.55); }
+.alex-launcher:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
+.alex-launcher-orb { position: relative; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(145deg, #8cf0d6, var(--mint)); color: var(--ink); }
+.alex-launcher-orb::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid rgba(103, 224, 193, 0.45); animation: alex-halo 3.2s var(--ease-smooth) infinite; }
+
+/* ---------- Greeting bubble ---------- */
+.alex-greeting {
+  position: fixed;
+  left: calc(24px + env(safe-area-inset-left));
+  bottom: calc(var(--alex-gap) + 64px);
+  z-index: 85;
+  width: min(320px, calc(100vw - 48px));
+  animation: alex-rise 420ms var(--ease-out) both;
+}
+.alex-greeting-body { display: block; width: 100%; padding: 14px 40px 14px 16px; border: 1px solid rgba(103, 224, 193, 0.3); border-radius: 18px 18px 18px 6px; background: var(--alex-surface); color: var(--paper); font: inherit; font-size: 0.86rem; line-height: 1.55; text-align: left; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38); cursor: pointer; backdrop-filter: blur(10px); }
+.alex-greeting-body:hover { border-color: rgba(103, 224, 193, 0.55); }
+.alex-greeting-body:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.alex-greeting-name { display: block; margin-bottom: 4px; color: var(--mint); font-size: 0.7rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
+.alex-greeting-close { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: var(--alex-muted); cursor: pointer; }
+.alex-greeting-close:hover { background: rgba(255, 255, 255, 0.08); color: var(--paper); }
+.alex-greeting-close:focus-visible { outline: 2px solid var(--mint); }
+
+/* ---------- Panel ---------- */
+.alex-panel {
+  position: fixed;
+  left: calc(24px + env(safe-area-inset-left));
+  bottom: var(--alex-gap);
+  z-index: 95; /* under the navbar (100), palette and menus */
+  display: flex;
+  flex-direction: column;
+  width: min(390px, calc(100vw - 48px));
+  height: min(600px, calc(100dvh - var(--nav-height, 80px) - 48px));
+  overflow: hidden;
+  border: 1px solid var(--alex-line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(14, 44, 46, 0.98), rgba(8, 30, 31, 0.98));
+  color: var(--paper);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  animation: alex-rise 320ms var(--ease-out) both;
+}
+.alex-panel-loading { display: grid; place-items: center; color: var(--alex-muted); font-size: 0.85rem; }
+
+.alex-head { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px 16px; border-bottom: 1px solid var(--alex-line); }
+.alex-avatar { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(145deg, #8cf0d6, var(--mint)); color: var(--ink); box-shadow: 0 6px 18px rgba(103, 224, 193, 0.25); }
+.alex-head-copy { flex: 1; min-width: 0; }
+.alex-head h2 { color: var(--paper); font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; }
+.alex-head p { display: flex; align-items: center; gap: 6px; margin-top: 1px; color: var(--alex-muted); font-size: 0.74rem; }
+.alex-online { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); }
+.alex-icon-button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--alex-muted); cursor: pointer; }
+.alex-icon-button:hover { background: rgba(255, 255, 255, 0.08); color: var(--paper); }
+.alex-icon-button:focus-visible { outline: 2px solid var(--mint); }
+
+.alex-voice { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--alex-line); }
+.alex-voice-button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 14px; border: 1px solid rgba(103, 224, 193, 0.35); border-radius: 999px; background: rgba(103, 224, 193, 0.1); color: var(--mint); font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+.alex-voice-button:disabled { border-color: var(--alex-line); background: transparent; color: var(--alex-muted); cursor: not-allowed; }
+.alex-voice-button:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.alex-soon { color: var(--alex-muted); font-size: 0.72rem; }
+
+.alex-messages { flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 16px; overflow-y: auto; list-style: none; overscroll-behavior: contain; }
+.alex-msg { max-width: 88%; animation: alex-pop 240ms var(--ease-out) both; }
+.alex-msg p { padding: 10px 14px; font-size: 0.86rem; line-height: 1.55; }
+.alex-msg-alex { align-self: flex-start; }
+.alex-msg-alex p { border-radius: 16px 16px 16px 4px; background: rgba(255, 255, 255, 0.07); color: var(--paper); }
+.alex-msg-visitor { align-self: flex-end; }
+.alex-msg-visitor p { border-radius: 16px 16px 4px 16px; background: linear-gradient(135deg, #8cf0d6, var(--mint)); color: var(--ink); font-weight: 550; }
+.alex-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.alex-actions a { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 12px; border: 1px solid rgba(103, 224, 193, 0.35); border-radius: 999px; color: var(--mint); font-size: 0.76rem; font-weight: 650; transition: background 150ms; }
+.alex-actions a:hover { background: rgba(103, 224, 193, 0.1); }
+.alex-actions a:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.alex-typing { display: flex; gap: 4px; padding: 14px 16px; border-radius: 16px 16px 16px 4px; background: rgba(255, 255, 255, 0.07); }
+.alex-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--alex-muted); animation: alex-dot 1s var(--ease-smooth) infinite; }
+.alex-typing span:nth-child(2) { animation-delay: 0.15s; }
+.alex-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+.alex-suggestions { display: flex; gap: 6px; padding: 0 16px 10px; overflow-x: auto; scrollbar-width: none; }
+.alex-suggestions::-webkit-scrollbar { display: none; }
+.alex-suggestions button { display: inline-flex; flex-shrink: 0; align-items: center; gap: 5px; min-height: 34px; padding: 0 12px; border: 1px solid var(--alex-line); border-radius: 999px; background: rgba(255, 255, 255, 0.04); color: var(--paper); font: inherit; font-size: 0.76rem; cursor: pointer; transition: border-color 150ms, background 150ms; }
+.alex-suggestions button svg { color: var(--mint); }
+.alex-suggestions button:hover { border-color: rgba(103, 224, 193, 0.4); background: rgba(103, 224, 193, 0.08); }
+.alex-suggestions button:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.alex-suggestions button:disabled { opacity: 0.5; cursor: default; }
+
+.alex-input { display: flex; gap: 8px; padding: 10px 12px 6px 16px; border-top: 1px solid var(--alex-line); }
+.alex-input input { flex: 1; min-width: 0; min-height: 44px; padding: 0 14px; border: 1px solid var(--alex-line); border-radius: 999px; background: rgba(255, 255, 255, 0.05); color: var(--paper); font: inherit; font-size: 16px; /* 16px stops iOS zooming on focus */ }
+.alex-input input::placeholder { color: var(--alex-muted); font-size: 0.86rem; }
+.alex-input input:focus { outline: none; border-color: rgba(103, 224, 193, 0.55); }
+.alex-send { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--mint); color: var(--ink); cursor: pointer; }
+.alex-send:disabled { background: rgba(255, 255, 255, 0.1); color: var(--alex-muted); cursor: default; }
+.alex-send:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+.alex-note { padding: 0 16px 12px; color: var(--alex-muted); font-size: 0.68rem; }
+
+/* ---------- Never overlap other controls ---------- */
+/* The Voice Studio has its own player; a game takes the whole screen. */
+body.voice-studio-in-view .alex-launcher,
+body.voice-studio-in-view .alex-greeting,
+body.game-open .alex-root { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 200ms, visibility 0s 200ms; }
+/* While Alex is open on a phone, the bottom-right floaters step aside. */
+@media (max-width: 640px) {
+  body.assistant-open .music-launcher,
+  body.assistant-open .back-to-top { opacity: 0 !important; visibility: hidden; pointer-events: none; }
+}
+
+@keyframes alex-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes alex-pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes alex-halo { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.35); opacity: 0; } }
+@keyframes alex-dot { 0%, 100% { opacity: 0.35; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  .alex-root { --alex-gap: calc(16px + env(safe-area-inset-bottom)); }
+  .alex-launcher { left: calc(16px + env(safe-area-inset-left)); min-height: 52px; padding: 5px; }
+  .alex-launcher-label { display: none; }
+  .alex-greeting { left: calc(16px + env(safe-area-inset-left)); bottom: calc(var(--alex-gap) + 62px); width: calc(100vw - 32px); }
+  /* The open music player is a full-width bar along the bottom: sit above it. */
+  body.music-open .alex-launcher { bottom: calc(72px + env(safe-area-inset-bottom)); }
+  body.music-open .alex-greeting { bottom: calc(134px + env(safe-area-inset-bottom)); }
+  .alex-panel { left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); width: auto; height: calc(100dvh - var(--nav-height, 70px) - 20px); border-radius: 20px; }
+  .alex-msg { max-width: 92%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alex-launcher, .alex-greeting, .alex-panel, .alex-msg { animation: none; }
+  .alex-launcher-orb::after, .alex-typing span { animation: none; }
+  .alex-launcher { transition: none; }
+}

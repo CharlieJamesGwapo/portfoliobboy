@@ -6,6 +6,7 @@ import { usePortfolioRoute } from './lib/portfolioRoute'
 import { updateRouteMetadata } from './lib/routeMetadata'
 import CommandPalette from './components/CommandPalette'
 import UpdateBanner from './components/UpdateBanner'
+import PortfolioAssistant from './components/assistant/PortfolioAssistant'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import ProductStudioPreview from './components/ProductStudioPreview'
@@ -258,6 +259,7 @@ function App() {
 
       <CommandPalette open={paletteOpen} onClose={closePalette} />
       <UpdateBanner />
+      <PortfolioAssistant />
 
       <button
         type="button"

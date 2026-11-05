@@ -93,15 +93,19 @@ Do not send test contact submissions during QA.
 
 Five authentic Anthropic certificate images are included and shown in the credentials gallery. Official OneRide app screenshots and public Momentum product previews are included. Other project case studies still need authentic screenshots, images for the remaining text-only credentials, individual repository URLs for private or unlinked work, or real dungeon audio. The UI reports unavailable media honestly and does not substitute stock images, dummy credentials, or fabricated links.
 
-## Voice samples
+## Bboy AI Voice Studio
 
-The player offers two complete fictional studio enquiries: US English (about 79 seconds) and Australian English (about 95 seconds). Each has 16 turns with consistent receptionist and customer voices. The caller asks about joining and beginner guidance, negotiates an after-work tour, gives a name, agrees to a confirmation text, asks what to bring, and receives a clear recap. No real appointment is made.
+The voice section follows the hero and has a primary navigation link. It offers eight pre-recorded accent previews: American, British, Australian, Filipino, Canadian, Irish, Indian, and South African English. Each is a short (about 20–30 seconds) fictional business conversation between a visitor and an AI assistant, generated with ElevenLabs (Eleven v4, multi-speaker Text to Speech) under the Starter plan's commercial license. Voices, scripts, credit usage, and Voice Library notes are recorded in `docs/voice-gallery-plan.md`.
 
-The recordings use Microsoft neural voices through the generation-only [edge-tts client](https://github.com/rany2/edge-tts): Emma and Andrew for US English, William Multilingual and Natasha for Australian English. The voices use their native regional presets and unmodified speaking tempo and pitch. Only leading/trailing padding, short turn-taking gaps, fades at joins, and gentle speaker volume balancing are applied. No cloned voices, laugh effects, added breaths, music, or telephone filters are used.
+The recordings are `src/assets/audio/accents/*.mp3` (44.1 kHz mono, 128 kbps) and are emitted with content hashes, so replaying them makes no provider request and spends no credits. Transcripts and descriptions live in `src/data/voiceAccents.js`. Waveforms are measured from the audio by `node scripts/build-voice-peaks.mjs` (requires ffmpeg) into `src/data/voicePeaks.json`; re-run it whenever a recording changes.
 
-The selected files are `src/assets/audio/voice-us-professional-v7.m4a` and `src/assets/audio/voice-au-professional-v7.m4a`, exported as mono AAC at 96 kbps. Voice identifiers, processing details, durations, and checksums are in `public/audio/README.txt`. Scripts and accent tags are in `src/data/voiceSamples.js`. Visitors load local, content-hashed files; there is no runtime speech API, account, provider request, or model download. Temporary generation tooling and intermediates are removed after verification.
+The custom player uses the `<audio>` element as its source of truth: play/pause with a progress ring, a seekable waveform, volume and mute, and loading, finished, and error states. Switching accents stops and resets playback. Transcripts are static because no word-level timestamps exist. Everything is labelled as sample conversations performed by AI voices; none are real customer calls.
 
-The compact voice section follows the hero and has a primary navigation link. The real call trace is inside an “Explore the voice engineering” disclosure. Vite emits content-hashed audio URLs so previously failed cached URLs are bypassed. A failed recording offers Retry audio and a direct audio link. Native controls use `preload="metadata"` and never autoplay. Switching accents stops the previous sample and updates the transcript. All voices are synthetic, not human recordings, real client calls, or Alex recordings. Vocal naturalness requires listening feedback; browser checks verify playback and interactions. For authentic Alex audio, replace the files with approved, redacted recordings and update the transcripts and disclosure together.
+"Talk to My AI" stays disabled until a real ElevenLabs agent exists with server-side usage limits and `VITE_ELEVENLABS_AGENT_ID` is set. Production also needs `microphone=(self)` in the `Permissions-Policy` header in `vercel.json`. Until then the section links to Alex, the live voice agent on hasti.com.au.
+
+## Alex, the portfolio assistant
+
+A floating assistant in the bottom-left corner greets first-time visitors once (remembered in `localStorage`), never plays audio, and never asks for the microphone. Its chat panel answers from `src/data/portfolioData.js` through a local answer engine in `src/lib/assistantAnswers.js`: no model, no network request, and no credits. Unknown questions get an honest fallback that points to contact. The panel is lazy-loaded, sits below the navbar, and hides inside the Voice Studio and during games. "Talk to Alex" (voice) stays disabled until the live agent above is configured.
 
 ## Verification
 
@@ -112,4 +116,4 @@ Run `npm test`, `npx playwright test --project=chromium`, and `npm run test:prod
 - Add approved screenshots for the remaining case studies.
 - The authenticated Momentum review found 34 private repositories. Members, Campaigns, and Drive are candidates for deeper case studies beyond their current group-level mentions; confirm personal contribution and public-safe screenshots before expanding the published copy. Some other repositories still have starter-template READMEs, so repository existence alone should not be presented as a delivered product.
 - Add measured outcomes with supporting evidence and client-approved testimonials.
-- Replace illustrative voice scripts with an approved Alex recording when available.
+- Configure and test a live ElevenLabs agent with server-side usage limits before enabling "Talk to My AI" and "Talk to Alex".

@@ -98,7 +98,7 @@ const VoiceAgentDemo = () => {
                 </button>
                 <a className="button button-primary" href={demoUrl} target="_blank" rel="noreferrer">
                   <PhoneCall size={17} aria-hidden="true" />
-                  {demo?.label ?? 'Talk to Alex'}
+                  Talk to Alex on Hasti
                   <ArrowUpRight size={16} aria-hidden="true" />
                   <span className="sr-only"> (opens in a new tab)</span>
                 </a>
