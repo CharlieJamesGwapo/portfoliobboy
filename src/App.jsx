@@ -12,6 +12,7 @@ import ProductStudioPreview from './components/ProductStudioPreview'
 import About from './components/About'
 import Experience from './components/Experience'
 import AISystems from './components/AISystems'
+import Automations from './components/Automations'
 import VoiceAgentDemo from './components/VoiceAgentDemo'
 import Skills from './components/Skills'
 import Education from './components/Education'
@@ -240,6 +241,7 @@ function App() {
         <About />
         <Experience />
         <AISystems />
+        <Automations />
         <Skills />
         <Education />
         <LabPreview />

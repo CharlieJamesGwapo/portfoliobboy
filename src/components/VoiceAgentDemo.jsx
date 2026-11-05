@@ -1,6 +1,7 @@
 import { ArrowUpRight, PhoneCall } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import VoiceSamplePlayer from './VoiceSamplePlayer'
+import LiveAgentPanel from './LiveAgentPanel'
 import { liveLinks, voiceCallFlow } from '../data/portfolioData'
 import './voice-demo.css'
 
@@ -49,6 +50,8 @@ const VoiceAgentDemo = () => {
             </div>
           </div>
         </ScrollReveal>
+
+        <ScrollReveal><LiveAgentPanel /></ScrollReveal>
 
         <ScrollReveal><VoiceSamplePlayer /></ScrollReveal>
 

@@ -16,6 +16,7 @@
     "test:production": "npm run build && playwright test --config=playwright.production.config.js"
   },
   "dependencies": {
+    "@elevenlabs/react": "1.19.0",
     "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.108.2",
     "howler": "^2.2.4",

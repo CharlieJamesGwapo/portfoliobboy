@@ -191,3 +191,25 @@
   .voice-sample-options button { padding: 10px; gap: 7px; font-size: .78rem; }
   .voice-sample-body { gap: 12px; }
 }
+
+/* ElevenLabs live agent panel (renders only when VITE_ELEVENLABS_AGENT_ID is set). */
+.live-agent { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(20px, 4vw, 48px); align-items: center; margin-bottom: 24px; padding: clamp(22px, 3vw, 32px); border: 1px solid rgba(103, 224, 193, .35); border-radius: 18px; background: linear-gradient(135deg, rgba(103, 224, 193, .08), rgba(255, 156, 119, .05)); }
+.live-agent-kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--mint); font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.live-agent-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px rgba(103, 224, 193, .18); }
+.live-agent-copy h3 { margin: 10px 0 8px; font-size: clamp(1.3rem, 2.2vw, 1.7rem); letter-spacing: -.035em; line-height: 1.2; color: var(--paper); }
+.live-agent-copy > p:last-child { color: var(--mist); font-size: .85rem; line-height: 1.7; }
+.live-agent-action { display: grid; gap: 12px; justify-items: start; }
+.live-agent-disclosure { color: var(--mist); font-size: .68rem; line-height: 1.5; }
+.live-agent-session { display: grid; gap: 12px; justify-items: start; width: 100%; }
+.live-agent-status { display: inline-flex; align-items: center; gap: 8px; color: var(--paper); font-size: .85rem; font-weight: 650; }
+.live-agent-error { color: var(--coral); font-size: .75rem; line-height: 1.5; }
+.live-agent-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+.live-agent-orb { display: flex; gap: 6px; align-items: center; height: 28px; }
+.live-agent-orb span { width: 6px; height: 8px; border-radius: 3px; background: var(--mist); transition: background 200ms; }
+.live-agent-orb.is-live span { background: var(--mint); }
+.live-agent-orb.is-speaking span { animation: live-agent-bars 900ms var(--ease-smooth) infinite; }
+.live-agent-orb.is-speaking span:nth-child(2) { animation-delay: 150ms; }
+.live-agent-orb.is-speaking span:nth-child(3) { animation-delay: 300ms; }
+@keyframes live-agent-bars { 0%, 100% { height: 8px; } 50% { height: 26px; } }
+@media (prefers-reduced-motion: reduce) { .live-agent-orb.is-speaking span { animation: none; height: 18px; } }
+@media (max-width: 760px) { .live-agent { grid-template-columns: 1fr; } }
