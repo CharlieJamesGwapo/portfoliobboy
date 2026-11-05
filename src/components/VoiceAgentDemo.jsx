@@ -1,7 +1,8 @@
-import { ArrowUpRight, PhoneCall } from 'lucide-react'
+import { ArrowUpRight, AudioLines, Heart, Mic, PhoneCall, Zap } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
-import VoiceSamplePlayer from './VoiceSamplePlayer'
-import LiveAgentPanel from './LiveAgentPanel'
+import AccentGallery from './voice/AccentGallery'
+import LiveAgentPanel, { hasLiveAgent } from './LiveAgentPanel'
+import './voice/voice-studio.css'
 import { liveLinks, voiceCallFlow } from '../data/portfolioData'
 import './voice-demo.css'
 
@@ -29,31 +30,53 @@ const VoiceAgentDemo = () => {
   const stats = Array.isArray(flow?.stats) ? flow.stats : []
 
   return (
-    <section id="voice-demo" className="section section-dark voice-demo-section" aria-labelledby="voice-demo-title">
+    <section id="voice-demo" className="section voice-demo-section voice-studio" aria-labelledby="voice-demo-title">
       <div className="page-container">
         <ScrollReveal>
-          <div className="voice-demo-intro">
-            <div>
-              <p className="eyebrow">Voice agent demo</p>
-              <h2 id="voice-demo-title">Hear the conversation.</h2>
-            </div>
-            <div className="voice-demo-copy">
-              <p>
-                Hear a complete studio enquiry in US or Australian English, or request a callback from the live Alex agent on Hasti.
+          <div className="voice-studio-intro">
+            <div className="voice-studio-heading">
+              <p className="eyebrow">Bboy AI Voice Studio</p>
+              <h2 id="voice-demo-title">Hear the Conversation.</h2>
+              <p className="voice-studio-subtitle">
+                Experience natural AI conversations in different accents, with expressive voices designed to sound clear, warm, and human.
               </p>
-              <a className="button button-primary" href={demoUrl} target="_blank" rel="noreferrer">
-                <PhoneCall size={17} aria-hidden="true" />
-                {demo?.label ?? 'Talk to Alex'}
-                <ArrowUpRight size={17} aria-hidden="true" />
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
+              <ul className="voice-studio-chips" aria-label="Voice qualities">
+                <li><AudioLines size={15} aria-hidden="true" /> Natural pacing</li>
+                <li><Heart size={15} aria-hidden="true" /> Human-like tone</li>
+                <li><Zap size={15} aria-hidden="true" /> Real-time voice agent</li>
+              </ul>
+            </div>
+
+            <div className="voice-orb" aria-hidden="true">
+              <span className="voice-orb-core"><AudioLines size={46} /></span>
+              <span className="voice-orb-ring" />
+              <span className="voice-orb-ring voice-orb-ring-2" />
+            </div>
+
+            <div className="voice-studio-cta">
+              {hasLiveAgent ? (
+                <>
+                  <p>Talk to my AI assistant live, right here in the browser.</p>
+                  <a className="button button-primary voice-studio-button" href="#live-agent"><Mic size={18} aria-hidden="true" /> Talk to My AI</a>
+                </>
+              ) : (
+                <>
+                  <p>Have a conversation with Alex, a live voice agent I built.</p>
+                  <a className="button button-primary voice-studio-button" href={demoUrl} target="_blank" rel="noreferrer">
+                    <PhoneCall size={18} aria-hidden="true" />
+                    {demo?.label ?? 'Talk to Alex'}
+                    <ArrowUpRight size={17} aria-hidden="true" />
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </ScrollReveal>
 
-        <ScrollReveal><LiveAgentPanel /></ScrollReveal>
+        <ScrollReveal><AccentGallery /></ScrollReveal>
 
-        <ScrollReveal><VoiceSamplePlayer /></ScrollReveal>
+        <ScrollReveal><LiveAgentPanel /></ScrollReveal>
 
         {steps.length > 0 && (
           <ScrollReveal className="vc-reveal" delay={60}>

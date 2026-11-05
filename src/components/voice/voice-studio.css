@@ -1,0 +1,147 @@
+/* Bboy AI Voice Studio: light, mint-and-cream treatment of the voice section. */
+.voice-demo-section.voice-studio {
+  --vs-cream: #fbf8f2;
+  --vs-card: #fffdfa;
+  --vs-mint-soft: #e3f4ee;
+  --vs-mint-line: rgba(15, 128, 109, 0.28);
+  --vs-text: var(--ink);
+  --vs-muted: var(--slate);
+  --vs-shadow: 0 18px 50px rgba(11, 37, 40, 0.08);
+  position: relative;
+  overflow: hidden;
+  color: var(--vs-text);
+  background:
+    radial-gradient(60% 70% at 85% 0%, rgba(103, 224, 193, 0.22), transparent 70%),
+    radial-gradient(45% 60% at 0% 20%, rgba(255, 156, 119, 0.12), transparent 70%),
+    var(--vs-cream);
+}
+.voice-studio .eyebrow { color: var(--mint-deep); }
+
+/* Intro: heading | orb | call to action */
+.voice-studio-intro { display: grid; grid-template-columns: minmax(0, 1.25fr) auto minmax(0, 0.9fr); gap: clamp(24px, 4vw, 56px); align-items: center; margin-bottom: clamp(28px, 4vw, 44px); }
+.voice-studio-heading h2 { margin-top: 12px; font-size: clamp(2.3rem, 5vw, 4rem); font-weight: 700; letter-spacing: -0.055em; line-height: 1.02; color: var(--ink); }
+.voice-studio-subtitle { max-width: 560px; margin-top: 16px; color: var(--vs-muted); font-size: 1rem; line-height: 1.7; }
+.voice-studio-chips { display: inline-flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 20px; padding: 10px 16px; list-style: none; border-radius: 999px; background: rgba(255, 253, 250, 0.75); box-shadow: 0 4px 18px rgba(11, 37, 40, 0.05); font-size: 0.8rem; font-weight: 600; }
+.voice-studio-chips li { display: inline-flex; align-items: center; gap: 7px; }
+.voice-studio-chips svg { color: var(--mint-deep); }
+
+.voice-orb { position: relative; display: grid; place-items: center; width: clamp(140px, 16vw, 200px); aspect-ratio: 1; }
+.voice-orb-core { position: relative; z-index: 2; display: grid; place-items: center; width: 64%; aspect-ratio: 1; border-radius: 50%; color: var(--mint-deep); background: radial-gradient(circle at 35% 30%, #ffffff, var(--vs-mint-soft)); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.85), 0 22px 50px rgba(15, 128, 109, 0.22); }
+.voice-orb-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--vs-mint-line); animation: voice-orb-pulse 3.2s var(--ease-smooth) infinite; }
+.voice-orb-ring-2 { animation-delay: 1.6s; }
+@keyframes voice-orb-pulse { 0% { transform: scale(0.72); opacity: 0.9; } 100% { transform: scale(1.08); opacity: 0; } }
+
+.voice-studio-cta { display: grid; gap: 14px; justify-items: start; }
+.voice-studio-cta > p { color: var(--vs-muted); font-size: 0.95rem; line-height: 1.6; }
+.voice-studio .button.voice-studio-button { min-height: 54px; padding-inline: 26px; background: var(--mint-deep); color: #fff; box-shadow: 0 14px 30px rgba(15, 128, 109, 0.28); }
+.voice-studio .button.voice-studio-button:hover { background: #0b6b5b; color: #fff; }
+
+/* Gallery shell */
+.accent-gallery { padding: clamp(18px, 3vw, 30px); border-radius: 24px; background: rgba(255, 253, 250, 0.82); box-shadow: var(--vs-shadow); border: 1px solid rgba(11, 37, 40, 0.06); backdrop-filter: blur(6px); }
+.accent-gallery-head { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.accent-gallery-icon { display: grid; place-items: center; flex-shrink: 0; width: 56px; height: 56px; border-radius: 16px; background: var(--vs-mint-soft); color: var(--mint-deep); }
+.accent-gallery-head h3 { font-size: clamp(1.25rem, 2.2vw, 1.6rem); letter-spacing: -0.035em; }
+.accent-gallery-head p { margin-top: 3px; color: var(--vs-muted); font-size: 0.88rem; }
+
+.accent-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.accent-card { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 12px 14px; border: 1px solid rgba(11, 37, 40, 0.1); border-radius: 14px; background: var(--vs-card); color: var(--ink); text-align: left; cursor: pointer; transition: border-color 160ms, box-shadow 160ms, transform 160ms; }
+.accent-card:hover { border-color: var(--vs-mint-line); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(11, 37, 40, 0.06); }
+.accent-card:focus-visible { outline: 2px solid var(--mint-deep); outline-offset: 2px; }
+.accent-card.is-active { border-color: var(--mint-deep); box-shadow: 0 0 0 1px var(--mint-deep), 0 10px 24px rgba(15, 128, 109, 0.12); }
+.accent-code { display: grid; place-items: center; flex-shrink: 0; min-width: 42px; height: 32px; border-radius: 999px; background: var(--vs-mint-soft); color: var(--mint-deep); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; }
+.accent-card-copy { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.accent-card-copy strong { font-size: 0.92rem; letter-spacing: -0.01em; }
+.accent-card-copy small { color: var(--vs-muted); font-size: 0.72rem; line-height: 1.4; }
+.accent-check { display: grid; place-items: center; flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; color: #fff; }
+.accent-card.is-active .accent-check { background: var(--mint-deep); }
+.accent-card-soon { cursor: default; border-style: dashed; background: transparent; color: var(--vs-muted); }
+.accent-card-soon:hover { transform: none; box-shadow: none; border-color: rgba(11, 37, 40, 0.1); }
+
+/* Stage: description + player */
+.accent-stage { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr); gap: 20px 28px; align-items: center; padding: 18px; border-radius: 18px; background: var(--vs-card); border: 1px solid rgba(11, 37, 40, 0.06); }
+.accent-stage-copy h4 { font-size: 1.2rem; letter-spacing: -0.03em; }
+.accent-stage-copy p { margin-top: 4px; color: var(--vs-muted); font-size: 0.85rem; line-height: 1.55; }
+
+/* Player */
+.accent-player { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; grid-template-areas: 'play time wave volume' 'status status status status'; align-items: center; gap: 4px 14px; padding: 10px 14px 10px 10px; border-radius: 999px; background: #f4f1ea; }
+.accent-play { grid-area: play; display: grid; place-items: center; width: 50px; height: 50px; border: 0; border-radius: 50%; background: var(--mint-deep); color: #fff; cursor: pointer; box-shadow: 0 8px 20px rgba(15, 128, 109, 0.3); transition: transform 150ms, background 150ms; }
+.accent-play:hover { background: #0b6b5b; transform: scale(1.04); }
+.accent-play:focus-visible { outline: 2px solid var(--mint-deep); outline-offset: 3px; }
+.accent-play:disabled { background: var(--mist); box-shadow: none; cursor: not-allowed; }
+.accent-play svg { margin-left: 1px; }
+.accent-time { grid-area: time; font-size: 0.82rem; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.accent-time span { color: var(--vs-muted); margin-inline: 2px; }
+
+.accent-wave { grid-area: wave; position: relative; height: 40px; min-width: 0; }
+.accent-wave-bars { position: absolute; inset: 0; display: flex; align-items: center; gap: 2px; overflow: hidden; pointer-events: none; }
+.accent-wave-bars i { flex: 1; min-width: 1px; border-radius: 2px; background: rgba(15, 128, 109, 0.22); transition: background 120ms; }
+.accent-wave-bars i.is-played { background: var(--mint-deep); }
+.accent-seek { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.accent-seek:disabled { cursor: default; }
+.accent-wave:has(.accent-seek:focus-visible) { outline: 2px solid var(--mint-deep); outline-offset: 4px; border-radius: 6px; }
+
+.accent-volume { grid-area: volume; display: flex; align-items: center; gap: 6px; }
+.accent-volume input { width: 72px; accent-color: var(--mint-deep); }
+.accent-icon-button { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
+.accent-icon-button:hover { background: rgba(11, 37, 40, 0.06); }
+.accent-icon-button:focus-visible { outline: 2px solid var(--mint-deep); }
+
+.accent-player-status { grid-area: status; min-height: 0; padding-left: 64px; color: var(--vs-muted); font-size: 0.72rem; }
+.accent-player-status:empty { display: none; }
+.accent-player-error { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; color: #a3452a; }
+.accent-player-error button, .accent-player-error a { padding: 0; border: 0; background: none; color: var(--mint-deep); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.accent-player.is-ended .accent-play { background: var(--ink); }
+
+/* Transcript */
+.accent-transcript { margin-top: 14px; border-radius: 16px; background: var(--vs-card); border: 1px solid rgba(11, 37, 40, 0.06); }
+.accent-transcript summary { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 18px; color: var(--mint-deep); font-size: 0.9rem; font-weight: 700; cursor: pointer; list-style: none; }
+.accent-transcript summary::-webkit-details-marker { display: none; }
+.accent-transcript summary svg { transition: transform 200ms var(--ease-out); transform: rotate(-90deg); }
+.accent-transcript[open] summary svg { transform: rotate(0deg); }
+.accent-transcript summary:focus-visible { outline: 2px solid var(--mint-deep); outline-offset: -2px; border-radius: 16px; }
+.accent-transcript-count { margin-left: auto; padding: 4px 10px; border-radius: 999px; background: var(--vs-mint-soft); font-size: 0.7rem; }
+.accent-transcript ol { display: grid; gap: 4px; margin: 0 14px 14px; padding: 8px; list-style: none; border-radius: 12px; background: #f6faf8; max-height: 340px; overflow-y: auto; }
+.accent-transcript li { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px; padding: 9px 10px; border-radius: 10px; }
+.accent-transcript li.turn-assistant { background: rgba(227, 244, 238, 0.7); }
+.accent-transcript .turn-role { display: inline-flex; align-items: center; gap: 7px; font-size: 0.8rem; font-weight: 750; }
+.accent-transcript .turn-assistant .turn-role { color: var(--mint-deep); }
+.accent-transcript li p { font-size: 0.86rem; line-height: 1.6; color: var(--ink); }
+.accent-disclosure { margin-top: 14px; color: var(--vs-muted); font-size: 0.72rem; line-height: 1.5; }
+
+/* Live panel and engineering disclosure on the light background */
+.voice-studio .live-agent { margin: 20px 0 0; background: var(--ink); border-color: transparent; box-shadow: var(--vs-shadow); }
+.voice-studio .live-agent-clock { color: var(--mist); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.voice-studio .live-agent-meter { display: flex; align-items: center; gap: 14px; }
+.voice-studio .voice-engineering { margin-top: 20px; background: var(--ink); color: var(--paper); border-color: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-orb-ring { animation: none; opacity: 0.4; }
+  .accent-card, .accent-play { transition: none; }
+}
+
+@media (max-width: 1000px) {
+  .voice-studio-intro { grid-template-columns: minmax(0, 1fr) auto; }
+  .voice-studio-cta { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+  .accent-stage { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .voice-studio-intro { grid-template-columns: 1fr; }
+  .voice-orb { display: none; }
+  .voice-studio-chips { border-radius: 16px; }
+  .voice-studio-cta { grid-template-columns: 1fr; }
+  .voice-studio-button { width: 100%; justify-content: center; }
+  .accent-gallery-head { align-items: flex-start; }
+  .accent-gallery-icon { width: 44px; height: 44px; border-radius: 12px; }
+  .accent-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .accent-card { min-height: 52px; gap: 8px; padding: 8px 10px; }
+  .accent-card-copy small { display: none; }
+  .accent-card-copy strong { font-size: 0.8rem; line-height: 1.25; }
+  .accent-code { min-width: 34px; height: 26px; font-size: 0.64rem; }
+  .accent-check { width: 18px; height: 18px; }
+  .accent-player { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'play wave volume' 'time time time' 'status status status'; border-radius: 22px; padding: 10px; }
+  .accent-time { padding-left: 4px; }
+  .accent-volume input { display: none; }
+  .accent-player-status { padding-left: 4px; }
+  .accent-transcript li { grid-template-columns: 1fr; gap: 4px; }
+}
