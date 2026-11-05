@@ -90,6 +90,36 @@ test('archive and credentials expand and collapse on desktop', async ({ page }) 
   await expect(panel.locator('.credential-record:visible')).toHaveCount(4)
 })
 
+test('credentials can be searched and filtered by category', async ({ page }) => {
+  await page.goto('/#education')
+  const section = page.locator('#education')
+  const search = section.getByRole('searchbox', { name: 'Search credentials' })
+  const count = section.locator('.credential-result-count')
+  await expect(count).toHaveText('Showing 23 of 23 records')
+
+  await search.fill('claude code')
+  await expect(count).not.toHaveText('Showing 23 of 23 records')
+  const records = section.locator('.credential-panel .credential-record strong')
+  await expect(records.first()).toBeVisible()
+  for (const title of await records.allTextContents()) {
+    expect(title.toLowerCase()).toContain('claude')
+    expect(title.toLowerCase()).toContain('code')
+  }
+
+  await search.fill('')
+  await section.getByRole('button', { name: 'Technical', exact: true }).click()
+  await expect(section.getByRole('button', { name: 'Technical', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await expect(section.locator('.credential-panel')).toHaveCount(1)
+  await expect(section.locator('.credential-panel .credential-more')).toHaveCount(0)
+
+  await search.fill('zzzz-no-such-credential')
+  await expect(section.getByText('No credentials match')).toBeVisible()
+  await section.getByRole('button', { name: 'Clear filters', exact: true }).click()
+  await expect(count).toHaveText('Showing 23 of 23 records')
+  await expect(search).toHaveValue('')
+  await expect(section.locator('.credential-panel')).toHaveCount(2)
+})
+
 test('successful contact response clears the form and confirms delivery', async ({ page }) => {
   await page.route('**/api/contact', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '{"success":true}' }))
   await page.goto('/#contact')
