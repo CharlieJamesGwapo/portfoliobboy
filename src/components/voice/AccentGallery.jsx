@@ -1,9 +1,13 @@
 import { useState } from 'react'
-import { AudioLines, Check, ChevronDown, Headphones, Plus, User } from 'lucide-react'
+import { AudioLines, ChevronDown, Clock3, Sparkles, User } from 'lucide-react'
 import AccentAudioPlayer from './AccentAudioPlayer'
-import { upcomingAccents, voiceAccents } from '../../data/voiceAccents'
+import { voiceAccents } from '../../data/voiceAccents'
 
-const ROLE_LABEL = { visitor: 'Visitor', assistant: 'AI Assistant' }
+const formatDuration = (seconds) => {
+  if (!Number.isFinite(seconds)) return ''
+  const whole = Math.round(seconds)
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`
+}
 
 export default function AccentGallery() {
   const [selectedId, setSelectedId] = useState(voiceAccents[0]?.id)
@@ -11,16 +15,16 @@ export default function AccentGallery() {
   if (!selected) return null
 
   return (
-    <div className="accent-gallery" aria-labelledby="accent-gallery-title">
-      <div className="accent-gallery-head">
-        <span className="accent-gallery-icon"><Headphones size={24} aria-hidden="true" /></span>
+    <div className="vs-studio" aria-labelledby="vs-studio-title">
+      <div className="vs-studio-bar">
         <div>
-          <h3 id="accent-gallery-title">Choose your accent</h3>
-          <p>Pick an accent and hear a short, natural conversation.</p>
+          <h3 id="vs-studio-title">Voice preview demo</h3>
+          <p>Pre-recorded accent previews. Pick one and press play.</p>
         </div>
+        <span className="vs-pill"><Sparkles size={13} aria-hidden="true" /> {voiceAccents.length} accents</span>
       </div>
 
-      <div className="accent-cards" role="group" aria-label="Choose an English accent">
+      <div className="vs-accents" role="group" aria-label="Choose an English accent">
         {voiceAccents.map((accent) => {
           const active = accent.id === selected.id
           return (
@@ -28,62 +32,59 @@ export default function AccentGallery() {
               key={accent.id}
               type="button"
               aria-pressed={active}
-              className={`accent-card ${active ? 'is-active' : ''}`}
+              className={`vs-accent ${active ? 'is-active' : ''}`}
               onClick={() => setSelectedId(accent.id)}
             >
-              <span className="accent-code" aria-hidden="true">{accent.code}</span>
-              <span className="accent-card-copy">
-                <strong>{accent.name}</strong>
-                <small>{accent.description}</small>
-              </span>
-              <span className="accent-check" aria-hidden="true">{active && <Check size={14} />}</span>
+              <span className="vs-accent-code" aria-hidden="true">{accent.code}</span>
+              <span className="vs-accent-name">{accent.name.replace(' English', '')}<span className="vs-accent-suffix"> English</span></span>
             </button>
           )
         })}
-        {upcomingAccents.length > 0 && (
-          <div className="accent-card accent-card-soon" title={upcomingAccents.join(', ')}>
-            <Plus size={16} aria-hidden="true" />
-            <span className="accent-card-copy">
-              <strong>More accents soon</strong>
-              <small>{upcomingAccents.join(' · ')}</small>
-            </span>
-          </div>
-        )}
       </div>
 
-      <div className="accent-stage" aria-live="polite">
-        <div className="accent-stage-copy">
-          <h4>{selected.name}</h4>
-          <p>{selected.description}</p>
+      <div className="vs-stage" aria-live="polite">
+        <div className="vs-stage-head">
+          <div>
+            <p className="vs-stage-kicker">{selected.code} · {selected.name}</p>
+            <h4>{selected.description}</h4>
+          </div>
+          <dl className="vs-stage-meta">
+            <div><dt className="sr-only">Length</dt><dd><Clock3 size={13} aria-hidden="true" /> {formatDuration(selected.duration)}</dd></div>
+            <div><dt className="sr-only">Voices</dt><dd><AudioLines size={13} aria-hidden="true" /> {selected.voice}</dd></div>
+          </dl>
         </div>
+
         <AccentAudioPlayer
           src={selected.src}
-          title={`${selected.name} sample`}
+          title={`${selected.name} preview`}
           peaks={selected.peaks}
           knownDuration={selected.duration}
         />
       </div>
 
-      <details className="accent-transcript">
+      <details className="vs-transcript">
         <summary>
-          <ChevronDown size={16} aria-hidden="true" /> Read the transcript
-          <span className="accent-transcript-count">{selected.turns.length} turns</span>
+          <span>Read the conversation</span>
+          <span className="vs-transcript-count">{selected.turns.length} lines</span>
+          <ChevronDown size={18} aria-hidden="true" />
         </summary>
-        <ol lang={selected.lang} aria-label={`${selected.name} transcript`}>
+        <ol lang={selected.lang} aria-label={`${selected.name} conversation transcript`}>
           {selected.turns.map((turn, index) => (
-            <li key={`${selected.id}-${index}`} className={`turn-${turn.role}`}>
-              <span className="turn-role">
-                {turn.role === 'visitor' ? <User size={14} aria-hidden="true" /> : <AudioLines size={14} aria-hidden="true" />}
-                {ROLE_LABEL[turn.role]}
+            <li key={`${selected.id}-${index}`} className={`vs-turn vs-turn-${turn.role}`}>
+              <span className="vs-turn-avatar" aria-hidden="true">
+                {turn.role === 'visitor' ? <User size={14} /> : <AudioLines size={14} />}
               </span>
-              <p>{turn.text}</p>
+              <div className="vs-turn-bubble">
+                <span className="vs-turn-role">{turn.role === 'visitor' ? 'Visitor' : 'AI Assistant'}</span>
+                <p>{turn.text}</p>
+              </div>
             </li>
           ))}
         </ol>
       </details>
 
-      <p className="accent-disclosure">
-        Fictional conversation with AI-generated voices: {selected.voice}. Voice technology by ElevenLabs. Not a real customer call; no booking is made.
+      <p className="vs-disclosure">
+        Sample conversations performed by AI voices ({selected.voice}), generated with ElevenLabs. Fictional scenarios; no real customers or bookings.
       </p>
     </div>
   )

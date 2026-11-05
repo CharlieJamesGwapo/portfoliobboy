@@ -1,4 +1,5 @@
-import { ArrowUpRight, AudioLines, Heart, Mic, PhoneCall, Zap } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { ArrowUpRight, Mic, PhoneCall } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import AccentGallery from './voice/AccentGallery'
 import LiveAgentPanel, { hasLiveAgent } from './LiveAgentPanel'
@@ -21,7 +22,27 @@ const messageColumns = (from, to) => {
   return [lifelineLine(Math.min(from, to)), lifelineLine(Math.max(from, to))]
 }
 
+// While the studio is on screen, the site's floating Music and back-to-top
+// buttons step aside so they never sit on top of the player controls.
+const useHideFloatingControls = (ref) => {
+  useEffect(() => {
+    const element = ref.current
+    if (!element || typeof IntersectionObserver === 'undefined') return undefined
+    const observer = new IntersectionObserver(
+      ([entry]) => document.body.classList.toggle('voice-studio-in-view', entry.isIntersecting),
+      { rootMargin: '-15% 0px -15% 0px' },
+    )
+    observer.observe(element)
+    return () => {
+      observer.disconnect()
+      document.body.classList.remove('voice-studio-in-view')
+    }
+  }, [ref])
+}
+
 const VoiceAgentDemo = () => {
+  const sectionRef = useRef(null)
+  useHideFloatingControls(sectionRef)
   const demo = (Array.isArray(liveLinks) ? liveLinks : []).find((item) => item.kind === 'AI voice demo')
   const demoUrl = demo?.url ?? FALLBACK_URL
   const flow = voiceCallFlow
@@ -30,53 +51,61 @@ const VoiceAgentDemo = () => {
   const stats = Array.isArray(flow?.stats) ? flow.stats : []
 
   return (
-    <section id="voice-demo" className="section voice-demo-section voice-studio" aria-labelledby="voice-demo-title">
+    <section ref={sectionRef} id="voice-demo" className="section voice-demo-section voice-studio" aria-labelledby="voice-demo-title">
       <div className="page-container">
         <ScrollReveal>
-          <div className="voice-studio-intro">
-            <div className="voice-studio-heading">
-              <p className="eyebrow">Bboy AI Voice Studio</p>
-              <h2 id="voice-demo-title">Hear the Conversation.</h2>
-              <p className="voice-studio-subtitle">
-                Experience natural AI conversations in different accents, with expressive voices designed to sound clear, warm, and human.
+          <header className="vs-hero">
+            <div className="vs-hero-copy">
+              <p className="vs-eyebrow"><span aria-hidden="true" /> Bboy AI Voice Studio</p>
+              <h2 id="voice-demo-title">Experience AI that sounds more human.</h2>
+              <p className="vs-lede">
+                Explore eight English accents, listen to natural conversations, and discover how intelligent voice experiences are built.
               </p>
-              <ul className="voice-studio-chips" aria-label="Voice qualities">
-                <li><AudioLines size={15} aria-hidden="true" /> Natural pacing</li>
-                <li><Heart size={15} aria-hidden="true" /> Human-like tone</li>
-                <li><Zap size={15} aria-hidden="true" /> Real-time voice agent</li>
+              <ul className="vs-facts" aria-label="About these previews">
+                <li><strong>8</strong> accents</li>
+                <li><strong>20–30s</strong> conversations</li>
+                <li><strong>Eleven v4</strong> voices</li>
               </ul>
             </div>
 
-            <div className="voice-orb" aria-hidden="true">
-              <span className="voice-orb-core"><AudioLines size={46} /></span>
-              <span className="voice-orb-ring" />
-              <span className="voice-orb-ring voice-orb-ring-2" />
+            <div className="vs-orb" aria-hidden="true">
+              <span className="vs-orb-glow" />
+              <span className="vs-orb-ring" />
+              <span className="vs-orb-ring vs-orb-ring-2" />
+              <span className="vs-orb-core">
+                <i /><i /><i /><i /><i />
+              </span>
             </div>
-
-            <div className="voice-studio-cta">
-              {hasLiveAgent ? (
-                <>
-                  <p>Talk to my AI assistant live, right here in the browser.</p>
-                  <a className="button button-primary voice-studio-button" href="#live-agent"><Mic size={18} aria-hidden="true" /> Talk to My AI</a>
-                </>
-              ) : (
-                <>
-                  <p>Have a conversation with Alex, a live voice agent I built.</p>
-                  <a className="button button-primary voice-studio-button" href={demoUrl} target="_blank" rel="noreferrer">
-                    <PhoneCall size={18} aria-hidden="true" />
-                    {demo?.label ?? 'Talk to Alex'}
-                    <ArrowUpRight size={17} aria-hidden="true" />
-                    <span className="sr-only"> (opens in a new tab)</span>
-                  </a>
-                </>
-              )}
-            </div>
-          </div>
+          </header>
         </ScrollReveal>
 
         <ScrollReveal><AccentGallery /></ScrollReveal>
 
-        <ScrollReveal><LiveAgentPanel /></ScrollReveal>
+        <ScrollReveal>
+          {hasLiveAgent ? <LiveAgentPanel /> : (
+            <aside className="vs-live" aria-labelledby="vs-live-title">
+              <div className="vs-live-copy">
+                <p className="vs-live-status"><span aria-hidden="true" /> Live agent · coming soon</p>
+                <h3 id="vs-live-title">Talk to My AI</h3>
+                <p>
+                  A real-time version you can speak with is being set up with usage limits. Until then, the previews above
+                  are pre-recorded, and you can try Alex, the live voice agent I built for Hasti.
+                </p>
+              </div>
+              <div className="vs-live-actions">
+                <button type="button" className="button vs-live-disabled" disabled aria-describedby="vs-live-title">
+                  <Mic size={17} aria-hidden="true" /> Talk to My AI
+                </button>
+                <a className="button button-primary" href={demoUrl} target="_blank" rel="noreferrer">
+                  <PhoneCall size={17} aria-hidden="true" />
+                  {demo?.label ?? 'Talk to Alex'}
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              </div>
+            </aside>
+          )}
+        </ScrollReveal>
 
         {steps.length > 0 && (
           <ScrollReveal className="vc-reveal" delay={60}>

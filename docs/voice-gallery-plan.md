@@ -28,8 +28,11 @@ read from ElevenLabs → Voices if needed.
 Voice Library notes: Joel (Filipino) has Live Moderation enabled, which is
 fine for TTS but means it **cannot be used in an ElevenLabs agent**.
 
-The old `voice-us/au-professional-v7.m4a` recordings and `voiceSamples.js`
-are kept on disk for rollback but are no longer imported or bundled.
+All earlier `edge-tts` recordings were removed on 2026-11-06:
+`src/assets/audio/voice-{us,au}-professional-v7.m4a`, the eight unreferenced
+`public/audio/voice-*` files (which were still deployed at `/audio/…`), their
+`README.txt`, `voiceSamples.js`, and `VoiceSamplePlayer.jsx`. Git history
+holds them if a rollback is ever needed.
 
 ## Account (checked 2026-11-06 in the ElevenLabs dashboard)
 
