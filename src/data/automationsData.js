@@ -29,7 +29,7 @@ export const automationWorkflows = [
     trigger: 'Voice agent call ended',
     steps: ['Summarise transcript', 'Update CRM record', 'Draft follow-up'],
     outcome: 'No call notes to type, and every caller hears back the same day',
-    tools: ['n8n', 'LiveKit', 'ElevenLabs', 'Gmail API', 'PostgreSQL'],
+    tools: ['n8n', 'LiveKit', 'AI voice', 'Gmail API', 'PostgreSQL'],
     draft: true,
   },
   {
@@ -113,7 +113,6 @@ export const automationToolbox = [
   'GoHighLevel',
   'Make',
   'Zapier',
-  'ElevenLabs',
   'LiveKit',
   'Insighto.ai',
   'OpenAI',

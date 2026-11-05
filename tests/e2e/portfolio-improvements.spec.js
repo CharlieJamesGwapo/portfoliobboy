@@ -1,28 +1,26 @@
 import { test, expect } from '@playwright/test'
 
-test('regional sample loads playable audio and a matching transcript', async ({ page }) => {
+test('accent preview loads playable audio and a matching transcript', async ({ page }) => {
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
-  await expect(demo.getByText('Illustrative synthetic audio', { exact: true })).toBeVisible()
+  await expect(demo.getByText(/Sample conversations performed by AI voices/)).toBeVisible()
   const audio = demo.locator('audio')
-  await audio.evaluate((element) => element.load())
   await expect.poll(() => audio.evaluate((element) => element.readyState)).toBeGreaterThanOrEqual(1)
-  await audio.evaluate((element) => element.play())
+  await expect(audio).toHaveAttribute('src', /american-english(?:-[\w-]+)?\.mp3$/)
+  await demo.getByRole('button', { name: 'Play American English preview' }).click()
   await expect.poll(() => audio.evaluate((element) => element.currentTime)).toBeGreaterThan(0)
-  await expect(audio).toHaveAttribute('src', /voice-us-professional-v7(?:-[\w-]+)?\.m4a$/)
-  await audio.evaluate((element) => element.pause())
+  await demo.getByRole('button', { name: 'Pause American English preview' }).click()
   await expect.poll(() => audio.evaluate((element) => element.paused)).toBe(true)
-  await demo.getByText('Read sample transcript', { exact: true }).click()
-  await expect(demo.getByText(/Emma speaking\. How can I help/)).toBeVisible()
+  await demo.getByText('Read the conversation', { exact: true }).click()
+  await expect(demo.getByText(/Do you help businesses automate their customer inquiries/)).toBeVisible()
 })
 
 test('voice audio errors offer a readable alternative', async ({ page }) => {
-  await page.route(/voice-(us|au)-[^/]+\.m4a/, (route) => route.request().resourceType() === 'script' ? route.continue() : route.abort())
+  await page.route(/-english[^/]*\.mp3/, (route) => route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
-  await page.locator('#voice-demo audio').evaluate((element) => element.load())
-  await expect(page.locator('#voice-demo [role="status"]')).toContainText('Audio could not load')
-  await page.getByText('Read sample transcript', { exact: true }).click()
-  await expect(page.locator('.voice-transcript')).toBeVisible()
+  await expect(page.locator('#voice-demo [role="status"]')).toContainText("This preview couldn't load")
+  await page.getByText('Read the conversation', { exact: true }).click()
+  await expect(page.locator('.vs-transcript ol')).toBeVisible()
 })
 
 test('project search handles archive matches and empty results', async ({ page }) => {
@@ -52,7 +50,7 @@ for (const width of [320, 390, 768, 1440]) {
   test(`voice and project controls fit at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/#voice-demo')
-    await expect(page.locator('.voice-listen-card')).toBeVisible()
+    await expect(page.locator('.vs-studio')).toBeVisible()
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     await page.goto('/#projects')
     await expect(page.getByRole('searchbox', { name: 'Search projects' })).toBeVisible()
@@ -132,14 +130,14 @@ test('successful contact response clears the form and confirms delivery', async 
   await expect(page.locator('#contact-name')).toHaveValue('')
 })
 
-test('regional sample identifies the receptionist and plays', async ({ page }) => {
+test('accent preview identifies the AI assistant and plays', async ({ page }) => {
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
-  await demo.getByText('Read sample transcript', { exact: true }).click()
-  await expect(demo.locator('.voice-transcript')).toContainText('Receptionist')
+  await demo.getByText('Read the conversation', { exact: true }).click()
+  await expect(demo.locator('.vs-transcript')).toContainText('AI Assistant')
   const audio = demo.locator('audio')
-  await expect(audio).toHaveAttribute('src', /-professional-v7(?:-[\w-]+)?\.m4a$/)
-  await audio.evaluate((element) => element.play())
+  await expect(audio).toHaveAttribute('src', /accents\/[a-z-]+-english(?:-[\w-]+)?\.mp3$/)
+  await demo.getByRole('button', { name: 'Play American English preview' }).click()
   await expect.poll(() => audio.evaluate((element) => element.currentTime)).toBeGreaterThan(0)
   expect(await audio.evaluate((element) => element.duration)).toBeGreaterThan(5)
 })

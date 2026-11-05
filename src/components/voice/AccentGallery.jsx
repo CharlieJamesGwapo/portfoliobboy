@@ -5,7 +5,7 @@ import { voiceAccents } from '../../data/voiceAccents'
 
 const formatDuration = (seconds) => {
   if (!Number.isFinite(seconds)) return ''
-  const whole = Math.round(seconds)
+  const whole = Math.floor(seconds) // whole seconds, matching the player's clock
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`
 }
 
@@ -84,7 +84,7 @@ export default function AccentGallery() {
       </details>
 
       <p className="vs-disclosure">
-        Sample conversations performed by AI voices ({selected.voice}), generated with ElevenLabs. Fictional scenarios; no real customers or bookings.
+        Sample conversations performed by AI voices ({selected.voice}). Fictional scenarios; no real customers or bookings.
       </p>
     </div>
   )

@@ -23,6 +23,7 @@ export default function AssistantPanel({ onClose }) {
   const inputRef = useRef(null)
   const panelRef = useRef(null)
   const timerRef = useRef(null)
+  const chipsRef = useRef(null)
 
   useEffect(() => {
     inputRef.current?.focus({ preventScroll: true })
@@ -62,6 +63,8 @@ export default function AssistantPanel({ onClose }) {
   const askSuggestion = (suggestion) => {
     if (typing) return
     setAsked((current) => new Set(current).add(suggestion.id))
+    // The chip row scrolls sideways; start it over so the next chip is not cut off.
+    chipsRef.current?.scrollTo({ left: 0 })
     reply(suggestion.label, answerSuggestion(suggestion.id))
   }
 
@@ -79,7 +82,7 @@ export default function AssistantPanel({ onClose }) {
         <span className="alex-avatar" aria-hidden="true"><AudioLines size={18} /></span>
         <div className="alex-head-copy">
           <h2 id="alex-title">Alex</h2>
-          <p><span className="alex-online" aria-hidden="true" /> Charlie&apos;s portfolio assistant</p>
+          <p><span className="alex-online" aria-hidden="true" /> AI Portfolio Assistant</p>
         </div>
         <button type="button" className="alex-icon-button" onClick={onClose} aria-label="Close Alex">
           <X size={18} aria-hidden="true" />
@@ -88,7 +91,7 @@ export default function AssistantPanel({ onClose }) {
 
       <div className="alex-voice">
         {hasLiveAgent ? (
-          <a className="alex-voice-button" href="#live-agent" onClick={onClose}>
+          <a className="alex-voice-button" href="/#live-agent" onClick={onClose}>
             <Mic size={16} aria-hidden="true" /> Talk to Alex
           </a>
         ) : (
@@ -130,7 +133,7 @@ export default function AssistantPanel({ onClose }) {
       </ol>
 
       {remaining.length > 0 && (
-        <div className="alex-suggestions" role="group" aria-label="Suggested questions">
+        <div ref={chipsRef} className="alex-suggestions" role="group" aria-label="Suggested questions">
           {remaining.map((suggestion) => (
             <button key={suggestion.id} type="button" onClick={() => askSuggestion(suggestion)} disabled={typing}>
               <Sparkles size={12} aria-hidden="true" /> {suggestion.label}

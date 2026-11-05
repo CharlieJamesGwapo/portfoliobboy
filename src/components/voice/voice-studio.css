@@ -211,3 +211,22 @@ body.voice-studio-in-view .back-to-top { opacity: 0 !important; visibility: hidd
   .vs-orb-ring { opacity: 0.35; }
   .vs-play-progress, .vs-accent, .vs-play-face, .vs-transcript summary svg { transition: none; }
 }
+.vs-credits { margin-top: 18px; color: var(--vs-muted); font-size: 0.68rem; letter-spacing: 0.01em; opacity: 0.75; }
+
+/* The studio is a deliberate dark "studio" panel in both themes. The light
+   theme restyles .voice-demo-section for the old player; restore the studio's
+   own surface and the engineering diagram's dark tokens over it. */
+html[data-theme] body .voice-demo-section.voice-studio {
+  --vc-line: rgba(255, 255, 255, 0.22);
+  --vc-arrow: var(--mint);
+  --vc-arrow-back: var(--coral);
+  --vc-text: #c9d8d5;
+  --vc-surface: var(--ink-soft);
+  color: var(--paper);
+  background:
+    radial-gradient(55% 45% at 82% 8%, rgba(103, 224, 193, 0.16), transparent 70%),
+    radial-gradient(40% 35% at 6% 30%, rgba(15, 128, 109, 0.22), transparent 70%),
+    linear-gradient(180deg, #08201f 0%, #0b2528 55%, #0a2224 100%);
+}
+html[data-theme] body .voice-studio .voice-engineering { border-color: rgba(255, 255, 255, 0.09); background: rgba(255, 255, 255, 0.03); }
+html[data-theme] body .voice-studio .voice-engineering > summary { color: var(--mint); }

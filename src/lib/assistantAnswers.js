@@ -46,47 +46,47 @@ const answers = {
 
   about: () => ({
     text: `Charlie James Abejo is an ${profile.role} based in ${profile.location}. He's currently ${current.role} at ${current.company} (${current.period}): ${current.summary}`,
-    actions: [{ label: 'About Charlie', href: '#about' }, { label: 'Experience', href: '#experience' }],
+    actions: [{ label: 'About Charlie', href: '/#about' }, { label: 'Experience', href: '/#experience' }],
   }),
 
   projects: () => ({
     text: `Some highlights: ${list(flagship.map((system) => system.title.replace(/\s+—.*$/, '')))}. ${liveSystems.length} of his systems have public live links you can try right from the portfolio.`,
-    actions: [{ label: 'Selected work', href: '#product-studio-preview' }, { label: 'Systems & demos', href: '#momentum-work' }, { label: 'Project archive', href: '#projects' }],
+    actions: [{ label: 'Selected work', href: '/#product-studio-preview' }, { label: 'Systems & demos', href: '/#momentum-work' }, { label: 'All projects', href: '/projects' }],
   }),
 
   ai: () => ({
     text: `Charlie builds ${list(aiSystemCapabilities.slice(0, 4).map((item) => lowerFirst(item.title)))}. A production example is Alex, his AI voice agent on LiveKit and GPT-Live over Twilio SIP, which powers the live callback demo on hasti.com.au.`,
-    actions: [{ label: 'AI systems', href: '#ai-systems' }, { label: 'Voice Studio', href: '#voice-demo' }],
+    actions: [{ label: 'AI systems', href: '/#ai-systems' }, { label: 'Voice Studio', href: '/#voice-demo' }],
   }),
 
   voice: () => ({
-    text: `The Voice Studio has ${voiceAccents.length} short sample conversations in different English accents, generated with ElevenLabs. They're pre-recorded previews. For a real live call, try Alex on hasti.com.au.`,
-    actions: [{ label: 'Open the Voice Studio', href: '#voice-demo' }, { label: 'Talk to Alex on Hasti', href: 'https://hasti.com.au/', external: true }],
+    text: `The Voice Studio has ${voiceAccents.length} short sample conversations in different English accents, created with AI voice technology. They're pre-recorded previews. For a real live call, try Alex on hasti.com.au.`,
+    actions: [{ label: 'Open the Voice Studio', href: '/#voice-demo' }, { label: 'Talk to Alex on Hasti', href: 'https://hasti.com.au/', external: true }],
   }),
 
   automations: () => ({
     text: `He builds automations with ${list(automationToolbox.slice(0, 4))}, plus AI agents that qualify leads, book appointments, and follow up, with retries, logging, and a human handoff.`,
-    actions: [{ label: 'Automation workflows', href: '#automations' }],
+    actions: [{ label: 'Automation workflows', href: '/#automations' }],
   }),
 
   services: () => ({
     text: `Charlie can help with ${list(aiSystemCapabilities.map((item) => lowerFirst(item.title)))}, as well as full-stack web and mobile apps. He works remotely and can overlap US business hours.`,
-    actions: [{ label: 'Start a conversation', href: '#contact' }, { label: 'AI systems', href: '#ai-systems' }],
+    actions: [{ label: 'Start a conversation', href: '/#contact' }, { label: 'AI systems', href: '/#ai-systems' }],
   }),
 
   pricing: () => ({
     text: `Pricing depends on the scope of the project, so Charlie quotes each one individually. Share a little about what you need and he'll get back to you.`,
-    actions: [{ label: 'Contact Charlie', href: '#contact' }, { label: 'Email', href: `mailto:${profile.email}`, external: true }],
+    actions: [{ label: 'Contact Charlie', href: '/#contact' }, { label: 'Email', href: `mailto:${profile.email}`, external: true }],
   }),
 
   skills: () => ({
     text: skillGroups.slice(0, 4).map((group) => `${group.title}: ${group.skills.slice(0, 5).join(', ')}`).join('. ') + '.',
-    actions: [{ label: 'All skills', href: '#skills' }],
+    actions: [{ label: 'All skills', href: '/#skills' }],
   }),
 
   experience: () => ({
     text: `Currently: ${current.role} at ${current.company}, ${current.period}. Before that, ${list(experiences.filter((item) => item !== current).slice(0, 2).map((item) => `${item.role} at ${item.company}`))}.`,
-    actions: [{ label: 'Full experience', href: '#experience' }],
+    actions: [{ label: 'Full experience', href: '/#experience' }],
   }),
 
   contact: () => ({
@@ -94,7 +94,7 @@ const answers = {
     actions: [
       { label: 'Email Charlie', href: `mailto:${profile.email}`, external: true },
       { label: 'LinkedIn', href: profile.linkedin, external: true },
-      { label: 'Contact form', href: '#contact' },
+      { label: 'Contact form', href: '/#contact' },
     ],
   }),
 
@@ -105,12 +105,12 @@ const answers = {
 
   credentials: () => ({
     text: `His education, certifications, and recognitions are in the Credentials section, including Anthropic courses on Claude and the Model Context Protocol.`,
-    actions: [{ label: 'Credentials', href: '#education' }],
+    actions: [{ label: 'Credentials', href: '/#education' }],
   }),
 
   games: () => ({
     text: `There's an Interactive Lab with playable creative-code games: Dungeon Crawler, Code Racer, Neon Circuit and more.`,
-    actions: [{ label: 'Interactive Lab', href: '#lab' }],
+    actions: [{ label: 'Interactive Lab', href: '/lab' }],
   }),
 
   identity: () => ({
@@ -121,7 +121,7 @@ const answers = {
 
   fallback: () => ({
     text: `I don't have an answer for that one. I can tell you about Charlie's projects, AI and automation work, skills, experience, or how to contact him. For anything else, he's happy to answer directly.`,
-    actions: [{ label: 'Contact Charlie', href: '#contact' }],
+    actions: [{ label: 'Contact Charlie', href: '/#contact' }],
   }),
 }
 
@@ -131,7 +131,7 @@ const intents = [
   ['pricing', ['price', 'pricing', 'cost', 'charge', 'rate', 'rates', 'budget', 'quote', 'how much', 'fee', 'fees']],
   ['contact', ['contact', 'email', 'reach', 'hire', 'phone', 'call him', 'linkedin', 'github', 'touch', 'message him', 'get in touch']],
   ['resume', ['resume', 'résumé', 'cv', 'curriculum']],
-  ['voice', ['voice', 'accent', 'elevenlabs', 'audio', 'speak', 'listen', 'studio', 'talk to alex']],
+  ['voice', ['voice', 'accent', 'elevenlabs', 'voices', 'audio', 'speak', 'listen', 'studio', 'talk to alex']],
   ['automations', ['automation', 'automate', 'n8n', 'zapier', 'make.com', 'gohighlevel', 'ghl', 'workflow']],
   ['ai', ['ai', 'agent', 'llm', 'gpt', 'claude', 'openai', 'mcp', 'machine learning', 'chatbot', 'alex']],
   ['services', ['service', 'offer', 'build for me', 'help me', 'can he build', 'freelance', 'available', 'availability']],
@@ -164,7 +164,7 @@ const findSystem = (text) => {
     text: `${system.title}: ${system.summary}`,
     actions: [
       ...(system.url ? [{ label: linkLabel, href: system.url, external: true }] : []),
-      { label: 'Systems & demos', href: '#momentum-work' },
+      { label: 'Systems & demos', href: '/#momentum-work' },
     ],
   }
 }
@@ -181,7 +181,7 @@ const findSkill = (text) => {
   if (!hit) return null
   return {
     text: `Yes: ${hit.skill} is part of Charlie's ${hit.group.toLowerCase()} toolkit. The Skills section lists the rest.`,
-    actions: [{ label: 'All skills', href: '#skills' }],
+    actions: [{ label: 'All skills', href: '/#skills' }],
   }
 }
 

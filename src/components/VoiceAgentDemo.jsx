@@ -62,9 +62,9 @@ const VoiceAgentDemo = () => {
                 Explore eight English accents, listen to natural conversations, and discover how intelligent voice experiences are built.
               </p>
               <ul className="vs-facts" aria-label="About these previews">
-                <li><strong>8</strong> accents</li>
-                <li><strong>20–30s</strong> conversations</li>
-                <li><strong>Eleven v4</strong> voices</li>
+                <li><strong>8</strong> English Accents</li>
+                <li>Natural AI Conversations</li>
+                <li>Interactive Voice Experience</li>
               </ul>
             </div>
 
@@ -157,6 +157,8 @@ const VoiceAgentDemo = () => {
             </details>
           </ScrollReveal>
         )}
+
+        <p className="vs-credits">AI voice technology: ElevenLabs. Sample voices are AI-generated.</p>
       </div>
     </section>
   )

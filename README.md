@@ -95,13 +95,13 @@ Five authentic Anthropic certificate images are included and shown in the creden
 
 ## Bboy AI Voice Studio
 
-The voice section follows the hero and has a primary navigation link. It offers eight pre-recorded accent previews: American, British, Australian, Filipino, Canadian, Irish, Indian, and South African English. Each is a short (about 20–30 seconds) fictional business conversation between a visitor and an AI assistant, generated with ElevenLabs (Eleven v4, multi-speaker Text to Speech) under the Starter plan's commercial license. Voices, scripts, credit usage, and Voice Library notes are recorded in `docs/voice-gallery-plan.md`.
+The voice section follows the hero and has a primary navigation link. It offers eight pre-recorded accent previews: American, British, Australian, Filipino, Canadian, Irish, Indian, and South African English. Each is a short (about 20–30 seconds) fictional business conversation between a visitor and an AI assistant, generated with ElevenLabs (Eleven v4, multi-speaker Text to Speech) under the Starter plan's commercial license. The public UI brands this as AI voice technology and keeps the provider credit in one small line at the bottom of the section. Voices, scripts, credit usage, and Voice Library notes are recorded in `docs/voice-gallery-plan.md`.
 
 The recordings are `src/assets/audio/accents/*.mp3` (44.1 kHz mono, 128 kbps) and are emitted with content hashes, so replaying them makes no provider request and spends no credits. Transcripts and descriptions live in `src/data/voiceAccents.js`. Waveforms are measured from the audio by `node scripts/build-voice-peaks.mjs` (requires ffmpeg) into `src/data/voicePeaks.json`; re-run it whenever a recording changes.
 
 The custom player uses the `<audio>` element as its source of truth: play/pause with a progress ring, a seekable waveform, volume and mute, and loading, finished, and error states. Switching accents stops and resets playback. Transcripts are static because no word-level timestamps exist. Everything is labelled as sample conversations performed by AI voices; none are real customer calls.
 
-"Talk to My AI" stays disabled until a real ElevenLabs agent exists with server-side usage limits and `VITE_ELEVENLABS_AGENT_ID` is set. Production also needs `microphone=(self)` in the `Permissions-Policy` header in `vercel.json`. Until then the section links to Alex, the live voice agent on hasti.com.au.
+"Talk to My AI" stays disabled until a real ElevenLabs agent exists with server-side usage limits and `VITE_ELEVENLABS_AGENT_ID` is set. Production also needs `microphone=(self)` in the `Permissions-Policy` header in `vercel.json`. Until then the section links to Alex, the live voice agent on hasti.com.au. Production setup, limits, and costs are in `docs/live-voice-agent-production.md`.
 
 ## Alex, the portfolio assistant
 
