@@ -86,10 +86,12 @@ test('shows AgentForge as a CLI toolkit with a promotional concept and direct li
   await expect(panel.getByRole('link', { name: 'Link to this project' })).toHaveAttribute('href', '#agentforge')
   await expect(panel).toContainText('fails closed')
 
+  // The project archive is a card grid; each card opens the case-study page.
   await page.goto('/#projects')
-  const projects = page.locator('#projects')
-  await projects.getByRole('tab', { name: /AgentForge/ }).click()
-  await expect(projects.getByRole('link', { name: /View source on GitHub/ })).toHaveAttribute(
+  await page.locator('#projects a[href="/projects/agentforge"]').first().click()
+  await expect(page).toHaveURL(/\/projects\/agentforge$/)
+  await expect(page.getByRole('heading', { level: 1, name: 'AgentForge' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /View source repository/ }).first()).toHaveAttribute(
     'href',
     'https://github.com/CharlieJamesGwapo/AgentForge',
   )
@@ -108,10 +110,9 @@ test('keeps product copy and gallery controls available when a preview image fai
 })
 
 test('shows BBOY as a private personal product without a public repository link', async ({ page }) => {
-  await page.goto('/#projects')
-  const tab = page.locator('#projects').getByRole('tab', { name: /BBOY/ })
-  await tab.click()
-  const panel = page.locator('#active-project-panel')
+  await page.goto('/projects/bboy')
+  const panel = page.locator('main')
+  await expect(page.getByRole('heading', { level: 1, name: 'BBOY' })).toBeVisible()
 
   await expect(panel).toContainText(/Private personal source/i)
   await expect(panel.locator('.independent-agent-diagram')).toBeVisible()
@@ -127,7 +128,7 @@ for (const width of [320, 390, 768, 1440]) {
     await expect(page.locator('#independent-products').getByRole('tab')).toHaveCount(5)
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     await page.goto('/#projects')
-    await expect(page.locator('#projects').getByRole('tab', { name: /BBOY/ })).toBeVisible()
+    await expect(page.locator('#projects a[href="/projects/bboy"]').first()).toBeVisible()
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
   })
 }

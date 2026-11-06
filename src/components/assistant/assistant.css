@@ -29,8 +29,8 @@
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
   cursor: pointer;
   backdrop-filter: blur(10px);
-  transition: transform 180ms var(--ease-out), border-color 180ms, opacity 200ms, visibility 0s;
-  animation: alex-rise 420ms var(--ease-out) both;
+  transition: transform 240ms var(--ease-out), border-color 180ms, opacity 240ms var(--ease-smooth), visibility 0s;
+  animation: alex-rise 420ms var(--ease-out) backwards;
 }
 .alex-launcher:hover { transform: translateY(-2px); border-color: rgba(103, 224, 193, 0.55); }
 .alex-launcher:focus-visible { outline: 2px solid var(--mint); outline-offset: 3px; }
@@ -40,11 +40,12 @@
 /* ---------- Greeting bubble ---------- */
 .alex-greeting {
   position: fixed;
+  transition: opacity 240ms var(--ease-smooth), transform 240ms var(--ease-smooth), visibility 0s;
   left: calc(24px + env(safe-area-inset-left));
   bottom: calc(var(--alex-gap) + 64px);
   z-index: 85;
   width: min(320px, calc(100vw - 48px));
-  animation: alex-rise 420ms var(--ease-out) both;
+  animation: alex-rise 420ms var(--ease-out) backwards;
 }
 .alex-greeting-body { display: block; width: 100%; padding: 14px 40px 14px 16px; border: 1px solid rgba(103, 224, 193, 0.3); border-radius: 18px 18px 18px 6px; background: var(--alex-surface); color: var(--paper); font: inherit; font-size: 0.86rem; line-height: 1.55; text-align: left; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38); cursor: pointer; backdrop-filter: blur(10px); }
 .alex-greeting-body:hover { border-color: rgba(103, 224, 193, 0.55); }
@@ -125,9 +126,11 @@
 
 /* ---------- Never overlap other controls ---------- */
 /* The Voice Studio has its own player; a game takes the whole screen. */
+/* The entrance animation fills "backwards" only: a forwards fill would pin
+   opacity at 1 and the launcher would blink out instead of fading. */
 body.voice-studio-in-view .alex-launcher,
 body.voice-studio-in-view .alex-greeting,
-body.game-open .alex-root { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 200ms, visibility 0s 200ms; }
+body.game-open .alex-root { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(8px); transition: opacity 240ms var(--ease-smooth), transform 240ms var(--ease-smooth), visibility 0s linear 240ms; }
 /* While Alex is open on a phone, the bottom-right floaters step aside. */
 @media (max-width: 640px) {
   body.assistant-open .music-launcher,
@@ -155,5 +158,8 @@ body.game-open .alex-root { opacity: 0; visibility: hidden; pointer-events: none
 @media (prefers-reduced-motion: reduce) {
   .alex-launcher, .alex-greeting, .alex-panel, .alex-msg { animation: none; }
   .alex-launcher-orb::after, .alex-typing span { animation: none; }
-  .alex-launcher { transition: none; }
+  .alex-launcher, .alex-greeting { transition: none; }
+  body.voice-studio-in-view .alex-launcher,
+  body.voice-studio-in-view .alex-greeting,
+  body.game-open .alex-root { transition: none; transform: none; }
 }

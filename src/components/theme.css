@@ -23,7 +23,8 @@
   --theme-surface-raised: #eaf3f0;
   --theme-text: #102f31;
   --theme-muted: #506966;
-  --theme-accent: #0f806d;
+  --theme-accent: #0c7363; /* ≥4.5:1 on every light section surface (WCAG AA) */
+  --mint-deep: #0c7363;
   --theme-line: rgba(11, 37, 40, 0.15);
   --theme-shadow: 0 24px 70px rgba(7, 30, 32, 0.1);
 }
@@ -645,7 +646,9 @@ html[data-theme='light'] .hero-project-media .studio-screen-controls button:hove
 /* Route pages load their project discovery styles lazily; keep dark-mode text
    and controls explicit at the section boundary so those styles cannot fall
    back to the original paper palette. */
-html[data-theme='dark'] .route-page-heading .eyebrow { color: var(--theme-accent); }
+html[data-theme='dark'] .route-page-heading .eyebrow,
+html[data-theme='dark'] .product-studio-section .eyebrow,
+html[data-theme='dark'] .independent-products .eyebrow { color: var(--theme-accent); }
 html[data-theme='dark'] #projects .project-eyebrow,
 html[data-theme='dark'] #projects .project-story-grid > div > span,
 html[data-theme='dark'] #projects .project-detail-row > div > span,

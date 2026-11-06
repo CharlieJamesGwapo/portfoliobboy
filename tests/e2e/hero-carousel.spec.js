@@ -66,15 +66,17 @@ test('wraps carousel navigation and identifies BBOY as private', async ({ page }
   await expect(carousel.getByRole('link', { name: 'View project details' })).toHaveAttribute('href', '#bboy-assistant')
 })
 
+// Since 4da620a the desktop hero gives the copy more room and crops the
+// portrait taller rather than wider, so desktop widths shrink and heights grow.
 const portraitSizeTargets = [
   { width: 320, minWidth: 160, minHeight: 180 },
   { width: 375, minWidth: 160, minHeight: 180 },
   { width: 430, minWidth: 180, minHeight: 200 },
   { width: 768, minWidth: 210, minHeight: 239 },
   { width: 1024, minWidth: 220, minHeight: 260 },
-  { width: 1280, minWidth: 240, minHeight: 280 },
-  { width: 1440, minWidth: 240, minHeight: 280 },
-  { width: 1920, minWidth: 300, minHeight: 339 },
+  { width: 1280, minWidth: 220, minHeight: 300 },
+  { width: 1440, minWidth: 240, minHeight: 340 },
+  { width: 1920, minWidth: 260, minHeight: 360 },
 ]
 
 for (const target of portraitSizeTargets) {
@@ -104,7 +106,7 @@ for (const target of portraitSizeTargets) {
 
     if (width === 1440) {
       const identityBounds = await hero.locator('.hero-identity').boundingBox()
-      expect(identityBounds.y).toBeLessThan(250)
+      expect(identityBounds.y).toBeLessThan(270)
     }
   })
 }
