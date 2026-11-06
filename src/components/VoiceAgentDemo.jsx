@@ -157,8 +157,6 @@ const VoiceAgentDemo = () => {
             </details>
           </ScrollReveal>
         )}
-
-        <p className="vs-credits">AI voice technology: ElevenLabs. Sample voices are AI-generated.</p>
       </div>
     </section>
   )
