@@ -9,6 +9,7 @@ import UpdateBanner from './components/UpdateBanner'
 import PortfolioAssistant from './components/assistant/PortfolioAssistant'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
+import Services from './components/Services'
 import ProductStudioPreview from './components/ProductStudioPreview'
 import About from './components/About'
 import Experience from './components/Experience'
@@ -238,6 +239,7 @@ function App() {
         {isHome ? <>
         <Hero />
         <VoiceAgentDemo />
+        <Services />
         <ProductStudioPreview />
         <About />
         <Experience />

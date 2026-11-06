@@ -68,7 +68,7 @@ test('mobile navigation traps focus and returns it after Escape', async ({ page 
   await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toBeHidden()
 })
 
-test('the two contact paths prefill distinct, editable subjects', async ({ page }) => {
+test('the contact paths prefill distinct, editable subjects', async ({ page }) => {
   await page.goto('/#contact')
 
   await page.getByRole('button', { name: 'Hire me' }).click()
@@ -76,9 +76,12 @@ test('the two contact paths prefill distinct, editable subjects', async ({ page 
   await expect(subject).toBeFocused()
   await expect(subject).toHaveValue('Remote role enquiry')
 
-  await page.getByRole('button', { name: 'Build with me' }).click()
+  await page.getByRole('button', { name: 'AI automation' }).click()
   await expect(subject).toBeFocused()
-  await expect(subject).toHaveValue('Product collaboration enquiry')
+  await expect(subject).toHaveValue('AI automation project enquiry')
+
+  await page.getByRole('button', { name: 'Mobile app' }).click()
+  await expect(subject).toHaveValue('Mobile app project enquiry')
   await expect(subject).toHaveAttribute('aria-invalid', 'false')
 })
 
