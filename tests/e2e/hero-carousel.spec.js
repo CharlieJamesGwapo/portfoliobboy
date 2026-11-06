@@ -100,7 +100,7 @@ for (const target of portraitSizeTargets) {
     expect(titleFontSize).toBeGreaterThanOrEqual(28)
     expect(await firstTab.boundingBox().then((bounds) => bounds.height)).toBeGreaterThanOrEqual(44)
     expect(await nextButton.boundingBox().then((bounds) => bounds.width)).toBeGreaterThanOrEqual(44)
-    const primaryCtaBounds = await hero.getByRole('link', { name: /Explore projects/ }).boundingBox()
+    const primaryCtaBounds = await hero.getByRole('link', { name: /Explore my work/ }).boundingBox()
     expect(primaryCtaBounds.y + primaryCtaBounds.height).toBeLessThanOrEqual(900)
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
 
