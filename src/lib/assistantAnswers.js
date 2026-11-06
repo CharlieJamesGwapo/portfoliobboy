@@ -16,6 +16,7 @@ import {
 } from '../data/portfolioData'
 import { automationToolbox } from '../data/automationsData'
 import { voiceAccents } from '../data/voiceAccents'
+import { voiceConversations } from '../data/voiceConversations'
 
 // "Custom AI agents" -> "custom AI agents": lower only the first letter, so
 // acronyms like AI, CRM, and n8n keep their casing.
@@ -39,6 +40,15 @@ export const suggestedQuestions = [
   { id: 'contact', label: 'How do I contact him?' },
 ]
 
+// Only claim recordings that exist: languages still in preview are "coming".
+const multilingualNote = () => {
+  const ready = voiceConversations.filter((item) => item.status === 'ready').map((item) => item.name)
+  const coming = voiceConversations.filter((item) => item.status !== 'ready').map((item) => item.name)
+  if (ready.length) return `There are also bilingual receptionist calls in ${list(ready)}. `
+  if (coming.length) return `Bilingual receptionist calls in ${list(coming)} are coming soon. `
+  return ''
+}
+
 const answers = {
   greeting: () => ({
     text: `Hi! I can walk you through Charlie's projects, AI and automation work, skills, experience, or how to reach him. What would you like to know?`,
@@ -60,7 +70,7 @@ const answers = {
   }),
 
   voice: () => ({
-    text: `The Voice Studio has ${voiceAccents.length} short sample conversations in different English accents, created with AI voice technology. They're pre-recorded previews. For a real live call, try Alex on hasti.com.au.`,
+    text: `The Voice Studio has ${voiceAccents.length} short sample conversations in different English accents, created with AI voice technology. They're pre-recorded previews. ${multilingualNote()}For a real live call, try Alex on hasti.com.au.`,
     actions: [{ label: 'Open the Voice Studio', href: '/#voice-demo' }, { label: 'Talk to Alex on Hasti', href: 'https://hasti.com.au/', external: true }],
   }),
 
@@ -131,7 +141,7 @@ const intents = [
   ['pricing', ['price', 'pricing', 'cost', 'charge', 'rate', 'rates', 'budget', 'quote', 'how much', 'fee', 'fees']],
   ['contact', ['contact', 'email', 'reach', 'hire', 'phone', 'call him', 'linkedin', 'github', 'touch', 'message him', 'get in touch']],
   ['resume', ['resume', 'résumé', 'cv', 'curriculum']],
-  ['voice', ['voice', 'accent', 'elevenlabs', 'voices', 'audio', 'speak', 'listen', 'studio', 'talk to alex']],
+  ['voice', ['voice', 'accent', 'elevenlabs', 'voices', 'audio', 'speak', 'listen', 'studio', 'talk to alex', 'multilingual', 'bilingual', 'spanish', 'español', 'tagalog', 'taglish']],
   ['automations', ['automation', 'automate', 'n8n', 'zapier', 'make.com', 'gohighlevel', 'ghl', 'workflow']],
   ['ai', ['ai', 'agent', 'llm', 'gpt', 'claude', 'openai', 'mcp', 'machine learning', 'chatbot', 'alex']],
   ['services', ['service', 'offer', 'build for me', 'help me', 'can he build', 'freelance', 'available', 'availability']],

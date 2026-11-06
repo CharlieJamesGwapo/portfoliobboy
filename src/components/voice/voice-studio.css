@@ -229,3 +229,41 @@ html[data-theme] body .voice-demo-section.voice-studio {
 }
 html[data-theme] body .voice-studio .voice-engineering { border-color: rgba(255, 255, 255, 0.09); background: rgba(255, 255, 255, 0.03); }
 html[data-theme] body .voice-studio .voice-engineering > summary { color: var(--mint); }
+
+/* ---------- Multilingual conversations ---------- */
+.vs-ml { margin-top: 16px; }
+.vs-ml-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.vs-ml-card { display: flex; flex-direction: column; min-width: 0; padding: clamp(16px, 2.2vw, 22px); border: 1px solid var(--vs-line); border-radius: 18px; background: rgba(6, 26, 27, 0.55); }
+.vs-ml-card.is-pending { background: rgba(6, 26, 27, 0.4); }
+.vs-ml-card-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.vs-ml-langs { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+.vs-ml-lang-wrap { display: inline-flex; align-items: center; gap: 6px; }
+.vs-ml-lang { display: grid; place-items: center; min-width: 34px; height: 26px; padding: 0 8px; border: 1px solid var(--vs-line); border-radius: 8px; background: rgba(255, 255, 255, 0.05); color: var(--paper); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; }
+.vs-ml-lang-wrap:last-child .vs-ml-lang { border-color: var(--vs-line-strong); background: var(--vs-mint-wash); color: var(--mint); }
+.vs-ml-arrow { color: var(--vs-muted); }
+.vs-ml-status, .vs-ml-length { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; padding: 4px 10px; border-radius: 999px; font-size: 0.68rem; font-weight: 750; letter-spacing: 0.02em; white-space: nowrap; }
+.vs-ml-length { border: 1px solid var(--vs-line); color: var(--vs-muted); }
+.vs-ml-status-soon { background: rgba(233, 180, 76, 0.14); color: #f0c56e; }
+.vs-ml-status-planned { border: 1px dashed rgba(255, 255, 255, 0.2); color: var(--vs-muted); }
+.vs-ml-card h4 { margin-top: 14px; color: var(--paper); font-size: clamp(1.05rem, 1.7vw, 1.22rem); font-weight: 680; letter-spacing: -0.025em; }
+.vs-ml-scenario { margin-top: 4px; color: var(--mint); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.vs-ml-description { margin: 8px 0 16px; color: var(--vs-muted); font-size: 0.86rem; line-height: 1.6; }
+.vs-ml-card .vs-player { margin-top: auto; }
+.vs-ml-pending { display: flex; align-items: center; gap: 14px; margin-top: auto; padding: 14px 16px; border: 1px dashed rgba(255, 255, 255, 0.14); border-radius: 14px; }
+.vs-ml-pending p { color: var(--vs-muted); font-size: 0.8rem; line-height: 1.5; }
+.vs-ml-pending-wave { display: flex; flex: 0 0 auto; align-items: center; gap: 2px; height: 28px; }
+.vs-ml-pending-wave i { width: 2px; border-radius: 2px; background: rgba(255, 255, 255, 0.16); }
+.vs-ml-transcript { margin-top: 12px; }
+.vs-ml-transcript .vs-turn { max-width: 94%; }
+
+@media (max-width: 900px) {
+  .vs-ml-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 640px) {
+  /* The accent gallery hides its helper line on phones; this subtitle is the section's message, so keep it. */
+  .vs-ml .vs-studio-bar p { display: block; }
+  .vs-ml .vs-studio-bar { align-items: flex-start; }
+  .vs-ml-card { padding: 14px; border-radius: 14px; }
+  .vs-ml-pending { flex-direction: column; align-items: flex-start; gap: 10px; }
+}

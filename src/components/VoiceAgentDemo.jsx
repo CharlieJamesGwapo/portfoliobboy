@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { ArrowUpRight, Mic, PhoneCall } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import AccentGallery from './voice/AccentGallery'
+import MultilingualConversations from './voice/MultilingualConversations'
 import LiveAgentPanel, { hasLiveAgent } from './LiveAgentPanel'
 import './voice/voice-studio.css'
 import { liveLinks, voiceCallFlow } from '../data/portfolioData'
@@ -80,6 +81,8 @@ const VoiceAgentDemo = () => {
         </ScrollReveal>
 
         <ScrollReveal><AccentGallery /></ScrollReveal>
+
+        <ScrollReveal><MultilingualConversations /></ScrollReveal>
 
         <ScrollReveal>
           {hasLiveAgent ? <LiveAgentPanel /> : (

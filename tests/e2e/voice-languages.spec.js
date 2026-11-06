@@ -42,8 +42,8 @@ test('every accent plays its own recording, with a matching transcript, and swit
   for (const [name, lang, file] of ACCENTS) {
     await accentButton(demo, name).click()
     await expect(accentButton(demo, name)).toHaveAttribute('aria-pressed', 'true')
-    await expect(demo.locator('.vs-transcript ol')).toHaveAttribute('lang', lang)
-    await expect(demo.locator('.vs-transcript ol li').first()).toBeVisible()
+    await expect(demo.locator('.vs-accent-gallery .vs-transcript ol')).toHaveAttribute('lang', lang)
+    await expect(demo.locator('.vs-accent-gallery .vs-transcript ol li').first()).toBeVisible()
     const audio = demo.locator('audio')
     await expect(audio).toHaveAttribute('src', new RegExp(`${file}(?:-[\\w-]+)?\\.mp3$`))
     await demo.getByRole('button', { name: `Play ${name} English preview` }).click()
@@ -75,7 +75,7 @@ test('previews play, pause, seek and finish within a mobile screen', async ({ pa
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
-  await demo.locator('.vs-studio').scrollIntoViewIfNeeded()
+  await demo.locator('.vs-accent-gallery').scrollIntoViewIfNeeded()
   for (const name of ['American', 'Irish']) {
     await accentButton(demo, name).click()
     const play = demo.getByRole('button', { name: `Play ${name} English preview` })
