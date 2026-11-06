@@ -51,3 +51,28 @@
   .auto-node-outcome { flex-basis: auto; }
   .auto-node:not(:last-child)::after, .auto-node:nth-last-child(2)::after { content: '↓'; right: auto; left: 16px; top: auto; bottom: -17px; transform: none; }
 }
+
+/* Light theme: the site turns .section-dark sections light, so the
+   automations section follows with light cards and theme text colours. */
+html[data-theme='light'] .automations-section .auto-intro h2 { color: var(--theme-text); }
+html[data-theme='light'] .automations-section .auto-intro-copy > p,
+html[data-theme='light'] .automations-section .auto-toolbar > p,
+html[data-theme='light'] .automations-section .auto-summary { color: var(--theme-muted); }
+html[data-theme='light'] .automations-section .auto-toolbox { border-color: var(--theme-line); }
+html[data-theme='light'] .automations-section .auto-toolbox > span { color: #0a5f51; }
+html[data-theme='light'] .automations-section .auto-toolbox ul { color: var(--theme-text); }
+html[data-theme='light'] .automations-section .auto-filters button { border-color: var(--theme-line); color: var(--theme-muted); }
+html[data-theme='light'] .automations-section .auto-filters button:hover { border-color: var(--theme-accent); color: var(--theme-text); }
+html[data-theme='light'] .automations-section .auto-filters button.is-active { border-color: var(--theme-accent); background: var(--theme-accent); color: #fff; }
+html[data-theme='light'] .automations-section .auto-filters button:focus-visible { outline-color: var(--theme-accent); }
+html[data-theme='light'] .automations-section .auto-card { border-color: var(--theme-line); background: var(--theme-surface); box-shadow: var(--theme-shadow); }
+html[data-theme='light'] .automations-section .auto-card h3 { color: var(--theme-text); }
+html[data-theme='light'] .automations-section .auto-platform { background: rgba(15, 128, 109, 0.1); color: #0a5f51; }
+html[data-theme='light'] .automations-section .auto-node { border-color: var(--theme-line); background: var(--theme-surface-raised); color: var(--theme-text); }
+html[data-theme='light'] .automations-section .auto-node::after { color: var(--theme-accent); }
+html[data-theme='light'] .automations-section .auto-node-kind { color: #0a5f51; }
+html[data-theme='light'] .automations-section .auto-node-trigger { border-color: rgba(15, 128, 109, 0.45); }
+html[data-theme='light'] .automations-section .auto-node-outcome { border-color: rgba(179, 84, 53, 0.4); }
+html[data-theme='light'] .automations-section .auto-node-outcome .auto-node-kind { color: #a4472a; }
+html[data-theme='light'] .automations-section .auto-tools { border-color: var(--theme-line); }
+html[data-theme='light'] .automations-section .auto-tools span { background: var(--theme-surface-raised); color: var(--theme-muted); }

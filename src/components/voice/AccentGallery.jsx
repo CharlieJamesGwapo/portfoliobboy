@@ -42,8 +42,8 @@ export default function AccentGallery() {
         })}
       </div>
 
-      <div className="vs-stage" aria-live="polite">
-        <div className="vs-stage-head">
+      <div className="vs-stage">
+        <div className="vs-stage-head" aria-live="polite">
           <div>
             <p className="vs-stage-kicker">{selected.code} · {selected.name}</p>
             <h4>{selected.description}</h4>
