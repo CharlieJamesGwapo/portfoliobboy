@@ -129,7 +129,7 @@
 .vs-transcript summary:focus-visible { outline: 2px solid var(--mint); outline-offset: -2px; border-radius: 16px; }
 .vs-transcript summary svg { margin-left: 4px; color: var(--vs-muted); transition: transform 220ms var(--ease-out); }
 .vs-transcript[open] summary svg { transform: rotate(180deg); }
-.vs-transcript-count { margin-left: auto; padding: 3px 9px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); color: var(--vs-muted); font-size: 0.7rem; font-weight: 650; }
+.vs-transcript-count { margin-left: auto; flex-shrink: 0; white-space: nowrap; padding: 3px 9px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); color: var(--vs-muted); font-size: 0.7rem; font-weight: 650; }
 .vs-transcript ol { display: grid; gap: 10px; margin: 0; padding: 4px 16px 18px; list-style: none; }
 .vs-turn { display: flex; align-items: flex-end; gap: 10px; max-width: 86%; }
 .vs-turn-assistant { flex-direction: row-reverse; justify-self: end; }
@@ -211,7 +211,6 @@ body.voice-studio-in-view .back-to-top { opacity: 0 !important; visibility: hidd
   .vs-orb-ring { opacity: 0.35; }
   .vs-play-progress, .vs-accent, .vs-play-face, .vs-transcript summary svg { transition: none; }
 }
-.vs-credits { margin-top: 18px; color: var(--vs-muted); font-size: 0.68rem; letter-spacing: 0.01em; opacity: 0.75; }
 
 /* The studio is a deliberate dark "studio" panel in both themes. The light
    theme restyles .voice-demo-section for the old player; restore the studio's

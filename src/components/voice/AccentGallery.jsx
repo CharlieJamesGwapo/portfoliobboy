@@ -50,7 +50,6 @@ export default function AccentGallery() {
           </div>
           <dl className="vs-stage-meta">
             <div><dt className="sr-only">Length</dt><dd><Clock3 size={13} aria-hidden="true" /> {formatDuration(selected.duration)}</dd></div>
-            <div><dt className="sr-only">Voices</dt><dd><AudioLines size={13} aria-hidden="true" /> {selected.voice}</dd></div>
           </dl>
         </div>
 
@@ -84,7 +83,7 @@ export default function AccentGallery() {
       </details>
 
       <p className="vs-disclosure">
-        Sample conversations performed by AI voices ({selected.voice}). Fictional scenarios; no real customers or bookings.
+        These demonstrations feature AI-generated voices and fictional conversations.
       </p>
     </div>
   )

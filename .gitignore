@@ -25,7 +25,6 @@ dist-ssr
 
 # Local agent tooling
 .superpowers/
-.env*
 !.env.example
 
 # Browser test output
