@@ -1,0 +1,144 @@
+/* "What can I build for you?" — client-facing services, built only from the
+   design-system tokens in index.css and the theme tokens in theme.css. */
+.services-section {
+  position: relative;
+  padding: var(--space-9) 0 var(--space-8);
+  background: var(--theme-page, var(--paper));
+  color: var(--theme-text, var(--ink));
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.services-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  align-items: end;
+  gap: var(--space-5) var(--space-8);
+  margin-bottom: var(--space-7);
+}
+
+.services-head .eyebrow { margin-bottom: var(--space-3); color: var(--theme-accent, var(--mint-deep)); }
+
+.services-head h2 {
+  font-size: var(--text-display);
+  font-weight: 620;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+  color: var(--theme-text, var(--ink));
+}
+
+.services-head > p {
+  max-width: 420px;
+  color: var(--theme-muted, var(--slate));
+  font-size: var(--text-base);
+  line-height: 1.7;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: 1px solid var(--theme-line, var(--line-light));
+  border-radius: var(--radius-lg);
+  background: var(--theme-surface, var(--white));
+  box-shadow: var(--elevation-1);
+  transition: border-color var(--duration-fast) var(--ease-smooth), transform var(--duration-base) var(--ease-out);
+}
+
+.service-card:hover,
+.service-card:focus-within {
+  border-color: color-mix(in srgb, var(--theme-accent, var(--mint-deep)) 45%, transparent);
+  transform: translateY(-2px);
+}
+
+.service-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--theme-surface-raised, var(--paper-deep));
+  color: var(--theme-accent, var(--mint-deep));
+}
+
+.service-card h3 {
+  font-size: var(--text-xl);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  color: var(--theme-text, var(--ink));
+}
+
+.service-summary {
+  color: var(--theme-text, var(--ink));
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.service-detail {
+  color: var(--theme-muted, var(--slate));
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.service-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--theme-line, var(--line-light));
+}
+
+.service-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--touch-target);
+  color: var(--theme-accent, var(--mint-deep));
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.service-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.service-links .service-start { color: var(--theme-text, var(--ink)); }
+
+@media (max-width: 1100px) {
+  .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .services-section { padding: var(--space-8) 0 var(--space-7); }
+  .services-head { grid-template-columns: 1fr; margin-bottom: var(--space-6); }
+  .services-head h2 { font-size: clamp(2rem, 9vw, 2.6rem); }
+  .service-card { padding: var(--space-4) var(--space-4) var(--space-3); }
+}
+
+@media (max-width: 560px) {
+  .services-grid { grid-template-columns: 1fr; gap: var(--space-3); }
+  /* Phones get the scannable version: icon beside title, the one-line
+     summary, and both links on one row. The longer detail stays on wider
+     screens, where it costs no extra scrolling. */
+  .service-card { display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: var(--space-3); row-gap: var(--space-1); }
+  .service-icon { grid-row: 1 / span 2; margin: 0; }
+  .service-card h3 { align-self: end; font-size: var(--text-lg); }
+  .service-summary { font-weight: 500; color: var(--theme-muted, var(--slate)); }
+  .service-detail { display: none; }
+  .service-links { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--space-4); margin-top: var(--space-2); padding-top: var(--space-1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card { transition: none; }
+  .service-card:hover, .service-card:focus-within { transform: none; }
+}

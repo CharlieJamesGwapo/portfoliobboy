@@ -71,7 +71,11 @@ const answers = {
 
   voice: () => ({
     text: `The Voice Studio has ${voiceAccents.length} short sample conversations in different English accents, created with AI voice technology. They're pre-recorded previews. ${multilingualNote()}For a real live call, try Alex on hasti.com.au.`,
-    actions: [{ label: 'Open the Voice Studio', href: '/#voice-demo' }, { label: 'Talk to Alex on Hasti', href: 'https://hasti.com.au/', external: true }],
+    actions: [
+      { label: 'Open the Voice Studio', href: '/#voice-demo' },
+      ...(voiceConversations.some((item) => item.status === 'ready') ? [{ label: 'Hear the bilingual call', href: '/#voice-multilingual' }] : []),
+      { label: 'Talk to Alex on Hasti', href: 'https://hasti.com.au/', external: true },
+    ],
   }),
 
   automations: () => ({

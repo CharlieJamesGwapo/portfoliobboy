@@ -82,7 +82,7 @@ export default function AssistantPanel({ onClose }) {
         <span className="alex-avatar" aria-hidden="true"><AudioLines size={18} /></span>
         <div className="alex-head-copy">
           <h2 id="alex-title">Alex</h2>
-          <p><span className="alex-online" aria-hidden="true" /> AI Portfolio Assistant</p>
+          <p><span className="alex-online" aria-hidden="true" /> Portfolio assistant · instant answers</p>
         </div>
         <button type="button" className="alex-icon-button" onClick={onClose} aria-label="Close Alex">
           <X size={18} aria-hidden="true" />
