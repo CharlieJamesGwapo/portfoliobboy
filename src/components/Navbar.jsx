@@ -26,10 +26,14 @@ const moreNavigation = [
   { label: 'Resume PDF', href: resumeUrl, activeId: 'resume', download: 'charlie-james-abejo-resume.pdf' },
 ]
 
+// The phone menu lists every destination in the order it appears on the
+// page, with Contact and the resume last, instead of primary-then-more.
+const byLabel = (label) => [...primaryNavigation, ...moreNavigation].find((item) => item.label === label)
 const mobileNavigation = [
   { label: 'Home', href: '/', activeId: 'home', route: true },
-  ...primaryNavigation,
-  ...moreNavigation,
+  ...['Voice demo'].map(byLabel),
+  { label: 'Services', href: '#services', activeId: 'services' },
+  ...['Featured work', 'Projects', 'About', 'Experience', 'AI & Automation', 'Automations', 'Skills', 'Credentials', 'Interactive Lab', 'Contact', 'Resume PDF'].map(byLabel),
 ]
 
 const navigationTargets = [...primaryNavigation, ...moreNavigation]
@@ -314,7 +318,7 @@ const Navbar = () => {
             <kbd aria-hidden="true">{isApplePlatform() ? '⌘' : 'Ctrl'} K</kbd>
           </button>
           <ThemeToggle />
-          <a className="nav-cta desktop-cta" href={`mailto:${profile.email}`}>Let’s talk</a>
+          <a className="nav-cta desktop-cta" href={resolveHref('#contact')}>Let’s talk</a>
         </div>
 
         <button
@@ -334,7 +338,7 @@ const Navbar = () => {
         <nav aria-label="Mobile navigation">
           {mobileNavigation.map((link, index) => renderLink(link, index, true))}
           <div className="mobile-menu-actions">
-            <a className="mobile-contact" href={`mailto:${profile.email}`} onClick={closeMenu}>Start a conversation</a>
+            <a className="mobile-contact" href={resolveHref('#contact')} onClick={closeMenu}>Start a conversation</a>
             <ThemeToggle className="mobile-theme-toggle" />
             <button type="button" className="mobile-music" onClick={() => { closeMenu(); openPalette() }}>
               Search sections and actions

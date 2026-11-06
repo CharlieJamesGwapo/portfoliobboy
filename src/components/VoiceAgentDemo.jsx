@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { ArrowUpRight, Mic, PhoneCall } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
-import AccentGallery from './voice/AccentGallery'
-import MultilingualConversations from './voice/MultilingualConversations'
+import VoiceStudioTabs from './voice/VoiceStudioTabs'
 import LiveAgentPanel, { hasLiveAgent } from './LiveAgentPanel'
 import './voice/voice-studio.css'
 import { liveLinks, voiceCallFlow } from '../data/portfolioData'
@@ -60,12 +59,12 @@ const VoiceAgentDemo = () => {
               <p className="vs-eyebrow"><span aria-hidden="true" /> Bboy AI Voice Studio</p>
               <h2 id="voice-demo-title">Experience AI that sounds more human.</h2>
               <p className="vs-lede">
-                Explore eight English accents, listen to natural conversations, and discover how intelligent voice experiences are built.
+                Listen to eight English accents and a bilingual call that switches from English to Mexican Spanish, then see how the live voice agent behind them is built.
               </p>
               <ul className="vs-facts" aria-label="About these previews">
-                <li><strong>8</strong> English Accents</li>
-                <li>Natural AI Conversations</li>
-                <li>Interactive Voice Experience</li>
+                <li><strong>8</strong> English accents</li>
+                <li><strong>EN → ES</strong> bilingual call</li>
+                <li>Pre-recorded, AI-generated audio</li>
               </ul>
             </div>
 
@@ -80,9 +79,7 @@ const VoiceAgentDemo = () => {
           </header>
         </ScrollReveal>
 
-        <ScrollReveal><AccentGallery /></ScrollReveal>
-
-        <ScrollReveal><MultilingualConversations /></ScrollReveal>
+        <ScrollReveal><VoiceStudioTabs /></ScrollReveal>
 
         <ScrollReveal>
           {hasLiveAgent ? <LiveAgentPanel /> : (

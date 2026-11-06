@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowUpRight, CheckCircle2, Clock3, FileText, Github, Linkedin, Loader2, Mail, MapPin, Phone } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import { profile, resumeUrl } from '../data/portfolioData'
+import { CONTACT_INTENT_EVENT } from '../lib/contactIntent'
 
 // `company` is a honeypot: hidden from people, irresistible to the bots that
 // fill every field they can find. The server drops any submission that has it
@@ -9,14 +10,28 @@ import { profile, resumeUrl } from '../data/portfolioData'
 const initialForm = { name: '', email: '', subject: '', message: '', company: '' }
 const contactPaths = [
   {
+    id: 'hire',
     label: 'Hire me',
     subject: 'Remote role enquiry',
     description: 'Remote AI, full-stack, backend, or technical leadership roles.',
   },
   {
-    label: 'Build with me',
-    subject: 'Product collaboration enquiry',
-    description: 'SaaS, CRM, voice-agent, and workflow automation projects.',
+    id: 'automation',
+    label: 'AI automation',
+    subject: 'AI automation project enquiry',
+    description: 'Voice agents, AI assistants, n8n and GoHighLevel workflows.',
+  },
+  {
+    id: 'web',
+    label: 'Web application',
+    subject: 'Web application project enquiry',
+    description: 'SaaS platforms, CRMs, dashboards, and the APIs behind them.',
+  },
+  {
+    id: 'mobile',
+    label: 'Mobile app',
+    subject: 'Mobile app project enquiry',
+    description: 'Expo and native apps with a reliable backend and admin tools.',
   },
 ]
 
@@ -67,6 +82,18 @@ const Contact = () => {
     }
     document.getElementById('contact-subject')?.focus()
   }
+
+  // "Start a project" links elsewhere on the page pre-select a subject here.
+  useEffect(() => {
+    const onIntent = (event) => {
+      const subject = event.detail?.subject
+      if (typeof subject !== 'string' || !subject) return
+      setForm((current) => (current.subject.trim() ? current : { ...current, subject }))
+      setErrors((current) => ({ ...current, subject: '' }))
+    }
+    window.addEventListener(CONTACT_INTENT_EVENT, onIntent)
+    return () => window.removeEventListener(CONTACT_INTENT_EVENT, onIntent)
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -126,11 +153,11 @@ const Contact = () => {
           <div className="contact-paths" aria-label="Choose how you would like to work together">
             {contactPaths.map((path) => (
               <button
-                key={path.label}
+                key={path.id}
                 className={`contact-path ${form.subject === path.subject ? 'is-selected' : ''}`}
                 type="button"
                 aria-label={path.label}
-                aria-describedby={`contact-path-${path.label.toLowerCase().replaceAll(' ', '-')}`}
+                aria-describedby={`contact-path-${path.id}`}
                 aria-pressed={form.subject === path.subject}
                 disabled={status === 'sending'}
                 onClick={() => chooseContactPath(path.subject)}
@@ -139,10 +166,14 @@ const Contact = () => {
                   <strong>{path.label}</strong>
                   <ArrowUpRight size={17} aria-hidden="true" />
                 </span>
-                <small id={`contact-path-${path.label.toLowerCase().replaceAll(' ', '-')}`}>{path.description}</small>
+                <small id={`contact-path-${path.id}`}>{path.description}</small>
               </button>
             ))}
           </div>
+
+          <p className="contact-review">
+            Just evaluating my engineering? <a href="/projects">Browse the case studies <ArrowUpRight size={14} aria-hidden="true" /></a>
+          </p>
 
           <a className="contact-email" href={`mailto:${profile.email}`}>
             <span>{profile.email}</span>

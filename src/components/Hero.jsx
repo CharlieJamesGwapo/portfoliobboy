@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, Briefcase, Headphones, Github, Linkedin, Mail, MapPin } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, FileText, Headphones, Github, Linkedin, Mail, MapPin } from 'lucide-react'
 import { aiCapabilityRibbon, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import AnimatedStat from './AnimatedStat'
 import HeroProjectCarousel from './HeroProjectCarousel'
@@ -49,18 +49,21 @@ const Hero = () => (
 
         <div className="hero-actions hero-enter hero-enter-6">
           <a className="button button-primary" href="#product-studio-preview">
-            Explore projects <ArrowDown size={17} aria-hidden="true" />
+            Explore my work <ArrowDown size={17} aria-hidden="true" />
           </a>
-          <a className="button button-secondary" href={resumeUrl} target="_blank" rel="noreferrer">
-            View resume <ArrowUpRight size={17} aria-hidden="true" />
+          <a className="button button-secondary" href="#voice-demo">
+            <Headphones size={17} aria-hidden="true" /> Experience my AI
           </a>
         </div>
 
         <div className="hero-support-actions hero-enter hero-enter-6">
           <a className="hero-contact-link" href="#contact">
-            <Briefcase size={16} aria-hidden="true" /> Get in touch <ArrowUpRight size={14} aria-hidden="true" />
+            <Mail size={16} aria-hidden="true" /> Let&apos;s work together <ArrowDown size={14} aria-hidden="true" />
           </a>
-          <a className="hero-contact-link" href="#voice-demo"><Headphones size={16} aria-hidden="true" /> Listen to a voice demo <ArrowDown size={14} aria-hidden="true" /></a>
+          <a className="hero-contact-link" href={resumeUrl} target="_blank" rel="noreferrer">
+            <FileText size={16} aria-hidden="true" /> View resume <ArrowUpRight size={14} aria-hidden="true" />
+            <span className="sr-only"> (PDF, opens in a new tab)</span>
+          </a>
         </div>
 
         <div className="hero-socials hero-enter hero-enter-7" aria-label="Profile links">
@@ -77,7 +80,7 @@ const Hero = () => (
     </div>
 
     <div className="page-container ai-hero-ribbon" aria-label="AI and automation services">
-      <a href="#ai-systems">What I build <ArrowUpRight size={15} aria-hidden="true" /></a>
+      <a href="#services">What I build <ArrowDown size={15} aria-hidden="true" /></a>
       <ul>{aiCapabilityRibbon.map((capability) => <li key={capability}>{capability}</li>)}</ul>
     </div>
 

@@ -1,0 +1,92 @@
+/*
+ * UX audit refinements (docs/PORTFOLIO_UX_AUDIT.md). Each block names the
+ * finding it fixes. Loaded after every homepage stylesheet, so selectors stay
+ * as narrow as the problem they solve instead of restyling whole sections.
+ */
+
+/* UX-06 · Mobile hero: a stacked 300x320 portrait pushed the headline to
+   570px and the secondary actions below the fold on phones. The portrait
+   keeps its reviewed minimum size (160x180, 180x200 from 430px) but sits
+   beside the name, so the headline, intro, and every CTA rise into view. */
+@media (max-width: 767px) {
+  body .hero-section .hero-profile-intro {
+    grid-template-columns: 164px minmax(0, 1fr);
+    align-items: end;
+    column-gap: var(--space-4);
+    row-gap: var(--space-4);
+  }
+  body .hero-section .hero-profile-intro .hero-profile-copy { display: contents; }
+  body .hero-section .hero-profile-intro picture {
+    grid-column: 1;
+    grid-row: 1;
+    width: 164px;
+    height: 184px;
+    border-radius: var(--radius-lg);
+  }
+  body .hero-section .hero-profile-intro picture img { object-position: 50% 18%; }
+  body .hero-section .hero-profile-details { grid-column: 2; grid-row: 1; margin: 0; }
+  body .hero-section .hero-profile-intro h1 { grid-column: 1 / -1; grid-row: 2; margin: 0; }
+  body .hero-section .availability-pill { font-size: 0.78rem; }
+}
+@media (min-width: 420px) and (max-width: 767px) {
+  body .hero-section .hero-profile-intro { grid-template-columns: 184px minmax(0, 1fr); }
+  body .hero-section .hero-profile-intro picture { width: 184px; height: 204px; }
+}
+
+/* UX-11 · Automations: arrows were pinned to the right edge of each node, so
+   when a chain wrapped the arrow dangled at the end of a row pointing at
+   nothing. Steps now share one row (their text wraps instead) and only the
+   result sits on its own line. Phones keep the vertical chain. */
+@media (min-width: 641px) {
+  .automations-section .auto-flow { flex-wrap: wrap; gap: 10px 22px; }
+  .automations-section .auto-node:not(.auto-node-outcome) { flex: 1 1 0; min-width: 0; }
+  .automations-section .auto-node-outcome { flex: 1 0 100%; }
+}
+
+/* UX-12 · "Independent products" started flush against the last client case
+   study card with no breathing room. */
+.product-studio-section .independent-products { margin-top: var(--space-9); }
+@media (max-width: 767px) {
+  .product-studio-section .independent-products { margin-top: var(--space-8); }
+}
+
+/* UX-15 · Touch targets: desktop nav links measured 23px tall and two inline
+   section links 19-21px, under the WCAG 2.2 24px minimum. */
+body .desktop-nav a { display: inline-flex; align-items: center; min-height: 32px; }
+.ai-systems-intro-copy a,
+.ai-hero-ribbon > a,
+.ai-delivery-note a { display: inline-flex; align-items: center; min-height: var(--touch-target); }
+
+/* UX-08 · Light theme: the "voice engineering" ladder lives on a dark panel,
+   but the light theme recoloured its labels to dark text (1.07:1 — invisible)
+   and its details to 2.26:1. */
+html[data-theme='light'] .voice-demo-section .vc-label { color: var(--paper); }
+html[data-theme='light'] .voice-demo-section .vc-detail { color: #b5c9c5; }
+
+/* UX-09 · Dark theme: mint-deep (#0f806d) labels on dark surfaces measured
+   2.5-3.2:1. The theme accent is the dark-surface equivalent. */
+html[data-theme='dark'] .selected-case-study .case-study-index span,
+html[data-theme='dark'] .archive-project .archive-number,
+html[data-theme='dark'] .archive-project p,
+html[data-theme='dark'] .ai-systems-intro-copy a { color: var(--theme-accent); }
+html[data-theme='dark'] .ai-capability-top span { color: var(--theme-muted); }
+
+/* UX-17 · Contact: a quiet route for people reviewing work rather than
+   starting a conversation. */
+.contact-review { margin-top: var(--space-4); color: inherit; font-size: var(--text-sm); opacity: 0.88; }
+.contact-review a { display: inline-flex; align-items: center; gap: 4px; min-height: var(--touch-target); font-weight: 700; color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+
+/* UX-18 · Alex on phones: page text showed through the panel behind the
+   conversation. A fully opaque surface keeps the answers readable. */
+@media (max-width: 640px) {
+  .alex-panel { background: #0b2729; }
+}
+
+/* UX-17b · Four contact paths on phones: a 2x2 grid of labels keeps the form
+   within reach. The descriptions stay as each button's accessible
+   description (aria-describedby still reads hidden text). */
+@media (max-width: 560px) {
+  .contact-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+  .contact-path { min-height: 56px; }
+  .contact-path small { display: none; }
+}
