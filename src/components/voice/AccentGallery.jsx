@@ -15,7 +15,7 @@ export default function AccentGallery() {
   if (!selected) return null
 
   return (
-    <div className="vs-studio" aria-labelledby="vs-studio-title">
+    <div className="vs-studio vs-accent-gallery" aria-labelledby="vs-studio-title">
       <div className="vs-studio-bar">
         <div>
           <h3 id="vs-studio-title">Voice preview demo</h3>

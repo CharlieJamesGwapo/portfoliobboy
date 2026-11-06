@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 // Bboy AI Voice Studio: eight pre-recorded accent previews on a custom player.
+// `demo` is the accent gallery itself; the multilingual panel has its own spec.
 // Audio requests are matched by file name; Vite also requests each .mp3 as a
 // JS module (resourceType "script"), which must be allowed through.
 const ACCENTS = [
@@ -20,7 +21,7 @@ test('a preview can retry after a failed load without reloading the page', async
   let available = false
   await page.route(/american-english[^/]*\.mp3/, (route) => available || route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
-  const demo = page.locator('#voice-demo')
+  const demo = page.locator('#voice-demo .vs-accent-gallery')
   await expect(demo.getByRole('status')).toContainText("This preview couldn't load")
   available = true
   await demo.getByRole('button', { name: 'Try again', exact: true }).click()
@@ -36,7 +37,7 @@ test('voice studio is the first section after the hero', async ({ page }) => {
 
 test('every accent plays its own recording, with a matching transcript, and switching stops the previous one', async ({ page }) => {
   await page.goto('/#voice-demo')
-  const demo = page.locator('#voice-demo')
+  const demo = page.locator('#voice-demo .vs-accent-gallery')
   await expect(demo.getByRole('group', { name: 'Choose an English accent' }).getByRole('button')).toHaveCount(8)
   await demo.getByText('Read the conversation', { exact: true }).click()
   for (const [name, lang, file] of ACCENTS) {
@@ -62,7 +63,7 @@ test('every accent plays its own recording, with a matching transcript, and swit
 test('a failed accent preview can recover by choosing another accent', async ({ page }) => {
   await page.route(/australian-english[^/]*\.mp3/, (route) => route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
-  const demo = page.locator('#voice-demo')
+  const demo = page.locator('#voice-demo .vs-accent-gallery')
   await accentButton(demo, 'Australian').click()
   await expect(demo.getByRole('status')).toContainText("This preview couldn't load")
   await accentButton(demo, 'British').click()
@@ -74,8 +75,8 @@ test('a failed accent preview can recover by choosing another accent', async ({ 
 test('previews play, pause, seek and finish within a mobile screen', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/#voice-demo')
-  const demo = page.locator('#voice-demo')
-  await demo.locator('.vs-studio').scrollIntoViewIfNeeded()
+  const demo = page.locator('#voice-demo .vs-accent-gallery')
+  await demo.scrollIntoViewIfNeeded()
   for (const name of ['American', 'Irish']) {
     await accentButton(demo, name).click()
     const play = demo.getByRole('button', { name: `Play ${name} English preview` })
