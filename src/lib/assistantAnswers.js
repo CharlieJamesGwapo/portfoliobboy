@@ -44,9 +44,9 @@ export const suggestedQuestions = [
 const multilingualNote = () => {
   const ready = voiceConversations.filter((item) => item.status === 'ready').map((item) => item.name)
   const coming = voiceConversations.filter((item) => item.status !== 'ready').map((item) => item.name)
-  if (ready.length) return `There are also bilingual receptionist calls in ${list(ready)}. `
-  if (coming.length) return `Bilingual receptionist calls in ${list(coming)} are coming soon. `
-  return ''
+  if (ready.length === 0) return coming.length ? `Bilingual receptionist calls in ${list(coming)} are coming soon. ` : ''
+  const readyNote = `There's also a bilingual receptionist call that switches from English to ${list(ready)}. `
+  return coming.length ? `${readyNote}${list(coming)} ${coming.length > 1 ? "are" : "is"} coming soon. ` : readyNote
 }
 
 const answers = {

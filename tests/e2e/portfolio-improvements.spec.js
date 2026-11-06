@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test'
 
 test('accent preview loads playable audio and a matching transcript', async ({ page }) => {
   await page.goto('/#voice-demo')
-  const demo = page.locator('#voice-demo')
-  await expect(demo.locator('.vs-accent-gallery').getByText('These demonstrations feature AI-generated voices and fictional conversations.')).toBeVisible()
+  const demo = page.locator('#voice-demo .vs-accent-gallery')
+  await expect(demo.getByText('These demonstrations feature AI-generated voices and fictional conversations.')).toBeVisible()
   const audio = demo.locator('audio')
   await expect.poll(() => audio.evaluate((element) => element.readyState)).toBeGreaterThanOrEqual(1)
   await expect(audio).toHaveAttribute('src', /american-english(?:-[\w-]+)?\.mp3$/)
@@ -18,7 +18,7 @@ test('accent preview loads playable audio and a matching transcript', async ({ p
 test('voice audio errors offer a readable alternative', async ({ page }) => {
   await page.route(/-english[^/]*\.mp3/, (route) => route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
-  await expect(page.locator('#voice-demo [role="status"]')).toContainText("This preview couldn't load")
+  await expect(page.locator('#voice-demo .vs-accent-gallery [role="status"]')).toContainText("This preview couldn't load")
   await page.getByText('Read the conversation', { exact: true }).click()
   await expect(page.locator('.vs-accent-gallery .vs-transcript ol')).toBeVisible()
 })
@@ -132,9 +132,9 @@ test('successful contact response clears the form and confirms delivery', async 
 
 test('accent preview identifies the AI assistant and plays', async ({ page }) => {
   await page.goto('/#voice-demo')
-  const demo = page.locator('#voice-demo')
+  const demo = page.locator('#voice-demo .vs-accent-gallery')
   await demo.getByText('Read the conversation', { exact: true }).click()
-  await expect(demo.locator('.vs-accent-gallery .vs-transcript')).toContainText('AI Assistant')
+  await expect(demo.locator('.vs-transcript')).toContainText('AI Assistant')
   const audio = demo.locator('audio')
   await expect(audio).toHaveAttribute('src', /accents\/[a-z-]+-english(?:-[\w-]+)?\.mp3$/)
   await demo.getByRole('button', { name: 'Play American English preview' }).click()

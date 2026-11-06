@@ -13,6 +13,7 @@
 // Recording plan, voices, and credit estimate: docs/multilingual-voice-plan.md.
 // When a recording is approved and generated, import the mp3, set `src`,
 // switch `status` to 'ready', and re-run scripts/build-voice-peaks.mjs.
+import mexicanSpanish from '../assets/audio/conversations/es-mx.mp3'
 import voicePeaks from './voicePeaks.json'
 
 const peaksFor = (file) => (file ? voicePeaks[`conversations/${file}`] : null) ?? { duration: null, peaks: [] }
@@ -33,9 +34,12 @@ const conversations = [
     title: 'Booking a clinic appointment',
     description:
       'A caller starts in English, switches to Spanish to book a checkup for his mother, and the receptionist follows without missing a beat.',
-    status: 'preview',
-    file: null,
-    src: null,
+    // Generated 2026-11-06: Eleven v4 dialogue, Emily (receptionist) with
+    // Ernesto (caller), default settings, 455 credits. Transcript below is the
+    // exact submitted text.
+    status: 'ready',
+    file: 'es-mx.mp3',
+    src: mexicanSpanish,
     turns: [
       ai(en('Northgate Family Clinic, this is Sofía. How can I help you?')),
       caller(en('Hi, I need to book a checkup for my mom. Actually,'), es('¿le puedo hablar en español?')),

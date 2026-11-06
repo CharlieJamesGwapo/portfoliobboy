@@ -1,8 +1,22 @@
 # Multilingual conversations: recording plan and credit estimate
 
-Status: **awaiting approval. No audio generated, no credits spent.**
-The UI ships in a labelled preview state ("Recording soon" / "Planned") that
-shows each script and plays nothing.
+Status:
+
+- **Mexican Spanish: generated 2026-11-06** (approved). One generation,
+  **455 credits** (36,050 → 35,595 remaining), exactly one per script
+  character; the line breaks between speaker blocks were not billed. Under the
+  910-credit cap, no retake.
+- **Filipino / Taglish: planned.** Not generated; needs a separate approval.
+  Its card shows the script only and plays nothing.
+
+| File | Length | Format |
+| --- | --- | --- |
+| `src/assets/audio/conversations/es-mx.mp3` | 29.96 s | MP3 44.1 kHz mono, 128 kbps (Generation 1 of 2 takes) |
+
+**A human listening pass is still needed** to confirm the English-to-Spanish
+switch, pronunciation, and that the take matches the transcript word for word.
+The other take (Generation 2) is in the ElevenLabs history if Generation 1 has
+a problem; downloading it costs nothing.
 
 ## Account (checked 2026-11-06 in the ElevenLabs dashboard)
 
@@ -37,6 +51,10 @@ rate, so this comes from our own measurement: the eight accent scripts were
 
 Alternates if a voice is unavailable: receptionist Ale Rodriguez – Natural
 Mexican; caller Pablo – Energetic Mexican Spanish.
+
+Note: Emily has **Live Moderation** enabled. That is fine for pre-recorded
+Text to Speech, but ElevenLabs does not allow such voices in a live agent, so
+a future live Spanish agent needs a different receptionist voice.
 
 Script (exactly as submitted, 455 characters, about 29–31 s):
 

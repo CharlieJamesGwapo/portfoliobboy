@@ -100,7 +100,8 @@ function ConversationCard({ conversation }) {
 
 export default function MultilingualConversations() {
   if (voiceConversations.length === 0) return null
-  const anyPending = voiceConversations.some((conversation) => conversation.status !== 'ready')
+  // Name only the labels actually shown, e.g. “Planned”, in the disclosure.
+  const pendingLabels = [...new Set(voiceConversations.map((conversation) => STATUS[conversation.status]?.label).filter(Boolean))]
 
   return (
     <section className="vs-studio vs-ml" aria-labelledby="vs-ml-title">
@@ -120,7 +121,7 @@ export default function MultilingualConversations() {
 
       <p className="vs-disclosure">
         These demonstrations feature AI-generated voices and fictional conversations.
-        {anyPending && ' Cards marked “Recording soon” or “Planned” show the script only; no audio is played.'}
+        {pendingLabels.length > 0 && ` Cards marked ${pendingLabels.map((label) => `“${label}”`).join(' or ')} show the script only; no audio is played.`}
       </p>
     </section>
   )

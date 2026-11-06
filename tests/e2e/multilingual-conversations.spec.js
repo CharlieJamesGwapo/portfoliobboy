@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-// Multilingual Conversations sit under the eight English accents. Until a
-// recording is approved and generated, a card shows its script only.
+// Multilingual Conversations sit under the eight English accents. The Spanish
+// call is recorded; the Taglish card shows its script only until approved.
 for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
   test(`multilingual cards fit and read correctly at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport)
@@ -12,14 +12,23 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 
 
     const spanish = section.getByRole('article', { name: 'Mexican Spanish' })
     const taglish = section.getByRole('article', { name: 'Filipino / Taglish' })
-    await expect(spanish.getByText('Recording soon')).toBeVisible()
     await expect(taglish.getByText('Planned', { exact: true })).toBeVisible()
-    await expect(section.getByRole('button', { name: /^Play / })).toHaveCount(0)
+    await expect(taglish.getByRole('button', { name: /^Play / })).toHaveCount(0)
 
-    await spanish.getByText('Read the script').click()
-    const script = spanish.getByRole('list', { name: 'Mexican Spanish script' })
-    await expect(script.locator('[lang="es-MX"]').first()).toBeVisible()
-    await expect(script.getByText('¿Se la aparto?', { exact: false })).toBeVisible()
+    // The recorded Spanish call plays inline, about 30 seconds long.
+    const audio = spanish.locator('audio')
+    await expect(audio).toHaveAttribute('src', /es-mx[^/]*\.mp3$/)
+    await spanish.getByRole('button', { name: 'Play Mexican Spanish conversation' }).click()
+    await expect.poll(() => audio.evaluate((element) => element.currentTime)).toBeGreaterThan(0)
+    const duration = await audio.evaluate((element) => element.duration)
+    expect(duration).toBeGreaterThan(25)
+    expect(duration).toBeLessThan(35)
+    await spanish.getByRole('button', { name: 'Pause Mexican Spanish conversation' }).click()
+
+    await spanish.getByText('Read the transcript').click()
+    const transcript = spanish.getByRole('list', { name: 'Mexican Spanish conversation transcript' })
+    await expect(transcript.locator('[lang="es-MX"]').first()).toBeVisible()
+    await expect(transcript.getByText('¿Se la aparto?', { exact: false })).toBeVisible()
 
     // The eight accents are untouched.
     await expect(page.getByRole('group', { name: 'Choose an English accent' }).getByRole('button')).toHaveCount(8)

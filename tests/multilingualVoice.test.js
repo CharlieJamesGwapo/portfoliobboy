@@ -44,16 +44,19 @@ test('Voice Studio keeps eight accents and adds an honest multilingual section',
     assert.equal((html.match(/<article class="vs-ml-card/g) ?? []).length, 2)
     assert.match(html, />Mexican Spanish</)
     assert.match(html, />Filipino \/ Taglish</)
-    // Unrecorded cards are labelled as such and never render a player.
-    assert.match(html, /Recording soon/)
+    // The recorded Spanish call gets the studio player (lazy, no autoplay);
+    // the unrecorded Taglish card is labelled and renders no player.
+    assert.match(html, /<audio src="[^"]*\/conversations\/es-mx[^"]*\.mp3" preload="metadata">/)
+    assert.match(html, /aria-label="Play Mexican Spanish conversation"/)
     assert.match(html, />Planned</)
-    assert.equal((html.match(/<audio /g) ?? []).length, 1, 'only the accent gallery has audio')
+    assert.doesNotMatch(html, /Recording soon/)
+    assert.equal((html.match(/<audio /g) ?? []).length, 2, 'accent gallery + Spanish call only')
     // Each phrase is marked in the language actually spoken.
     assert.match(html, /<span lang="es-MX">[^<]*¿le puedo hablar en español\?<\/span>/)
     assert.match(html, /<span lang="fil">[^<]*Pero pwede mag-Tagalog na lang\?/)
     assert.match(html, /<span lang="en-US">Northgate Family Clinic/)
     // Disclosure stays, provider and model branding stay out.
-    assert.match(html, /show the script only; no audio is played\./)
+    assert.match(html, /These demonstrations feature AI-generated voices and fictional conversations\./)
     assert.doesNotMatch(html, /Eleven ?Labs|Eleven v\d|11\.ai/i)
   })
 })
@@ -63,10 +66,9 @@ test('Alex only claims multilingual recordings that exist', async () => {
     const { answerQuestion } = await server.ssrLoadModule('/src/lib/assistantAnswers.js')
     const { voiceConversations } = await server.ssrLoadModule('/src/data/voiceConversations.js')
     const answer = answerQuestion('Can your AI speak Spanish?').text
-    if (voiceConversations.every((item) => item.status !== 'ready')) {
-      assert.match(answer, /Mexican Spanish and Filipino \/ Taglish are coming soon/)
-      assert.doesNotMatch(answer, /There are also bilingual/)
-    }
+    const ready = voiceConversations.filter((item) => item.status === 'ready').map((item) => item.name)
+    assert.deepEqual(ready, ['Mexican Spanish'])
+    assert.match(answer, /bilingual receptionist call that switches from English to Mexican Spanish\. Filipino \/ Taglish is coming soon\./)
     assert.match(answerQuestion('do you do taglish').text, /Voice Studio/)
   })
 })
