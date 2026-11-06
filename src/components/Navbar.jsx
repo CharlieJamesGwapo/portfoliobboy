@@ -21,6 +21,7 @@ const moreNavigation = [
   { label: 'Skills', href: '#skills', activeId: 'skills' },
   { label: 'Credentials', href: '#education', activeId: 'education' },
   { label: 'Voice demo', href: '#voice-demo', activeId: 'voice-demo' },
+  { label: 'Automations', href: '#automations', activeId: 'automations' },
   { label: 'Interactive Lab', href: '/lab', activeId: 'lab-route', route: true },
   { label: 'Resume PDF', href: resumeUrl, activeId: 'resume', download: 'charlie-james-abejo-resume.pdf' },
 ]

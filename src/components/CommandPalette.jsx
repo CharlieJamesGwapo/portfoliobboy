@@ -26,6 +26,7 @@ import {
   Sparkles,
   User,
   Wrench,
+  Zap,
 } from 'lucide-react'
 import { featuredProjects, navigation, profile, resumeUrl } from '../data/portfolioData'
 import { caseStudySlug } from '../data/routeMetadata'
@@ -119,8 +120,9 @@ export default function CommandPalette({ open, onClose }) {
       })),
       { id: 'case-alex-hasti', label: 'Alex / Hasti voice engineering', hint: 'Case study · LiveKit · Twilio · OpenAI · n8n', icon: Sparkles, run: () => navigatePortfolio('/projects/alex-hasti') },
       { id: 'case-zalio-crm', label: 'Zalio CRM', hint: 'Case study · Conversations · Calling · Retention', icon: Layers, run: () => navigatePortfolio('/projects/zalio-crm') },
-      { id: 'go-voice-demo', label: 'Listen to the voice demos', hint: 'US and Australian English', icon: Music2, run: () => goTo('#voice-demo') },
+      { id: 'go-voice-demo', label: 'Listen to the voice demos', hint: 'Eight English accents', icon: Music2, run: () => goTo('#voice-demo') },
       { id: 'go-ai-systems', label: 'AI agents, voice & automation', hint: 'Explore capabilities and live demos', icon: Sparkles, run: () => goTo('#ai-systems') },
+      { id: 'go-automations', label: 'AI automation workflows', hint: 'n8n, GoHighLevel, Make, Zapier', icon: Zap, run: () => goTo('#automations') },
       {
         id: 'copy-email',
         label: 'Copy email address',

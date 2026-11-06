@@ -27,11 +27,10 @@ test('voice engineering stays collapsed while audio remains directly playable', 
   const engineering = demo.locator('.voice-engineering')
   await expect(engineering).not.toHaveAttribute('open', '')
   await expect(demo.locator('.vc-figure')).toBeHidden()
-  await expect(demo.locator('audio')).toBeVisible()
+  await expect(demo.getByRole('button', { name: 'Play American English preview' })).toBeVisible()
   await engineering.locator('summary').press('Enter')
   await expect(demo.locator('.vc-figure')).toBeVisible()
-  await expect(demo.locator('#voice-sample-disclosure')).toContainText('Fictional conversations with synthetic voices.')
-  await expect(demo.locator('#voice-sample-disclosure')).toContainText('No real appointment is made.')
+  await expect(demo.locator('.vs-disclosure')).toHaveText('These demonstrations feature AI-generated voices and fictional conversations.')
 })
 
 for (const hash of ['projects', 'momentum-work', 'live-projects']) {
