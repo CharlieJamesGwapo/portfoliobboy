@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test('accent preview loads playable audio and a matching transcript', async ({ page }) => {
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo')
-  await expect(demo.getByText(/Sample conversations performed by AI voices/)).toBeVisible()
+  await expect(demo.getByText('These demonstrations feature AI-generated voices and fictional conversations.')).toBeVisible()
   const audio = demo.locator('audio')
   await expect.poll(() => audio.evaluate((element) => element.readyState)).toBeGreaterThanOrEqual(1)
   await expect(audio).toHaveAttribute('src', /american-english(?:-[\w-]+)?\.mp3$/)

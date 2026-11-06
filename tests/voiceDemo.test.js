@@ -14,9 +14,9 @@ test('voice studio offers eight inline accent previews and discloses AI voices',
     assert.doesNotMatch(html, /autoplay/i)
     assert.match(html, /aria-label="Play American English preview"/)
     assert.equal((html.match(/class="vs-accent[ "]/g) ?? []).length, 8)
-    // Honest disclosure, with the provider credit kept to one small line.
-    assert.match(html, /Sample conversations performed by AI voices/)
-    assert.match(html, /AI voice technology: ElevenLabs/)
+    // Honest AI-voice disclosure, with no provider or model branding in the public UI.
+    assert.match(html, /These demonstrations feature AI-generated voices and fictional conversations\./)
+    assert.doesNotMatch(html, /Eleven ?Labs|Eleven v\d|11\.ai/i)
     assert.match(html, /Read the conversation/)
     // No legacy recordings or model branding in the public copy.
     assert.doesNotMatch(html, /William|Natasha|edge-tts|synthetic neural/i)

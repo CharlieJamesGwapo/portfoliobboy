@@ -44,7 +44,7 @@ const LiveAgentPanel = () => {
             <Mic size={17} aria-hidden="true" /> Start a live conversation
           </button>
         )}
-        <p className="live-agent-disclosure">You're speaking with an AI, not a person. Voice technology by ElevenLabs; audio is processed under their privacy policy.</p>
+        <p className="live-agent-disclosure">You're speaking with an AI, not a person. Audio is processed by a third-party voice provider while the conversation is open.</p>
       </div>
     </div>
   )
