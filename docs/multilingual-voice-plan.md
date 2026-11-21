@@ -112,3 +112,55 @@ Caller: Salamat din!
    the take matches the script word for word.
 
 All business and person names in the scripts are fictional.
+
+## Batch 2: generated 2026-11-21 (approved)
+
+Eleven v4 multi-speaker Text to Speech, default settings (stability 50,
+similarity 75), MP3 44.1 kHz 128 kbps, one generation each. **2,722 credits**
+for the six calls plus the welcome clip (35,595 → 32,873 remaining).
+
+| File | Receptionist / agent | Caller | Length |
+| --- | --- | --- | --- |
+| `fil-taglish.mp3` | Maria – Soothing, Gentle, and Clear | Rezz – Calm & Friendly | 36.8 s |
+| `ja-jp.mp3` | Otani – Inviting, Clear and Measured | Hadou – Calm Japanese Male | 42.3 s |
+| `fr-fr.mp3` | Lucie – Support Agent | Paul – Calm, Confident Narrator | 30.6 s |
+| `pt-br.mp3` | Pri – Warm & Natural Brazilian Portuguese | Daniel – Brazilian Conversational Voice | 36.0 s |
+| `hi-in.mp3` | Monika Sogam – Lively E-Com Support | Aarav J – Cool & Wise Friend | 34.3 s |
+| `ar-gulf.mp3` | Maryam Essa – Kuwaiti Calm & Warm | Nasser AlJubaily – Authentic Saudi Pro | 32.4 s |
+| `welcome/welcome.mp3` | Eric – Smooth, Trustworthy (same voice as the live Alex agent) | | 20.3 s |
+
+The welcome clip says: "Hey, welcome to Charlie James Abejo's portfolio! I'm
+Alex, Charlie's AI assistant. Charlie is a lead full-stack developer who builds
+AI voice agents, CRM platforms, and web and mobile apps for teams around the
+world. Take a look around, ask me anything in the chat, or book a free
+fifteen-minute call. Enjoy your visit!"
+
+**Still needed: a native-speaker listening pass** for each call (pronunciation,
+the language switch, and that the take matches its transcript). The other take
+of every call is in the ElevenLabs history if one needs replacing.
+
+### Scripts as approved
+
+Scripts live in `src/data/voiceConversations.js` (status `preview`). Each opens
+in American English, then switches. They are written for spoken realism:
+fillers ("um", "euh", "えっと"), a "let me check" pause, read-backs of the
+booking, and short turns.
+
+| Id | Language | Scenario | Characters |
+| --- | --- | --- | --- |
+| `fil-taglish` | Filipino / Taglish | Dental cleaning | 477 |
+| `ja-jp` | Japanese (keigo) | Extending a hotel stay | 330 |
+| `fr-fr` | French | Table for six, later terrace slot | 520 |
+| `pt-br` | Brazilian Portuguese | Free gym trial (mirrors the gym CRM work) | 521 |
+| `hi-in` | Hindi with English tech terms | Broadband outage (mirrors the ISP work) | 459 |
+| `ar-gulf` | Gulf Arabic | Apartment viewing in Dubai Marina | 415 |
+
+**Estimate: 2,722 credits** for one pass (same model and settings as batch 1,
+1 credit per character), plus about 200 for a spoken welcome clip
+(`src/assets/audio/welcome/welcome.mp3`). Pick a native voice per language
+from the Voice Library for both roles; the receptionist must not be a voice
+with Live Moderation if it may later be used in a live agent.
+
+After generating: save each file as `src/assets/audio/conversations/<id>.mp3`
+(the card switches to a player automatically), run
+`node scripts/build-voice-peaks.mjs`, then do a native-speaker listening pass.

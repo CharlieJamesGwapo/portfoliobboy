@@ -26,7 +26,9 @@ Commit `9a0cb1b` (#16, "UX audit…") deleted both lines from `.gitignore`. That
 `RESEND_API_KEY`) would be picked up by `git add .`. `.env.local` is still covered
 by `*.local`. Removing `.vscode/*` matters because earlier infections in this repo
 shipped `.vscode` payloads (see §2). An unrelated UX commit has no reason to touch
-these lines, so treat the change as suspect. **Fixed** by restoring both lines:
+these lines, so treat the change as suspect. The same commit also deleted every
+file in `public/fonts/`, so the live site fell back to system fonts (restored from
+`9a0cb1b^`). **Fixed** by restoring both lines:
 
 ```gitignore
 .vscode/*
@@ -36,14 +38,13 @@ these lines, so treat the change as suspect. **Fixed** by restoring both lines:
 !.env.example
 ```
 
-**B. The live ElevenLabs voice agent is blocked by the site's own headers**
-`vercel.json` sends `Permissions-Policy: microphone=()`, which makes every
-`getUserMedia` call fail. Its CSP `connect-src` allows only `'self'` and Supabase,
-so the ElevenLabs WebSocket/WebRTC connections are refused too. Right now this only
-matters when `VITE_ELEVENLABS_AGENT_ID` is set: without it, `LiveAgentPanel` stays
-hidden and the recorded demo is shown instead. **Fix if you turn the live agent on:**
-switch to `microphone=(self)` and add the ElevenLabs hosts (`https://api.elevenlabs.io`,
-`wss://api.elevenlabs.io`, plus the LiveKit/WebRTC hosts the SDK uses) to `connect-src`.
+**B. ✅ FIXED — the live voice agent was blocked by the site's own headers**
+`Permissions-Policy` now allows `microphone=(self)` (your own origin only), and
+`connect-src` lists the voice hosts (`api.elevenlabs.io`, `livekit.rtc.elevenlabs.io`).
+The SDK's audio worklets are served as same-origin build assets through
+`workletPaths`, so `script-src` needs no `blob:`. The one external script source is
+the exact pinned resampler file. `tests/hostingSecurity.test.js` guards all of this.
+The agent still only appears once `VITE_ELEVENLABS_AGENT_ID` is set.
 
 **C. Arcade sound files are never deployed**
 `.vercelignore` excludes `public/audio/*`, but `src/components/game/AudioManager.jsx`
@@ -191,7 +192,8 @@ down for the session, and it always falls back to a localStorage leaderboard.
 
 ### Voice
 - **Recorded demos:** `src/data/voiceAccents.js` and `voiceConversations.js` import MP3s from `src/assets/audio/`; waveform bars come from `voicePeaks.json`.
-- **Live agent:** `LiveAgentPanel` renders only when `VITE_ELEVENLABS_AGENT_ID` is set. Sessions are capped at 180s, and the mic permission is requested up front so a denial gets a clear message. Currently blocked by headers (Finding B).
+- **Live agent:** renders only when `VITE_ELEVENLABS_AGENT_ID` is set, both in the Voice Studio and inside Alex's chat panel ("Talk to Alex"). Sessions are capped at 180s, the mic permission is requested up front so a denial gets a clear message, and SDK error text is never shown to visitors (it names the provider).
+- **Booking:** `bookingOptions` in `portfolioData.js` (15 / 30 / 60 min Google Meet). Add a Google Calendar appointment-schedule URL to an option's `url` and its button opens it; without one, the button pre-fills the contact form.
 
 ### Hosting headers (`vercel.json`)
 Strict CSP (scripts from self and YouTube only), HSTS preload, `nosniff`,

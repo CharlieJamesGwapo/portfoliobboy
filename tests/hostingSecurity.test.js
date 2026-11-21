@@ -20,3 +20,15 @@ test('blocks injected script attributes, object embeds and foreign framing', () 
   assert.doesNotMatch(csp, /unsafe-eval/)
   assert.doesNotMatch(csp.match(/script-src [^;]+/)[0], /unsafe-inline/)
 })
+test('lets the live voice agent work without loosening the policy', () => {
+  const rules = policy('/(.*)')
+  // The microphone is ours to request, never an embedded third party's.
+  assert.match(rules['Permissions-Policy'], /microphone=\(self\)/)
+  assert.doesNotMatch(rules['Permissions-Policy'], /microphone=\*/)
+  const csp = rules['Content-Security-Policy']
+  const connect = csp.match(/connect-src [^;]+/)[0]
+  for (const host of ['https://api.elevenlabs.io', 'wss://api.elevenlabs.io', 'wss://livekit.rtc.elevenlabs.io']) assert.ok(connect.includes(host), host)
+  // Worklets are self-hosted, so script-src never needs blob:/data: or a whole CDN.
+  const script = csp.match(/script-src [^;]+/)[0]
+  assert.doesNotMatch(script, /blob:|data:|cdn\.jsdelivr\.net(?:\s|$)|cdn\.jsdelivr\.net\/npm\/?(?:\s|$)/)
+})

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { ArrowUpRight, AudioLines, Mic, Send, Sparkles, X } from 'lucide-react'
+import { Suspense, useEffect, useRef, useState } from 'react'
+import { ArrowUpRight, AudioLines, Loader2, Mic, Send, Sparkles, X } from 'lucide-react'
 import { answerQuestion, answerSuggestion, suggestedQuestions } from '../../lib/assistantAnswers'
-import { hasLiveAgent } from '../LiveAgentPanel'
+import { AGENT_ID, LIVE_SESSION_LIMIT_SECONDS, LiveAgentSession, hasLiveAgent, warmSession } from '../LiveAgentPanel'
 
 const WELCOME = {
   role: 'alex',
-  text: "Hey there! 👋 I'm Alex, Charlie's AI assistant. Want to explore his projects, learn about his AI work, or ask me something?",
+  text: "Welcome to Charlie James Abejo's portfolio! 👋 I'm Alex, his AI assistant. Ask me about his projects, AI work and skills, or how to book a free call.",
 }
 
 const prefersReducedMotion = () => {
@@ -14,8 +14,11 @@ const prefersReducedMotion = () => {
 
 let nextId = 1
 
-export default function AssistantPanel({ onClose }) {
+export default function AssistantPanel({ onClose, startWithVoice = false }) {
   const [messages, setMessages] = useState([{ id: 0, ...WELCOME }])
+  // The live call runs inside the panel, so "Talk to Alex" starts talking
+  // straight away; the agent's opening line is the spoken welcome.
+  const [voiceOpen, setVoiceOpen] = useState(startWithVoice && hasLiveAgent)
   const [draft, setDraft] = useState('')
   const [typing, setTyping] = useState(false)
   const [asked, setAsked] = useState(() => new Set())
@@ -26,7 +29,7 @@ export default function AssistantPanel({ onClose }) {
   const chipsRef = useRef(null)
 
   useEffect(() => {
-    inputRef.current?.focus({ preventScroll: true })
+    if (!startWithVoice) inputRef.current?.focus({ preventScroll: true })
     const onKey = (event) => { if (event.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
     return () => {
@@ -89,11 +92,20 @@ export default function AssistantPanel({ onClose }) {
         </button>
       </header>
 
-      <div className="alex-voice">
+      <div className={`alex-voice ${voiceOpen ? 'is-live' : ''}`}>
         {hasLiveAgent ? (
-          <a className="alex-voice-button" href="/#live-agent" onClick={onClose}>
-            <Mic size={16} aria-hidden="true" /> Talk to Alex
-          </a>
+          voiceOpen ? (
+            <Suspense fallback={<p className="live-agent-status" role="status"><Loader2 className="spin" size={16} aria-hidden="true" /> Starting voice…</p>}>
+              <LiveAgentSession agentId={AGENT_ID} limitSeconds={LIVE_SESSION_LIMIT_SECONDS} onClose={() => setVoiceOpen(false)} />
+            </Suspense>
+          ) : (
+            <>
+              <button type="button" className="alex-voice-button" onClick={() => setVoiceOpen(true)} {...warmSession}>
+                <Mic size={16} aria-hidden="true" /> Talk to Alex
+              </button>
+              <span className="alex-soon">Live voice · up to {Math.round(LIVE_SESSION_LIMIT_SECONDS / 60)} min</span>
+            </>
+          )
         ) : (
           <>
             <button type="button" className="alex-voice-button" disabled aria-describedby="alex-voice-note">
@@ -115,7 +127,7 @@ export default function AssistantPanel({ onClose }) {
                     key={action.label}
                     href={action.href}
                     onClick={() => onAction(action)}
-                    {...(action.external && !action.href.startsWith('mailto:') ? { target: '_blank', rel: 'noreferrer' } : {})}
+                    {...(action.external && !/^(mailto|tel):/.test(action.href) ? { target: '_blank', rel: 'noreferrer' } : {})}
                   >
                     {action.label}
                     {action.external && <ArrowUpRight size={13} aria-hidden="true" />}
@@ -158,7 +170,11 @@ export default function AssistantPanel({ onClose }) {
           <Send size={16} aria-hidden="true" />
         </button>
       </form>
-      <p id="alex-note" className="alex-note">Instant answers from Charlie&apos;s portfolio. No AI model or data collection.</p>
+      <p id="alex-note" className="alex-note">
+        {hasLiveAgent
+          ? 'Chat answers come instantly from this portfolio. Voice is a live AI that uses your microphone only during a call.'
+          : <>Instant answers from Charlie&apos;s portfolio. No AI model or data collection.</>}
+      </p>
     </section>
   )
 }

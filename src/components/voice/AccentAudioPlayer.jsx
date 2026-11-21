@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { clearActiveVoice, setActiveVoice } from '../../lib/voiceActivity'
 import { AlertCircle, Loader2, Pause, Play, RotateCcw, Volume1, Volume2, VolumeX } from 'lucide-react'
 
 const formatTime = (seconds) => {
@@ -45,7 +46,10 @@ export default function AccentAudioPlayer({ src, title, peaks = [], knownDuratio
     setStatus('idle')
     setAttempt(0)
     const audio = audioRef.current
-    return () => audio?.pause()
+    return () => {
+      audio?.pause()
+      clearActiveVoice(audio)
+    }
   }, [src, knownDuration])
 
   useEffect(() => {
@@ -110,11 +114,11 @@ export default function AccentAudioPlayer({ src, title, peaks = [], knownDuratio
         onLoadedMetadata={(event) => { setDuration(event.currentTarget.duration); setStatus((value) => (value === 'error' ? value : value === 'loading' ? value : 'ready')) }}
         onDurationChange={(event) => Number.isFinite(event.currentTarget.duration) && setDuration(event.currentTarget.duration)}
         onTimeUpdate={(event) => setCurrent(event.currentTarget.currentTime)}
-        onPlay={() => setPlaying(true)}
+        onPlay={(event) => { setPlaying(true); setActiveVoice(event.currentTarget, peaks, knownDuration) }}
         onPlaying={() => setStatus('ready')}
         onWaiting={() => setStatus('loading')}
-        onPause={() => setPlaying(false)}
-        onEnded={() => { setPlaying(false); setStatus('ended') }}
+        onPause={(event) => { setPlaying(false); clearActiveVoice(event.currentTarget) }}
+        onEnded={(event) => { setPlaying(false); setStatus('ended'); clearActiveVoice(event.currentTarget) }}
         onVolumeChange={(event) => { setVolume(event.currentTarget.volume); setMuted(event.currentTarget.muted) }}
         onError={() => { setPlaying(false); setStatus('error') }}
       />

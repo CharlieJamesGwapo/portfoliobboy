@@ -1,12 +1,29 @@
 import { useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 
 const routeSnapshot = () => typeof window === 'undefined'
   ? { pathname: '/', search: '', hash: '' }
   : { pathname: window.location.pathname.replace(/\/$/, '') || '/', search: window.location.search, hash: window.location.hash }
 
-export function navigatePortfolio(href) {
+const prefersReducedMotion = () => {
+  try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches } catch { return true }
+}
+
+function commitRoute(href) {
   window.history.pushState({}, '', href)
   window.dispatchEvent(new PopStateEvent('popstate'))
+}
+
+// Page changes cross-fade with the View Transitions API where the browser has
+// it. The route must be committed synchronously inside the callback (hence
+// flushSync), or the browser would snapshot the old page as the "new" one.
+// Unsupported browsers and reduced-motion visitors get the instant swap.
+export function navigatePortfolio(href) {
+  if (typeof document.startViewTransition !== 'function' || prefersReducedMotion()) {
+    commitRoute(href)
+    return
+  }
+  document.startViewTransition(() => flushSync(() => commitRoute(href)))
 }
 
 // This small static portfolio needs path navigation, not a routing dependency.

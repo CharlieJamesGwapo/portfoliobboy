@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react'
 import { ArrowUpRight, Mic, PhoneCall } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import VoiceStudioTabs from './voice/VoiceStudioTabs'
+import VoiceOrb3D from './voice/VoiceOrb3D'
 import LiveAgentPanel, { hasLiveAgent } from './LiveAgentPanel'
 import './voice/voice-studio.css'
 import { liveLinks, voiceCallFlow } from '../data/portfolioData'
+import { voiceConversations } from '../data/voiceConversations'
 import './voice-demo.css'
 
 const FALLBACK_URL = 'https://hasti.com.au/'
@@ -40,6 +42,15 @@ const useHideFloatingControls = (ref) => {
   }, [ref])
 }
 
+// Copy follows the recordings that actually exist, so it never claims a call
+// that has not been recorded yet.
+const recordedCalls = voiceConversations.filter((item) => item.status === 'ready')
+const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
+const callCount = NUMBER_WORDS[recordedCalls.length] ?? String(recordedCalls.length)
+const callLanguages = recordedCalls.length <= 3
+  ? recordedCalls.map((item) => item.name).join(', ').replace(/, ([^,]*)$/, ' and $1')
+  : `${callCount} languages, from ${recordedCalls[0].name} to ${recordedCalls[recordedCalls.length - 1].name}`
+
 const VoiceAgentDemo = () => {
   const sectionRef = useRef(null)
   useHideFloatingControls(sectionRef)
@@ -59,23 +70,16 @@ const VoiceAgentDemo = () => {
               <p className="vs-eyebrow"><span aria-hidden="true" /> Bboy AI Voice Studio</p>
               <h2 id="voice-demo-title">Experience AI that sounds more human.</h2>
               <p className="vs-lede">
-                Listen to eight English accents and a bilingual call that switches from English to Mexican Spanish, then see how the live voice agent behind them is built.
+                Listen to eight English accents and {recordedCalls.length === 1 ? 'a bilingual call' : `${callCount} bilingual calls`} that {recordedCalls.length === 1 ? 'switches' : 'switch'} from English into {callLanguages}, then see how the live voice agent behind them is built.
               </p>
               <ul className="vs-facts" aria-label="About these previews">
                 <li><strong>8</strong> English accents</li>
-                <li><strong>EN → ES</strong> bilingual call</li>
+                <li><strong>{recordedCalls.length}</strong> {recordedCalls.length === 1 ? 'bilingual call' : 'bilingual calls'}</li>
                 <li>Pre-recorded, AI-generated audio</li>
               </ul>
             </div>
 
-            <div className="vs-orb" aria-hidden="true">
-              <span className="vs-orb-glow" />
-              <span className="vs-orb-ring" />
-              <span className="vs-orb-ring vs-orb-ring-2" />
-              <span className="vs-orb-core">
-                <i /><i /><i /><i /><i />
-              </span>
-            </div>
+            <VoiceOrb3D />
           </header>
         </ScrollReveal>
 

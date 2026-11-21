@@ -9,7 +9,7 @@ import { prefetchProps } from '../lib/prefetch'
 // (maximum conversation duration, concurrency and daily call limits, and an
 // allowed-origins list), which the provider enforces server-side. Do not set
 // this variable until those limits are configured.
-const AGENT_ID = (import.meta.env.VITE_ELEVENLABS_AGENT_ID ?? '').trim()
+export const AGENT_ID = (import.meta.env.VITE_ELEVENLABS_AGENT_ID ?? '').trim()
 export const hasLiveAgent = AGENT_ID.length > 0
 
 // Must match (or be below) the agent's server-side maximum duration. The UI
@@ -17,8 +17,8 @@ export const hasLiveAgent = AGENT_ID.length > 0
 export const LIVE_SESSION_LIMIT_SECONDS = 180
 
 const loadSession = () => import('./LiveAgentSession')
-const LiveAgentSession = lazy(loadSession)
-const warmSession = prefetchProps('live-agent-session', loadSession)
+export const LiveAgentSession = lazy(loadSession)
+export const warmSession = prefetchProps('live-agent-session', loadSession)
 
 const LiveAgentPanel = () => {
   const [open, setOpen] = useState(false)

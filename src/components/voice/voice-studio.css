@@ -38,6 +38,11 @@
 .vs-orb-glow { position: absolute; inset: 8%; border-radius: 50%; background: radial-gradient(circle, rgba(103, 224, 193, 0.35), transparent 65%); filter: blur(18px); animation: vs-breathe 6s var(--ease-smooth) infinite; }
 .vs-orb-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(103, 224, 193, 0.28); animation: vs-ripple 4.8s var(--ease-smooth) infinite; }
 .vs-orb-ring-2 { animation-delay: 2.4s; }
+/* 3D upgrade: the particle sphere takes over from the bar core, and the
+   orb grows into the room the canvas needs. */
+.vs-orb-canvas { position: absolute; inset: -18%; width: 136%; height: 136%; pointer-events: none; opacity: 0; transition: opacity 900ms var(--ease-smooth); }
+.vs-orb.is-3d .vs-orb-canvas { opacity: 1; }
+.vs-orb.is-3d .vs-orb-core { opacity: 0; transform: scale(0.6); transition: opacity 600ms var(--ease-smooth), transform 600ms var(--ease-smooth); }
 .vs-orb-core { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 6px; width: 58%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 28%, #1d4d4b, #0c2a2b 70%); border: 1px solid rgba(103, 224, 193, 0.35); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 60px rgba(0, 0, 0, 0.35); }
 .vs-orb-core i { width: 6px; height: 22%; border-radius: 4px; background: linear-gradient(180deg, var(--mint), #2fb89a); animation: vs-idle 2.8s var(--ease-smooth) infinite; }
 .vs-orb-core i:nth-child(2) { animation-delay: 0.2s; height: 38%; }

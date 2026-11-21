@@ -8,6 +8,7 @@
 // ============================================================================
 import {
   aiSystemCapabilities,
+  bookingOptions,
   experiences,
   momentumSystems,
   profile,
@@ -28,6 +29,10 @@ const list = (items) => {
 }
 
 const current = experiences.find((item) => item.featured) ?? experiences[0]
+// A finished role must not be described as current ("Jun 2026 – Sep 2026").
+const currentIsOngoing = /present/i.test(current.period)
+const roleLine = `${current.role} at ${current.company} (${current.period})`
+const freeCalls = bookingOptions.filter((option) => option.price === 'Free')
 const liveSystems = momentumSystems.filter((system) => system.url && system.statusTone === 'live')
 const flagship = momentumSystems.slice(0, 5)
 
@@ -38,6 +43,7 @@ export const suggestedQuestions = [
   { id: 'services', label: 'What can he build for me?' },
   { id: 'skills', label: 'Which tech does he use?' },
   { id: 'contact', label: 'How do I contact him?' },
+  { id: 'booking', label: 'Book a free call' },
 ]
 
 // Only claim recordings that exist: languages still in preview are "coming".
@@ -45,7 +51,9 @@ const multilingualNote = () => {
   const ready = voiceConversations.filter((item) => item.status === 'ready').map((item) => item.name)
   const coming = voiceConversations.filter((item) => item.status !== 'ready').map((item) => item.name)
   if (ready.length === 0) return coming.length ? `Bilingual receptionist calls in ${list(coming)} are coming soon. ` : ''
-  const readyNote = `There's also a bilingual receptionist call that switches from English to ${list(ready)}. `
+  const readyNote = ready.length === 1
+    ? `There's also a bilingual receptionist call that switches from English to ${list(ready)}. `
+    : `There are also ${ready.length} bilingual receptionist calls that switch from English to ${list(ready)}. `
   return coming.length ? `${readyNote}${list(coming)} ${coming.length > 1 ? "are" : "is"} coming soon. ` : readyNote
 }
 
@@ -55,7 +63,7 @@ const answers = {
   }),
 
   about: () => ({
-    text: `Charlie James Abejo is an ${profile.role} based in ${profile.location}. He's currently ${current.role} at ${current.company} (${current.period}): ${current.summary}`,
+    text: `Charlie James Abejo is a ${profile.role} based in ${profile.location}. ${currentIsOngoing ? `He's currently ${roleLine}` : `Most recently he was ${roleLine}`}: ${current.summary}`,
     actions: [{ label: 'About Charlie', href: '/#about' }, { label: 'Experience', href: '/#experience' }],
   }),
 
@@ -73,7 +81,7 @@ const answers = {
     text: `The Voice Studio has ${voiceAccents.length} short sample conversations in different English accents, created with AI voice technology. They're pre-recorded previews. ${multilingualNote()}For a real live call, try Alex on hasti.com.au.`,
     actions: [
       { label: 'Open the Voice Studio', href: '/#voice-demo' },
-      ...(voiceConversations.some((item) => item.status === 'ready') ? [{ label: 'Hear the bilingual call', href: '/#voice-multilingual' }] : []),
+      ...(voiceConversations.some((item) => item.status === 'ready') ? [{ label: 'Hear the bilingual calls', href: '/#voice-multilingual' }] : []),
       { label: 'Talk to Alex on Hasti', href: 'https://hasti.com.au/', external: true },
     ],
   }),
@@ -84,13 +92,13 @@ const answers = {
   }),
 
   services: () => ({
-    text: `Charlie can help with ${list(aiSystemCapabilities.map((item) => lowerFirst(item.title)))}, as well as full-stack web and mobile apps. He works remotely and can overlap US business hours.`,
-    actions: [{ label: 'Start a conversation', href: '/#contact' }, { label: 'AI systems', href: '/#ai-systems' }],
+    text: `Charlie can help with ${list(aiSystemCapabilities.map((item) => lowerFirst(item.title)))}, as well as full-stack web and mobile apps. He works remotely and overlaps US and Australian business hours. The easiest start is a free ${freeCalls[0]?.minutes ?? 15}-minute Google Meet call.`,
+    actions: [{ label: 'Book a call', href: '/#book-a-call' }, { label: 'Start a conversation', href: '/#contact' }, { label: 'AI systems', href: '/#ai-systems' }],
   }),
 
   pricing: () => ({
-    text: `Pricing depends on the scope of the project, so Charlie quotes each one individually. Share a little about what you need and he'll get back to you.`,
-    actions: [{ label: 'Contact Charlie', href: '/#contact' }, { label: 'Email', href: `mailto:${profile.email}`, external: true }],
+    text: `Pricing depends on the scope of the project, so Charlie quotes each one individually. A free ${bookingOptions.find((option) => option.id === 'discovery')?.minutes ?? 30}-minute project discovery call is the quickest way to get a rough estimate.`,
+    actions: [{ label: 'Book a discovery call', href: '/#book-a-call' }, { label: 'Contact Charlie', href: '/#contact' }],
   }),
 
   skills: () => ({
@@ -99,17 +107,23 @@ const answers = {
   }),
 
   experience: () => ({
-    text: `Currently: ${current.role} at ${current.company}, ${current.period}. Before that, ${list(experiences.filter((item) => item !== current).slice(0, 2).map((item) => `${item.role} at ${item.company}`))}.`,
+    text: `${currentIsOngoing ? 'Currently' : 'Most recently'}: ${current.role} at ${current.company}, ${current.period}. Before that, ${list(experiences.filter((item) => item !== current).slice(0, 2).map((item) => `${item.role} at ${item.company}`))}.`,
     actions: [{ label: 'Full experience', href: '/#experience' }],
   }),
 
   contact: () => ({
-    text: `You can email Charlie at ${profile.email}, or reach him on LinkedIn or GitHub. The contact form at the bottom of the page works too.`,
+    text: `Email Charlie at ${profile.email} (or ${profile.altEmail}), call or text ${profile.phoneDisplay}, or message him on LinkedIn. You can also use the contact form, or book a Google Meet call.`,
     actions: [
       { label: 'Email Charlie', href: `mailto:${profile.email}`, external: true },
+      { label: 'Call', href: profile.phoneHref, external: true },
       { label: 'LinkedIn', href: profile.linkedin, external: true },
-      { label: 'Contact form', href: '/#contact' },
+      { label: 'Book a call', href: '/#book-a-call' },
     ],
+  }),
+
+  booking: () => ({
+    text: `You can book a Google Meet call with Charlie: ${list(bookingOptions.map((option) => `a ${option.minutes}-minute ${option.title.toLowerCase()} (${option.price.toLowerCase()})`))}. Pick one and he'll confirm with a calendar invite.`,
+    actions: [{ label: 'Choose a call', href: '/#book-a-call' }],
   }),
 
   resume: () => ({
@@ -128,7 +142,7 @@ const answers = {
   }),
 
   identity: () => ({
-    text: `I'm Alex, a portfolio guide. Right now I answer from the content on this site rather than a live AI model, so my replies are instant and don't make anything up. A voice version will come later. I share my name with Alex, the production AI voice agent Charlie built for Hasti.`,
+    text: `I'm Alex, a portfolio guide. In chat I answer from the content on this site rather than a live AI model, so my replies are instant and don't make anything up. When voice is available, "Talk to Alex" connects you to a live AI version of me. I share my name with Alex, the production AI voice agent Charlie built for Hasti.`,
   }),
 
   thanks: () => ({ text: `You're welcome! Anything else you'd like to explore?` }),
@@ -143,6 +157,7 @@ const answers = {
 const intents = [
   ['identity', ['who are you', 'are you a', 'are you an', 'are you ai', 'are you real', 'real ai', 'a bot', 'your name', 'chatgpt', 'are you human', 'what are you', 'who made you']],
   ['pricing', ['price', 'pricing', 'cost', 'charge', 'rate', 'rates', 'budget', 'quote', 'how much', 'fee', 'fees']],
+  ['booking', ['book', 'booking', 'schedule', 'meeting', 'meet', 'gmeet', 'google meet', 'appointment', 'consult', 'consultation', 'free call', 'intro call', 'discovery call', 'calendar', 'zoom']],
   ['contact', ['contact', 'email', 'reach', 'hire', 'phone', 'call him', 'linkedin', 'github', 'touch', 'message him', 'get in touch']],
   ['resume', ['resume', 'résumé', 'cv', 'curriculum']],
   ['voice', ['voice', 'accent', 'elevenlabs', 'voices', 'audio', 'speak', 'listen', 'studio', 'talk to alex', 'multilingual', 'bilingual', 'spanish', 'español', 'tagalog', 'taglish']],

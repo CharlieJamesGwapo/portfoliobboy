@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { ConversationProvider, useConversation } from '@elevenlabs/react'
 import { Mic, MicOff, PhoneOff, RotateCcw } from 'lucide-react'
+import rawAudioProcessor from '@elevenlabs/client/worklets/rawAudioProcessor.js?url'
+import audioConcatProcessor from '@elevenlabs/client/worklets/audioConcatProcessor.js?url'
+
+// The SDK otherwise loads its audio worklets from blob: URLs, which the site's
+// CSP (script-src 'self') rightly refuses. Served as same-origin build assets
+// they load under the existing policy.
+const WORKLET_PATHS = { rawAudioProcessor, audioConcatProcessor }
 
 const STATUS_TEXT = {
   disconnected: 'Conversation ended',
@@ -47,7 +54,13 @@ const Session = ({ onClose, limitSeconds }) => {
       return
     }
     conversation.startSession({
-      onError: (message) => setError(typeof message === 'string' && message ? message : 'The voice assistant is unavailable right now.'),
+      workletPaths: WORKLET_PATHS,
+      // SDK messages are written for developers and name the provider; the
+      // visitor gets one plain sentence, the detail goes to the console.
+      onError: (message) => {
+        console.warn('[voice]', message)
+        setError('The voice assistant is unavailable right now. Please try again, or use the chat.')
+      },
     })
   }
 

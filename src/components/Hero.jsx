@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, FileText, Headphones, Github, Linkedin, Mail, MapPin } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, CalendarClock, FileText, Headphones, Github, Linkedin, Mail, MapPin } from 'lucide-react'
 import { aiCapabilityRibbon, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import AnimatedStat from './AnimatedStat'
 import HeroProjectCarousel from './HeroProjectCarousel'
@@ -59,6 +59,9 @@ const Hero = () => (
         <div className="hero-support-actions hero-enter hero-enter-6">
           <a className="hero-contact-link" href="#contact">
             <Mail size={16} aria-hidden="true" /> Let&apos;s work together <ArrowDown size={14} aria-hidden="true" />
+          </a>
+          <a className="hero-contact-link" href="#book-a-call">
+            <CalendarClock size={16} aria-hidden="true" /> Book a free call <ArrowDown size={14} aria-hidden="true" />
           </a>
           <a className="hero-contact-link" href={resumeUrl} target="_blank" rel="noreferrer">
             <FileText size={16} aria-hidden="true" /> View resume <ArrowUpRight size={14} aria-hidden="true" />

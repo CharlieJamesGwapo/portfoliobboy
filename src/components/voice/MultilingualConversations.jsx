@@ -18,11 +18,13 @@ const formatDuration = (seconds) => {
 }
 
 // A line can switch language mid-sentence, so each phrase carries its own
-// `lang`; screen readers then pronounce English and Spanish/Filipino correctly.
+// `lang`; screen readers then pronounce each language correctly. Arabic runs
+// right to left, so its phrases are isolated with their own direction.
+const RTL = new Set(['ar', 'he', 'fa', 'ur'])
 const Line = ({ parts }) => (
   <p>
     {parts.map(([lang, text], index) => (
-      <span key={index} lang={lang}>{index > 0 ? ' ' : ''}{text}</span>
+      <span key={index} lang={lang} dir={RTL.has(lang.split('-')[0]) ? 'rtl' : undefined}>{index > 0 ? ' ' : ''}{text}</span>
     ))}
   </p>
 )

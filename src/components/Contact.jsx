@@ -1,8 +1,54 @@
 import { useEffect, useState } from 'react'
-import { ArrowUpRight, CheckCircle2, Clock3, FileText, Github, Linkedin, Loader2, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowUpRight, CalendarClock, CheckCircle2, Clock3, FileText, Github, Linkedin, Loader2, Mail, MapPin, Phone, Video } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
-import { profile, resumeUrl } from '../data/portfolioData'
-import { CONTACT_INTENT_EVENT } from '../lib/contactIntent'
+import './contact-booking.css'
+import { bookingOptions, profile, resumeUrl } from '../data/portfolioData'
+import { CONTACT_INTENT_EVENT, requestContact } from '../lib/contactIntent'
+
+const bookingRequest = (option) => ({
+  subject: `Book a ${option.minutes}-min ${option.title.toLowerCase()} (Google Meet)`,
+  message: `Hi Charlie, I'd like to book a ${option.minutes}-minute ${option.title.toLowerCase()} on Google Meet.\n\nPreferred date and time (with timezone): \nWhat I'd like to discuss: `,
+})
+
+// Without a scheduling link, a booking becomes a pre-filled request in the
+// form below, and the visitor lands on the field they still need to complete.
+const requestBooking = (option) => {
+  const { subject, message } = bookingRequest(option)
+  requestContact(subject, message)
+  const field = document.getElementById('contact-message')
+  if (!field) return
+  field.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  window.setTimeout(() => {
+    field.focus({ preventScroll: true })
+    const cursor = field.value.indexOf('timezone): ') + 'timezone): '.length
+    if (cursor > 10) field.setSelectionRange(cursor, cursor)
+  }, 350)
+}
+
+const BookingOptions = () => (
+  <div className="booking-options">
+    {bookingOptions.map((option) => (
+      <article key={option.id} className={`booking-card ${option.featured ? 'is-featured' : ''}`}>
+        <header>
+          <span className="booking-duration"><Clock3 size={14} aria-hidden="true" /> {option.minutes} min</span>
+          <span className={`booking-price ${option.price === 'Free' ? 'is-free' : ''}`}>{option.price}</span>
+        </header>
+        <h4>{option.title}</h4>
+        <p>{option.description}</p>
+        <small>Best for: {option.bestFor}</small>
+        {option.url ? (
+          <a className="button button-primary booking-cta" href={option.url} target="_blank" rel="noreferrer">
+            <CalendarClock size={16} aria-hidden="true" /> Pick a time <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
+        ) : (
+          <button type="button" className="button button-primary booking-cta" onClick={() => requestBooking(option)}>
+            <CalendarClock size={16} aria-hidden="true" /> Request this call
+          </button>
+        )}
+      </article>
+    ))}
+  </div>
+)
 
 // `company` is a honeypot: hidden from people, irresistible to the bots that
 // fill every field they can find. The server drops any submission that has it
@@ -87,9 +133,17 @@ const Contact = () => {
   useEffect(() => {
     const onIntent = (event) => {
       const subject = event.detail?.subject
+      const template = typeof event.detail?.message === 'string' ? event.detail.message : ''
       if (typeof subject !== 'string' || !subject) return
-      setForm((current) => (current.subject.trim() ? current : { ...current, subject }))
-      setErrors((current) => ({ ...current, subject: '' }))
+      // A booking request is an explicit choice, so it replaces the subject;
+      // a plain "Start a project" link only fills an empty one. A message
+      // template never overwrites something the visitor has typed.
+      setForm((current) => ({
+        ...current,
+        subject: template || !current.subject.trim() ? subject : current.subject,
+        message: template && !current.message.trim() ? template : current.message,
+      }))
+      setErrors((current) => ({ ...current, subject: '', message: '' }))
     }
     window.addEventListener(CONTACT_INTENT_EVENT, onIntent)
     return () => window.removeEventListener(CONTACT_INTENT_EVENT, onIntent)
@@ -181,15 +235,16 @@ const Contact = () => {
           </a>
 
           <div className="contact-details">
-            <a href={profile.phoneHref}><Phone size={17} aria-hidden="true" /> {profile.phoneDisplay}</a>
+            <a href={profile.phoneHref}><Phone size={17} aria-hidden="true" /> {profile.phoneDisplay} <small>Call or text</small></a>
+            <a href={`mailto:${profile.altEmail}`}><Mail size={17} aria-hidden="true" /> {profile.altEmail} <small>Alternate email</small></a>
             <span><MapPin size={17} aria-hidden="true" /> {profile.location}</span>
-            <span><Clock3 size={17} aria-hidden="true" /> PHT (UTC+8) · US business-hours overlap</span>
+            <span><Clock3 size={17} aria-hidden="true" /> PHT (UTC+8) · US and AU business-hours overlap</span>
           </div>
 
           <div className="contact-socials">
-            <a href={profile.github} target="_blank" rel="noreferrer"><Github size={18} /> GitHub</a>
-            <a href={profile.linkedin} target="_blank" rel="noreferrer"><Linkedin size={18} /> LinkedIn</a>
-            <a href={resumeUrl} download="charlie-james-abejo-resume.pdf"><FileText size={18} /> Download resume</a>
+            <a href={profile.linkedin} target="_blank" rel="noreferrer"><Linkedin size={18} aria-hidden="true" /> LinkedIn</a>
+            <a href={profile.github} target="_blank" rel="noreferrer"><Github size={18} aria-hidden="true" /> GitHub</a>
+            <a href={resumeUrl} download="charlie-james-abejo-resume.pdf"><FileText size={18} aria-hidden="true" /> Download resume</a>
           </div>
         </ScrollReveal>
 
@@ -244,6 +299,17 @@ const Contact = () => {
               </a>
             )}
           </form>
+        </ScrollReveal>
+      </div>
+
+      <div className="page-container booking-block" id="book-a-call">
+        <ScrollReveal className="booking-head">
+          <p className="eyebrow"><Video size={14} aria-hidden="true" /> Google Meet</p>
+          <h3>Prefer to talk it through? Book a call.</h3>
+          <p>Choose the length that fits. I confirm every call with a calendar invite and a Google Meet link.</p>
+        </ScrollReveal>
+        <ScrollReveal delay={80}>
+          <BookingOptions />
         </ScrollReveal>
       </div>
     </section>

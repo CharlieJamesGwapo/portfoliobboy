@@ -6,6 +6,7 @@ export const profile = {
   role: 'Lead Full-Stack Developer | AI, Web & Mobile',
   location: 'Cebu City, Philippines',
   email: 'capstonee2@gmail.com',
+  altEmail: 'charliejamesdevzxc@gmail.com',
   phoneDisplay: '+63 985 612 2843',
   phoneHref: 'tel:+639856122843',
   github: 'https://github.com/CharlieJamesGwapo',
@@ -14,6 +15,41 @@ export const profile = {
 }
 
 export const resumeUrl = '/charlie-james-abejo-resume.pdf'
+
+// Google Meet calls. `url` is a Google Calendar appointment-schedule link
+// (calendar.app.google/…); Calendar creates the Meet link and sends invites.
+// Until a link is set, the button pre-fills the contact form with the request
+// instead, so booking always works.
+export const bookingOptions = [
+  {
+    id: 'intro',
+    minutes: 15,
+    title: 'Intro call',
+    price: 'Free',
+    description: 'A quick hello: what you are hiring for or building, and whether I am the right fit.',
+    bestFor: 'Recruiters and first conversations',
+    url: '',
+  },
+  {
+    id: 'discovery',
+    minutes: 30,
+    title: 'Project discovery',
+    price: 'Free',
+    description: 'Walk through scope, users, stack and timeline. You leave with next steps and a rough estimate.',
+    bestFor: 'New web, mobile, CRM or AI projects',
+    url: '',
+    featured: true,
+  },
+  {
+    id: 'consult',
+    minutes: 60,
+    title: 'Technical deep-dive',
+    price: 'By arrangement',
+    description: 'Architecture review, AI voice-agent planning, or a code and infrastructure audit, in depth.',
+    bestFor: 'Teams with an existing system',
+    url: '',
+  },
+]
 
 export const professionalTitles = [
   'Lead Full-Stack Developer',

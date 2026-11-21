@@ -4,6 +4,7 @@ import App from './App.jsx'
 import { registerServiceWorker } from './lib/registerServiceWorker'
 import './index.css'
 import './components/studio-polish.css'
+import './components/motion.css'
 // Audit refinements load last so their narrow fixes win ties.
 import './components/refinements.css'
 

@@ -5,7 +5,9 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { createServer } from 'vite'
 
 test('voice studio offers eight inline accent previews and discloses AI voices', async () => {
-  const server = await createServer({ server: { middlewareMode: true, hmr: false, ws: false } })
+  // envDir points at a folder with no .env files, so a developer's local
+  // agent ID cannot change what this test renders.
+  const server = await createServer({ envDir: 'tests', server: { middlewareMode: true, hmr: false, ws: false } })
   try {
     const { default: VoiceAgentDemo } = await server.ssrLoadModule('/src/components/VoiceAgentDemo.jsx')
     const html = renderToStaticMarkup(createElement(VoiceAgentDemo))
@@ -42,7 +44,7 @@ test('Alex answers locally from portfolio data with honest fallbacks and route-s
     // Section links must work from /projects and /lab too, so they are absolute.
     for (const question of ['what has he built', 'tell me about his skills', 'contact', 'his experience', 'voice studio']) {
       for (const action of answerQuestion(question).actions ?? []) {
-        assert.match(action.href, /^(\/|https:\/\/|mailto:)/, `${question} → ${action.href}`)
+        assert.match(action.href, /^(\/|https:\/\/|mailto:|tel:\+\d+$)/, `${question} → ${action.href}`)
       }
     }
   } finally {

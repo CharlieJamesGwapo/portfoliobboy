@@ -1,0 +1,22 @@
+/* Page transitions (View Transitions API, see lib/portfolioRoute.js).
+   The outgoing page lifts away quickly; the incoming one rises into place a
+   touch slower, so the change reads as one movement rather than a cut. The
+   navbar has its own transition name, so it stays perfectly still. */
+.navbar { view-transition-name: site-nav; }
+
+::view-transition-old(root) { animation: page-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+::view-transition-new(root) { animation: page-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+::view-transition-group(site-nav) { animation: none; }
+
+@keyframes page-out {
+  to { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.995); }
+}
+
+@keyframes page-in {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
+}

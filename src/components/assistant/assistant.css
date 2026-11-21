@@ -47,9 +47,17 @@
   width: min(320px, calc(100vw - 48px));
   animation: alex-rise 420ms var(--ease-out) backwards;
 }
-.alex-greeting-body { display: block; width: 100%; padding: 14px 40px 14px 16px; border: 1px solid rgba(103, 224, 193, 0.3); border-radius: 18px 18px 18px 6px; background: var(--alex-surface); color: var(--paper); font: inherit; font-size: 0.86rem; line-height: 1.55; text-align: left; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38); cursor: pointer; backdrop-filter: blur(10px); }
-.alex-greeting-body:hover { border-color: rgba(103, 224, 193, 0.55); }
-.alex-greeting-body:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.alex-greeting-body { display: block; width: 100%; padding: 14px 40px 14px 16px; border: 1px solid rgba(103, 224, 193, 0.3); border-radius: 18px 18px 18px 6px; background: var(--alex-surface); color: var(--paper); font: inherit; font-size: 0.86rem; line-height: 1.55; text-align: left; box-shadow: 0 22px 50px rgba(0, 0, 0, 0.38); backdrop-filter: blur(10px); }
+/* On the hero (wide screens only) the welcome sits bottom-right, clear of
+   the hero copy, above the music and back-to-top controls. */
+.alex-greeting.is-on-hero { left: auto; right: 24px; bottom: 92px; }
+.alex-greeting.is-on-hero .alex-greeting-body { border-radius: 18px; }
+.alex-greeting-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.alex-greeting-actions button { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border: 1px solid rgba(103, 224, 193, 0.3); border-radius: 999px; background: transparent; color: var(--paper); font: inherit; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: background 160ms ease, border-color 160ms ease; }
+.alex-greeting-actions button:hover { border-color: rgba(103, 224, 193, 0.6); background: rgba(103, 224, 193, 0.08); }
+.alex-greeting-actions button.is-primary { border-color: transparent; background: var(--mint); color: #0b2528; }
+.alex-greeting-actions button.is-primary:hover { background: #8cebd2; }
+.alex-greeting-actions button:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 .alex-greeting-name { display: block; margin-bottom: 4px; color: var(--mint); font-size: 0.7rem; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
 .alex-greeting-close { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: var(--alex-muted); cursor: pointer; }
 .alex-greeting-close:hover { background: rgba(255, 255, 255, 0.08); color: var(--paper); }
@@ -90,6 +98,9 @@
 .alex-voice-button:disabled { border-color: var(--alex-line); background: transparent; color: var(--alex-muted); cursor: not-allowed; }
 .alex-voice-button:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 .alex-soon { color: var(--alex-muted); font-size: 0.72rem; }
+.alex-voice.is-live { display: block; padding: 14px 16px; background: rgba(103, 224, 193, 0.05); }
+.alex-voice .live-agent-session { gap: 10px; }
+.alex-voice .live-agent-controls .button { min-height: 36px; padding: 0 14px; font-size: 0.78rem; }
 
 .alex-messages { flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 16px; overflow-y: auto; list-style: none; overscroll-behavior: contain; }
 .alex-msg { max-width: 88%; animation: alex-pop 240ms var(--ease-out) both; }

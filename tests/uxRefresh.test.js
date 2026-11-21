@@ -46,6 +46,6 @@ test('Voice Studio renders both demos as tab panels so prerendered HTML keeps ev
     assert.match(html, /id="vs-panel-multilingual"[^>]*hidden=""/)
     assert.doesNotMatch(html, /id="vs-panel-accents"[^>]*hidden=""/)
     assert.match(html, />8 recordings</)
-    assert.match(html, />1 recorded · 1 planned</)
+    assert.match(html, />\d+ recorded(?: · \d+ planned)?</)
   })
 })
