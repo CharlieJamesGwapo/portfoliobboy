@@ -2,7 +2,7 @@
 // Hashed bundles/fonts are cache-first; stable media refreshes in the
 // background. HTML and the stable resume route prefer fresh network bytes.
 // APIs, cross-origin requests and non-GET requests never enter these caches.
-const CACHE_VERSION = 'v4'
+const CACHE_VERSION = 'v5'
 const SHELL_CACHE = `portfolio-shell-${CACHE_VERSION}`
 const ASSET_CACHE = `portfolio-assets-${CACHE_VERSION}`
 const MEDIA_CACHE = `portfolio-media-${CACHE_VERSION}`
