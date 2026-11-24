@@ -76,7 +76,7 @@ export const navigation = [
 export const proofPoints = [
   { value: '22+', label: 'Genuine products and client builds', numericValue: 22, suffix: '+' },
   { value: 'Hands-on', label: 'Development' },
-  { value: '25', label: 'Credentials and recognitions', numericValue: 25, suffix: '' },
+  { value: '29', label: 'Credentials and recognitions', numericValue: 29, suffix: '' },
   { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },
 ]
 
@@ -635,6 +635,24 @@ const originalFeaturedProjects = [
     private: true,
   },
   {
+    id: 'web3-crypto',
+    categories: ['Web3', 'Fintech', 'Full Stack', 'API'],
+    title: 'Web3 & Crypto Projects',
+    eyebrow: '2022 – Present · Project-based · Confidential client work + public demo',
+    overview: 'Crypto trading bots, trading dashboards, dApp front ends, and a crypto lending platform, built for clients on a project-by-project basis.',
+    context: 'This work was done in company-owned GitHub accounts and private client repositories, so the original code and client names stay confidential. A separate public demo shows the same concepts.',
+    implementation: 'Bots connect to exchange APIs for market data and order execution. React front ends connect wallets through ethers.js and web3.js and display positions and bot status.',
+    architecture: ['React dApp front ends', 'MetaMask / WalletConnect', 'ethers.js + web3.js', 'Solidity contracts', 'Exchange REST + WebSocket APIs', 'Bot dashboards'],
+    features: ['Automated and strategy-based trading', 'Arbitrage and sniping bots', 'Price alerts and signals', 'Position and P&L dashboards', 'Wallet connection', 'Collateralized lending workflows'],
+    engineering: 'Public demo (illustrative, simulated data): a paper-trading bot with moving-average signals, stop-loss, fees, and drawdown tracking; read-only wallet connection with ethers.js v6; and loan-to-value, health-factor, and liquidation-price math, with unit tests.',
+    delivered: 'Client projects delivered privately. The public demo is a representative implementation, not a client deliverable.',
+    stack: ['React', 'ethers.js', 'web3.js', 'Solidity', 'Exchange APIs', 'WebSockets'],
+    url: 'https://web3-trading-demo.vercel.app/',
+    linkLabel: 'Public demo',
+    private: true,
+    status: 'Confidential client repositories · Public demo available',
+  },
+  {
     id: 'moist-alumni',
     categories: ['SaaS', 'Full Stack'],
     title: 'MOIST Alumni Tracking System',
@@ -816,7 +834,7 @@ export const projectArchive = [
   { title: 'Shopify & Cloudflare anti-bot development', type: 'E-commerce security', categories: ['Security', 'Full Stack'], description: 'Custom Shopify solutions and Cloudflare-based anti-bot protections for e-commerce storefronts.', stack: ['Shopify', 'Cloudflare', 'Anti-bot'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
 ]
 
-export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'Desktop', 'API', 'Fintech', 'CRM', 'Security', 'Developer Tools']
+export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'Desktop', 'API', 'Fintech', 'Web3', 'CRM', 'Security', 'Developer Tools']
 
 export const skillGroups = [
   {
@@ -858,12 +876,54 @@ export const education = {
 
 export const certifications = [
   {
+    title: 'Claude Platform 101',
+    issuer: 'Anthropic',
+    kind: 'Certificate of completion',
+    issued: 'Jul 2026',
+    credentialId: '4c065e9988e1e375c38612adf4f04e23',
+    category: 'AI & Anthropic',
+    image: '/certificates/claude-platform-101.webp',
+    thumb: '/certificates/claude-platform-101-thumb.webp',
+  },
+  {
+    title: 'Claude Code 101',
+    issuer: 'Anthropic',
+    kind: 'Certificate of completion',
+    issued: 'Nov 2026',
+    credentialId: '8c34a4ccadda5bceb36353c7895c2981',
+    category: 'AI & Anthropic',
+    image: '/certificates/claude-code-101.webp',
+    thumb: '/certificates/claude-code-101-thumb.webp',
+  },
+  {
+    title: 'Introduction to Claude Cowork',
+    issuer: 'Anthropic',
+    kind: 'Certificate of completion',
+    issued: 'Nov 2026',
+    credentialId: '464b7ee8a8191a661a322e5eea904c28',
+    category: 'AI & Anthropic',
+    image: '/certificates/introduction-claude-cowork.webp',
+    thumb: '/certificates/introduction-claude-cowork-thumb.webp',
+  },
+  {
+    title: 'Claude on Google Cloud',
+    issuer: 'Anthropic',
+    kind: 'Certificate of completion',
+    issued: 'Nov 2026',
+    credentialId: '568a6b5a271bad481654bf5bb9fd483f',
+    category: 'AI & Anthropic',
+    image: '/certificates/claude-on-google-cloud.webp',
+    thumb: '/certificates/claude-on-google-cloud-thumb.webp',
+  },
+  {
     title: 'Model Context Protocol: Advanced Topics',
     issuer: 'Anthropic',
     kind: 'Certificate of completion',
     issued: 'Jul 2026',
     credentialId: 'azpzwuk5gowu',
     category: 'AI & Anthropic',
+    image: '/certificates/mcp-advanced-topics.webp',
+    thumb: '/certificates/mcp-advanced-topics-thumb.webp',
   },
   {
     title: 'Introduction to Agent Skills',
@@ -872,6 +932,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 'b5ozvc7uj6zp',
     category: 'AI & Anthropic',
+    image: '/certificates/introduction-agent-skills.webp',
+    thumb: '/certificates/introduction-agent-skills-thumb.webp',
   },
   {
     title: 'AI Fluency for Builders',
@@ -880,6 +942,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 't3ezfyy5es9o',
     category: 'AI & Anthropic',
+    image: '/certificates/ai-fluency-for-builders.webp',
+    thumb: '/certificates/ai-fluency-for-builders-thumb.webp',
   },
   {
     title: 'Introduction to Model Context Protocol',
@@ -898,6 +962,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 'sghsdrqu8hzj',
     category: 'AI & Anthropic',
+    image: '/certificates/ai-capabilities-limitations.webp',
+    thumb: '/certificates/ai-capabilities-limitations-thumb.webp',
   },
   {
     title: 'Claude Code in Action',
@@ -906,6 +972,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: '7jbexrv7sqo8',
     category: 'AI & Anthropic',
+    image: '/certificates/claude-code-in-action.webp',
+    thumb: '/certificates/claude-code-in-action-thumb.webp',
   },
   {
     title: 'Introduction to Subagents',
@@ -914,6 +982,8 @@ export const certifications = [
     issued: 'Jul 2026',
     credentialId: 'bwdbd3vvajkh',
     category: 'AI & Anthropic',
+    image: '/certificates/introduction-subagents.webp',
+    thumb: '/certificates/introduction-subagents-thumb.webp',
   },
   {
     title: 'Teaching the AI Fluency Framework',

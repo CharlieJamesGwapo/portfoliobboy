@@ -158,8 +158,8 @@ function ProjectCard({ project, index }) {
             </a>
           )}
           {project.url && (
-            <a className="project-card-action project-card-action--secondary" href={project.url} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} live product in a new tab`}>
-              Live product <ArrowUpRight size={16} aria-hidden="true" />
+            <a className="project-card-action project-card-action--secondary" href={project.url} target="_blank" rel="noreferrer" aria-label={`Open ${project.title} ${(project.linkLabel ?? 'Live product').toLowerCase()} in a new tab`}>
+              {project.linkLabel ?? 'Live product'} <ArrowUpRight size={16} aria-hidden="true" />
             </a>
           )}
         </div>

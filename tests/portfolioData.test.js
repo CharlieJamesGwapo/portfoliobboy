@@ -67,11 +67,11 @@ test('aligns public profile identity, role, location, and education with the sup
 })
 
 test('keeps the original featured and archived projects while prepending independent products', () => {
-  assert.equal(featuredProjects.length, independentProducts.length + 13)
+  assert.equal(featuredProjects.length, independentProducts.length + 14)
   assert.deepEqual(featuredProjects.slice(0, independentProducts.length).map((project) => project.id),
     independentProducts.map((project) => project.id))
   assert.deepEqual(featuredProjects.slice(independentProducts.length).map((project) => project.id), [
-    'one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending',
+    'one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending', 'web3-crypto',
     'moist-alumni', 'filtra-pos', 'ecycle-hub', 'mobile-booking',
     'scale-with-accounting', 'st-john-baptist', 'freelancepath', 'idealink', 'zero-to-hero-dev',
   ])
@@ -157,7 +157,7 @@ test('publishes the five supplied client projects with their case studies and me
     ['zero-to-hero-dev', 'zero-to-hero-dev', 'https://zerotoherodev.vercel.app/', '/projects/zero-to-hero-dev/showcase.webp'],
   ]
 
-  assert.deepEqual(featuredProjects.slice(independentProducts.length + 8).map((project) => project.id), projects.map(([id]) => id))
+  assert.deepEqual(featuredProjects.slice(independentProducts.length + 9).map((project) => project.id), projects.map(([id]) => id))
   for (const [id, slug, url, image] of projects) {
     const project = featuredProjects.find((item) => item.id === id)
     const study = getCaseStudyBySlug(slug)
@@ -283,18 +283,18 @@ test('preserves earlier portfolio experience records and historical project iden
     assert.ok(experiences.some((item) => item.company === company), `missing experience record ${company}`)
   }
   assert.deepEqual(
-    featuredProjects.slice(independentProducts.length, independentProducts.length + 8).map((project) => project.id),
-    ['one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending', 'moist-alumni', 'filtra-pos', 'ecycle-hub', 'mobile-booking'],
+    featuredProjects.slice(independentProducts.length, independentProducts.length + 9).map((project) => project.id),
+    ['one-ride-balingasag', 'omji-billing', 'fitness-crm', 'fintech-lending', 'web3-crypto', 'moist-alumni', 'filtra-pos', 'ecycle-hub', 'mobile-booking'],
   )
   assert.equal(projectArchive.length, 12)
   assert.deepEqual(portfolioData.projectCategories.includes('Desktop'), true)
 })
 
 test('keeps the original credential inventory and clean resume route', () => {
-  assert.equal(certifications.length, 23)
+  assert.equal(certifications.length, 27)
   assert.equal(recognitions.length, 2)
-  assert.equal(certifications.length + recognitions.length, 25)
-  assert.equal(certifications.filter((credential) => credential.image).length, 5)
+  assert.equal(certifications.length + recognitions.length, 29)
+  assert.equal(certifications.filter((credential) => credential.image).length, 15)
   assert.equal(certifications.filter((credential) => credential.title === 'Claude 101').length, 1)
   assert.equal(resumeUrl, '/charlie-james-abejo-resume.pdf')
 })
@@ -309,7 +309,17 @@ test('publishes the corrected Rooche dates and authentic Anthropic certificates'
     .filter((credential) => credential.issuer === 'Anthropic' && credential.image)
     .map((credential) => credential.title)
   assert.deepEqual(uploadedAnthropicTitles, [
+    'Claude Platform 101',
+    'Claude Code 101',
+    'Introduction to Claude Cowork',
+    'Claude on Google Cloud',
+    'Model Context Protocol: Advanced Topics',
+    'Introduction to Agent Skills',
+    'AI Fluency for Builders',
     'Introduction to Model Context Protocol',
+    'AI Capabilities and Limitations',
+    'Claude Code in Action',
+    'Introduction to Subagents',
     'Teaching the AI Fluency Framework',
     'Claude 101',
     'Building with the Claude API',
@@ -399,7 +409,7 @@ test('renders the additive AI systems section without replacing existing project
     await server.close()
   }
 
-  assert.equal(featuredProjects.length, independentProducts.length + 13)
+  assert.equal(featuredProjects.length, independentProducts.length + 14)
   assert.equal(projectArchive.length, 12)
 })
 

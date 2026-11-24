@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--", "--host", "127.0.0.1", "--port", "5173"],
       "port": 5173
+    },
+    {
+      "name": "web3-demo",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "/Users/zalio/Desktop/web3-trading-demo", "run", "dev", "--", "--host", "127.0.0.1"],
+      "port": 5199
     }
   ]
 }

@@ -129,7 +129,7 @@ const Education = () => {
         <SectionHeading
           eyebrow="05 · Credentials"
           title="Education and continued learning."
-          description="Twenty-three certificates and technical training records from the supplied portfolio materials, plus two academic recognitions. Credential URLs are omitted where none were supplied."
+          description="Twenty-seven certificates and technical training records from the supplied portfolio materials, plus two academic recognitions. Credential URLs are omitted where none were supplied."
           light
         />
       </ScrollReveal>
