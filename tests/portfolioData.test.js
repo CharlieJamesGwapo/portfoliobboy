@@ -291,9 +291,9 @@ test('preserves earlier portfolio experience records and historical project iden
 })
 
 test('keeps the original credential inventory and clean resume route', () => {
-  assert.equal(certifications.length, 27)
+  assert.equal(certifications.length, 29)
   assert.equal(recognitions.length, 2)
-  assert.equal(certifications.length + recognitions.length, 29)
+  assert.equal(certifications.length + recognitions.length, 31)
   assert.equal(certifications.filter((credential) => credential.image).length, 15)
   assert.equal(certifications.filter((credential) => credential.title === 'Claude 101').length, 1)
   assert.equal(resumeUrl, '/charlie-james-abejo-resume.pdf')

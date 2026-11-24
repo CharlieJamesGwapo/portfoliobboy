@@ -76,7 +76,7 @@ export const navigation = [
 export const proofPoints = [
   { value: '22+', label: 'Genuine products and client builds', numericValue: 22, suffix: '+' },
   { value: 'Hands-on', label: 'Development' },
-  { value: '29', label: 'Credentials and recognitions', numericValue: 29, suffix: '' },
+  { value: '31', label: 'Credentials and recognitions', numericValue: 31, suffix: '' },
   { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },
 ]
 
@@ -1024,6 +1024,20 @@ export const certifications = [
     category: 'AI & Anthropic',
     image: '/certificates/ai-fluency-framework-foundations.webp',
     thumb: '/certificates/ai-fluency-framework-foundations-thumb.webp',
+  },
+  {
+    title: 'The AI-native SDLC Playbook',
+    issuer: 'Anthropic',
+    kind: 'Course completed · no badge awarded',
+    issued: 'Nov 2026',
+    category: 'AI & Anthropic',
+  },
+  {
+    title: 'AI Fluency for pK-12 Train the Trainer',
+    issuer: 'Anthropic',
+    kind: 'Course completed · no badge awarded',
+    issued: 'Nov 2026',
+    category: 'AI & Anthropic',
   },
   {
     title: 'Java SE 8 Programmer I',
