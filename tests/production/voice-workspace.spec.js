@@ -23,7 +23,8 @@ async function openVoice(page, path = '/#live-agent', { pendingMicrophone = fals
       return stream
     }
   }, { pendingMicrophone })
-  page.on('request', request => { if (request.method() === 'POST') posts.push(request.url()) })
+  page.on('request', request => { if (request.method() === 'POST' && new URL(request.url()).pathname !== '/api/analytics') posts.push(request.url()) })
+  await page.route('**/api/analytics', route => route.fulfill({ status: 204 }))
   await page.route('https://api.elevenlabs.io/**', route => route.abort())
   await page.routeWebSocket('wss://livekit.rtc.elevenlabs.io/**', socket => socket.close())
   await page.routeWebSocket('wss://api.elevenlabs.io/**', socket => {

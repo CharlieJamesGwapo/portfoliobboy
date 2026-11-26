@@ -11,6 +11,7 @@ test.use({
 })
 
 async function prepare(page, onSocket) {
+  await page.route('**/api/analytics', route => route.fulfill({ status: 204 }))
   // Exercise the real built SDK with generated audio and local signalling;
   // no request may create a provider conversation or use a real microphone.
   await page.addInitScript(() => {

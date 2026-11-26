@@ -1,0 +1,311 @@
+{
+  "status": "Awaiting owner selection of the analytics project; not provisioned",
+  "governance": "Local proposed event-count definitions, not catalog-approved business metrics",
+  "dashboard": {
+    "name": "Portfolio Enquiry Outcomes",
+    "description": "Aggregate portfolio actions and accepted contact submissions. Repeated actions count; totals do not identify visitors or attribute enquiries to individual conversations."
+  },
+  "textTile": {
+    "body": "Counts show captured actions, not unique people or a conversion funnel. Contact success means the email provider accepted the request; it does not confirm inbox delivery. Privacy preferences, blockers and outages can reduce recorded counts.",
+    "layout": {
+      "x": 0,
+      "y": 0,
+      "w": 12,
+      "h": 2
+    }
+  },
+  "insights": [
+    {
+      "name": "Voice connections",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_voice_started",
+              "custom_name": "Voice connections",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 0,
+        "y": 2,
+        "w": 4,
+        "h": 3
+      }
+    },
+    {
+      "name": "Starter questions used",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_starter_used",
+              "custom_name": "Starter questions used",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 4,
+        "y": 2,
+        "w": 4,
+        "h": 3
+      }
+    },
+    {
+      "name": "Project cards opened",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_project_opened",
+              "custom_name": "Project cards opened",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 8,
+        "y": 2,
+        "w": 4,
+        "h": 3
+      }
+    },
+    {
+      "name": "Enquiry drafts reviewed",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_enquiry_reviewed",
+              "custom_name": "Enquiry drafts reviewed",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 0,
+        "y": 5,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "name": "Contact messages accepted",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_contact_submitted",
+              "custom_name": "Contact messages accepted",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 6,
+        "y": 5,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "name": "Portfolio actions over time",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_voice_started",
+              "custom_name": "Voice connections",
+              "math": "total"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_starter_used",
+              "custom_name": "Starter questions used",
+              "math": "total"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_project_opened",
+              "custom_name": "Project cards opened",
+              "math": "total"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_enquiry_reviewed",
+              "custom_name": "Enquiry drafts reviewed",
+              "math": "total"
+            },
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_contact_submitted",
+              "custom_name": "Contact messages accepted",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "ActionsLineGraph"
+          }
+        }
+      },
+      "layout": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 4
+      }
+    },
+    {
+      "name": "Project cards opened by project",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_project_opened",
+              "custom_name": "Project cards opened",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "ActionsBarValue"
+          },
+          "breakdownFilter": {
+            "breakdowns": [
+              {
+                "property": "project_id",
+                "type": "event"
+              }
+            ],
+            "breakdown_limit": 20
+          }
+        }
+      },
+      "layout": {
+        "x": 0,
+        "y": 12,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "name": "Starter questions used by question",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_starter_used",
+              "custom_name": "Starter questions used",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "ActionsBarValue"
+          },
+          "breakdownFilter": {
+            "breakdowns": [
+              {
+                "property": "starter_id",
+                "type": "event"
+              }
+            ],
+            "breakdown_limit": 20
+          }
+        }
+      },
+      "layout": {
+        "x": 6,
+        "y": 12,
+        "w": 6,
+        "h": 4
+      }
+    }
+  ]
+}

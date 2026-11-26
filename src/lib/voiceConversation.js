@@ -69,12 +69,17 @@ const shortNames = { 'alex-hasti': ['Hasti'], 'zalio-crm': ['Zalio'] }
 const named = (text, study) => [study.title, study.slug, study.slug.replace(/-/g, ' '), ...(shortNames[study.slug] || [])]
   .some(name => new RegExp(`(?<![a-z0-9])${escaped(name)}(?![a-z0-9])`, 'i').test(text))
 const projectCard = study => recommendProjects(study.title).projects.find(project => project.href === `/projects/${study.slug}`)
+// Pricing/scheduling follow-ups are not new product requirements. In
+// particular, "delivery date" must not replace CRM evidence with rider apps.
+const commercialFollowUp = text => /^(?:what|how|when|can|is|are|does|will)\b/i.test(text)
+  && /\b(?:pric\w*|costs?|rates?|quotes?|budget|availability|available|timelines?|delivery\s+(?:date|time|deadline|schedule|estimate)|guarantee\w*)\b/i.test(text)
+  && !caseStudies.some(study => named(text, study))
 
 export function getVoiceProjects(messages) {
   const turns = transcript(messages)
   let latestVisitorIndex = -1
   for (let index = turns.length - 1; index >= 0; index--) {
-    if (turns[index].source === 'user' && substantive(textValue(turns[index].text))) {
+    if (turns[index].source === 'user' && substantive(textValue(turns[index].text)) && !commercialFollowUp(textValue(turns[index].text))) {
       latestVisitorIndex = index
       break
     }

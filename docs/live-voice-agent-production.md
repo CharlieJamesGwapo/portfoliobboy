@@ -163,3 +163,23 @@ Sources:
 - [ElevenLabs pricing summary, HappyRobot](https://www.happyrobot.ai/hub/elevenlabs-pricing)
 - [Agents pricing explained, Macha](https://www.getmacha.com/blog/elevenlabs-agents-pricing-explained)
 - [Agents price cut, May 2026](https://www.usagepricing.com/blueprint/activity/elevenlabs-2026-05-07-conversational-ai-price-cut)
+
+## Evidence context, fallback and outcome counts
+
+Every established connection receives one public evidence contextual update via
+the installed SDK. It includes the current portfolio identity, dated roles, all
+20 case studies, documented contribution/technology/status and published booking
+facts. Unknown prices, availability, delivery guarantees and unsupported skill
+depth must be confirmed with Charlie. This does not replace provider-side
+instructions or guarantee all spoken claims; see [the audit](alex-evidence-audit.md).
+
+If microphone access is denied or a connection fails, Continue in text ends
+audio and retains the current transcript and draft. Questions then use the local
+portfolio answer engine, with no voice-provider requests. Try voice again is
+explicit. Draft review and existing-contact-text protection continue to work.
+
+Optional outcome counts are described in [analytics setup](analytics/README.md).
+They are disabled pending the owner's destination project selection. No voice
+content, conversation ID, enquiry fields or visitor identity is included in
+analytics. The browser enable flag and server ingestion configuration must be
+set for the selected project before deployment/rebuild.

@@ -83,6 +83,9 @@
 .voice-workspace .voice-workspace-link-note { flex-basis: 100%; color: var(--voice-workspace-muted); font-size: .65rem; font-weight: 400; }
 
 .voice-workspace .voice-workspace-enquiry { padding-top: 16px; border-top: 1px solid var(--voice-workspace-line); }
+.voice-workspace .voice-workspace-text-form { display: grid; gap: 8px; grid-column: 1 / -1; }
+.voice-workspace .voice-workspace-text-form label { color: var(--voice-workspace-text); font-size: .8rem; font-weight: 650; }
+.voice-workspace .voice-workspace-text-form input { min-width: 0; width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #71928d; border-radius: 9px; background: #081e20; color: var(--voice-workspace-text); font: inherit; font-size: 16px; }
 .voice-workspace .voice-workspace-prepare { color: var(--voice-workspace-mint); border-color: #5b9d8f; }
 .voice-workspace .voice-workspace-draft { display: grid; gap: 8px; min-width: 0; padding-top: 6px; }
 .voice-workspace .voice-workspace-draft label { color: var(--voice-workspace-text); font-size: .77rem; font-weight: 650; }

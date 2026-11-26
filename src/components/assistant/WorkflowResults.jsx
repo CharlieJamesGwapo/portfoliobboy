@@ -1,3 +1,5 @@
+import { trackPortfolioEvent } from '../../lib/portfolioAnalytics'
+
 const statusLabels = { documented: 'Documented', partial: 'Partly documented', unverified: 'Needs confirmation' }
 
 export default function WorkflowResults({ result, onEnquiry, onNavigate }) {
@@ -10,7 +12,11 @@ export default function WorkflowResults({ result, onEnquiry, onNavigate }) {
             <span className="alex-evidence-label">{project.reason}</span>
             <p>{project.contribution}</p>
             <span className="alex-evidence-label">{project.status}</span>
-            <a href={project.href} onClick={onNavigate}>Read case study <span className="sr-only">for {project.title}</span></a>
+            <a href={project.href} onClick={event => {
+              const projectId = project.href.match(/^\/projects\/([a-z0-9-]+)$/)?.[1]
+              if (projectId) trackPortfolioEvent('portfolio_project_opened', { surface: 'text_guide', project_id: projectId })
+              onNavigate?.(event)
+            }}>Read case study <span className="sr-only">for {project.title}</span></a>
           </article>
         ))}
         <button className="alex-workflow-cta" type="button" onClick={() => onEnquiry(result.enquiry)}>

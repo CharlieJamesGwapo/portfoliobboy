@@ -7,6 +7,7 @@ import { navigatePortfolio } from '../../lib/portfolioRoute'
 import { AGENT_ID, LIVE_SESSION_LIMIT_SECONDS, LiveAgentSession, hasLiveAgent, warmSession } from '../LiveAgentPanel'
 import WorkflowResults from './WorkflowResults'
 import BriefReview from './BriefReview'
+import { trackPortfolioEvent } from '../../lib/portfolioAnalytics'
 
 const MODES = [
   { id: 'general', label: 'General questions', field: 'Ask Alex a question', hint: 'Ask about Charlie’s projects, skills, experience, or contact details.', placeholder: 'Ask about projects, skills, contact…' },
@@ -110,6 +111,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
 
   const startEnquiry = enquiry => {
     stageAssistantEnquiry(enquiry.subject, enquiry.message)
+    trackPortfolioEvent('portfolio_enquiry_reviewed', { surface: 'text_guide' })
     navigatePortfolio('/#contact')
     onClose(false)
   }
@@ -156,7 +158,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
             <>
             <button type="button" className="alex-voice-button alex-voice-back" onClick={() => setVoiceOpen(false)}>Close voice and return to text</button>
             <Suspense fallback={<p className="live-agent-status" role="status"><Loader2 className="spin" size={16} aria-hidden="true" /> Starting voice…</p>}>
-              <LiveAgentSession agentId={AGENT_ID} limitSeconds={LIVE_SESSION_LIMIT_SECONDS} onClose={() => setVoiceOpen(false)} onEnquiry={() => onClose(false)} />
+              <LiveAgentSession agentId={AGENT_ID} limitSeconds={LIVE_SESSION_LIMIT_SECONDS} surface="voice_panel" onClose={() => setVoiceOpen(false)} onEnquiry={() => onClose(false)} />
             </Suspense>
             </>
           ) : (

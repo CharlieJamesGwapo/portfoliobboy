@@ -112,3 +112,20 @@ test('enquiry remains contact-compatible with long transcripts while retaining t
   assert.match(draft.message, /Latest requirement: support booking reminders\./)
   assert.ok(draft.subject.length <= 120)
 })
+
+test('commercial follow-up questions preserve project context instead of matching delivery logistics', () => {
+  const messages = [
+    { source: 'user', text: 'I need a clinic CRM with automated appointment reminders.' },
+    { source: 'ai', text: 'Review the Zalio CRM case study.' },
+    { source: 'user', text: 'What is the guaranteed project price and delivery date?' },
+  ]
+  assert.equal(getVoiceProjects(messages)[0].href, '/projects/zalio-crm')
+  assert.equal(getVoiceProjects([{ source: 'user', text: 'What is the guaranteed project price and delivery date?' }]).length, 0)
+  assert(getVoiceProjects([{ source: 'user', text: 'I need a mobile delivery app with rider tracking.' }]).some(project => project.href === '/projects/oneride'))
+})
+
+test('an explicit delivery-app request changes the project topic even when phrased as a question', () => {
+  const question = { source: 'user', text: 'Can you build a delivery tracking app?' }
+  assert.equal(getVoiceProjects([question])[0].href, '/projects/oneride')
+  assert.equal(getVoiceProjects([{ source: 'user', text: 'I need a clinic CRM with follow-ups.' }, question])[0].href, '/projects/oneride')
+})

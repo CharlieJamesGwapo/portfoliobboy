@@ -18,9 +18,9 @@ Current source inventory:
 | Independent products | 5 | `src/data/independentProducts.js` |
 | Arcade games | 9 | `interactiveGames` in `src/data/portfolioData.js` |
 | Credential records | 29 | `certifications` in `src/data/portfolioData.js` |
-| Node test files | 16 | `tests/*.test.js` |
+| Node test files | 21 | `tests/*.test.js` |
 | Development browser spec files | 16 | `tests/e2e/` |
-| Production-preview browser spec files | 5 | `tests/production/` |
+| Production-preview browser spec files | 6 | `tests/production/` |
 
 These collections overlap; their counts are not intended to be added together. All project metadata routes now have matching case-study records.
 
@@ -175,6 +175,16 @@ The recorded gallery includes eight accents and seven multilingual conversations
 
 Manual End, goodbye, the deadline and provider disconnect retain the workspace for review. Preparing a draft stops audio and uses only the visitor's statements, with scope, budget and timeline marked for discussion. Draft edits survive new turns and retries; replacement and contact handoff require explicit clicks. Opening a case study ends audio and opens a new tab. The existing staged contact path preserves an existing contact draft and never submits automatically. Closing voice, closing Alex, returning to the text guide or leaving the homepage discards this voice workspace. These messages are not persisted to browser storage or a new backend. Voice mode has its own scroll area in the Alex sheet; the local text assistant's state remains separate.
 
+### Aggregate outcome analytics and voice fallback
+
+The optional tracker in [src/lib/portfolioAnalytics.js](src/lib/portfolioAnalytics.js) emits five fixed action types through [api/analytics.js](api/analytics.js), validated by [shared/portfolioAnalytics.js](shared/portfolioAnalytics.js). [server/portfolioAnalytics.js](server/portfolioAnalytics.js) forwards only allowlisted surface/starter/project identifiers with a fresh random event ID, no person profiles or GeoIP, and no visitor IP, referrer, URL, transcript or form content. Browser requests omit credentials/referrers and respect Do Not Track and Global Privacy Control. Contact success is server-only after email-provider acceptance, not proof of inbox delivery; the public endpoint cannot spoof it. Capture failure is nonfatal and bounded to 1.5 seconds.
+
+**Activation is pending the owner's PostHog project selection.** No analytics credentials or enable flag were added to production. The connected organization found during setup was zalio with one Default project; it was not modified or used for portfolio ingestion. [docs/analytics/portfolio-dashboard.json](docs/analytics/portfolio-dashboard.json) is a proposed portable eight-insight definition, not an already provisioned dashboard. It uses action totals only, with no unique-visitor or attributed-conversion claims. Setup and privacy limits are documented in [docs/analytics/README.md](docs/analytics/README.md).
+
+Once connected, voice sends a bounded public evidence update built by [src/lib/voiceEvidence.js](src/lib/voiceEvidence.js). The deterministic answer audit corrects stale voice links, preserves dated role and private/planned project distinctions, and leaves price, delivery, availability and unproven experience unconfirmed. A contextual update reduces spoken-answer risk; it cannot guarantee provider behavior. [docs/alex-evidence-audit.md](docs/alex-evidence-audit.md) records cases and limits.
+
+Microphone denial and provider failures expose Continue in text. This stops audio and keeps the transcript/draft in the same workspace, using local portfolio answers and existing project/enquiry tools. Try voice again requires an explicit click; it never restarts the microphone from a text question.
+
 ### Local portfolio assistant
 
 `PortfolioAssistant` opens a lazy `AssistantPanel`. [src/lib/assistantAnswers.js](src/lib/assistantAnswers.js) matches questions against local portfolio and voice data, with contact-oriented fallbacks. Text answers do not call an LLM API. Three guided modes in the existing panel add project recommendations, recruiter comparisons, and brief preparation through [src/lib/assistantWorkflows.js](src/lib/assistantWorkflows.js):
@@ -275,11 +285,11 @@ Environment: Node **24.14.1**, npm **11.11.0**, Python 3; fresh dependencies ins
 | Check | Result on November 26, 2026 |
 | --- | --- |
 | `npm ci --ignore-scripts --no-audit --no-fund` | Passed; 149 packages installed |
-| `npm test` | Passed: 79 JavaScript tests and 2 Python tests |
+| `npm test` | Passed: 123 JavaScript tests and 2 Python tests |
 | `npm run build` | Passed; emitted metadata for 23 routes; deprecated chunk-option warning removed |
 | `npm audit --omit=dev --json` | 0 reported production dependency vulnerabilities |
 | Metadata vs. case-study inventory | All 20 project metadata routes have matching case studies |
-| Production-preview Chromium suite | Passed: all 28 tests, including transcript deduplication/corrections, starter delivery, public case-study navigation, visitor-only draft review and contact transfer, existing contact text preservation, reading position, microphone cleanup, farewell and deadline retention, narrow layouts, and retry |
+| Production-preview Chromium suite | Passed: all 32 tests with analytics enabled in the mocked harness, including explicit event/privacy checks, microphone-denied and provider-failure text fallback, transcript/draft retention, public evidence, review-only contact transfer, cleanup, deadline and retry |
 | Complete development Chromium suite | Passed: all 137 development browser tests |
 | Focused assistant suite | Passed: 13 each in Chromium, Firefox, and WebKit (39 checks total) |
 | Crypto removal check | Passed: project/category removed; metadata and sitemap exclude the route; old built page absent; all 20 project metadata routes match case studies |

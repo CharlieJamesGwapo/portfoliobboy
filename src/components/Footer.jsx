@@ -1,5 +1,6 @@
 import { ArrowUpRight, FileText } from 'lucide-react'
 import { profile, resumeUrl } from '../data/portfolioData'
+import { portfolioAnalyticsEnabled } from '../lib/portfolioAnalytics'
 
 const resources = [
   { label: 'Project archive', href: '/projects' },
@@ -50,6 +51,7 @@ const Footer = () => (
         <span>© {new Date().getFullYear()} {profile.shortName}</span>
         <a href="/#home">Back to top</a>
       </div>
+      {portfolioAnalyticsEnabled && <p className="footer-analytics-note">Anonymous action counts help improve this portfolio. Conversation and form contents are excluded from analytics. We honor Do Not Track and Global Privacy Control.</p>}
     </div>
   </footer>
 )

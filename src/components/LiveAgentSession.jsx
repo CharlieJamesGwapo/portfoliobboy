@@ -9,6 +9,9 @@ import { buildVoiceEnquiry, getVoiceProjects, mergeVoiceTranscript, voiceStarter
 import { stageAssistantEnquiry } from '../lib/contactIntent'
 import { navigatePortfolio } from '../lib/portfolioRoute'
 import VoiceConversation from './voice/VoiceConversation'
+import { answerQuestion } from '../lib/assistantAnswers'
+import { buildVoiceEvidenceContext } from '../lib/voiceEvidence'
+import { trackPortfolioEvent } from '../lib/portfolioAnalytics'
 
 // The SDK otherwise loads its audio worklets from blob: URLs, which the site's
 // CSP (script-src 'self') rightly refuses. Served as same-origin build assets
@@ -40,13 +43,15 @@ async function checkMicrophone() {
   }
 }
 
-const Session = ({ onClose, onEnquiry, limitSeconds }) => {
+const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
   const [error, setError] = useState('')
   const [elapsed, setElapsed] = useState(0)
   const [checking, setChecking] = useState(true)
   const [messages, setMessages] = useState([])
   const [draft, setDraft] = useState(null)
   const [starterError, setStarterError] = useState('')
+  const [textMode, setTextMode] = useState(false)
+  const textNumber = useRef(0)
   const conversation = useConversation()
   const { status, isSpeaking, isMuted, endSession } = conversation
   const endedForLimit = useRef(false)
@@ -59,6 +64,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
   if (!starter.current) starter.current = createVoiceSessionStarter(checkMicrophone)
 
   const start = async () => {
+    setTextMode(false)
     setError('')
     setStarterError('')
     setElapsed(0)
@@ -75,6 +81,14 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
         // WebSocket carries both audio directions over the supported API host.
         connectionType: 'websocket',
         workletPaths: WORKLET_PATHS,
+        onConnect: () => {
+          if (!isCurrent()) return
+          trackPortfolioEvent('portfolio_voice_started', { surface })
+          try { conversation.sendContextualUpdate(buildVoiceEvidenceContext()) } catch {
+            // Public context is optional; keep call controls usable if the
+            // transport closes between connection and context delivery.
+          }
+        },
         onMessage: (event) => {
           if (!isCurrent()) return
           setMessages(previous => mergeVoiceTranscript(previous, event, sessionId))
@@ -129,7 +143,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const connected = status === 'connected'
+  const connected = status === 'connected' && !textMode
   const projects = useMemo(() => getVoiceProjects(messages), [messages])
 
   const stopCall = () => {
@@ -139,9 +153,16 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
   }
 
   const askStarter = (prompt) => {
-    if (!connected || !activeCheck.current() || !voiceStarters.some(item => item.prompt === prompt)) return
+    const selected = voiceStarters.find(item => item.prompt === prompt)
+    if (!selected) return
+    if (textMode) {
+      if (askLocal(prompt)) trackPortfolioEvent('portfolio_starter_used', { surface: 'text_guide', starter_id: selected.id })
+      return
+    }
+    if (!connected || !activeCheck.current()) return
     try {
       conversation.sendUserMessage(prompt)
+      trackPortfolioEvent('portfolio_starter_used', { surface, starter_id: selected.id })
       setStarterError('')
       setMessages(previous => mergeVoiceTranscript(previous, {
         source: 'user', message: prompt, event_id: `starter-${++starterNumber.current}`, local: true,
@@ -149,6 +170,30 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
     } catch {
       setStarterError('That question could not be sent. Please try speaking it instead.')
     }
+  }
+
+  const continueInText = () => {
+    stopCall()
+    setError('')
+    setStarterError('')
+    setTextMode(true)
+  }
+
+  const askLocal = (value) => {
+    const question = typeof value === 'string' ? value.trim().slice(0, 1000) : ''
+    if (!textMode || !question) return false
+    const id = `text-${++textNumber.current}`
+    const answer = answerQuestion(question)
+    setMessages(previous => mergeVoiceTranscript(mergeVoiceTranscript(previous, {
+      source: 'user', message: question, event_id: id,
+    }, 'text'), { source: 'ai', message: answer.text, event_id: id }, 'text'))
+    return true
+  }
+
+  const openProject = (event) => {
+    const projectId = event.currentTarget.getAttribute('href')?.match(/^\/projects\/([a-z0-9-]+)$/)?.[1]
+    stopCall()
+    if (projectId) trackPortfolioEvent('portfolio_project_opened', { surface: textMode ? 'text_guide' : surface, project_id: projectId })
   }
 
   const prepareDraft = () => {
@@ -164,6 +209,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
     if (!subject || subject.length > 120 || !message || message.length < 10 || message.length > 4500) return
     stopCall()
     stageAssistantEnquiry(subject, message)
+    trackPortfolioEvent('portfolio_enquiry_reviewed', { surface: textMode ? 'text_guide' : surface })
     navigatePortfolio('/#contact')
     onEnquiry?.()
   }
@@ -192,7 +238,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
     }
   }, [connected, limitSeconds, endSession])
 
-  const label = checking
+  const label = textMode ? 'Text mode · microphone off' : checking
     ? 'Waiting for microphone permission…'
     : error
       ? STATUS_TEXT.error
@@ -204,7 +250,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
             ? 'Time limit reached. Thanks for trying it!'
             : STATUS_TEXT[status] ?? status
 
-  const finished = !checking && (status === 'disconnected' || status === 'error' || Boolean(error))
+  const finished = textMode || (!checking && (status === 'disconnected' || status === 'error' || Boolean(error)))
 
   return (
     <div className="live-agent-session">
@@ -212,7 +258,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
         <div className={`live-agent-orb ${connected ? 'is-live' : ''} ${isSpeaking ? 'is-speaking' : ''}`} aria-hidden="true">
           <span /><span /><span />
         </div>
-        <span className="live-agent-session-name">Alex · Voice assistant</span>
+        <span className="live-agent-session-name">Alex · {textMode ? 'Local text guide' : 'Voice assistant'}</span>
         {!finished && <div className="live-agent-clock" role="timer" aria-label={`${formatClock(Math.max(0, limitSeconds - elapsed))} remaining`}><span>Time left</span><strong>{formatClock(Math.max(0, limitSeconds - elapsed))}</strong></div>}
       </div>
       {connected && <progress className="live-agent-progress" max={limitSeconds} value={elapsed} aria-label="Conversation time used" />}
@@ -220,6 +266,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
       {!finished && <p className="live-agent-hint">{isMuted ? 'Unmute when you’re ready to speak.' : 'Say “goodbye” or select End conversation to finish.'}</p>}
       {error && <p className="live-agent-error" role="alert">{error}</p>}
       {starterError && <p className="live-agent-error" role="alert">{starterError}</p>}
+      {!textMode && error && <button type="button" className="button button-primary" onClick={continueInText}>Continue in text</button>}
       <div className="live-agent-controls">
         {connected && (
           <button type="button" className="button button-secondary" onClick={() => conversation.setMuted(!isMuted)} aria-pressed={isMuted}>
@@ -229,7 +276,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
         )}
         {finished ? (
           <>
-            <button type="button" className="button button-primary" onClick={start}><RotateCcw size={16} aria-hidden="true" /> Start again</button>
+            <button type="button" className="button button-primary" onClick={start}><RotateCcw size={16} aria-hidden="true" /> {textMode ? 'Try voice again' : 'Start again'}</button>
             <button type="button" className="button button-secondary" onClick={onClose}>Close</button>
           </>
         ) : (
@@ -238,16 +285,16 @@ const Session = ({ onClose, onEnquiry, limitSeconds }) => {
           </button>
         )}
       </div>
-      <VoiceConversation messages={messages} projects={projects} connected={connected && !checking}
+      <VoiceConversation messages={messages} projects={projects} connected={connected && !checking} textMode={textMode} onAskLocal={askLocal}
         draft={draft} onAsk={askStarter} onPrepareDraft={prepareDraft} onDraftChange={setDraft}
-        onReviewEnquiry={reviewEnquiry} onOpenProject={stopCall} />
+        onReviewEnquiry={reviewEnquiry} onOpenProject={openProject} />
     </div>
   )
 }
 
-const LiveAgentSession = ({ agentId, limitSeconds, onClose, onEnquiry }) => (
+const LiveAgentSession = ({ agentId, limitSeconds, onClose, onEnquiry, surface = 'voice_home' }) => (
   <ConversationProvider agentId={agentId}>
-    <Session onClose={onClose} onEnquiry={onEnquiry} limitSeconds={limitSeconds} />
+    <Session onClose={onClose} onEnquiry={onEnquiry} limitSeconds={limitSeconds} surface={surface} />
   </ConversationProvider>
 )
 

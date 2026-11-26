@@ -90,3 +90,5 @@ html[data-theme='dark'] .ai-capability-top span { color: var(--theme-muted); }
   .contact-path { min-height: 56px; }
   .contact-path small { display: none; }
 }
+
+.footer-analytics-note { max-width: 75ch; margin-top: 14px; color: var(--theme-muted, var(--mist)); font-size: .72rem; line-height: 1.6; }

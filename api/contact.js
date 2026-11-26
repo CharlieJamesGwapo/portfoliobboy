@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { capturePortfolioEvent } from '../server/portfolioAnalytics.js'
 
 // Exact origins only: accepting arbitrary *.vercel.app also accepts attackers.
 const ALLOWED_ORIGINS = new Set([
@@ -168,6 +169,9 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to send email' })
     }
 
+    if (req.headers.dnt !== '1' && req.headers['sec-gpc'] !== '1') {
+      await capturePortfolioEvent('portfolio_contact_submitted', { surface: 'contact' })
+    }
     return res.status(200).json({ success: true, message: 'Email sent successfully' })
   } catch (error) {
     // Log the detail server-side; don't hand internals back to the caller.

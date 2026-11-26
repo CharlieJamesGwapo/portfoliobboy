@@ -2,9 +2,8 @@
 // Alex's text answers: a local, deterministic answer engine.
 //
 // No model, no network, no credits. Every answer is assembled from the same
-// data the portfolio renders (src/data/portfolioData.js), so the assistant can
-// never claim something the site itself does not say. Questions it cannot
-// match get an honest fallback pointing to topics it does know and to contact.
+// public data the portfolio renders. Keyword matching is limited: it cannot
+// verify a visitor's premise or confirm commercial commitments.
 // ============================================================================
 import {
   aiSystemCapabilities,
@@ -14,10 +13,11 @@ import {
   profile,
   resumeUrl,
   skillGroups,
-} from '../data/portfolioData'
-import { automationToolbox } from '../data/automationsData'
-import { voiceAccents } from '../data/voiceAccents'
-import { voiceConversations } from '../data/voiceConversations'
+} from '../data/portfolioData.js'
+import { caseStudies } from '../data/caseStudies.js'
+import { automationToolbox } from '../data/automationsData.js'
+import { voiceAccents } from '../data/voiceAccents.js'
+import { voiceConversations } from '../data/voiceConversations.js'
 
 // "Custom AI agents" -> "custom AI agents": lower only the first letter, so
 // acronyms like AI, CRM, and n8n keep their casing.
@@ -32,7 +32,11 @@ const current = experiences.find((item) => item.featured) ?? experiences[0]
 // A finished role must not be described as current ("Jun 2026 – Sep 2026").
 const currentIsOngoing = /present/i.test(current.period)
 const roleLine = `${current.role} at ${current.company} (${current.period})`
+const ongoingRoles = experiences.filter(item => /present/i.test(item.period))
+const ongoingNote = ongoingRoles.length ? ` The portfolio also lists ${list(ongoingRoles.map(item => `${item.role} at ${item.company} (${item.period})`))}.` : ''
 const freeCalls = bookingOptions.filter((option) => option.price === 'Free')
+const freeCallNote = freeCalls.length ? ` The published free call options include a ${freeCalls[0].minutes}-minute ${freeCalls[0].title.toLowerCase()}.` : ''
+const voiceIdentity = `When voice is available, the portfolio's Talk to Alex connects to its live ElevenLabs portfolio guide. The separate Alex / Hasti project uses LiveKit Agents and GPT-Live over Twilio SIP for its callback experience on hasti.com.au.`
 const liveSystems = momentumSystems.filter((system) => system.url && system.statusTone === 'live')
 const flagship = momentumSystems.slice(0, 5)
 
@@ -63,7 +67,7 @@ const answers = {
   }),
 
   about: () => ({
-    text: `Charlie James Abejo is a ${profile.role} based in ${profile.location}. ${currentIsOngoing ? `He's currently ${roleLine}` : `Most recently he was ${roleLine}`}: ${current.summary}`,
+    text: `${profile.name} is a ${profile.role} based in ${profile.location}. ${currentIsOngoing ? `He's currently ${roleLine}` : `Most recently he was ${roleLine}`}: ${current.summary}${ongoingNote}`,
     actions: [{ label: 'About Charlie', href: '/#about' }, { label: 'Experience', href: '/#experience' }],
   }),
 
@@ -73,12 +77,12 @@ const answers = {
   }),
 
   ai: () => ({
-    text: `Charlie builds ${list(aiSystemCapabilities.slice(0, 4).map((item) => lowerFirst(item.title)))}. A production example is Alex, his AI voice agent on LiveKit and GPT-Live over Twilio SIP, which powers the live callback demo on hasti.com.au.`,
+    text: `Charlie builds ${list(aiSystemCapabilities.slice(0, 4).map((item) => lowerFirst(item.title)))}. ${voiceIdentity}`,
     actions: [{ label: 'AI systems', href: '/#ai-systems' }, { label: 'Voice Studio', href: '/#voice-demo' }],
   }),
 
   voice: () => ({
-    text: `The Voice Studio has ${voiceAccents.length} short sample conversations in different English accents, created with AI voice technology. They're pre-recorded previews. ${multilingualNote()}For a real live call, try Alex on hasti.com.au.`,
+    text: `${voiceIdentity} The Voice Studio also has ${voiceAccents.length} short, pre-recorded accent previews with fictional AI-generated conversations. ${multilingualNote()}`,
     actions: [
       { label: 'Open the Voice Studio', href: '/#voice-demo' },
       ...(voiceConversations.some((item) => item.status === 'ready') ? [{ label: 'Hear the bilingual calls', href: '/#voice-multilingual' }] : []),
@@ -92,12 +96,12 @@ const answers = {
   }),
 
   services: () => ({
-    text: `Charlie can help with ${list(aiSystemCapabilities.map((item) => lowerFirst(item.title)))}, as well as full-stack web and mobile apps. He works remotely and overlaps US and Australian business hours. The easiest start is a free ${freeCalls[0]?.minutes ?? 15}-minute Google Meet call.`,
+    text: `Charlie can help with ${list(aiSystemCapabilities.map((item) => lowerFirst(item.title)))}, as well as full-stack web and mobile apps. Confirm project scope and working-hour availability with Charlie.${freeCallNote}`,
     actions: [{ label: 'Book a call', href: '/#book-a-call' }, { label: 'Start a conversation', href: '/#contact' }, { label: 'AI systems', href: '/#ai-systems' }],
   }),
 
   pricing: () => ({
-    text: `Pricing depends on the scope of the project, so Charlie quotes each one individually. A free ${bookingOptions.find((option) => option.id === 'discovery')?.minutes ?? 30}-minute project discovery call is the quickest way to get a rough estimate.`,
+    text: `Project prices and hourly rates are not published here. Charlie quotes each one individually; confirm scope and a quote with Charlie directly.`,
     actions: [{ label: 'Book a discovery call', href: '/#book-a-call' }, { label: 'Contact Charlie', href: '/#contact' }],
   }),
 
@@ -107,7 +111,7 @@ const answers = {
   }),
 
   experience: () => ({
-    text: `${currentIsOngoing ? 'Currently' : 'Most recently'}: ${current.role} at ${current.company}, ${current.period}. Before that, ${list(experiences.filter((item) => item !== current).slice(0, 2).map((item) => `${item.role} at ${item.company}`))}.`,
+    text: `${currentIsOngoing ? 'Currently' : 'Most recently'}: ${current.role} at ${current.company}, ${current.period}. Other published roles include ${list(experiences.filter((item) => item !== current).slice(0, 2).map((item) => `${item.role} at ${item.company}`))}.${ongoingNote}`,
     actions: [{ label: 'Full experience', href: '/#experience' }],
   }),
 
@@ -122,7 +126,7 @@ const answers = {
   }),
 
   booking: () => ({
-    text: `You can book a Google Meet call with Charlie: ${list(bookingOptions.map((option) => `a ${option.minutes}-minute ${option.title.toLowerCase()} (${option.price.toLowerCase()})`))}. Pick one and he'll confirm with a calendar invite.`,
+    text: `You can request a Google Meet call with Charlie: ${list(bookingOptions.map((option) => `a ${option.minutes}-minute ${option.title.toLowerCase()} (${option.price.toLowerCase()})`))}. A meeting request does not reserve a calendar event; Charlie must confirm the time and invite.`,
     actions: [{ label: 'Choose a call', href: '/#book-a-call' }],
   }),
 
@@ -142,7 +146,12 @@ const answers = {
   }),
 
   identity: () => ({
-    text: `I'm Alex, a portfolio guide. In chat I answer from the content on this site rather than a live AI model, so my replies are instant and don't make anything up. When voice is available, "Talk to Alex" connects you to a live AI version of me. I share my name with Alex, the production AI voice agent Charlie built for Hasti.`,
+    text: `I'm Alex, a portfolio guide. In local text mode I answer from the content on this site rather than a live AI model. My keyword matching is limited, so ask Charlie to confirm anything unclear. ${voiceIdentity}`,
+  }),
+
+  unconfirmed: () => ({
+    text: `That detail is not confirmed by the published portfolio. Please confirm availability, delivery dates, proficiency, credentials, or promised results with Charlie directly.`,
+    actions: [{ label: 'Confirm with Charlie', href: '/#contact' }],
   }),
 
   thanks: () => ({ text: `You're welcome! Anything else you'd like to explore?` }),
@@ -182,7 +191,7 @@ const allSkills = skillGroups.flatMap((group) => group.skills.map((skill) => ({ 
 const findSystem = (text) => {
   const named = momentumSystems
     .map((system) => ({ system, name: system.title.split(/\s+—\s+/)[0].toLowerCase() }))
-    .filter(({ name }) => name.length > 2 && text.includes(` ${name}`))
+    .filter(({ name }) => name !== 'alex' && name.length > 2 && text.includes(` ${name}`))
     .sort((a, b) => b.name.length - a.name.length)[0]
   if (!named) return null
   const { system } = named
@@ -218,8 +227,24 @@ export function answerQuestion(input) {
   const text = normalize(input)
   if (text.trim().length === 0) return answers.greeting()
 
+  // Commercial commitments must be checked before named projects, skills, or
+  // booking keywords; a free discovery call does not make a project free.
+  if (/\b(price|pricing|cost|charge|rate|rates|budget|quote|fee|fees|how much|hourly)\b/.test(text)) return answers.pricing()
+  if (/\b(available|availability|timeline|timeframe|turnaround|deadline|deliver|delivery|guarantee|guaranteed|expert|proficient|senior|seniority|years?|certified)\b|\bwhen\b.*\b(start|finish|launch|free)\b|\b(does|has|holds?|have)\b.*\b(certification|degree)\b/.test(text)
+    || /\bhow (long|soon)\b|\b(can|could|will|would)\b.*\b(start|ship|finish|launch)\b|\b(tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|\bnext (week|month)\b/.test(text)
+    || (/\d/.test(text) && /\b(revenue|growth|conversion|metrics?|roi|percent)\b/.test(text))) return answers.unconfirmed()
+
+  if (/\b(talk to alex|elevenlabs|portfolio alex)\b/.test(text)) return answers.voice()
+
   const asksAboutUs = /\b(are you|who are you|your name|you a bot)\b/.test(text)
   if (!asksAboutUs) {
+    const study = caseStudies
+      .filter(item => [item.title, item.slug].some(name => text.includes(normalize(name))))
+      .sort((a, b) => b.title.length - a.title.length)[0]
+    if (study) return {
+      text: `${study.title}: ${study.overview} Role: ${study.role}. ${[].concat(study.responsibilities).join(' ')} Status: ${study.status}.`,
+      actions: [{ label: 'Read the case study', href: `/projects/${study.slug}` }],
+    }
     const specific = findSystem(text) ?? (/(know|use|work with|experience with|familiar)/.test(text) ? findSkill(text) : null)
     if (specific) return specific
   }
