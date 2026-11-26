@@ -167,7 +167,7 @@ Delivery requires `RESEND_API_KEY`; sender and recipient are configured in the f
 
 The recorded gallery includes eight accents and seven multilingual conversations. MP3s are imported from `src/assets/audio/` and emitted with hashed filenames. Playback uses static files rather than live generation. Waveforms are derived from recordings; scripts/transcripts are stored alongside the content data. The gallery identifies AI-generated voices and fictional conversations.
 
-[src/components/LiveAgentPanel.jsx](src/components/LiveAgentPanel.jsx) enables live controls only when a nonempty `VITE_ELEVENLABS_AGENT_ID` is present. The session module is lazy-loaded, checks microphone permission, and provides connection, mute, end, retry, and elapsed-time controls. A cancellation gate prevents a delayed microphone grant from starting a connection after the visitor closes the session or requests a newer start. Voice audio explicitly uses the SDK's WebSocket transport; the agent's WebRTC path disconnected before its greeting during the 2026-11-26 investigation. Startup and disconnect errors offer a clear retry, including a server hangup before the first response. Its audio worklets are emitted as same-origin assets. The UI ends a connected session at 180 seconds, but enforceable usage and domain limits depend on external agent configuration. No signed-session API or server-side voice quota endpoint exists in this repository. A brief live WebSocket connection reached the agent greeting on 2026-11-26; provider usage limits and domain restrictions still require separate verification.
+[src/components/LiveAgentPanel.jsx](src/components/LiveAgentPanel.jsx) enables live controls only when a nonempty `VITE_ELEVENLABS_AGENT_ID` is present. The session module is lazy-loaded, checks microphone permission, and provides connection, mute, end, retry, and elapsed-time controls. A cancellation gate prevents a delayed microphone grant from starting a connection after the visitor closes the session or requests a newer start. Voice audio explicitly uses the SDK's WebSocket transport; the agent's WebRTC path disconnected before its greeting during the 2026-11-26 investigation. Startup and disconnect errors offer a clear retry, including a server hangup before the first response. Its audio worklets are emitted as same-origin assets. Final visitor farewell transcripts immediately end the call; questions and negations mentioning goodbye keep it open. The panel shows a countdown, progress, and controls with explicit contrast in both themes. A monotonic timer and deadline end a connected session at 120 seconds, but enforceable usage and domain limits depend on external agent configuration. No signed-session API or server-side voice quota endpoint exists in this repository. A brief live WebSocket connection reached the agent greeting on 2026-11-26; provider usage limits and domain restrictions still require separate verification.
 
 ### Local portfolio assistant
 
@@ -269,11 +269,11 @@ Environment: Node **24.14.1**, npm **11.11.0**, Python 3; fresh dependencies ins
 | Check | Result on November 26, 2026 |
 | --- | --- |
 | `npm ci --ignore-scripts --no-audit --no-fund` | Passed; 149 packages installed |
-| `npm test` | Passed: 66 JavaScript tests and 2 Python tests |
+| `npm test` | Passed: 68 JavaScript tests and 2 Python tests |
 | `npm run build` | Passed; emitted metadata for 23 routes; deprecated chunk-option warning removed |
 | `npm audit --omit=dev --json` | 0 reported production dependency vulnerabilities |
 | Metadata vs. case-study inventory | All 20 project metadata routes have matching case studies |
-| Production-preview Chromium suite | Passed: all 18 tests, including WebSocket greeting playback, microphone cleanup, pre-greeting hangup, and interrupted-connection retry |
+| Production-preview Chromium suite | Passed: all 20 tests, including WebSocket greeting playback, microphone cleanup, farewell detection, the two-minute deadline, narrow layouts, button contrast in both themes, pre-greeting hangup, and retry |
 | Complete development Chromium suite | Passed: all 137 development browser tests |
 | Focused assistant suite | Passed: 13 each in Chromium, Firefox, and WebKit (39 checks total) |
 | Crypto removal check | Passed: project/category removed; metadata and sitemap exclude the route; old built page absent; all 20 project metadata routes match case studies |

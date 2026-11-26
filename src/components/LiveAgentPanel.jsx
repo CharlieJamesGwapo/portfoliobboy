@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import { Loader2, Mic } from 'lucide-react'
 import { prefetchProps } from '../lib/prefetch'
+import './voice-demo.css'
 
 // Public agent ID (safe in the browser; it is not an API key). Unset means the
 // live agent is unavailable and the panel renders nothing.
@@ -14,7 +15,7 @@ export const hasLiveAgent = AGENT_ID.length > 0
 
 // Must match (or be below) the agent's server-side maximum duration. The UI
 // timer only informs the visitor; the provider is what actually ends the call.
-export const LIVE_SESSION_LIMIT_SECONDS = 180
+export const LIVE_SESSION_LIMIT_SECONDS = 120
 
 const loadSession = () => import('./LiveAgentSession')
 export const LiveAgentSession = lazy(loadSession)
@@ -30,9 +31,9 @@ const LiveAgentPanel = () => {
         <p className="live-agent-kicker"><span className="live-agent-dot" aria-hidden="true" /> Bboy AI Voice Studio · Live</p>
         <h3 id="live-agent-title">Talk to My AI.</h3>
         <p>
-          Ask my AI assistant about my full-stack work, AI agents, automations, or how to get in touch.
-          Conversations are limited to {Math.round(LIVE_SESSION_LIMIT_SECONDS / 60)} minutes, and your microphone is used only while one is open.
+          Ask Alex about my full-stack projects, AI agents, automations, or working together.
         </p>
+        <p className="live-agent-guidance">Conversations are limited to {Math.round(LIVE_SESSION_LIMIT_SECONDS / 60)} minutes. Say “goodbye” to end your call at any time.</p>
       </div>
       <div className="live-agent-action">
         {open ? (

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { readFileSync } from 'node:fs'
+import { mkdirSync, readFileSync } from 'node:fs'
 
 const config = JSON.parse(readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'))
 const csp = config.headers.find(rule => rule.source === '/(.*)').headers.find(h => h.key === 'Content-Security-Policy').value
@@ -62,6 +62,41 @@ test('voice reaches the greeting over WebSocket under production CSP and closes 
     })
   })
   await expect(page.locator('.live-agent-status')).toHaveText('Assistant is speaking')
+  await expect(page.locator('#live-agent')).toContainText('limited to 2 minutes')
+  await expect(page.locator('.live-agent-clock')).toContainText('Time left')
+  for (const theme of ['light', 'dark']) {
+    await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
+    for (const button of await page.locator('.live-agent-controls button').all()) {
+      const contrast = await button.evaluate(element => {
+        const luminance = color => {
+          const channels = color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => {
+            const n = value / 255
+            return n <= 0.04045 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4
+          })
+          return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+        }
+        const style = getComputedStyle(element)
+        const values = [luminance(style.color), luminance(style.backgroundColor)].sort((a, b) => a - b)
+        return (values[1] + 0.05) / (values[0] + 0.05)
+      })
+      expect(contrast, `${theme} button text contrast`).toBeGreaterThanOrEqual(4.5)
+    }
+  }
+  mkdirSync('/tmp/charlie-portfolio-preview', { recursive: true })
+  for (const width of [1280, 390, 320]) {
+    await page.setViewportSize({ width, height: 960 })
+    const panel = page.locator('#live-agent')
+    await panel.scrollIntoViewIfNeeded()
+    const bounds = await panel.boundingBox()
+    expect(bounds.x).toBeGreaterThanOrEqual(0)
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(width)
+    for (const button of await page.locator('.live-agent-controls button').all()) {
+      const touch = await button.boundingBox()
+      expect(touch.height).toBeGreaterThanOrEqual(44)
+      expect(touch.width).toBeGreaterThanOrEqual(44)
+    }
+    await panel.screenshot({ path: `/tmp/charlie-portfolio-preview/live-voice-${width}.png` })
+  }
   expect(sentAudio).toBe(true)
   await page.locator('#live-agent').getByRole('button', { name: 'Mute', exact: true }).click()
   await expect(page.locator('#live-agent').getByRole('button', { name: 'Unmute', exact: true })).toHaveAttribute('aria-pressed', 'true')
@@ -70,6 +105,45 @@ test('voice reaches the greeting over WebSocket under production CSP and closes 
   await expect.poll(() => closed).toBe(true)
   await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
   expect(errors).toEqual([])
+})
+
+test('a visitor farewell ends the call immediately, while mentioning goodbye keeps it open', async ({ page }) => {
+  let connection
+  let closed = false
+  await prepare(page, socket => {
+    connection = socket
+    socket.onClose(() => { closed = true })
+    socket.onMessage(message => {
+      if (JSON.parse(String(message)).type === 'conversation_initiation_client_data') startVoice(socket)
+    })
+  })
+  await expect(page.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+  connection.send(JSON.stringify({ type: 'user_transcript', user_transcription_event: { user_transcript: "Don't say goodbye yet", event_id: 1 } }))
+  await expect(page.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+  connection.send(JSON.stringify({ type: 'user_transcript', user_transcription_event: { user_transcript: 'Thank you, goodbye Alex!', event_id: 2 } }))
+  await expect(page.locator('.live-agent-status')).toHaveText('Conversation ended. Thanks for stopping by!')
+  await expect.poll(() => closed).toBe(true)
+  await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
+  await expect(page.getByRole('button', { name: 'Start again', exact: true })).toBeVisible()
+})
+
+test('the two-minute deadline ends audio even when timer updates were throttled', async ({ page }) => {
+  await page.clock.install()
+  let closed = false
+  await prepare(page, socket => {
+    socket.onClose(() => { closed = true })
+    socket.onMessage(message => {
+      if (JSON.parse(String(message)).type === 'conversation_initiation_client_data') startVoice(socket)
+    })
+  })
+  await expect(page.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+  await page.clock.fastForward(119_000)
+  await expect(page.locator('.live-agent-clock')).toContainText('0:01')
+  expect(closed).toBe(false)
+  await page.clock.runFor(1000)
+  await expect(page.locator('.live-agent-status')).toHaveText('Time limit reached. Thanks for trying it!')
+  await expect.poll(() => closed).toBe(true)
+  await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
 })
 
 test('a server hangup before the greeting is a failed start rather than a completed conversation', async ({ page }) => {

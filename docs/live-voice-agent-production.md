@@ -15,14 +15,20 @@ agent needs the owner's separate approval because it spends money per minute.
   - asks for the microphone first, so it can explain a denial clearly;
   - shows connecting, listening and speaking states, with mute and end
     controls;
-  - shows a session clock.
+  - shows time remaining and a progress indicator, with readable controls in
+    both themes and on narrow screens;
+  - immediately ends the session when a final visitor transcript is a short
+    farewell such as “goodbye” or “thank you, goodbye Alex.” Questions and
+    negations mentioning goodbye keep the session open;
   - explicitly uses the SDK's WebSocket audio transport. On 2026-11-26 the
     deployed agent's WebRTC room disconnected before its greeting; the same
     agent delivered its greeting over WebSocket under the production CSP;
   - handles provider disconnect callbacks as well as startup errors, so a
     dropped connection or a hangup before the greeting offers a clear retry.
-- `LIVE_SESSION_LIMIT_SECONDS` (180) is a **display and courtesy limit only**.
-  The real limits must be enforced by ElevenLabs on the agent (see below).
+- `LIVE_SESSION_LIMIT_SECONDS` (120) is a **display and courtesy limit only**.
+  A monotonic clock and a deadline stop the browser's call at two minutes,
+  including delayed timer updates. Account-wide limits must be enforced by
+  ElevenLabs on the agent (see below).
 - No API key is used in the browser. Never put an ElevenLabs API key in a
   `VITE_` variable: Vite bundles every `VITE_` value into public JavaScript.
 
@@ -71,7 +77,7 @@ Set these on the agent before going public, then verify each one by testing:
 
 | Limit | Recommended launch value | Why |
 | --- | --- | --- |
-| Maximum conversation duration | 180 s | Matches the on-site clock; caps each call's cost |
+| Maximum conversation duration | 120 s | Matches the on-site clock; caps each call's cost |
 | Concurrency limit | 1–2 | Prevents a traffic spike from multiplying cost |
 | Daily call limit | 10–20 | Hard daily ceiling on spend |
 
@@ -94,8 +100,8 @@ before launch.**
 
 | Scenario | Minutes per day | Approx. per day | Approx. per month (30 days) |
 | --- | --- | --- | --- |
-| Daily limit 10 × 3 min | 30 | ~US$2.40 | ~US$72 (worst case) |
-| Daily limit 20 × 3 min | 60 | ~US$4.80 | ~US$144 (worst case) |
+| Daily limit 10 × 2 min | 20 | ~US$1.60 | ~US$48 (worst case) |
+| Daily limit 20 × 2 min | 40 | ~US$3.20 | ~US$96 (worst case) |
 | Typical portfolio traffic (estimate) | 5–10 | ~US$0.40–0.80 | ~US$12–24 |
 
 These are ceilings set by the limits, plus LLM usage. The recorded accent
@@ -110,7 +116,7 @@ previews cost nothing to replay: they are static files.
 5. Test on desktop and phone:
    - microphone granted and denied;
    - connect, mute and end;
-   - the 3-minute cut-off;
+   - the 2-minute cut-off;
    - disconnect handling;
    - a blocked origin.
 6. Watch the first week's usage in the ElevenLabs dashboard and set an alert.

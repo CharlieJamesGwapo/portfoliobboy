@@ -4,6 +4,7 @@ import { Mic, MicOff, PhoneOff, RotateCcw } from 'lucide-react'
 import rawAudioProcessor from '@elevenlabs/client/worklets/rawAudioProcessor.js?url'
 import audioConcatProcessor from '@elevenlabs/client/worklets/audioConcatProcessor.js?url'
 import { createVoiceSessionStarter } from '../lib/voiceSessionStart'
+import { isVoiceFarewell } from '../lib/voiceFarewell'
 
 // The SDK otherwise loads its audio worklets from blob: URLs, which the site's
 // CSP (script-src 'self') rightly refuses. Served as same-origin build assets
@@ -40,8 +41,9 @@ const Session = ({ onClose, limitSeconds }) => {
   const [elapsed, setElapsed] = useState(0)
   const [checking, setChecking] = useState(true)
   const conversation = useConversation()
-  const { status, isSpeaking, isMuted } = conversation
+  const { status, isSpeaking, isMuted, endSession } = conversation
   const endedForLimit = useRef(false)
+  const endedForGoodbye = useRef(false)
   const heardAssistant = useRef(false)
   const starter = useRef(null)
   if (!starter.current) starter.current = createVoiceSessionStarter(checkMicrophone)
@@ -50,6 +52,7 @@ const Session = ({ onClose, limitSeconds }) => {
     setError('')
     setElapsed(0)
     endedForLimit.current = false
+    endedForGoodbye.current = false
     heardAssistant.current = false
     setChecking(true)
     const result = await starter.current.start((isCurrent) => {
@@ -59,6 +62,12 @@ const Session = ({ onClose, limitSeconds }) => {
         // WebSocket carries both audio directions over the supported API host.
         connectionType: 'websocket',
         workletPaths: WORKLET_PATHS,
+        onMessage: ({ source, message }) => {
+          if (!isCurrent() || source !== 'user' || !isVoiceFarewell(message)) return
+          endedForGoodbye.current = true
+          starter.current.cancel()
+          conversation.endSession()
+        },
         onModeChange: ({ mode }) => {
           if (isCurrent() && mode === 'speaking') heardAssistant.current = true
         },
@@ -99,30 +108,41 @@ const Session = ({ onClose, limitSeconds }) => {
 
   const connected = status === 'connected'
 
-  // Session clock. The provider enforces the real limit server-side; ending
-  // here as well just stops the visitor's side promptly at the same moment.
+  // Stop this browser's call at the displayed limit. Provider-side usage caps
+  // are configured separately; the browser cannot enforce an account quota.
   useEffect(() => {
     if (!connected) return undefined
-    const timer = window.setInterval(() => setElapsed((value) => value + 1), 1000)
-    return () => window.clearInterval(timer)
-  }, [connected])
-
-  useEffect(() => {
-    if (connected && elapsed >= limitSeconds && !endedForLimit.current) {
+    const startedAt = performance.now()
+    const finishForLimit = () => {
+      if (endedForLimit.current || endedForGoodbye.current) return
       endedForLimit.current = true
-      conversation.endSession()
+      setElapsed(limitSeconds)
+      starter.current.cancel()
+      endSession()
     }
-  }, [connected, elapsed, limitSeconds, conversation])
+    const timer = window.setInterval(() => {
+      const seconds = Math.floor((performance.now() - startedAt) / 1000)
+      setElapsed(Math.min(seconds, limitSeconds))
+      if (seconds >= limitSeconds) finishForLimit()
+    }, 1000)
+    const deadline = window.setTimeout(finishForLimit, limitSeconds * 1000)
+    return () => {
+      window.clearInterval(timer)
+      window.clearTimeout(deadline)
+    }
+  }, [connected, limitSeconds, endSession])
 
   const label = checking
     ? 'Waiting for microphone permission…'
     : error
       ? STATUS_TEXT.error
       : connected
-        ? (isSpeaking ? 'Assistant is speaking' : 'Listening… go ahead')
-        : endedForLimit.current && status === 'disconnected'
-          ? 'Time limit reached. Thanks for trying it!'
-          : STATUS_TEXT[status] ?? status
+        ? (isMuted ? 'Microphone muted' : isSpeaking ? 'Assistant is speaking' : 'Listening… go ahead')
+        : endedForGoodbye.current && status === 'disconnected'
+          ? 'Conversation ended. Thanks for stopping by!'
+          : endedForLimit.current && status === 'disconnected'
+            ? 'Time limit reached. Thanks for trying it!'
+            : STATUS_TEXT[status] ?? status
 
   const finished = !checking && (status === 'disconnected' || status === 'error' || Boolean(error))
 
@@ -132,9 +152,12 @@ const Session = ({ onClose, limitSeconds }) => {
         <div className={`live-agent-orb ${connected ? 'is-live' : ''} ${isSpeaking ? 'is-speaking' : ''}`} aria-hidden="true">
           <span /><span /><span />
         </div>
-        {connected && <span className="live-agent-clock" aria-label={`Elapsed ${formatClock(elapsed)} of ${formatClock(limitSeconds)}`}>{formatClock(elapsed)} / {formatClock(limitSeconds)}</span>}
+        <span className="live-agent-session-name">Alex · Voice assistant</span>
+        {!finished && <div className="live-agent-clock" role="timer" aria-label={`${formatClock(Math.max(0, limitSeconds - elapsed))} remaining`}><span>Time left</span><strong>{formatClock(Math.max(0, limitSeconds - elapsed))}</strong></div>}
       </div>
+      {connected && <progress className="live-agent-progress" max={limitSeconds} value={elapsed} aria-label="Conversation time used" />}
       <p className="live-agent-status" role="status" aria-live="polite">{label}</p>
+      {!finished && <p className="live-agent-hint">{isMuted ? 'Unmute when you’re ready to speak.' : 'Say “goodbye” or select End conversation to finish.'}</p>}
       {error && <p className="live-agent-error" role="alert">{error}</p>}
       <div className="live-agent-controls">
         {connected && (

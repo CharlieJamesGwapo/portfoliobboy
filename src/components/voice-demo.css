@@ -115,13 +115,33 @@
 .live-agent-kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--mint); font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .live-agent-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px rgba(103, 224, 193, .18); }
 .live-agent-copy h3 { margin: 10px 0 8px; font-size: clamp(1.3rem, 2.2vw, 1.7rem); letter-spacing: -.035em; line-height: 1.2; color: var(--paper); }
-.live-agent-copy > p:last-child { color: var(--mist); font-size: .85rem; line-height: 1.7; }
-.live-agent-action { display: grid; gap: 12px; justify-items: start; }
+.live-agent-copy > p:not(.live-agent-kicker) { color: var(--mist); font-size: .88rem; line-height: 1.7; }
+.live-agent-copy > .live-agent-guidance { margin-top: 14px; font-size: .78rem; color: #bdd5ce; }
+.live-agent-action { display: grid; gap: 14px; justify-items: start; min-width: 0; width: 100%; }
 .live-agent-disclosure { color: var(--mist); font-size: .68rem; line-height: 1.5; }
-.live-agent-session { display: grid; gap: 12px; justify-items: start; width: 100%; }
+.live-agent-session { display: grid; gap: 16px; justify-items: start; width: 100%; min-width: 0; padding: 20px; border: 1px solid #315452; border-radius: 16px; background: #0b2528; color: #f3f0e9; }
+.live-agent-meter { display: flex; align-items: center; gap: 12px; width: 100%; }
+.live-agent-session-name { color: #bdd5ce; font-size: .75rem; line-height: 1.4; }
+.live-agent-clock { display: grid; gap: 2px; margin-left: auto; text-align: right; flex-shrink: 0; }
+.live-agent-clock > span { color: #bdd5ce; font-size: .65rem; }
+.live-agent-clock > strong { color: #f3f0e9; font-size: 1.5rem; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.live-agent-progress { appearance: none; width: 100%; height: 4px; border: 0; border-radius: 4px; overflow: hidden; background: #315452; color: #67e0c1; }
+.live-agent-progress::-webkit-progress-bar { background: #315452; }
+.live-agent-progress::-webkit-progress-value { background: #67e0c1; border-radius: 4px; }
+.live-agent-progress::-moz-progress-bar { background: #67e0c1; border-radius: 4px; }
+.live-agent-hint { color: #bdd5ce; font-size: .73rem; line-height: 1.55; }
 .live-agent-status { display: inline-flex; align-items: center; gap: 8px; color: var(--paper); font-size: .85rem; font-weight: 650; }
 .live-agent-error { color: var(--coral); font-size: .75rem; line-height: 1.5; }
-.live-agent-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+.live-agent-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr)); gap: 10px; width: 100%; }
+.live-agent-controls .button { min-width: 0; min-height: 48px; padding: 12px; line-height: 1.35; text-align: center; }
+:is(.live-agent, .live-agent-session) .button.button-secondary { color: #f3f0e9; background: #183c3e; border: 1px solid #71928d; }
+:is(.live-agent, .live-agent-session) .button.button-secondary:hover { background: #244d4e; border-color: #9dc6bb; }
+:is(.live-agent, .live-agent-session) .button.button-primary { color: #0b2528; background: #67e0c1; }
+:is(.live-agent, .live-agent-session) .button.button-primary:hover { background: #81efd3; }
+.live-agent-session .button.live-agent-end { color: #ffe0d4; background: #482e2d; border-color: #c59280; }
+.live-agent-session .button.live-agent-end:hover { color: #fff5ed; background: #633a33; border-color: #ffc1a7; }
+.live-agent-session .button[aria-pressed='true'] { color: #67e0c1; border-color: #67e0c1; }
+:is(.live-agent, .live-agent-session) .button:focus-visible { outline: 3px solid #67e0c1; outline-offset: 4px; }
 .live-agent-orb { display: flex; gap: 6px; align-items: center; height: 28px; }
 .live-agent-orb span { width: 6px; height: 8px; border-radius: 3px; background: var(--mist); transition: background 200ms; }
 .live-agent-orb.is-live span { background: var(--mint); }
