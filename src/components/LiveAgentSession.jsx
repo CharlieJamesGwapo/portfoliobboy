@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ConversationProvider, useConversation } from '@elevenlabs/react'
 import { Mic, MicOff, PhoneOff, RotateCcw } from 'lucide-react'
 import rawAudioProcessor from '@elevenlabs/client/worklets/rawAudioProcessor.js?url'
 import audioConcatProcessor from '@elevenlabs/client/worklets/audioConcatProcessor.js?url'
 import { createVoiceSessionStarter } from '../lib/voiceSessionStart'
 import { isVoiceFarewell } from '../lib/voiceFarewell'
+import { buildVoiceEnquiry, getVoiceProjects, mergeVoiceTranscript, voiceStarters } from '../lib/voiceConversation'
+import { stageAssistantEnquiry } from '../lib/contactIntent'
+import { navigatePortfolio } from '../lib/portfolioRoute'
+import VoiceConversation from './voice/VoiceConversation'
 
 // The SDK otherwise loads its audio worklets from blob: URLs, which the site's
 // CSP (script-src 'self') rightly refuses. Served as same-origin build assets
@@ -36,20 +40,27 @@ async function checkMicrophone() {
   }
 }
 
-const Session = ({ onClose, limitSeconds }) => {
+const Session = ({ onClose, onEnquiry, limitSeconds }) => {
   const [error, setError] = useState('')
   const [elapsed, setElapsed] = useState(0)
   const [checking, setChecking] = useState(true)
+  const [messages, setMessages] = useState([])
+  const [draft, setDraft] = useState(null)
+  const [starterError, setStarterError] = useState('')
   const conversation = useConversation()
   const { status, isSpeaking, isMuted, endSession } = conversation
   const endedForLimit = useRef(false)
   const endedForGoodbye = useRef(false)
   const heardAssistant = useRef(false)
+  const sessionNumber = useRef(0)
+  const starterNumber = useRef(0)
+  const activeCheck = useRef(() => false)
   const starter = useRef(null)
   if (!starter.current) starter.current = createVoiceSessionStarter(checkMicrophone)
 
   const start = async () => {
     setError('')
+    setStarterError('')
     setElapsed(0)
     endedForLimit.current = false
     endedForGoodbye.current = false
@@ -57,22 +68,34 @@ const Session = ({ onClose, limitSeconds }) => {
     setChecking(true)
     const result = await starter.current.start((isCurrent) => {
       setChecking(false)
+      const sessionId = ++sessionNumber.current
+      activeCheck.current = isCurrent
       return conversation.startSession({
         // The agent's WebRTC room disconnects before its first response.
         // WebSocket carries both audio directions over the supported API host.
         connectionType: 'websocket',
         workletPaths: WORKLET_PATHS,
-        onMessage: ({ source, message }) => {
-          if (!isCurrent() || source !== 'user' || !isVoiceFarewell(message)) return
+        onMessage: (event) => {
+          if (!isCurrent()) return
+          setMessages(previous => mergeVoiceTranscript(previous, event, sessionId))
+          if (event.source !== 'user' || !isVoiceFarewell(event.message)) return
           endedForGoodbye.current = true
           starter.current.cancel()
           conversation.endSession()
+        },
+        onAgentResponseCorrection: (event) => {
+          if (!isCurrent()) return
+          setMessages(previous => mergeVoiceTranscript(previous, {
+            source: 'ai', message: event.corrected_agent_response, event_id: event.event_id,
+          }, sessionId))
         },
         onModeChange: ({ mode }) => {
           if (isCurrent() && mode === 'speaking') heardAssistant.current = true
         },
         onDisconnect: (details) => {
-          if (!isCurrent() || details.reason === 'user' || endedForLimit.current) return
+          if (!isCurrent()) return
+          starter.current.cancel()
+          if (details.reason === 'user' || endedForLimit.current) return
           console.warn('[voice] disconnected:', details)
           if (details.reason === 'error') {
             setError('The voice connection was interrupted. Please start again, or use the chat.')
@@ -107,6 +130,43 @@ const Session = ({ onClose, limitSeconds }) => {
   }, [])
 
   const connected = status === 'connected'
+  const projects = useMemo(() => getVoiceProjects(messages), [messages])
+
+  const stopCall = () => {
+    starter.current.cancel()
+    setChecking(false)
+    endSession()
+  }
+
+  const askStarter = (prompt) => {
+    if (!connected || !activeCheck.current() || !voiceStarters.some(item => item.prompt === prompt)) return
+    try {
+      conversation.sendUserMessage(prompt)
+      setStarterError('')
+      setMessages(previous => mergeVoiceTranscript(previous, {
+        source: 'user', message: prompt, event_id: `starter-${++starterNumber.current}`, local: true,
+      }, sessionNumber.current))
+    } catch {
+      setStarterError('That question could not be sent. Please try speaking it instead.')
+    }
+  }
+
+  const prepareDraft = () => {
+    const enquiry = buildVoiceEnquiry(messages, projects)
+    if (!enquiry) return
+    stopCall()
+    setDraft(enquiry)
+  }
+
+  const reviewEnquiry = () => {
+    const subject = draft?.subject?.trim()
+    const message = draft?.message?.trim()
+    if (!subject || subject.length > 120 || !message || message.length < 10 || message.length > 4500) return
+    stopCall()
+    stageAssistantEnquiry(subject, message)
+    navigatePortfolio('/#contact')
+    onEnquiry?.()
+  }
 
   // Stop this browser's call at the displayed limit. Provider-side usage caps
   // are configured separately; the browser cannot enforce an account quota.
@@ -159,6 +219,7 @@ const Session = ({ onClose, limitSeconds }) => {
       <p className="live-agent-status" role="status" aria-live="polite">{label}</p>
       {!finished && <p className="live-agent-hint">{isMuted ? 'Unmute when you’re ready to speak.' : 'Say “goodbye” or select End conversation to finish.'}</p>}
       {error && <p className="live-agent-error" role="alert">{error}</p>}
+      {starterError && <p className="live-agent-error" role="alert">{starterError}</p>}
       <div className="live-agent-controls">
         {connected && (
           <button type="button" className="button button-secondary" onClick={() => conversation.setMuted(!isMuted)} aria-pressed={isMuted}>
@@ -172,18 +233,21 @@ const Session = ({ onClose, limitSeconds }) => {
             <button type="button" className="button button-secondary" onClick={onClose}>Close</button>
           </>
         ) : (
-          <button type="button" className="button button-secondary live-agent-end" onClick={() => { starter.current.cancel(); conversation.endSession(); onClose() }}>
+          <button type="button" className="button button-secondary live-agent-end" onClick={stopCall}>
             <PhoneOff size={16} aria-hidden="true" /> End conversation
           </button>
         )}
       </div>
+      <VoiceConversation messages={messages} projects={projects} connected={connected && !checking}
+        draft={draft} onAsk={askStarter} onPrepareDraft={prepareDraft} onDraftChange={setDraft}
+        onReviewEnquiry={reviewEnquiry} onOpenProject={stopCall} />
     </div>
   )
 }
 
-const LiveAgentSession = ({ agentId, limitSeconds, onClose }) => (
+const LiveAgentSession = ({ agentId, limitSeconds, onClose, onEnquiry }) => (
   <ConversationProvider agentId={agentId}>
-    <Session onClose={onClose} limitSeconds={limitSeconds} />
+    <Session onClose={onClose} onEnquiry={onEnquiry} limitSeconds={limitSeconds} />
   </ConversationProvider>
 )
 

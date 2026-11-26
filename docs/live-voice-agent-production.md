@@ -32,6 +32,34 @@ agent needs the owner's separate approval because it spends money per minute.
 - No API key is used in the browser. Never put an ElevenLabs API key in a
   `VITE_` variable: Vite bundles every `VITE_` value into public JavaScript.
 
+## Live transcript and project enquiries
+
+The existing voice session includes a bounded in-memory transcript (latest 80
+messages, up to 2,000 characters each). Final visitor/agent events and agent
+corrections update it without duplicating SDK IDs or echoed starter questions.
+Messages are escaped text; scrolling follows new turns only while the visitor
+is already near the bottom of the transcript.
+
+Three starter buttons explicitly send a question to the current voice agent.
+They are disabled outside an active connection. Local public case-study data
+provides up to three project cards with documented contributions and status;
+provider claims are never treated as portfolio evidence. Opening a case study
+ends the call and opens a new tab so the transcript remains in the original.
+
+Preparing an enquiry ends audio and creates an editable subject/message from
+the visitor's words, with unconfirmed scope, budget and timeline marked for
+discussion. AI replies are excluded from visitor notes. New turns and retries
+do not overwrite draft edits. Replacing a draft requires an explicit button.
+Review in contact form stages the edited text through the existing contact
+handoff, including from project routes; it does not submit an email and keeps
+an existing contact draft available for manual merging.
+
+End conversation, goodbye, timeout and connection errors retain the open
+workspace for review. Close (including closing Alex or returning to its text
+guide) discards that voice workspace. No transcript, draft or audio recording
+is added to browser storage or a new backend by this feature; audio still uses
+the external provider under the existing disclosure.
+
 ## Environment variables
 
 | Variable | Where | Value | Secret? |

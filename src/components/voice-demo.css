@@ -112,6 +112,7 @@
 .voice-engineering[open] > summary span { transform: rotate(45deg); }
 /* ElevenLabs live agent panel (renders only when VITE_ELEVENLABS_AGENT_ID is set). */
 .live-agent { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(20px, 4vw, 48px); align-items: center; margin-bottom: 24px; padding: clamp(22px, 3vw, 32px); border: 1px solid rgba(103, 224, 193, .35); border-radius: 18px; background: linear-gradient(135deg, rgba(103, 224, 193, .08), rgba(255, 156, 119, .05)); }
+.live-agent.is-open { grid-template-columns: minmax(0, 1fr); align-items: start; }
 .live-agent-kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--mint); font-size: .68rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
 .live-agent-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px rgba(103, 224, 193, .18); }
 .live-agent-copy h3 { margin: 10px 0 8px; font-size: clamp(1.3rem, 2.2vw, 1.7rem); letter-spacing: -.035em; line-height: 1.2; color: var(--paper); }

@@ -101,6 +101,8 @@ test('voice reaches the greeting over WebSocket under production CSP and closes 
   await page.locator('#live-agent').getByRole('button', { name: 'Mute', exact: true }).click()
   await expect(page.locator('#live-agent').getByRole('button', { name: 'Unmute', exact: true })).toHaveAttribute('aria-pressed', 'true')
   await page.locator('#live-agent').getByRole('button', { name: 'End conversation', exact: true }).click()
+  await expect(page.locator('#live-agent').getByRole('button', { name: 'Start again', exact: true })).toBeVisible()
+  await page.locator('#live-agent').getByRole('button', { name: 'Close', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Start a live conversation', exact: true })).toBeVisible()
   await expect.poll(() => closed).toBe(true)
   await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
@@ -130,13 +132,17 @@ test('a visitor farewell ends the call immediately, while mentioning goodbye kee
 test('the two-minute deadline ends audio even when timer updates were throttled', async ({ page }) => {
   await page.clock.install()
   let closed = false
+  let connection
   await prepare(page, socket => {
+    connection = socket
     socket.onClose(() => { closed = true })
     socket.onMessage(message => {
       if (JSON.parse(String(message)).type === 'conversation_initiation_client_data') startVoice(socket)
     })
   })
   await expect(page.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+  connection.send(JSON.stringify({ type: 'user_transcript', user_transcription_event: { user_transcript: 'I need automated CRM reminders.', event_id: 1 } }))
+  await expect(page.getByRole('log', { name: /transcript/i })).toContainText('I need automated CRM reminders.')
   await page.clock.fastForward(119_000)
   await expect(page.locator('.live-agent-clock')).toContainText('0:01')
   expect(closed).toBe(false)
@@ -144,6 +150,7 @@ test('the two-minute deadline ends audio even when timer updates were throttled'
   await expect(page.locator('.live-agent-status')).toHaveText('Time limit reached. Thanks for trying it!')
   await expect.poll(() => closed).toBe(true)
   await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
+  await expect(page.getByRole('log', { name: /transcript/i })).toContainText('I need automated CRM reminders.')
 })
 
 test('a server hangup before the greeting is a failed start rather than a completed conversation', async ({ page }) => {

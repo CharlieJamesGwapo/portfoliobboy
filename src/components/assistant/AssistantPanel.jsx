@@ -138,7 +138,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
   const remaining = suggestedQuestions.filter((item) => !asked.has(item.id))
 
   return (
-    <section ref={panelRef} className="alex-panel" role="dialog" aria-modal="false" aria-labelledby="alex-title" aria-describedby="alex-note">
+    <section ref={panelRef} className={`alex-panel${voiceOpen ? ' has-voice' : ''}`} role="dialog" aria-modal="false" aria-labelledby="alex-title" aria-describedby="alex-note">
       <header className="alex-head">
         <span className="alex-avatar" aria-hidden="true"><AudioLines size={18} /></span>
         <div className="alex-head-copy">
@@ -153,9 +153,12 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
       <div className={`alex-voice ${voiceOpen ? 'is-live' : ''}`}>
         {hasLiveAgent ? (
           voiceOpen && isOpen ? (
+            <>
+            <button type="button" className="alex-voice-button alex-voice-back" onClick={() => setVoiceOpen(false)}>Close voice and return to text</button>
             <Suspense fallback={<p className="live-agent-status" role="status"><Loader2 className="spin" size={16} aria-hidden="true" /> Starting voice…</p>}>
-              <LiveAgentSession agentId={AGENT_ID} limitSeconds={LIVE_SESSION_LIMIT_SECONDS} onClose={() => setVoiceOpen(false)} />
+              <LiveAgentSession agentId={AGENT_ID} limitSeconds={LIVE_SESSION_LIMIT_SECONDS} onClose={() => setVoiceOpen(false)} onEnquiry={() => onClose(false)} />
             </Suspense>
+            </>
           ) : (
             <>
               <button type="button" className="alex-voice-button" onClick={() => setVoiceOpen(true)} {...warmSession}>
@@ -174,6 +177,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
         )}
       </div>
 
+      {!voiceOpen && <>
       <div className="alex-modes" role="group" aria-label="How Alex can help">
         {MODES.map(item => (
           <button key={item.id} type="button" aria-pressed={mode === item.id} onClick={() => setMode(item.id)} disabled={typing}>
@@ -260,6 +264,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
           <Send size={16} aria-hidden="true" />
         </button>
       </form>}
+      </>}
       <p id="alex-note" className="alex-note">
         {hasLiveAgent
           ? 'Chat answers come instantly from this portfolio. Voice is a live AI that uses your microphone only during a call.'

@@ -26,7 +26,7 @@ const LiveAgentPanel = () => {
   if (!hasLiveAgent) return null
 
   return (
-    <div id="live-agent" className="live-agent" aria-labelledby="live-agent-title">
+    <div id="live-agent" className={`live-agent${open ? ' is-open' : ''}`} aria-labelledby="live-agent-title">
       <div className="live-agent-copy">
         <p className="live-agent-kicker"><span className="live-agent-dot" aria-hidden="true" /> Bboy AI Voice Studio · Live</p>
         <h3 id="live-agent-title">Talk to My AI.</h3>

@@ -99,8 +99,11 @@
 .alex-voice-button:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 .alex-soon { color: var(--alex-muted); font-size: 0.72rem; }
 .alex-voice.is-live { display: block; padding: 14px 16px; background: rgba(103, 224, 193, 0.05); }
+.alex-panel.has-voice { overflow: hidden; }
+.alex-panel.has-voice > .alex-voice.is-live { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.alex-voice-back { margin-bottom: 12px; min-height: 44px; }
 .alex-voice .live-agent-session { gap: 10px; }
-.alex-voice .live-agent-controls .button { min-height: 36px; padding: 0 14px; font-size: 0.78rem; }
+.alex-voice .live-agent-controls .button { min-height: 44px; padding: 10px 14px; font-size: 0.78rem; }
 
 .alex-messages { flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 16px; overflow-y: auto; list-style: none; overscroll-behavior: contain; }
 .alex-msg { max-width: 88%; animation: alex-pop 240ms var(--ease-out) both; }

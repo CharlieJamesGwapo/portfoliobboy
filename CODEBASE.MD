@@ -18,9 +18,9 @@ Current source inventory:
 | Independent products | 5 | `src/data/independentProducts.js` |
 | Arcade games | 9 | `interactiveGames` in `src/data/portfolioData.js` |
 | Credential records | 29 | `certifications` in `src/data/portfolioData.js` |
-| Node test files | 14 | `tests/*.test.js` |
+| Node test files | 16 | `tests/*.test.js` |
 | Development browser spec files | 16 | `tests/e2e/` |
-| Production-preview browser spec files | 3 | `tests/production/` |
+| Production-preview browser spec files | 5 | `tests/production/` |
 
 These collections overlap; their counts are not intended to be added together. All project metadata routes now have matching case-study records.
 
@@ -169,6 +169,12 @@ The recorded gallery includes eight accents and seven multilingual conversations
 
 [src/components/LiveAgentPanel.jsx](src/components/LiveAgentPanel.jsx) enables live controls only when a nonempty `VITE_ELEVENLABS_AGENT_ID` is present. The session module is lazy-loaded, checks microphone permission, and provides connection, mute, end, retry, and elapsed-time controls. A cancellation gate prevents a delayed microphone grant from starting a connection after the visitor closes the session or requests a newer start. Voice audio explicitly uses the SDK's WebSocket transport; the agent's WebRTC path disconnected before its greeting during the 2026-11-26 investigation. Startup and disconnect errors offer a clear retry, including a server hangup before the first response. Its audio worklets are emitted as same-origin assets. Final visitor farewell transcripts immediately end the call; questions and negations mentioning goodbye keep it open. The panel shows a countdown, progress, and controls with explicit contrast in both themes. A monotonic timer and deadline end a connected session at 120 seconds, but enforceable usage and domain limits depend on external agent configuration. No signed-session API or server-side voice quota endpoint exists in this repository. A brief live WebSocket connection reached the agent greeting on 2026-11-26; provider usage limits and domain restrictions still require separate verification.
 
+### Voice conversation workspace
+
+[src/components/voice/VoiceConversation.jsx](src/components/voice/VoiceConversation.jsx) adds a labelled live transcript, starter questions, public case-study cards and editable enquiry fields to the existing voice session. [src/lib/voiceConversation.js](src/lib/voiceConversation.js) bounds the in-memory transcript to 80 messages of 2,000 characters, updates SDK IDs/corrections without duplicating starter echoes, and matches cards only against canonical portfolio data. Starter clicks send one explicit question through the active voice SDK; disconnected buttons cannot start detached calls.
+
+Manual End, goodbye, the deadline and provider disconnect retain the workspace for review. Preparing a draft stops audio and uses only the visitor's statements, with scope, budget and timeline marked for discussion. Draft edits survive new turns and retries; replacement and contact handoff require explicit clicks. Opening a case study ends audio and opens a new tab. The existing staged contact path preserves an existing contact draft and never submits automatically. Closing voice, closing Alex, returning to the text guide or leaving the homepage discards this voice workspace. These messages are not persisted to browser storage or a new backend. Voice mode has its own scroll area in the Alex sheet; the local text assistant's state remains separate.
+
 ### Local portfolio assistant
 
 `PortfolioAssistant` opens a lazy `AssistantPanel`. [src/lib/assistantAnswers.js](src/lib/assistantAnswers.js) matches questions against local portfolio and voice data, with contact-oriented fallbacks. Text answers do not call an LLM API. Three guided modes in the existing panel add project recommendations, recruiter comparisons, and brief preparation through [src/lib/assistantWorkflows.js](src/lib/assistantWorkflows.js):
@@ -269,11 +275,11 @@ Environment: Node **24.14.1**, npm **11.11.0**, Python 3; fresh dependencies ins
 | Check | Result on November 26, 2026 |
 | --- | --- |
 | `npm ci --ignore-scripts --no-audit --no-fund` | Passed; 149 packages installed |
-| `npm test` | Passed: 68 JavaScript tests and 2 Python tests |
+| `npm test` | Passed: 79 JavaScript tests and 2 Python tests |
 | `npm run build` | Passed; emitted metadata for 23 routes; deprecated chunk-option warning removed |
 | `npm audit --omit=dev --json` | 0 reported production dependency vulnerabilities |
 | Metadata vs. case-study inventory | All 20 project metadata routes have matching case studies |
-| Production-preview Chromium suite | Passed: all 20 tests, including WebSocket greeting playback, microphone cleanup, farewell detection, the two-minute deadline, narrow layouts, button contrast in both themes, pre-greeting hangup, and retry |
+| Production-preview Chromium suite | Passed: all 28 tests, including transcript deduplication/corrections, starter delivery, public case-study navigation, visitor-only draft review and contact transfer, existing contact text preservation, reading position, microphone cleanup, farewell and deadline retention, narrow layouts, and retry |
 | Complete development Chromium suite | Passed: all 137 development browser tests |
 | Focused assistant suite | Passed: 13 each in Chromium, Firefox, and WebKit (39 checks total) |
 | Crypto removal check | Passed: project/category removed; metadata and sitemap exclude the route; old built page absent; all 20 project metadata routes match case studies |
