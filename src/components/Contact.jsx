@@ -4,6 +4,7 @@ import ScrollReveal from './ScrollReveal'
 import './contact-booking.css'
 import { bookingOptions, profile, resumeUrl } from '../data/portfolioData'
 import { CONTACT_INTENT_EVENT, requestContact, takeAssistantEnquiry } from '../lib/contactIntent'
+import { trackBookingClick } from '../lib/portfolioAnalytics'
 
 const bookingRequest = (option) => ({
   subject: `Book a ${option.minutes}-min ${option.title.toLowerCase()} (Google Meet)`,
@@ -37,7 +38,7 @@ const BookingOptions = () => (
         <p>{option.description}</p>
         <small>Best for: {option.bestFor}</small>
         {option.url ? (
-          <a className="button button-primary booking-cta" href={option.url} target="_blank" rel="noreferrer">
+          <a className="button button-primary booking-cta" href={option.url} target="_blank" rel="noopener noreferrer" referrerPolicy="no-referrer" onClick={event => trackBookingClick(event, 'contact', option.id)} onAuxClick={event => trackBookingClick(event, 'contact', option.id)}>
             <CalendarClock size={16} aria-hidden="true" /> Pick a time <ArrowUpRight size={14} aria-hidden="true" />
           </a>
         ) : (

@@ -15,7 +15,7 @@ const clientCaseStudies = [
     role: 'Full-stack & mobile development',
     overview: 'Transport, delivery and local shopping in one working platform.',
     problem: oneRide.context,
-    contribution: 'Built the mobile, API, web and administrative workflows for Pasugo delivery, Pasabay rides, Pasundo pickup and local-store orders.',
+    contribution: 'Built the mobile, API, web and administrative workflows for Pasugo delivery, Pasundo ride booking, Pasabay ride sharing and local-store orders.',
     approach: 'React Native and Expo connect to a Go/Gin API and PostgreSQL. WebSockets carry live rider tracking, alongside OTP/JWT authentication, fare estimates and scheduled bookings.',
     scope: ['Customer, rider, store and admin workflows', 'Payments, ratings and SOS', 'Maps, live tracking and recurring bookings'],
     delivered: oneRide.delivered,

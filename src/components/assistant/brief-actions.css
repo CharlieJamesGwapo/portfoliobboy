@@ -1,5 +1,7 @@
 /* Shared by Alex's text and voice drafts. Deliberately scoped from page buttons. */
 .brief-tools { display: grid; gap: 8px; min-width: 0; }
+.alex-recruiter-export { display: grid; gap: 10px; padding: 14px 12px; border: 1px solid #426663; border-radius: 12px; background: #103033; }
+.alex-recruiter-export h3 { margin: 0; color: #f3f0e9; font-size: .88rem; }
 .brief-tools-actions { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
 .brief-tools .brief-tools-actions button,
 .alex-booking .alex-booking-body > button,

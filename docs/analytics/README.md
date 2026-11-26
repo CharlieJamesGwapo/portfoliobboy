@@ -6,9 +6,9 @@ Personal workspace: **Charlie Abejo Portfolio**, project **769787** (Default pro
 
 [Open the private Portfolio Enquiry Outcomes dashboard](https://us.posthog.com/project/769787/dashboard/2416983).
 
-The eight prepared insights are saved in this personal project, with private sharing and a 30-day default range. Its project reporting timezone remains UTC. Production is configured with the personal ingestion key (server-only Secret), regional ingestion host and browser enable flag. A deployment rebuild applies these values; the earlier Zalio project remains unchanged.
+The eleven prepared insights are saved in this personal project, with private sharing and a 30-day default range. Its project reporting timezone remains UTC. Production is configured with the personal ingestion key (server-only Secret), regional ingestion host and browser enable flag. A deployment rebuild applies these values; the earlier Zalio project remains unchanged.
 
-The [dashboard definition](portfolio-dashboard.json) records actual insight/tile IDs and the private dashboard URL. Five catalog count definitions are proposed and linked to their saved insights; they are not claimed as human-approved business metrics. New collection does not backfill earlier visits. Initial action counts include controlled setup verification; no test contact email is submitted.
+The [dashboard definition](portfolio-dashboard.json) records actual insight/tile IDs and the private dashboard URL. Eight catalog count definitions are proposed and linked to their saved insights; they are not claimed as human-approved business metrics. New collection does not backfill earlier visits. Initial action counts include controlled setup verification; no test contact email is submitted.
 
 ## What is counted
 
@@ -19,12 +19,17 @@ The [dashboard definition](portfolio-dashboard.json) records actual insight/tile
 | `portfolio_project_opened` | Visitor selects a published evidence card | fixed `surface`, canonical `project_id` |
 | `portfolio_enquiry_reviewed` | Visitor explicitly transfers an edited enquiry to contact | fixed `surface` |
 | `portfolio_contact_submitted` | Contact API receives successful acceptance from the email provider | `surface: contact`; server only |
+| `portfolio_brief_downloaded` | Brief text-download helper returns after requesting a download | fixed guide/voice `surface` |
+| `portfolio_brief_print_opened` | A local printable brief tab opens successfully | fixed guide/voice `surface` |
+| `portfolio_booking_clicked` | Primary, keyboard or middle activation of an external scheduler link | fixed `surface`, `booking_id` (`intro`, `discovery`, `consult`) |
 
 The public analytics endpoint cannot report contact success. Validation failures, honeypots, failed provider requests, and opening a draft do not count as accepted contact submissions. Provider acceptance does not confirm inbox delivery or receipt by Charlie.
 
+Brief downloads count requests, not operating-system file completion. A print view is not proof that a PDF was saved. Booking selections are not confirmed appointments. Blocked export APIs and right-click menu openings do not produce these events; native browser menu selections cannot be observed reliably. Repeated actions count. Recruiter-summary actions and document contents are not tracked. Voice actions use the fixed home/panel surface; the local text fallback uses `text_guide`.
+
 ## Privacy and limits
 
-- Five explicit events; no client analytics SDK, autocapture, session replay, pageview or typed-content collection.
+- Eight explicit events; no client analytics SDK, autocapture, session replay, pageview or typed-content collection.
 - Never forward audio, transcripts, draft text, form fields, names, email, phone, URL/query strings, cookies, referrers, visitor IP or user agent to analytics.
 - Each event gets a fresh random ingestion identifier. It cannot link two events to a visitor. No person profiles or GeoIP processing are requested.
 - Browser requests omit credentials and referrers and respect Do Not Track and Global Privacy Control. Contact capture independently checks the request's privacy headers.

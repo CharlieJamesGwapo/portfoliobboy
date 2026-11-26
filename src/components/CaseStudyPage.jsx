@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronRight, LockKeyhole } from '
 import { caseStudies, getCaseStudyBySlug } from '../data/caseStudies.js'
 import { ProductMedia } from './IndependentProducts.jsx'
 import './case-study-page.css'
+import OneRideStory from './OneRideStory'
 
 const toList = (value) => (Array.isArray(value) ? value : value ? [value] : [])
 
@@ -179,7 +180,7 @@ export default function CaseStudyPage({ slug, study: providedStudy }) {
               <span className="case-study-status"><span aria-hidden="true" />{study.status}</span>
             </div>
             <div className="case-study-hero-actions">
-              <a className="case-study-button case-study-button-primary" href="/projects">Explore my work <ArrowRight size={16} aria-hidden="true" /></a>
+              <a className="case-study-button case-study-button-primary" href={study.story ? '#oneride-walkthrough' : '/projects'}>{study.story ? 'Explore the customer app' : 'Explore my work'} <ArrowRight size={16} aria-hidden="true" /></a>
               <a className="case-study-button case-study-button-secondary" href="/#contact">Discuss a similar project</a>
             </div>
           </div>
@@ -187,6 +188,7 @@ export default function CaseStudyPage({ slug, study: providedStudy }) {
         </header>
 
         <div className="case-study-body">
+          {study.story && <OneRideStory story={study.story} />}
           <section className="case-study-section case-study-problem" aria-labelledby="case-study-problem-title">
             <p className="case-study-section-index">01 / Context</p>
             <h2 id="case-study-problem-title">Problem</h2>

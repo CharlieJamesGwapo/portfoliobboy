@@ -1,6 +1,8 @@
 import { trackPortfolioEvent } from '../../lib/portfolioAnalytics'
+import { buildRecruiterSummary, roleStatusLabels } from '../../lib/recruiterSummary'
+import DocumentActions from './DocumentActions'
 
-const statusLabels = { documented: 'Documented', partial: 'Partly documented', unverified: 'Needs confirmation' }
+const statusLabels = roleStatusLabels
 
 export default function WorkflowResults({ result, onEnquiry, onNavigate }) {
   if (result.projects) {
@@ -39,6 +41,11 @@ export default function WorkflowResults({ result, onEnquiry, onNavigate }) {
             </li>
           ))}
         </ul>
+        {result.requirements.length > 0 && <section className="alex-recruiter-export" aria-label="Recruiter summary">
+          <h3>Keep this comparison</h3>
+          <p>Save the requirements, evidence, gaps and résumé link. This summary makes no hiring verdict.</p>
+          <DocumentActions document={buildRecruiterSummary(result)} noun="summary" />
+        </section>}
       </div>
     )
   }

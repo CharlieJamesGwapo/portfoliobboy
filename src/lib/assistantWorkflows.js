@@ -141,7 +141,7 @@ function evidenceFor(item) {
 }
 
 export function assessRole(input) {
-  const original = String(input ?? '').trim()
+  const original = String(input ?? '')
   // Keep shared qualifiers/negation attached to every technology in a line:
   // “5 years of React and Python” must not certify Python on its own.
   const clauses = clean(input).split(/\n|;/)
@@ -152,8 +152,8 @@ export function assessRole(input) {
     // eligibility, or the other words a visitor includes in a requirement.
     const unexplained = remainder.toLowerCase()
       .replace(/\b(experience|experienced|with|in|using|knowledge|of|skills?|proficiency|proficient|required|requirements?|preferred|development|developer|engineering|engineer|strong|the|a|an|to|and)\b/g, ' ')
-      .replace(/[^a-z0-9]/g, '').trim()
-    const negated = /\b(no|not|without|excluding|except)\b/i.test(requirement)
+      .replace(/[^\p{L}\p{M}\p{N}]/gu, '').trim()
+    const negated = /\b(no|not|without|excluding|except|hindi|walang)\b|不要|不需要|无需|不用|不使用|不要求/iu.test(requirement)
     const establishedItems = items.filter(item => !item.plannedOnly)
     const status = negated || establishedItems.length === 0 ? 'unverified'
       : unexplained || establishedItems.length !== items.length ? 'partial' : 'documented'
@@ -170,7 +170,9 @@ export function assessRole(input) {
     text: requirements.length ? 'This is a comparison with public portfolio evidence, not a hiring verdict. Unverified does not mean Charlie lacks the skill.'
       : 'Paste the role’s requirements, preferably one per line, to compare them with the public portfolio.',
     requirements,
-    truncated: original.length > 4000 || clauses.length > 30,
+    // Native textarea maxLength also caps long pastes at exactly 4,000.
+    // At that boundary state the coverage limit rather than silently omitting it.
+    truncated: original.length >= 4000 || clauses.length > 30,
   }
 }
 

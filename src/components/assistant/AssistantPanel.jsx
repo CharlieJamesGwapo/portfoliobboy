@@ -96,7 +96,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
     if (!question || typing) return
     setDraft('')
     if (mode === 'projects') reply(question, recommendProjects(question))
-    else if (mode === 'role') reply(question, assessRole(question))
+    else if (mode === 'role') reply(question, assessRole(draft))
     else if (mode === 'brief') {
       const answers = { ...briefAnswers, [briefQuestions[briefStep].key]: question }
       setBriefAnswers(answers)

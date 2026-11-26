@@ -27,3 +27,8 @@ export const trackPortfolioEvent = createPortfolioTracker({
   enabled: portfolioAnalyticsEnabled,
   fetchImpl: (...args) => globalThis.fetch(...args),
 })
+
+export function trackBookingClick(event, surface, bookingId) {
+  if (event.type !== 'click' && !(event.type === 'auxclick' && event.button === 1)) return
+  trackPortfolioEvent('portfolio_booking_clicked', { surface, booking_id: bookingId })
+}

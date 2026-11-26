@@ -294,7 +294,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
       </div>
       <VoiceConversation messages={messages} projects={projects} connected={connected && !checking} textMode={textMode} onAskLocal={askLocal}
         draft={draft} onAsk={askStarter} onPrepareDraft={prepareDraft} onDraftChange={setDraft}
-        onReviewEnquiry={reviewEnquiry} onOpenProject={openProject} onBookCall={bookCall} onSchedule={stopCall} />
+        onReviewEnquiry={reviewEnquiry} onOpenProject={openProject} onBookCall={bookCall} onSchedule={stopCall} surface={textMode ? 'text_guide' : surface} />
     </div>
   )
 }

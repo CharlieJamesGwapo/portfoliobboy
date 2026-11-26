@@ -73,6 +73,31 @@ async function micReleased(page) {
   await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
 }
 
+for (const [path, surface] of [['/#live-agent', 'voice_home'], ['/projects/zalio-crm', 'voice_panel']]) {
+  test(`brief exports and booking report ${surface} without voice content`, async ({ page }) => {
+    const events = []
+    page.on('request', request => { if (new URL(request.url()).pathname === '/api/analytics') events.push(request.postDataJSON()) })
+    const { panel, send } = await openVoice(page, path)
+    send('user', 'Private clinic requirements for a CRM.', 1)
+    await expect(panel.getByRole('log', { name: /transcript/i })).toContainText('Private clinic')
+    await panel.getByRole('button', { name: 'Prepare enquiry draft', exact: true }).click()
+    const downloadEvent = page.waitForEvent('download')
+    await panel.getByRole('button', { name: 'Download text' }).click()
+    await downloadEvent
+    await expect.poll(() => events.filter(event => event.event === 'portfolio_brief_downloaded')).toEqual([{ event: 'portfolio_brief_downloaded', properties: { surface } }])
+    await panel.locator('.alex-booking > summary').click()
+    const link = panel.getByRole('link', { name: 'Choose a time' })
+    const url = await link.getAttribute('href')
+    await page.context().route(`${url}**`, route => route.fulfill({ contentType: 'text/html', body: '<h1>Test scheduler</h1>' }))
+    const popupEvent = page.context().waitForEvent('page')
+    await link.click()
+    await (await popupEvent).close()
+    await expect.poll(() => events.filter(event => event.event === 'portfolio_booking_clicked')).toEqual([{ event: 'portfolio_booking_clicked', properties: { surface, booking_id: 'intro' } }])
+    expect(JSON.stringify(events)).not.toContain('Private clinic')
+    await micReleased(page)
+  })
+}
+
 test('saving a reviewed voice brief exports edits and stops a retried voice session', async ({ page }) => {
   const { panel, send, posts } = await openVoice(page)
   send('user', 'We need a CRM and appointment reminders for our clinic.', 1)

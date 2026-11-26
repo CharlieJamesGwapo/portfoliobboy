@@ -14,7 +14,7 @@ test('dashboard counts actions rather than anonymous random IDs as visitors or a
     }
   }
   const totals = definition.insights.filter(insight => insight.query.source.trendsFilter.display === 'Metric')
-  assert.equal(totals.length, 5)
+  assert.equal(totals.length, 8)
   assert.deepEqual(new Set(totals.map(insight => insight.query.source.series[0].event)), allowed)
   assert.match(definition.textTile.body, /not unique people/)
   assert.match(definition.textTile.body, /does not confirm inbox delivery/)

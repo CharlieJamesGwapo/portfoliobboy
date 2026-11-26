@@ -1,6 +1,6 @@
 {
   "status": "Provisioned in the personal workspace; production capture configured",
-  "governance": "Five proposed catalog count definitions linked to saved insights; no human approval claimed",
+  "governance": "Eight proposed catalog count definitions linked to saved insights; no human approval claimed",
   "dashboard": {
     "name": "Portfolio Enquiry Outcomes",
     "description": "Aggregate portfolio actions and accepted contact submissions. Repeated actions count; totals do not identify visitors or attribute enquiries to individual conversations."
@@ -346,6 +346,120 @@
         "id": 14685211,
         "shortId": "kskBG01L",
         "tileId": 16315163
+      }
+    },
+    {
+      "name": "Brief text download requests",
+      "description": "Requested text exports of reviewed briefs; browser or operating-system file saving is unconfirmed.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_brief_downloaded",
+              "custom_name": "Brief text download requests",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 0,
+        "y": 16,
+        "w": 4,
+        "h": 3
+      },
+      "posthog": {
+        "id": 14703475,
+        "shortId": "m5vvKMZX",
+        "tileId": 16342374
+      }
+    },
+    {
+      "name": "Brief PDF print views",
+      "description": "Opened printable brief tabs; PDF saving and printing are unconfirmed.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_brief_print_opened",
+              "custom_name": "Brief PDF print views",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 4,
+        "y": 16,
+        "w": 4,
+        "h": 3
+      },
+      "posthog": {
+        "id": 14703486,
+        "shortId": "vRnUHHCd",
+        "tileId": 16342393
+      }
+    },
+    {
+      "name": "Booking link selections",
+      "description": "Primary, keyboard and middle-click scheduling-link activations; no confirmed appointment is implied.",
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "kind": "TrendsQuery",
+          "series": [
+            {
+              "kind": "EventsNode",
+              "event": "portfolio_booking_clicked",
+              "custom_name": "Booking link selections",
+              "math": "total"
+            }
+          ],
+          "dateRange": {
+            "date_from": "-30d"
+          },
+          "interval": "day",
+          "trendsFilter": {
+            "display": "Metric",
+            "metricSummary": "total",
+            "metricShowChange": false
+          }
+        }
+      },
+      "layout": {
+        "x": 8,
+        "y": 16,
+        "w": 4,
+        "h": 3
+      },
+      "posthog": {
+        "id": 14703496,
+        "shortId": "sdnoFpLm",
+        "tileId": 16342411
       }
     }
   ],

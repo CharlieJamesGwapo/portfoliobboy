@@ -6,9 +6,13 @@ export const ANALYTICS_EVENTS = Object.freeze({
   PROJECT_OPENED: 'portfolio_project_opened',
   ENQUIRY_REVIEWED: 'portfolio_enquiry_reviewed',
   CONTACT_SUBMITTED: 'portfolio_contact_submitted',
+  BRIEF_DOWNLOADED: 'portfolio_brief_downloaded',
+  BRIEF_PRINT_OPENED: 'portfolio_brief_print_opened',
+  BOOKING_CLICKED: 'portfolio_booking_clicked',
 })
 export const ANALYTICS_SURFACES = Object.freeze(['voice_home', 'voice_panel', 'text_guide', 'contact'])
 export const ANALYTICS_STARTER_IDS = Object.freeze(['crm', 'ai-agents', 'work-together'])
+export const ANALYTICS_BOOKING_IDS = Object.freeze(['intro', 'discovery', 'consult'])
 // Kept separate from the rich case-study data to keep the browser contract tiny.
 // A contract test verifies that this inventory matches the canonical slugs.
 export const ANALYTICS_PROJECT_IDS = Object.freeze([
@@ -27,6 +31,9 @@ const schemas = new Map([
   [ANALYTICS_EVENTS.PROJECT_OPENED, { surfaces: guideSurfaces, identifier: 'project_id', values: ANALYTICS_PROJECT_IDS }],
   [ANALYTICS_EVENTS.ENQUIRY_REVIEWED, { surfaces: ANALYTICS_SURFACES }],
   [ANALYTICS_EVENTS.CONTACT_SUBMITTED, { surfaces: ['contact'] }],
+  [ANALYTICS_EVENTS.BRIEF_DOWNLOADED, { surfaces: guideSurfaces }],
+  [ANALYTICS_EVENTS.BRIEF_PRINT_OPENED, { surfaces: guideSurfaces }],
+  [ANALYTICS_EVENTS.BOOKING_CLICKED, { surfaces: ANALYTICS_SURFACES, identifier: 'booking_id', values: ANALYTICS_BOOKING_IDS }],
 ])
 
 export function normalizeAnalyticsEvent(event, properties, { allowContact = false } = {}) {

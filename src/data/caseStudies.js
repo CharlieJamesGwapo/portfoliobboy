@@ -2,6 +2,7 @@ import { experiences, featuredProjects, momentumSystems } from './portfolioData.
 import { independentProducts } from './independentProducts.js'
 import { liveProjectLinks, oneRidePreview } from './productPreviewData.js'
 import { selectedCaseStudies } from './selectedCaseStudies.js'
+import { oneRideStory } from './oneRideStory.js'
 
 const byId = (items, id) => items.find((item) => item.id === id)
 const projectById = new Map(featuredProjects.map((project) => [project.id, project]))
@@ -84,6 +85,8 @@ const routeDefinitions = [
     slug: 'oneride',
     projectId: 'one-ride-balingasag',
     selectedId: 'oneride',
+    story: oneRideStory,
+    responsibilities: oneRideStory.contributions.map(item => `${item.title}: ${item.text}`),
     role: 'Full-stack & mobile development',
     architecture: [
       'React Native + Expo customer app',
@@ -99,8 +102,8 @@ const routeDefinitions = [
     implementationDecision: 'React Native and Expo cover customer and rider workflows, with React web and admin tools alongside a Go/Gin API and PostgreSQL. WebSockets carry live rider tracking.',
     workflows: [
       'Pasugo parcel delivery',
-      'Pasabay motorcycle rides',
-      'Pasundo scheduled pickup',
+      'Pasundo motorcycle ride booking',
+      'Pasabay ride sharing',
       'Local-store orders',
       'Fare estimates, maps, live tracking, and recurring bookings',
     ],

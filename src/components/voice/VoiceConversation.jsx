@@ -26,6 +26,7 @@ export default function VoiceConversation({
   onOpenProject,
   onBookCall,
   onSchedule,
+  surface = 'voice_home',
 }) {
   const id = useId()
   const [question, setQuestion] = useState('')
@@ -166,7 +167,7 @@ export default function VoiceConversation({
               onChange={event => onDraftChange?.({ ...draft, message: event.target.value })}
             />
             <p id={`${id}-draft-note`} className="voice-workspace-note">Review and edit the details. Your draft stays as you edit it; “Replace draft” overwrites these fields.</p>
-            <BriefActions subject={subject} message={message} onSave={onSchedule} />
+            <BriefActions subject={subject} message={message} onSave={onSchedule} surface={surface} />
             <p className="voice-workspace-note">Saving or copying the brief ends any voice call.</p>
             <button type="button" className="voice-workspace-review" disabled={!canReview} onClick={onReviewEnquiry}>Review in contact form<span aria-hidden="true">→</span></button>
           </div>
@@ -174,7 +175,7 @@ export default function VoiceConversation({
       </section>
       <section className="voice-workspace-booking" aria-label="Call booking">
         <p className="voice-workspace-note">Opening booking ends any voice call.</p>
-        <AlexBooking brief={draft} onRequest={onBookCall} onSchedule={onSchedule} />
+        <AlexBooking brief={draft} onRequest={onBookCall} onSchedule={onSchedule} surface={surface} />
       </section>
     </div>
   )

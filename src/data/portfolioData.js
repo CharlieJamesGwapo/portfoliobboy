@@ -578,7 +578,7 @@ const originalFeaturedProjects = [
     context: 'Passengers, riders, families, and local stores need one service for transport, parcel delivery, scheduled pickup, and local shopping.',
     implementation: 'React Native mobile delivery backed by a Go and Gin API, PostgreSQL data, real-time WebSocket tracking, maps, plus React web and admin clients.',
     architecture: ['React Native + Expo', 'React + TypeScript web', 'Go + Gin API', 'PostgreSQL + GORM', 'JWT authentication', 'Maps + WebSockets'],
-    features: ['Pasugo delivery', 'Pasabay motorcycle rides', 'Pasundo scheduled pickup', 'Local store delivery', 'Live tracking and fare estimates', 'Rider, store, and admin operations'],
+    features: ['Pasugo delivery', 'Pasundo motorcycle ride booking', 'Pasabay ride sharing', 'Local store delivery', 'Live tracking and fare estimates', 'Rider, store, and admin operations'],
     engineering: 'OTP and JWT authentication, distance-based fares, scheduled and recurring bookings, real-time rider tracking, multiple payment methods, ratings, SOS, and operational dashboards.',
     delivered: 'A live Google Play customer app supported by rider, store, web, and administrative workflows for the Balingasag service area.',
     stack: ['React Native', 'Expo', 'TypeScript', 'Go', 'Gin', 'PostgreSQL', 'GORM', 'WebSockets'],
