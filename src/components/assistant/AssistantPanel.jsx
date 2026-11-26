@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
-import { ArrowUpRight, AudioLines, Loader2, Mic, Send, Sparkles, X } from 'lucide-react'
+import { ArrowUpRight, AudioLines, CalendarClock, Loader2, Mic, Send, Sparkles, X } from 'lucide-react'
 import { answerQuestion, answerSuggestion, suggestedQuestions } from '../../lib/assistantAnswers'
 import { assessRole, briefQuestions, buildProjectBrief, recommendProjects } from '../../lib/assistantWorkflows'
 import { stageAssistantEnquiry } from '../../lib/contactIntent'
@@ -7,6 +7,8 @@ import { navigatePortfolio } from '../../lib/portfolioRoute'
 import { AGENT_ID, LIVE_SESSION_LIMIT_SECONDS, LiveAgentSession, hasLiveAgent, warmSession } from '../LiveAgentPanel'
 import WorkflowResults from './WorkflowResults'
 import BriefReview from './BriefReview'
+import AlexBooking from './AlexBooking'
+import useAssistantViewport from './useAssistantViewport'
 import { trackPortfolioEvent } from '../../lib/portfolioAnalytics'
 
 const MODES = [
@@ -44,10 +46,11 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
   const panelRef = useRef(null)
   const timerRef = useRef(null)
   const chipsRef = useRef(null)
-  const activeMode = MODES.find(item => item.id === mode)
+  const activeMode = MODES.find(item => item.id === mode) || { hint: 'Choose a call type. A call request is confirmed directly with Charlie.' }
   const draft = drafts[mode] || ''
   const reviewingBrief = mode === 'brief' && briefReview !== null
   const setDraft = value => setDrafts(current => ({ ...current, [mode]: value }))
+  useAssistantViewport(panelRef, isOpen)
 
   useEffect(() => {
     // Retain local text work while hidden, but end microphone use immediately.
@@ -70,7 +73,8 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
 
   useEffect(() => {
     if (!isOpen || voiceOpen) return
-    if (reviewingBrief) document.getElementById('alex-brief')?.focus({ preventScroll: true })
+    if (mode === 'booking') panelRef.current?.querySelector('.alex-booking select')?.focus({ preventScroll: true })
+    else if (reviewingBrief) document.getElementById('alex-brief')?.focus({ preventScroll: true })
     else inputRef.current?.focus({ preventScroll: true })
   }, [isOpen, voiceOpen, mode, reviewingBrief, typing])
 
@@ -112,6 +116,12 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
   const startEnquiry = enquiry => {
     stageAssistantEnquiry(enquiry.subject, enquiry.message)
     trackPortfolioEvent('portfolio_enquiry_reviewed', { surface: 'text_guide' })
+    navigatePortfolio('/#contact')
+    onClose(false)
+  }
+
+  const requestBooking = enquiry => {
+    stageAssistantEnquiry(enquiry.subject, enquiry.message, { preserveSubject: true })
     navigatePortfolio('/#contact')
     onClose(false)
   }
@@ -177,6 +187,9 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
             <span id="alex-voice-note" className="alex-soon">Voice coming soon</span>
           </>
         )}
+        {!voiceOpen && <button type="button" className="alex-voice-button alex-booking-toggle" aria-pressed={mode === 'booking'} onClick={() => setMode(mode === 'booking' ? 'general' : 'booking')}>
+          <CalendarClock size={16} aria-hidden="true" />Book a call
+        </button>}
       </div>
 
       {!voiceOpen && <>
@@ -192,7 +205,10 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
       </p>
 
       <ol ref={listRef} className="alex-messages" aria-live="polite" aria-label="Conversation with Alex">
-        {messages.map((message) => (
+        {mode === 'booking' && <li className="alex-msg alex-msg-workflow">
+          <AlexBooking initiallyOpen brief={briefReview !== null ? { message: briefReview } : [...messages].reverse().find(item => item.enquiry)?.enquiry} onRequest={requestBooking} />
+        </li>}
+        {mode !== 'booking' && messages.map((message) => (
           <li key={message.id} className={`alex-msg alex-msg-${message.role}${message.projects || message.requirements ? ' alex-msg-workflow' : ''}`}>
             <p>{message.text}</p>
             <WorkflowResults result={message} onEnquiry={startEnquiry} onNavigate={() => onAction({})} />
@@ -220,7 +236,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
         )}
         {reviewingBrief && !typing && (
           <li className="alex-msg alex-msg-alex alex-msg-workflow">
-            <BriefReview value={briefReview} onChange={setBriefReview} onUse={() => startEnquiry({ ...buildProjectBrief(briefAnswers), message: briefReview.trim() })} onRestart={restartBrief} />
+            <BriefReview value={briefReview} subject={buildProjectBrief(briefAnswers).subject} onChange={setBriefReview} onUse={() => startEnquiry({ ...buildProjectBrief(briefAnswers), message: briefReview.trim() })} onRestart={restartBrief} />
           </li>
         )}
       </ol>
@@ -235,7 +251,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
         </div>
       )}
 
-      {!reviewingBrief && <form className="alex-input" onSubmit={ask}>
+      {!reviewingBrief && mode !== 'booking' && <form className="alex-input" onSubmit={ask}>
         <label htmlFor="alex-question" className="sr-only">{activeMode.field}</label>
         {mode === 'general' ? <input
           ref={inputRef}

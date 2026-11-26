@@ -67,12 +67,12 @@
 .alex-panel {
   position: fixed;
   left: calc(24px + env(safe-area-inset-left));
-  bottom: var(--alex-gap);
+  bottom: calc(var(--alex-viewport-bottom, 0px) + var(--alex-gap));
   z-index: 95; /* under the navbar (100), palette and menus */
   display: flex;
   flex-direction: column;
   width: min(460px, calc(100vw - 48px));
-  height: min(720px, calc(100dvh - var(--nav-height, 80px) - 48px));
+  height: min(720px, calc(var(--alex-viewport-height, 100dvh) - 48px - env(safe-area-inset-bottom)), calc(100dvh - var(--nav-height, 80px) - 48px));
   overflow: hidden;
   border: 1px solid var(--alex-line);
   border-radius: 22px;
@@ -93,11 +93,15 @@
 .alex-icon-button:hover { background: rgba(255, 255, 255, 0.08); color: var(--paper); }
 .alex-icon-button:focus-visible { outline: 2px solid var(--mint); }
 
-.alex-voice { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--alex-line); }
+.alex-voice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--alex-line); }
 .alex-voice-button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 14px; border: 1px solid rgba(103, 224, 193, 0.35); border-radius: 999px; background: rgba(103, 224, 193, 0.1); color: var(--mint); font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
 .alex-voice-button:disabled { border-color: var(--alex-line); background: transparent; color: var(--alex-muted); cursor: not-allowed; }
 .alex-voice-button:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 .alex-soon { color: var(--alex-muted); font-size: 0.72rem; }
+.alex-voice > .alex-soon { order: 2; flex-basis: 100%; }
+.alex-voice > .alex-voice-button { min-height: 44px; }
+.alex-booking-toggle { margin-left: auto; }
+.alex-booking-toggle[aria-pressed='true'] { background: #234b49; border-color: var(--mint); }
 .alex-voice.is-live { display: block; padding: 14px 16px; background: rgba(103, 224, 193, 0.05); }
 .alex-panel.has-voice { overflow: hidden; }
 .alex-panel.has-voice > .alex-voice.is-live { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
@@ -166,6 +170,11 @@
 .alex-input textarea, .alex-brief-review textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--alex-line); border-radius: 12px; background: rgba(255,255,255,.05); color: var(--paper); font: inherit; font-size: 16px; line-height: 1.5; resize: vertical; }
 .alex-input textarea { flex: 1; min-height: 64px; max-height: 130px; }
 .alex-brief-review textarea { min-height: 180px; max-height: 320px; }
+.alex-panel.is-compact { overflow-y: auto; overscroll-behavior: contain; }
+.alex-panel.is-compact .alex-head { position: sticky; top: 0; z-index: 3; background: #0e2c2e; }
+.alex-panel.is-compact .alex-messages { flex: none; min-height: 100px; overflow: visible; }
+.alex-panel.is-compact .alex-input { position: sticky; bottom: 0; z-index: 2; background: #0b2729; }
+.alex-panel.is-compact .alex-brief-review textarea { min-height: 120px; max-height: 180px; }
 .alex-input textarea::placeholder { color: var(--alex-muted); font-size: .8rem; }
 .alex-modes button:focus-visible, .alex-workflow-results a:focus-visible, .alex-workflow-cta:focus-visible, .alex-workflow-reset:focus-visible, .alex-input textarea:focus-visible, .alex-brief-review textarea:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 
@@ -196,8 +205,15 @@ body.game-open .alex-root { opacity: 0; visibility: hidden; pointer-events: none
   /* The open music player is a full-width bar along the bottom: sit above it. */
   body.music-open .alex-launcher { bottom: calc(72px + env(safe-area-inset-bottom)); }
   body.music-open .alex-greeting { bottom: calc(134px + env(safe-area-inset-bottom)); }
-  .alex-panel { left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); width: auto; height: calc(100dvh - var(--nav-height, 70px) - 20px); border-radius: 20px; }
+  .alex-panel { left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); bottom: calc(var(--alex-viewport-bottom, 0px) + 8px + env(safe-area-inset-bottom)); width: auto; height: min(calc(var(--alex-viewport-height, 100dvh) - 20px - env(safe-area-inset-bottom)), calc(100dvh - var(--nav-height, 70px) - 20px)); border-radius: 20px; }
   .alex-msg { max-width: 92%; }
+  .alex-msg-workflow { max-width: 100%; }
+  .alex-icon-button { min-width: 44px; min-height: 44px; }
+  .alex-modes button { min-height: 44px; }
+  .alex-voice, .alex-head, .alex-mode-help, .alex-messages { padding-left: 12px; padding-right: 12px; }
+  .alex-modes { padding-left: 12px; padding-right: 12px; }
+  .alex-brief-review { padding: 10px; }
+  .alex-brief-review textarea { min-height: 140px; }
 }
 
 /* Landscape phones and open on-screen keyboards leave little vertical room.

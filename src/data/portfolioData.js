@@ -28,7 +28,7 @@ export const bookingOptions = [
     price: 'Free',
     description: 'A quick hello: what you are hiring for or building, and whether I am the right fit.',
     bestFor: 'Recruiters and first conversations',
-    url: '',
+    url: typeof __PORTFOLIO_BOOKING_URL__ === 'string' ? __PORTFOLIO_BOOKING_URL__ : '',
   },
   {
     id: 'discovery',

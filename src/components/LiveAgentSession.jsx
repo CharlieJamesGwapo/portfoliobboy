@@ -214,6 +214,13 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
     onEnquiry?.()
   }
 
+  const bookCall = enquiry => {
+    stopCall()
+    stageAssistantEnquiry(enquiry.subject, enquiry.message, { preserveSubject: true })
+    navigatePortfolio('/#contact')
+    onEnquiry?.()
+  }
+
   // Stop this browser's call at the displayed limit. Provider-side usage caps
   // are configured separately; the browser cannot enforce an account quota.
   useEffect(() => {
@@ -287,7 +294,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
       </div>
       <VoiceConversation messages={messages} projects={projects} connected={connected && !checking} textMode={textMode} onAskLocal={askLocal}
         draft={draft} onAsk={askStarter} onPrepareDraft={prepareDraft} onDraftChange={setDraft}
-        onReviewEnquiry={reviewEnquiry} onOpenProject={openProject} />
+        onReviewEnquiry={reviewEnquiry} onOpenProject={openProject} onBookCall={bookCall} onSchedule={stopCall} />
     </div>
   )
 }

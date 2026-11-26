@@ -106,6 +106,7 @@ const Contact = () => {
   // should stay available (and track the edits) until the visitor resends.
   const [sendFailed, setSendFailed] = useState(false)
   const [preparedEnquiry, setPreparedEnquiry] = useState('')
+  const [preparedSubject, setPreparedSubject] = useState('')
   const latestForm = useRef({ form, status })
   useEffect(() => { latestForm.current = { form, status } }, [form, status])
 
@@ -142,6 +143,7 @@ const Contact = () => {
       if (typeof subject !== 'string' || !subject) return
       if (intent?.source === 'assistant') {
         setPreparedEnquiry(latestForm.current.form.message.trim() ? template : '')
+        setPreparedSubject(intent.preserveSubject && latestForm.current.form.subject.trim() ? subject : '')
         window.requestAnimationFrame(() => {
           const field = document.getElementById('contact-message')
           field?.scrollIntoView({ block: 'center', behavior: 'instant' })
@@ -149,12 +151,11 @@ const Contact = () => {
         })
       }
       if (latestForm.current.status === 'sending') return
-      // A booking request is an explicit choice, so it replaces the subject;
-      // a plain "Start a project" link only fills an empty one. A message
-      // template never overwrites something the visitor has typed.
+      // Page booking cards retain their explicit subject selection. Alex
+      // booking preserves an existing subject and offers the request separately.
       setForm((current) => ({
         ...current,
-        subject: template || !current.subject.trim() ? subject : current.subject,
+        subject: intent.preserveSubject && current.subject.trim() ? current.subject : template || !current.subject.trim() ? subject : current.subject,
         message: template && !current.message.trim() ? template : current.message,
       }))
       setErrors((current) => ({ ...current, subject: '', message: '' }))
@@ -266,12 +267,19 @@ const Contact = () => {
 
         <ScrollReveal delay={100} variant="scale">
           <form className="contact-form" onSubmit={handleSubmit} noValidate aria-busy={status === 'sending'}>
-            {preparedEnquiry && <aside className="contact-prepared-enquiry" aria-label="Prepared enquiry">
+            {(preparedEnquiry || preparedSubject) && <aside className="contact-prepared-enquiry" aria-label="Prepared enquiry">
+              {preparedSubject && <>
+                <p role="status">Your existing subject was kept.</p>
+                <label htmlFor="contact-prepared-subject">Prepared call-request subject to copy</label>
+                <input id="contact-prepared-subject" readOnly value={preparedSubject} />
+              </>}
+              {preparedEnquiry && <>
               <p role="status">Your existing message was kept.</p>
               <p>Copy any details you want to merge from the prepared enquiry below.</p>
               <label htmlFor="contact-prepared-message">Prepared enquiry to copy</label>
               <textarea id="contact-prepared-message" readOnly value={preparedEnquiry} rows={4} />
-              <button type="button" onClick={() => setPreparedEnquiry('')}>Dismiss prepared enquiry</button>
+              </>}
+              <button type="button" onClick={() => { setPreparedEnquiry(''); setPreparedSubject('') }}>Dismiss prepared enquiry</button>
             </aside>}
             <div className="form-row">
               <label>

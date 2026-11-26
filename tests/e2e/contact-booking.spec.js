@@ -16,8 +16,8 @@ test('booking cards pre-fill a call request and every contact channel is reachab
 
   // Typed text is never overwritten by a second booking choice.
   await message.fill('Tuesday 10am AEST works. We need a CRM.')
-  await block.locator('.booking-card', { hasText: 'Intro call' }).getByRole('button', { name: 'Request this call' }).click()
-  await expect(page.locator('#contact-subject')).toHaveValue('Book a 15-min intro call (Google Meet)')
+  await block.locator('.booking-card', { hasText: 'Technical deep-dive' }).getByRole('button', { name: 'Request this call' }).click()
+  await expect(page.locator('#contact-subject')).toHaveValue('Book a 60-min technical deep-dive (Google Meet)')
   await expect(message).toHaveValue('Tuesday 10am AEST works. We need a CRM.')
 
   const contact = page.locator('#contact')

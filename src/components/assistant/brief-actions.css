@@ -1,0 +1,31 @@
+/* Shared by Alex's text and voice drafts. Deliberately scoped from page buttons. */
+.brief-tools { display: grid; gap: 8px; min-width: 0; }
+.brief-tools-actions { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.brief-tools .brief-tools-actions button,
+.alex-booking .alex-booking-body > button,
+.alex-booking .alex-booking-body > a {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; min-width: 0; padding: 10px 12px;
+  border: 1px solid #6a9f93; border-radius: 10px;
+  background: #173a3b; color: #eaf7f1; font: inherit; font-size: .8rem;
+  font-weight: 650; line-height: 1.5; text-decoration: none; cursor: pointer;
+}
+.brief-tools .brief-tools-actions button { flex: 1 1 125px; }
+.brief-tools .brief-tools-actions button:hover:not(:disabled),
+.alex-booking .alex-booking-body > a:hover,
+.alex-booking .alex-booking-body > button:hover { background: #28534e; border-color: #67e0c1; }
+.brief-tools .brief-tools-actions button:disabled { opacity: .55; cursor: not-allowed; }
+.brief-tools p.brief-tools-note, .brief-tools p.brief-tools-status,
+.alex-booking .alex-booking-body > p { margin: 0; padding: 0; border-radius: 0; background: none; color: #bdd5ce; font-size: .74rem; line-height: 1.6; overflow-wrap: anywhere; }
+.brief-tools .brief-tools-status:empty { display: none; }
+.brief-tools button:focus-visible, .alex-booking :is(summary, select, button, a):focus-visible { outline: 3px solid #67e0c1; outline-offset: 3px; }
+.alex-booking { min-width: 0; border: 1px solid #426663; border-radius: 12px; background: #103033; color: #f3f0e9; }
+.alex-booking > summary { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 12px; color: #a1f5de; font-size: .8rem; font-weight: 650; cursor: pointer; list-style: none; }
+.alex-booking > summary::-webkit-details-marker { display: none; }
+.alex-booking > summary::after { content: '+'; margin-left: auto; font-size: 1.1rem; }
+.alex-booking[open] > summary::after { content: '−'; }
+.alex-booking > summary small { margin-left: auto; color: #bdd5ce; font-size: .7rem; font-weight: 400; }
+.alex-booking .alex-booking-body { display: grid; gap: 10px; padding: 0 12px 12px; }
+.alex-booking .alex-booking-body > label { color: #f3f0e9; font-size: .8rem; font-weight: 650; }
+.alex-booking select { width: 100%; min-width: 0; min-height: 44px; padding: 8px; border: 1px solid #71928d; border-radius: 8px; background: #081e20; color: #f3f0e9; font: inherit; font-size: 16px; }
+@media (max-width: 360px) { .brief-tools .brief-tools-actions button { flex-basis: 100%; } }

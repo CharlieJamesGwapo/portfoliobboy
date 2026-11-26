@@ -6,9 +6,9 @@ export const CONTACT_INTENT_EVENT = 'portfolio:contact-intent'
 // Held in memory only, until the contact section mounts after route navigation.
 let pendingAssistantIntent = null
 
-export function stageAssistantEnquiry(subject, message) {
+export function stageAssistantEnquiry(subject, message, { preserveSubject = false } = {}) {
   if (typeof window === 'undefined' || !subject || !message) return
-  pendingAssistantIntent = { subject, message, source: 'assistant' }
+  pendingAssistantIntent = { subject, message, source: 'assistant', preserveSubject }
   window.dispatchEvent(new CustomEvent(CONTACT_INTENT_EVENT, { detail: pendingAssistantIntent }))
 }
 

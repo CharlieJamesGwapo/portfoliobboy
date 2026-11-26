@@ -92,6 +92,7 @@
 .voice-workspace .voice-workspace-draft input,
 .voice-workspace .voice-workspace-draft textarea { box-sizing: border-box; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 10px 12px; border: 1px solid #71928d; border-radius: 9px; background: #081e20; color: var(--voice-workspace-text); caret-color: var(--voice-workspace-mint); font: inherit; font-size: 16px; line-height: 1.5; }
 .voice-workspace .voice-workspace-draft textarea { min-height: 7rem; max-height: min(22rem, 45dvh); overflow-y: auto; resize: vertical; }
+.voice-workspace-booking { min-width: 0; grid-column: 1 / -1; }
 .voice-workspace .voice-workspace-draft label:not(:first-child) { margin-top: 4px; }
 .voice-workspace .voice-workspace-review { margin-top: 4px; border-color: var(--voice-workspace-mint); background: var(--voice-workspace-mint); color: #0b2528; }
 .voice-workspace .voice-workspace-review:hover:not(:disabled) { background: #8cebd2; }

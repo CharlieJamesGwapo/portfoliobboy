@@ -73,6 +73,48 @@ async function micReleased(page) {
   await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
 }
 
+test('saving a reviewed voice brief exports edits and stops a retried voice session', async ({ page }) => {
+  const { panel, send, posts } = await openVoice(page)
+  send('user', 'We need a CRM and appointment reminders for our clinic.', 1)
+  await expect(panel.getByRole('log', { name: /transcript/i })).toContainText('our clinic')
+  await panel.getByRole('button', { name: 'Prepare enquiry draft', exact: true }).click()
+  const edited = 'José’s clinic: edited reminder and migration requirements.'
+  await panel.getByRole('textbox', { name: 'Voice enquiry draft', exact: true }).fill(edited)
+  await panel.getByRole('button', { name: 'Start again', exact: true }).click()
+  await expect(panel.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+  const downloadEvent = page.waitForEvent('download')
+  await panel.getByRole('button', { name: 'Download text', exact: true }).click()
+  const download = await downloadEvent
+  expect(readFileSync(await download.path(), 'utf8')).toContain(edited)
+  await micReleased(page)
+  await expect(panel.getByRole('textbox', { name: 'Voice enquiry draft', exact: true })).toHaveValue(edited)
+  expect(posts).toEqual([])
+})
+
+test('booking during a microphone prompt cancels a late connection and preserves contact notes', async ({ page }) => {
+  const { panel, sockets, posts } = await openVoice(page, '/projects/zalio-crm', { pendingMicrophone: true })
+  await panel.locator('.alex-booking > summary').click()
+  await panel.getByLabel('Choose your conversation').selectOption('discovery')
+  await panel.getByRole('button', { name: 'Request this call', exact: true }).click()
+  await expect(page).toHaveURL(/\/#contact$/)
+  await expect(page.locator('#contact-subject')).toHaveValue('Request a 30-min project discovery')
+  await expect(page.locator('#contact-message')).toHaveValue(/Preferred date and time \(with timezone\)/)
+  await page.evaluate(() => window.__grantVoiceMicrophone())
+  await expect.poll(() => page.evaluate(() => window.__voiceTracks.length)).toBeGreaterThan(0)
+  await micReleased(page)
+  expect(sockets).toHaveLength(0)
+  expect(posts).toEqual([])
+})
+
+test('opening booking stops voice before any new-tab scheduling action is available', async ({ page }) => {
+  const { panel, posts } = await openVoice(page)
+  await panel.locator('.alex-booking > summary').click()
+  await micReleased(page)
+  await expect(panel.getByLabel('Choose your conversation')).toBeVisible()
+  await expect(panel.getByRole('button', { name: 'Start again', exact: true })).toBeVisible()
+  expect(posts).toEqual([])
+})
+
 test('the live transcript deduplicates SDK messages, applies corrections and renders text safely', async ({ page }) => {
   const { panel, send, sockets } = await openVoice(page)
   const log = panel.getByRole('log', { name: /transcript/i })
