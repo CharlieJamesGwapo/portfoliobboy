@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowUpRight, Bot, Database, MonitorSmartphone, Workflow } from 'lucide-react'
 import { requestContact } from '../lib/contactIntent'
+import ScrollReveal from './ScrollReveal'
 import './services.css'
 
 // "What can I build for you?" translates the skills list into outcomes a
@@ -59,8 +60,8 @@ export default function Services() {
         </div>
 
         <ul className="services-grid">
-          {services.map(({ id, icon: Icon, title, summary, detail, evidence, subject }) => (
-            <li key={id} className="service-card">
+          {services.map(({ id, icon: Icon, title, summary, detail, evidence, subject }, index) => (
+            <ScrollReveal as="li" key={id} className="service-card" delay={index * 65}>
               <span className="service-icon" aria-hidden="true"><Icon size={20} /></span>
               <h3 id={`service-${id}-title`}>{title}</h3>
               <p className="service-summary">{summary}</p>
@@ -78,7 +79,7 @@ export default function Services() {
                   Start a project <ArrowUpRight size={15} aria-hidden="true" />
                 </a>
               </div>
-            </li>
+            </ScrollReveal>
           ))}
         </ul>
       </div>

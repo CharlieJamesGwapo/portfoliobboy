@@ -53,10 +53,12 @@ const featuredSlides = [
 
 function HeroProjectCarousel() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [direction, setDirection] = useState('next')
   const activeSlide = featuredSlides[activeIndex] || featuredSlides[0]
   const activeTabId = `hero-featured-tab-${activeSlide.id}`
 
   const moveTo = (index) => {
+    setDirection(index < activeIndex ? 'previous' : 'next')
     setActiveIndex((index + featuredSlides.length) % featuredSlides.length)
   }
 
@@ -69,7 +71,7 @@ function HeroProjectCarousel() {
         ? featuredSlides.length - 1
         : index + (event.key === 'ArrowRight' ? 1 : -1)
     const wrappedIndex = (nextIndex + featuredSlides.length) % featuredSlides.length
-    moveTo(wrappedIndex)
+    moveTo(nextIndex)
     document.getElementById(`hero-featured-tab-${featuredSlides[wrappedIndex].id}`)?.focus()
   }
 
@@ -123,6 +125,7 @@ function HeroProjectCarousel() {
       <div
         id="hero-featured-panel"
         className="hero-project-panel"
+        data-direction={direction}
         role="tabpanel"
         aria-labelledby={activeTabId}
         tabIndex={0}

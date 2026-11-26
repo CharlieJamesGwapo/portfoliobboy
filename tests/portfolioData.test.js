@@ -108,7 +108,7 @@ test('shows current independent work and role count in the page consumers', asyn
   assert.equal(SKILL_CATEGORIES.flatMap((group) => group.skills).includes('MongoDB'), false)
   assert.equal(BIO_SCROLL[1], 'Hands-on development across Python, Go, .NET, Node.js, and PHP.')
   assert.match(heroMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' '), /Lead Full-Stack/)
-  assert.match(heroMarkup, /AI, web &amp; mobile\./)
+  assert.match(heroMarkup, /AI, Web &amp; Mobile\./)
   assert.match(heroMarkup, /OneRidePhone|one-ride|oneRide/i)
   assert.match(aboutMarkup, /At Zalio, I led/i)
   assert.match(aboutMarkup, /AutoFlow AI Pro/i)

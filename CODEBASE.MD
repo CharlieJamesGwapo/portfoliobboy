@@ -221,6 +221,8 @@ The nine games are Dungeon Crawler, Space Shooter, Code Racer, Block Blast, Raci
 
 ### Themes, performance, and offline behavior
 
+- `components/motion.css` supplies staggered hero entrances, layered client-study reveals, directional featured-project transitions and optional desktop scroll-timeline image depth. The primary headline remains readable during its entrance. Project switching remains manual.
+- `main.jsx` responds to reduced-motion changes during a visit. `sectionNavigation.js` exposes focused/linked content immediately; section links use native smooth scrolling while cold links and browser history settle immediately. Focus alone does not open a disclosure.
 - `public/theme-init.js` applies a saved/system theme before React paints; `ThemeToggle` persists visitor choices and reacts to system changes.
 - Heavy route pages, games, music, live voice, and optional graphics use dynamic imports. `prefetch.js` warms selected features on intent. The build names React, Three.js, and React Three Fiber vendor groups separately.
 - Reduced-motion styles, focus handling, semantic controls, a skip link, and menu/dialog behavior are implemented; these are not a complete accessibility certification.

@@ -4,9 +4,10 @@ import App from './App.jsx'
 import { registerServiceWorker } from './lib/registerServiceWorker'
 import './index.css'
 import './components/studio-polish.css'
-import './components/motion.css'
 // Audit refinements load last so their narrow fixes win ties.
 import './components/refinements.css'
+// Motion only changes presentation and follows the final layout refinements.
+import './components/motion.css'
 
 // Entrance animations are opt-in. The stylesheet only hides content behind an
 // animation when <html> carries `motion-ready`, so a JS failure, a blocked
@@ -18,24 +19,19 @@ import './components/refinements.css'
 // otherwise sit at opacity 0 until focused. We arm the animations only once
 // the tab is actually visible. Runs before render, so there is no flash.
 function armEntranceAnimations() {
-  if (
-    typeof IntersectionObserver === 'undefined' ||
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
-    return
+  if (typeof IntersectionObserver === 'undefined') return
+  const preference = window.matchMedia('(prefers-reduced-motion: reduce)')
+  const syncMotion = () => {
+    if (preference.matches) {
+      document.documentElement.classList.remove('motion-ready')
+      document.querySelectorAll('.reveal').forEach((element) => element.classList.add('is-visible'))
+    } else if (document.visibilityState === 'visible') {
+      document.documentElement.classList.add('motion-ready')
+    }
   }
-
-  if (document.visibilityState === 'visible') {
-    document.documentElement.classList.add('motion-ready')
-    return
-  }
-
-  const onVisible = () => {
-    if (document.visibilityState !== 'visible') return
-    document.removeEventListener('visibilitychange', onVisible)
-    document.documentElement.classList.add('motion-ready')
-  }
-  document.addEventListener('visibilitychange', onVisible)
+  syncMotion()
+  preference.addEventListener('change', syncMotion)
+  document.addEventListener('visibilitychange', syncMotion)
 }
 
 armEntranceAnimations()

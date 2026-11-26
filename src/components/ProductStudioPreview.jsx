@@ -287,7 +287,7 @@ export default function ProductStudioPreview() {
           </div>
         </ScrollReveal>
         <div className="selected-case-list">
-          {selectedCaseStudies.map((study, index) => <ScrollReveal key={study.id}><SelectedCaseStudy study={study} index={index} /></ScrollReveal>)}
+          {selectedCaseStudies.map((study, index) => <ScrollReveal key={study.id} variant="showcase" duration={720}><SelectedCaseStudy study={study} index={index} /></ScrollReveal>)}
         </div>
         <IndependentProducts />
         <ProjectCollection><SystemsViewDisclosure /></ProjectCollection>

@@ -37,8 +37,9 @@ const Hero = () => (
             <h1>
               <span className="hero-line hero-line-primary">Lead</span>{' '}
               <span className="hero-line hero-line-primary">Full-Stack</span>{' '}
-              <span className="hero-line hero-line-accent">Developer.</span>{' '}
-              <span className="hero-line hero-line-note">AI, web &amp; mobile.</span>
+              <span className="hero-line hero-line-accent">Developer</span>{' '}
+              <span className="sr-only">— </span>
+              <span className="hero-line hero-line-note">AI, Web &amp; Mobile.</span>
             </h1>
           </div>
         </div>

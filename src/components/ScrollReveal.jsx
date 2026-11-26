@@ -12,7 +12,8 @@ const getObserver = () => {
           sharedObserver.unobserve(entry.target)
         })
       },
-      { threshold: 0.08, rootMargin: '0px 0px -48px' },
+      // A tall case study must reveal even when only its first edge fits.
+      { threshold: 0, rootMargin: '0px 0px -32px' },
     )
   }
   return sharedObserver
@@ -24,6 +25,7 @@ const ScrollReveal = ({
   delay = 0,
   duration = 640,
   variant = 'up',
+  as: Element = 'div',
 }) => {
   const ref = useRef(null)
 
@@ -47,7 +49,7 @@ const ScrollReveal = ({
   }, [])
 
   return (
-    <div
+    <Element
       ref={ref}
       className={`reveal reveal-${variant} ${className}`}
       style={{
@@ -56,7 +58,7 @@ const ScrollReveal = ({
       }}
     >
       {children}
-    </div>
+    </Element>
   )
 }
 

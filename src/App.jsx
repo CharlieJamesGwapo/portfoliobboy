@@ -30,7 +30,12 @@ const ProjectsPage = lazy(() => import('./components/ProjectsPage'))
 const CaseStudyPage = lazy(() => import('./components/CaseStudyPage'))
 
 function RouteFocus({ pathname, hash }) {
+  const focusedPath = useRef(null)
   useEffect(() => {
+    // Same-page fragments are handled by the anchor/hash listeners below.
+    // Re-focusing here would cancel their smooth scroll with an instant jump.
+    if (focusedPath.current === pathname) return
+    focusedPath.current = pathname
     if (hash) {
       let target
       try { target = document.getElementById(decodeURIComponent(hash.slice(1))) } catch { return }
@@ -59,6 +64,7 @@ function App() {
   const musicButtonRef = useRef(null)
   const progressRef = useRef(null)
   const showTopRef = useRef(false)
+  const pointerFocusTargetRef = useRef(null)
 
   useEffect(() => {
     // scrollHeight is a layout-forcing read, so it is measured once per resize
@@ -181,7 +187,20 @@ function App() {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       const anchor = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null
       const target = findTarget(anchor?.getAttribute('href'))
-      if (target) revealSection(target)
+      if (!target) return
+      event.preventDefault()
+      revealSection(target)
+      const hash = anchor.getAttribute('href')
+      if (window.location.hash !== hash) {
+        window.history.pushState({}, '', hash)
+        window.dispatchEvent(new PopStateEvent('popstate'))
+      }
+      target.scrollIntoView({
+        block: 'start',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      })
+      if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1')
+      target.focus({ preventScroll: true })
     }
     const onHashChange = () => {
       const target = findTarget(window.location.hash)
@@ -203,6 +222,7 @@ function App() {
     const openPalette = () => setPaletteOpen(true)
 
     const onKeyDown = (event) => {
+      pointerFocusTargetRef.current = null
       // ⌘K on macOS, Ctrl+K elsewhere. Both are claimed by the browser's
       // address bar in some configurations, so `/` is offered as a second
       // opener — but only when the visitor is not already typing somewhere.
@@ -235,7 +255,19 @@ function App() {
       <a href="#main-content" className="skip-link">Skip to content</a>
       <div ref={progressRef} className="scroll-progress" aria-hidden="true" />
       <Navbar key={route.pathname} />
-      <main id="main-content" tabIndex={-1}>
+      <main id="main-content" tabIndex={-1}
+        onPointerDownCapture={(event) => { pointerFocusTargetRef.current = event.target }}
+        onPointerUpCapture={() => { pointerFocusTargetRef.current = null }}
+        onPointerCancelCapture={() => { pointerFocusTargetRef.current = null }}
+        onFocusCapture={(event) => {
+          // Never snap the element under a pointer between down and up. A
+          // keyboard/programmatic focus transfer can expose pending work now.
+          const pointerTarget = pointerFocusTargetRef.current
+          const pointerFocus = pointerTarget && event.target.contains(pointerTarget)
+          if (!pointerFocus && event.target.closest('.reveal:not(.is-visible)')) {
+            revealSection(event.target, { openDisclosures: false })
+          }
+        }}>
         {isHome ? <>
         <Hero />
         <VoiceAgentDemo />

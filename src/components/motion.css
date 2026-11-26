@@ -1,22 +1,164 @@
-/* Page transitions (View Transitions API, see lib/portfolioRoute.js).
-   The outgoing page lifts away quickly; the incoming one rises into place a
-   touch slower, so the change reads as one movement rather than a cut. The
-   navbar has its own transition name, so it stays perfectly still. */
-.navbar { view-transition-name: site-nav; }
+/* Editorial motion: quick orientation, then a little room for the work.
+   Only transforms and opacity move. All content remains in normal flow. */
+:root {
+  --motion-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-::view-transition-old(root) { animation: page-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
-::view-transition-new(root) { animation: page-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+/* Keep the navigation steady while the page beneath it crossfades. */
+.navbar { view-transition-name: site-nav; }
+::view-transition-old(root) { animation: page-out 180ms ease-out both; }
+::view-transition-new(root) { animation: page-in 460ms var(--motion-reveal) both; }
 ::view-transition-group(site-nav) { animation: none; }
+::view-transition-old(site-nav),
+::view-transition-new(site-nav) { animation: none; }
 
 @keyframes page-out {
-  to { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.995); }
+  to { opacity: 0; transform: translate3d(0, -8px, 0); }
 }
-
 @keyframes page-in {
-  from { opacity: 0; transform: translate3d(0, 18px, 0); }
+  from { opacity: 0; transform: translate3d(0, 20px, 0); }
 }
 
+/* The hero is readable even during its first frame. Stagger position rather
+   than hiding the headline or waiting to load the project preview. */
+.motion-ready .hero-enter {
+  animation: showcase-settle 620ms var(--motion-reveal) backwards;
+}
+.motion-ready .hero-identity { animation: none; }
+.motion-ready .hero-profile-intro picture {
+  animation: portrait-arrive 760ms var(--motion-reveal) backwards;
+}
+.motion-ready .hero-profile-details {
+  animation: showcase-settle 540ms var(--motion-reveal) backwards;
+}
+.motion-ready .hero-copy h1 .hero-line {
+  animation: headline-arrive 640ms var(--motion-reveal) backwards;
+}
+.hero-copy h1 .hero-line:nth-child(2) { animation-delay: 55ms; }
+.hero-copy h1 .hero-line:nth-child(3) { animation-delay: 110ms; }
+.hero-copy h1 .hero-line-note { animation-delay: 165ms; }
+.motion-ready .hero-enter-5 { animation-delay: 120ms; }
+.motion-ready .hero-enter-6 { animation-delay: 175ms; }
+.motion-ready .hero-enter-7 { animation-delay: 220ms; }
+.motion-ready .hero-enter-visual { animation-delay: 80ms; }
+
+@keyframes showcase-settle {
+  from { opacity: 0.85; transform: translate3d(0, 18px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes headline-arrive {
+  from { opacity: 0.85; transform: translate3d(0, 20px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes portrait-arrive {
+  from { transform: translate3d(-14px, 10px, 0) rotate(-2deg) scale(0.97); }
+  to { transform: none; }
+}
+
+/* Client studies unfold in layers: image, title, then evidence. The surface
+   stays visible; stagger ends quickly even for a tall article. */
+.motion-ready .reveal-showcase:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+.reveal-showcase .case-study-media,
+.reveal-showcase .case-study-copy > * {
+  transition: opacity 640ms var(--motion-reveal), transform 720ms var(--motion-reveal);
+}
+.motion-ready .reveal-showcase:not(.is-visible) .case-study-media {
+  opacity: 0.3;
+  transform: translate3d(-24px, 0, 0) scale(0.98);
+}
+.motion-ready .reveal-showcase:not(.is-visible) .case-study-copy > * {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+}
+.reveal-showcase .case-study-copy > :nth-child(2) { transition-delay: 55ms; }
+.reveal-showcase .case-study-copy > :nth-child(3) { transition-delay: 90ms; }
+.reveal-showcase .case-study-copy > :nth-child(n + 4) { transition-delay: 130ms; }
+
+/* Switching projects follows the visitor's direction. A new keyed panel
+   restarts these short entrances; nothing rotates automatically. */
+.hero-project-panel { --project-from-x: 24px; }
+.hero-project-panel[data-direction='previous'] { --project-from-x: -24px; }
+.motion-ready .hero-project-media {
+  animation: project-media-arrive 520ms var(--motion-reveal) backwards;
+}
+.motion-ready .hero-project-copy {
+  animation: project-copy-arrive 480ms var(--motion-reveal) 65ms backwards;
+}
+@keyframes project-media-arrive {
+  from { opacity: 0.6; transform: translate3d(var(--project-from-x), 0, 0) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes project-copy-arrive {
+  from { opacity: 0.6; transform: translate3d(0, 12px, 0); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Progressive depth on large screens, driven by the browser's scroll
+   timeline. Unsupported browsers keep the same static, complete preview. */
+@supports (animation-timeline: view()) {
+  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+    .motion-ready .case-study-media:not(.is-mobile-app) .case-study-image img {
+      animation: showcase-depth linear both;
+      animation-timeline: view();
+      animation-range: entry 10% exit 90%;
+    }
+  }
+}
+@keyframes showcase-depth {
+  from { transform: translate3d(0, 10px, 0) scale(1.025); }
+  to { transform: translate3d(0, -10px, 0) scale(1.025); }
+}
+
+.hero-project-details svg,
+.case-study-actions a svg,
+.service-links a svg,
+.hero-actions a svg {
+  transition: transform 240ms var(--motion-reveal);
+}
+.selected-case-study { transition: border-color 260ms ease, box-shadow 260ms ease; }
+
+@media (hover: hover) and (pointer: fine) {
+  .selected-case-study:hover {
+    border-color: rgba(15, 128, 109, 0.4);
+    box-shadow: 0 16px 38px -22px rgba(11, 37, 40, 0.25);
+  }
+  .hero-project-details:hover svg,
+  .case-study-actions a:hover svg,
+  .service-links a:hover svg { transform: translate3d(3px, -3px, 0); }
+  .hero-actions a:hover svg { transform: translate3d(0, 3px, 0); }
+}
+
+/* Focus and fragment navigation are instant. Never ask someone to wait for
+   an animation to see the control they have already reached. */
+.reveal.is-reveal-immediate,
+.reveal.is-reveal-immediate * {
+  transition-delay: 0ms !important;
+  transition-duration: 0ms !important;
+}
+@media (max-width: 767px) {
+  .motion-ready .reveal-showcase:not(.is-visible) .case-study-media {
+    transform: translate3d(0, 16px, 0) scale(0.99);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
-  ::view-transition-new(root) { animation: none; }
+  ::view-transition-new(root),
+  .hero-profile-intro picture,
+  .hero-profile-details,
+  .hero-line,
+  .hero-project-media,
+  .hero-project-copy,
+  .case-study-image img { animation: none !important; transform: none !important; }
+
+  .motion-ready .reveal:not(.is-visible),
+  .motion-ready .reveal:not(.is-visible) .section-heading > *,
+  .motion-ready .reveal-showcase:not(.is-visible) .case-study-media,
+  .motion-ready .reveal-showcase:not(.is-visible) .case-study-copy > * {
+    opacity: 1;
+    transform: none;
+  }
 }
