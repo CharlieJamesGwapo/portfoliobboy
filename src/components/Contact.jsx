@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowUpRight, CalendarClock, CheckCircle2, Clock3, FileText, Github, Linkedin, Loader2, Mail, MapPin, Phone, Video } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import './contact-booking.css'
 import { bookingOptions, profile, resumeUrl } from '../data/portfolioData'
-import { CONTACT_INTENT_EVENT, requestContact } from '../lib/contactIntent'
+import { CONTACT_INTENT_EVENT, requestContact, takeAssistantEnquiry } from '../lib/contactIntent'
 
 const bookingRequest = (option) => ({
   subject: `Book a ${option.minutes}-min ${option.title.toLowerCase()} (Google Meet)`,
@@ -105,6 +105,9 @@ const Contact = () => {
   // Separate from `status`, which editing a field resets: the mail fallback
   // should stay available (and track the edits) until the visitor resends.
   const [sendFailed, setSendFailed] = useState(false)
+  const [preparedEnquiry, setPreparedEnquiry] = useState('')
+  const latestForm = useRef({ form, status })
+  useEffect(() => { latestForm.current = { form, status } }, [form, status])
 
   const updateField = (event) => {
     const { name, value } = event.target
@@ -132,9 +135,20 @@ const Contact = () => {
   // "Start a project" links elsewhere on the page pre-select a subject here.
   useEffect(() => {
     const onIntent = (event) => {
-      const subject = event.detail?.subject
-      const template = typeof event.detail?.message === 'string' ? event.detail.message : ''
+      const intent = event.detail
+      if (intent?.source === 'assistant') takeAssistantEnquiry()
+      const subject = intent?.subject
+      const template = typeof intent?.message === 'string' ? intent.message : ''
       if (typeof subject !== 'string' || !subject) return
+      if (intent?.source === 'assistant') {
+        setPreparedEnquiry(latestForm.current.form.message.trim() ? template : '')
+        window.requestAnimationFrame(() => {
+          const field = document.getElementById('contact-message')
+          field?.scrollIntoView({ block: 'center', behavior: 'instant' })
+          field?.focus({ preventScroll: true })
+        })
+      }
+      if (latestForm.current.status === 'sending') return
       // A booking request is an explicit choice, so it replaces the subject;
       // a plain "Start a project" link only fills an empty one. A message
       // template never overwrites something the visitor has typed.
@@ -146,6 +160,8 @@ const Contact = () => {
       setErrors((current) => ({ ...current, subject: '', message: '' }))
     }
     window.addEventListener(CONTACT_INTENT_EVENT, onIntent)
+    const pending = takeAssistantEnquiry()
+    if (pending) onIntent({ detail: pending })
     return () => window.removeEventListener(CONTACT_INTENT_EVENT, onIntent)
   }, [])
 
@@ -250,26 +266,33 @@ const Contact = () => {
 
         <ScrollReveal delay={100} variant="scale">
           <form className="contact-form" onSubmit={handleSubmit} noValidate aria-busy={status === 'sending'}>
+            {preparedEnquiry && <aside className="contact-prepared-enquiry" aria-label="Prepared enquiry">
+              <p role="status">Your existing message was kept.</p>
+              <p>Copy any details you want to merge from the prepared enquiry below.</p>
+              <label htmlFor="contact-prepared-message">Prepared enquiry to copy</label>
+              <textarea id="contact-prepared-message" readOnly value={preparedEnquiry} rows={4} />
+              <button type="button" onClick={() => setPreparedEnquiry('')}>Dismiss prepared enquiry</button>
+            </aside>}
             <div className="form-row">
               <label>
                 <span>Name</span>
-                <input id="contact-name" name="name" type="text" value={form.name} onChange={updateField} autoComplete="name" autoCapitalize="words" maxLength={120} required aria-required="true" placeholder="Your name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'contact-name-error' : undefined} />
+                <input id="contact-name" name="name" disabled={status === 'sending'} type="text" value={form.name} onChange={updateField} autoComplete="name" autoCapitalize="words" maxLength={120} required aria-required="true" placeholder="Your name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'contact-name-error' : undefined} />
                 {errors.name && <small id="contact-name-error" className="field-error">{errors.name}</small>}
               </label>
               <label>
                 <span>Email</span>
-                <input id="contact-email" name="email" type="email" inputMode="email" value={form.email} onChange={updateField} autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck="false" maxLength={254} required aria-required="true" placeholder="you@company.com" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'contact-email-error' : undefined} />
+                <input id="contact-email" name="email" disabled={status === 'sending'} type="email" inputMode="email" value={form.email} onChange={updateField} autoComplete="email" autoCapitalize="none" autoCorrect="off" spellCheck="false" maxLength={254} required aria-required="true" placeholder="you@company.com" aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'contact-email-error' : undefined} />
                 {errors.email && <small id="contact-email-error" className="field-error">{errors.email}</small>}
               </label>
             </div>
             <label>
               <span>Subject</span>
-              <input id="contact-subject" name="subject" type="text" value={form.subject} onChange={updateField} autoComplete="off" autoCapitalize="sentences" enterKeyHint="next" maxLength={200} required aria-required="true" placeholder="What would you like to build?" aria-invalid={Boolean(errors.subject)} aria-describedby={errors.subject ? 'contact-subject-error' : undefined} />
+              <input id="contact-subject" name="subject" disabled={status === 'sending'} type="text" value={form.subject} onChange={updateField} autoComplete="off" autoCapitalize="sentences" enterKeyHint="next" maxLength={200} required aria-required="true" placeholder="What would you like to build?" aria-invalid={Boolean(errors.subject)} aria-describedby={errors.subject ? 'contact-subject-error' : undefined} />
               {errors.subject && <small id="contact-subject-error" className="field-error">{errors.subject}</small>}
             </label>
             <label>
               <span>Message</span>
-              <textarea id="contact-message" name="message" value={form.message} onChange={updateField} autoComplete="off" autoCapitalize="sentences" required aria-required="true" minLength={10} maxLength={5000} rows="5" placeholder="Share a little context, timeline, or role details." aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? 'contact-message-error' : undefined} />
+              <textarea id="contact-message" name="message" disabled={status === 'sending'} value={form.message} onChange={updateField} autoComplete="off" autoCapitalize="sentences" required aria-required="true" minLength={10} maxLength={5000} rows="5" placeholder="Share a little context, timeline, or role details." aria-invalid={Boolean(errors.message)} aria-describedby={errors.message ? 'contact-message-error' : undefined} />
               {errors.message && <small id="contact-message-error" className="field-error">{errors.message}</small>}
             </label>
             {/* Off-screen rather than display:none — some bots skip fields

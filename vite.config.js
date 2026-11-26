@@ -94,12 +94,12 @@ export default defineConfig({
         // reuse at all between the hero and the arcade. Pinned, it is fetched
         // once and then served from cache for every other consumer.
         //
-        // Expressed with rolldown's `advancedChunks` rather than the legacy
+        // Expressed with rolldown's `codeSplitting` rather than the legacy
         // `manualChunks` callback: under the compat callback rolldown merged
         // `three-vendor` back into `r3f-vendor`, because a group below its
         // minimum size gets folded into the chunk that pulls it in. Declaring
         // `minSize: 0` per group is what actually keeps them apart.
-        advancedChunks: {
+        codeSplitting: {
           groups: [
             {
               name: 'react-vendor',

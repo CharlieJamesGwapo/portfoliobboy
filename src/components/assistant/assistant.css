@@ -71,12 +71,12 @@
   z-index: 95; /* under the navbar (100), palette and menus */
   display: flex;
   flex-direction: column;
-  width: min(390px, calc(100vw - 48px));
-  height: min(600px, calc(100dvh - var(--nav-height, 80px) - 48px));
+  width: min(460px, calc(100vw - 48px));
+  height: min(720px, calc(100dvh - var(--nav-height, 80px) - 48px));
   overflow: hidden;
   border: 1px solid var(--alex-line);
   border-radius: 22px;
-  background: linear-gradient(180deg, rgba(14, 44, 46, 0.98), rgba(8, 30, 31, 0.98));
+  background: linear-gradient(180deg, #0e2c2e, #081e1f);
   color: var(--paper);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   animation: alex-rise 320ms var(--ease-out) both;
@@ -135,6 +135,37 @@
 .alex-send:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
 .alex-note { padding: 0 16px 12px; color: var(--alex-muted); font-size: 0.68rem; }
 
+/* Guided local workflows share the existing conversation and contact path. */
+.alex-head, .alex-voice, .alex-modes, .alex-mode-help, .alex-suggestions, .alex-input, .alex-note { flex-shrink: 0; }
+.alex-messages { min-height: 0; }
+.alex-msg { overflow-wrap: anywhere; }
+.alex-msg > p { white-space: pre-wrap; }
+.alex-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 10px 16px 0; }
+.alex-modes button { min-height: 38px; padding: 6px 8px; border: 1px solid var(--alex-line); border-radius: 10px; background: rgba(255,255,255,.04); color: var(--paper); font: inherit; font-size: .76rem; cursor: pointer; }
+.alex-modes button[aria-pressed='true'] { border-color: var(--mint); background: rgba(103,224,193,.12); color: var(--mint); }
+.alex-modes button:disabled { opacity: .6; cursor: default; }
+.alex-mode-help { margin: 0; padding: 8px 16px; color: var(--alex-muted); font-size: .75rem; line-height: 1.5; }
+.alex-msg-workflow { width: 100%; max-width: 100%; }
+.alex-workflow-results { display: grid; gap: 10px; margin-top: 10px; }
+.alex-project-card, .alex-requirements > li, .alex-brief-review { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--alex-line); border-radius: 12px; background: rgba(255,255,255,.035); }
+.alex-project-card h3 { margin: 0; color: var(--paper); font-size: .93rem; }
+.alex-workflow-results p, .alex-brief-review p { margin: 0; padding: 0; border-radius: 0; background: none; color: var(--paper); font-size: .8rem; }
+.alex-evidence-label { display: block; color: var(--alex-muted); font-size: .71rem; line-height: 1.5; }
+.alex-project-card a, .alex-requirements a { color: var(--mint); font-size: .76rem; line-height: 1.5; text-decoration: underline; text-underline-offset: 3px; }
+.alex-workflow-cta, .alex-workflow-reset { min-height: 42px; padding: 10px 12px; border: 1px solid rgba(103,224,193,.4); border-radius: 10px; color: var(--mint); background: rgba(103,224,193,.08); font: inherit; font-size: .8rem; font-weight: 650; cursor: pointer; }
+.alex-workflow-cta:disabled { opacity: .5; cursor: default; }
+.alex-workflow-reset { border-color: var(--alex-line); color: var(--alex-muted); background: transparent; }
+.alex-requirements { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.alex-requirements strong { color: var(--paper); font-size: .85rem; white-space: pre-wrap; }
+.alex-evidence-status { justify-self: start; padding: 3px 7px; border-radius: 6px; color: #ffe4ad; background: rgba(255,201,103,.1); font-size: .7rem; }
+.alex-evidence-status.is-documented { color: var(--mint); background: rgba(103,224,193,.1); }
+.alex-brief-review label { color: var(--paper); font-size: .85rem; font-weight: 650; }
+.alex-input textarea, .alex-brief-review textarea { width: 100%; min-width: 0; padding: 10px 12px; border: 1px solid var(--alex-line); border-radius: 12px; background: rgba(255,255,255,.05); color: var(--paper); font: inherit; font-size: 16px; line-height: 1.5; resize: vertical; }
+.alex-input textarea { flex: 1; min-height: 64px; max-height: 130px; }
+.alex-brief-review textarea { min-height: 180px; max-height: 320px; }
+.alex-input textarea::placeholder { color: var(--alex-muted); font-size: .8rem; }
+.alex-modes button:focus-visible, .alex-workflow-results a:focus-visible, .alex-workflow-cta:focus-visible, .alex-workflow-reset:focus-visible, .alex-input textarea:focus-visible, .alex-brief-review textarea:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+
 /* ---------- Never overlap other controls ---------- */
 /* The Voice Studio has its own player; a game takes the whole screen. */
 /* The entrance animation fills "backwards" only: a forwards fill would pin
@@ -164,6 +195,16 @@ body.game-open .alex-root { opacity: 0; visibility: hidden; pointer-events: none
   body.music-open .alex-greeting { bottom: calc(134px + env(safe-area-inset-bottom)); }
   .alex-panel { left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom)); width: auto; height: calc(100dvh - var(--nav-height, 70px) - 20px); border-radius: 20px; }
   .alex-msg { max-width: 92%; }
+}
+
+/* Landscape phones and open on-screen keyboards leave little vertical room.
+   Let the sheet scroll while its close and send controls remain reachable. */
+@media (max-height: 600px) {
+  .alex-panel { overflow-y: auto; overscroll-behavior: contain; }
+  .alex-head { position: sticky; top: 0; z-index: 3; background: #0e2c2e; }
+  .alex-messages { flex: none; min-height: 100px; overflow: visible; }
+  .alex-input { position: sticky; bottom: 0; z-index: 2; background: #0b2729; }
+  .alex-brief-review textarea { min-height: 120px; max-height: 180px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

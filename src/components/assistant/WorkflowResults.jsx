@@ -1,0 +1,40 @@
+const statusLabels = { documented: 'Documented', partial: 'Partly documented', unverified: 'Needs confirmation' }
+
+export default function WorkflowResults({ result, onEnquiry, onNavigate }) {
+  if (result.projects) {
+    return (
+      <div className="alex-workflow-results">
+        {result.projects.map(project => (
+          <article className="alex-project-card" key={project.href}>
+            <h3>{project.title}</h3>
+            <span className="alex-evidence-label">{project.reason}</span>
+            <p>{project.contribution}</p>
+            <span className="alex-evidence-label">{project.status}</span>
+            <a href={project.href} onClick={onNavigate}>Read case study <span className="sr-only">for {project.title}</span></a>
+          </article>
+        ))}
+        <button className="alex-workflow-cta" type="button" onClick={() => onEnquiry(result.enquiry)}>
+          Start a project enquiry
+        </button>
+      </div>
+    )
+  }
+  if (result.requirements) {
+    return (
+      <div className="alex-workflow-results">
+        {result.truncated && <p role="status">Showing up to 30 requirements from the first 4,000 characters. Split a longer role into smaller sections.</p>}
+        <ul className="alex-requirements" aria-label="Requirement comparison">
+          {result.requirements.map(row => (
+            <li key={row.requirement}>
+              <strong>{row.requirement}</strong>
+              <span className={`alex-evidence-status is-${row.status}`}>{statusLabels[row.status]}</span>
+              <p>{row.text}</p>
+              {row.evidence.map((item, index) => <a key={`${item.href}-${index}`} href={item.href} onClick={onNavigate}>{item.text}</a>)}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+  return null
+}

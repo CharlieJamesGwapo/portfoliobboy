@@ -1,8 +1,8 @@
-# Live voice agent: production setup (not activated)
+# Live voice agent: production setup and verification
 
-Status: **prepared, not activated.** No billable agent exists. The site's
-"Talk to My AI" (Voice Studio) and "Talk to Alex" (assistant) buttons stay
-disabled until every step below is done and tested. Creating or publishing the
+Source readiness: **integration implemented; provider account status must be checked separately.** The site's
+"Talk to My AI" (Voice Studio) and "Talk to Alex" (assistant) controls depend
+on the public agent ID configured at build time. An unset ID keeps live voice unavailable. Creating or publishing the
 agent needs the owner's separate approval because it spends money per minute.
 
 ## How it plugs in
@@ -76,10 +76,9 @@ enable** the live agent.
 
 ## Microphone permission (required for production)
 
-`vercel.json` currently sends `Permissions-Policy: microphone=()`, which blocks
-the microphone on the deployed site. In the same change that sets the agent ID,
-change only that directive to `microphone=(self)`. Leave camera and geolocation
-blocked.
+`vercel.json` currently permits `microphone=(self)` and blocks camera and geolocation.
+Verify the deployed Permissions-Policy matches the tracked configuration before enabling a live agent.
+A permitted microphone header does not establish that an external agent or usage limits are configured.
 
 ## Estimated costs
 
@@ -102,7 +101,7 @@ previews cost nothing to replay: they are static files.
 1. Create the agent with the configuration above. **Approval needed: billable.**
 2. Set the domain allowlist and the three usage limits, then test each one.
 3. Set `VITE_ELEVENLABS_AGENT_ID` in Vercel, and in `.env.local` for testing.
-4. Change `microphone=()` to `microphone=(self)` in `vercel.json`.
+4. Verify the deployed header permits only `microphone=(self)` and retains the other restrictions.
 5. Test on desktop and phone:
    - microphone granted and denied;
    - connect, mute and end;

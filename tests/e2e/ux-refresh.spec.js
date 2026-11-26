@@ -45,7 +45,7 @@ test('Voice Studio tabs follow the ARIA tabs pattern and keep both demos discove
   const accents = tablist.getByRole('tab', { name: /English Accents/ })
   const multilingual = tablist.getByRole('tab', { name: /Multilingual/ })
   await expect(accents).toContainText('8 recordings')
-  await expect(multilingual).toContainText('1 recorded · 1 planned')
+  await expect(multilingual).toContainText('7 recorded')
 
   await accents.focus()
   await page.keyboard.press('ArrowRight')

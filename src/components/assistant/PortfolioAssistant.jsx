@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { CalendarClock, MessageCircle, Mic, Pause, Volume2, X } from 'lucide-react'
 import { prefetchProps } from '../../lib/prefetch'
 import { revealSection } from '../../lib/sectionNavigation'
+import { navigatePortfolio } from '../../lib/portfolioRoute'
 import { hasLiveAgent, warmSession } from '../LiveAgentPanel'
 import './assistant.css'
 
@@ -114,6 +115,7 @@ function useBusy() {
 // and an unprompted voice is the fastest way to lose a visitor.
 export default function PortfolioAssistant() {
   const [open, setOpen] = useState(false)
+  const [panelLoaded, setPanelLoaded] = useState(false)
   const [voice, setVoice] = useState(false)
   const [greeting, setGreeting] = useState(false)
   const pastHero = usePastHero()
@@ -161,22 +163,26 @@ export default function PortfolioAssistant() {
   const openPanel = useCallback((withVoice = false) => {
     setGreeting(false)
     setVoice(withVoice === true)
+    setPanelLoaded(true)
     setOpen(true)
   }, [])
 
   const bookCall = useCallback(() => {
     setGreeting(false)
     const target = document.getElementById('book-a-call')
-    if (!target) return
+    if (!target) {
+      navigatePortfolio('/#book-a-call')
+      return
+    }
     // Same as an in-page link: reveal first, then jump. A smooth scroll down
     // the whole page would pass through sections still waiting to animate in.
     revealSection(target)
     target.scrollIntoView({ block: 'start', behavior: 'instant' })
   }, [])
 
-  const closePanel = useCallback(() => {
+  const closePanel = useCallback((restoreFocus = true) => {
     setOpen(false)
-    window.setTimeout(() => launcherRef.current?.focus(), 0)
+    if (restoreFocus) window.setTimeout(() => launcherRef.current?.focus(), 0)
   }, [])
 
   return (
@@ -227,10 +233,13 @@ export default function PortfolioAssistant() {
         </button>
       )}
 
-      {open && (
-        <Suspense fallback={<div className="alex-panel alex-panel-loading" role="status">Opening Alex…</div>}>
-          <AssistantPanel onClose={closePanel} startWithVoice={voice} />
-        </Suspense>
+      {/* Keep text work in memory for this visit; hidden panels release voice and focus. */}
+      {panelLoaded && (
+        <div hidden={!open}>
+          <Suspense fallback={<div className="alex-panel alex-panel-loading" role="status">Opening Alex…</div>}>
+            <AssistantPanel onClose={closePanel} startWithVoice={voice} isOpen={open} />
+          </Suspense>
+        </div>
       )}
     </div>
   )

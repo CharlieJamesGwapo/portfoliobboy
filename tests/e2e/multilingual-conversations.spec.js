@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-// Multilingual Conversations sit under the eight English accents. The Spanish
-// call is recorded; the Taglish card shows its script only until approved.
+// Multilingual Conversations sit under the eight English accents. Spanish and
+// Taglish both have published local recordings and transcripts.
 for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
   test(`multilingual cards fit and read correctly at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport)
@@ -17,8 +17,9 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 
 
     const spanish = section.getByRole('article', { name: 'Mexican Spanish' })
     const taglish = section.getByRole('article', { name: 'Filipino / Taglish' })
-    await expect(taglish.getByText('Planned', { exact: true })).toBeVisible()
-    await expect(taglish.getByRole('button', { name: /^Play / })).toHaveCount(0)
+    await expect(taglish.getByText('Planned', { exact: true })).toHaveCount(0)
+    await expect(taglish.locator('audio')).toHaveAttribute('src', /fil-taglish[^/]*\.mp3$/)
+    await expect(taglish.getByRole('button', { name: /^Play / })).toBeVisible()
 
     // The recorded Spanish call plays inline, about 30 seconds long.
     const audio = spanish.locator('audio')
@@ -38,8 +39,9 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1440, height: 900 
     // Switching back pauses the call and shows the eight accents again.
     await spanish.getByRole('button', { name: 'Play Mexican Spanish conversation' }).click()
     await page.getByRole('tab', { name: /English Accents/ }).click()
-    // Role locators skip hidden panels, so read the call's <audio> by id.
-    await expect.poll(() => page.locator('#vs-panel-multilingual audio').evaluate((element) => element.paused)).toBe(true)
+    // The hidden gallery now has seven published recordings. Check every
+    // player so changing tabs cannot leave any conversation playing.
+    await expect.poll(() => page.locator('#vs-panel-multilingual audio').evaluateAll(elements => elements.every(element => element.paused))).toBe(true)
     await expect(page.getByRole('group', { name: 'Choose an English accent' }).getByRole('button')).toHaveCount(8)
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(viewport.width)
   })

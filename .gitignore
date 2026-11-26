@@ -39,3 +39,6 @@ test-results-production/
 # Local portfolio verification captures
 output/portfolio-upgrade/
 config.bat
+
+# Generated additional-project browser screenshots
+output/project-additions/

@@ -43,6 +43,11 @@
 
 .contact-details small { opacity: 0.72; font-size: 0.68rem; font-weight: 650; }
 
+.contact-prepared-enquiry { display: grid; gap: 10px; padding: 14px; border: 1px solid currentColor; border-radius: 12px; font-size: .85rem; }
+.contact-prepared-enquiry p { margin: 0; }
+.contact-prepared-enquiry label { font-weight: 700; }
+.contact-prepared-enquiry button { justify-self: start; min-height: 40px; text-decoration: underline; text-underline-offset: 3px; }
+
 html[data-theme='dark'] .booking-block { border-top-color: rgba(231, 246, 241, 0.16); }
 html[data-theme='dark'] .booking-head > p:last-child,
 html[data-theme='dark'] .booking-card p { color: #c1d2ce; }

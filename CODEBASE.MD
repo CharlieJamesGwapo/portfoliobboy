@@ -1,0 +1,299 @@
+# CODEBASE.MD — portfoliobboy
+
+Reviewed **November 26, 2026 (Asia/Manila)** against local `main` at `7eae94c` (`feat: add completed Claude Academy courses without badges`), including the requested crypto removal, local Alex workflows, and release improvements. This is a source-based project guide and code review, replacing the November 21 snapshot. Verification results below apply to this checkout; they do not establish the state of the deployed website or external service accounts.
+
+## 1. Project overview
+
+A personal developer portfolio built as a React single-page application, with dedicated project and arcade routes. It showcases professional experience, client case studies, independent products, credentials, recorded AI voice demonstrations, a local portfolio assistant, optional live voice conversations, a contact form, and nine browser games.
+
+The configured production origin is `https://portfoliobboy.vercel.app`, defined in [src/data/routeMetadata.js](src/data/routeMetadata.js). The repository contains the frontend, one contact API function, optional Supabase SQL, build helpers, and automated tests. It does not contain the implementations of the client products described in the portfolio.
+
+Current source inventory:
+
+| Item | Count | Owning source |
+| --- | ---: | --- |
+| Featured project records | 18 | `src/data/portfolioData.js` |
+| Dedicated case studies | 20 | `src/data/caseStudies.js` |
+| Metadata/sitemap routes | 23 | `src/data/routeMetadata.js` |
+| Independent products | 5 | `src/data/independentProducts.js` |
+| Arcade games | 9 | `interactiveGames` in `src/data/portfolioData.js` |
+| Credential records | 29 | `certifications` in `src/data/portfolioData.js` |
+| Node test files | 14 | `tests/*.test.js` |
+| Development browser spec files | 16 | `tests/e2e/` |
+| Production-preview browser spec files | 3 | `tests/production/` |
+
+These collections overlap; their counts are not intended to be added together. All project metadata routes now have matching case-study records.
+
+## 2. Stack and prerequisites
+
+| Layer | Implementation |
+| --- | --- |
+| Application | React 18, JavaScript/JSX, ES modules |
+| Build tooling | Vite 8, `@vitejs/plugin-react`, Rolldown chunk configuration |
+| Styling | Tailwind CSS 3, PostCSS, feature CSS, semantic theme variables |
+| Icons | `lucide-react` |
+| Graphics | Three.js, React Three Fiber, Canvas 2D, custom WebGL renderers |
+| Audio | Native audio elements, Web Audio synthesizer, optional Howler assets |
+| Live voice | `@elevenlabs/react` 1.19.0 and `@elevenlabs/client` 1.29.0 |
+| Optional backend | Supabase JavaScript client for leaderboards; tutorial component also exists |
+| Contact delivery | Vercel Node function using Resend's HTTP API |
+| Tests | Node's built-in test runner, Python `unittest`, Playwright |
+| Hosting configuration | Vercel static `dist/` output plus `api/contact.js` |
+
+The Node engine requirement in [package.json](package.json) is `>=20.19.0 <21 || >=22.12.0`. Python 3 is needed for the resume tests/export helper; ffmpeg is needed only when regenerating waveform data. Playwright browser binaries are installed separately. Use `package-lock.json` for repeatable dependency versions: the reviewed install resolved Vite **8.3.5**, while `package.json` declares `^8.1.5`.
+
+There is no TypeScript, ESLint, or standalone type-check script configured in `package.json`.
+
+## 3. Directory map
+
+```text
+api/
+  contact.js                   Contact form endpoint and abuse controls
+index.html                     HTML shell, initial metadata, theme bootstrap reference
+vite.config.js                 React plugin, resume asset plugin, chunks, preview rewrites
+vercel.json                    Hosting routes, headers, CSP, function duration
+src/
+  main.jsx                     React entry, motion setup, service-worker registration
+  App.jsx                      Page shell, routes, sections, palette, music, assistant
+  index.css                    Shared styling and Tailwind layers
+  components/
+    Hero.jsx                   Introduction and featured-project carousel
+    VoiceAgentDemo.jsx         Recorded demos and optional live voice panel
+    ProductStudioPreview.jsx   Selected work, independent products, project archive
+    ProjectsPage.jsx           Dedicated project explorer
+    CaseStudyPage.jsx          Individual case-study UI and unavailable-state view
+    LabPage.jsx                Explicit arcade launch page
+    Contact.jsx                Enquiry form, booking intent, mail-client fallback
+    assistant/                 Floating assistant, local workflows, evidence cards, brief review
+    voice/                     Accent players, conversation gallery, voice visuals
+    game/                      Lobby, dungeon, eight other games, shared controls
+    *.css                      Feature styles and shared visual refinements
+  data/                        Profile, products, case studies, voice scripts, game data
+  lib/                         Navigation, metadata, storage, integrations, rendering helpers
+  assets/audio/                Bundled accent, conversation, and welcome recordings
+public/                        Theme script, service worker, offline page, images, fonts
+scripts/                       Route metadata build, resume export, waveforms, QA helpers
+supabase/
+  schema.sql                   Consolidated leaderboard, local-only saves, tutorials schema
+  migrations/                  Ordered historical schema changes and saves lockdown
+  config.toml                  Supabase project configuration
+tests/                        Node/Python tests, e2e/ and production/ browser specs
+docs/                         Design system, audits, implementation notes, historical plans
+ABEJO_CHARLIE_JAMES_RESUME.pdf   Canonical resume copied to a stable public URL
+```
+
+`node_modules/`, `dist/`, and browser test output are generated and ignored by Git. Root-level certificate scans, PDFs, and legacy text notes are source/reference material; they should not be confused with generated caches.
+
+## 4. Runtime architecture
+
+```mermaid
+flowchart TD
+  Entry[main.jsx] --> App[App.jsx]
+  App --> Home[Homepage sections]
+  App --> Router[portfolioRoute.js]
+  Router --> Projects[ProjectsPage]
+  Router --> CaseStudy[CaseStudyPage]
+  Router --> Lab[LabPage and lazy arcade]
+  Data[src/data content] --> Home
+  Data --> Projects
+  Data --> CaseStudy
+  Home --> Contact[Contact.jsx]
+  Contact --> API[POST /api/contact]
+  API --> Resend[Resend email API]
+  Home --> TextChat[Local assistant answer engine]
+  Home --> Voice[Optional lazy live voice session]
+  Voice --> Provider[External voice service]
+  Lab --> Storage[localStorage]
+  Lab --> Supabase[Optional Supabase leaderboard]
+```
+
+### Entry and homepage
+
+[src/main.jsx](src/main.jsx) imports the CSS, enables entrance animations only when browser capabilities, motion preference, and visibility allow them, and mounts `App` in React Strict Mode. It also registers the service worker in production.
+
+The homepage section order is defined directly in [src/App.jsx](src/App.jsx): Hero → Voice Studio → Services → Product Studio → About → Experience → AI Systems → Automations → Skills → Education → Lab preview → Contact. Shared navigation, footer, command palette, update banner, assistant, back-to-top control, and optional music surround the page content.
+
+`ProductStudioPreview` composes the selected client work, independent products, and expandable project archive. The primary project browser also has its own `/projects` route. Several older components remain in the repository, so component existence alone does not prove that a feature is mounted.
+
+### Routing and SEO
+
+There is no router dependency. [src/lib/portfolioRoute.js](src/lib/portfolioRoute.js) maintains pathname/search/hash state, intercepts eligible same-origin links, updates browser history, and listens to `popstate` and `hashchange`. It preserves modified clicks, downloads, and external links. Supported browsers use View Transitions when reduced motion is not requested.
+
+| Route | Behavior |
+| --- | --- |
+| `/` | Homepage |
+| `/projects` | Project search and filters, with URL query state |
+| `/projects/:slug` | Lazy case-study page; unavailable view for unknown slugs |
+| `/lab` | Arcade overview and explicit game launch |
+| `/charlie-james-abejo-resume.pdf` | Build-emitted copy of the canonical resume |
+| `/api/contact` | Serverless POST/OPTIONS endpoint |
+
+[src/lib/sectionNavigation.js](src/lib/sectionNavigation.js) reveals collapsed destinations before navigation. `App` also handles cold-load fragments and focus after lazy route content mounts.
+
+[src/data/routeMetadata.js](src/data/routeMetadata.js) owns page titles, descriptions, canonical URLs, and project structured data. [src/lib/routeMetadata.js](src/lib/routeMetadata.js) applies metadata during client navigation. [scripts/prerender_routes.mjs](scripts/prerender_routes.mjs) writes route-specific HTML shells and a sitemap after Vite builds. These files contain metadata; React page bodies still render in the browser. This is not server-rendered React content.
+
+### Data ownership and common edits
+
+| Change | Start here |
+| --- | --- |
+| Identity, experience, skills, education, credentials, booking choices | `src/data/portfolioData.js` |
+| Independent product copy and media | `src/data/independentProducts.js` |
+| Three selected client studies | `src/data/selectedCaseStudies.js` |
+| Dedicated case-study pages | `src/data/caseStudies.js` |
+| Route titles, descriptions, canonical origin, sitemap inclusion | `src/data/routeMetadata.js` |
+| Live product links and OneRide previews | `src/data/productPreviewData.js` |
+| Automation examples | `src/data/automationsData.js` |
+| Accent scripts and recordings | `src/data/voiceAccents.js`, `src/assets/audio/accents/` |
+| Multilingual conversations | `src/data/voiceConversations.js`, `src/assets/audio/conversations/` |
+| Waveform bars | `src/data/voicePeaks.json`, regenerated by `scripts/build-voice-peaks.mjs` |
+| Dungeon narrative and gameplay configuration | `src/data/gameData.js` |
+| Local assistant answers | `src/lib/assistantAnswers.js` |
+| Project recommendations, role checks, brief prompts | `src/lib/assistantWorkflows.js` |
+| Public resume | Replace the approved canonical root PDF; the build preserves its bytes |
+
+Keep project descriptions, case-study records, route metadata, and evidence labels consistent. Displayed client-system architectures are portfolio content, not dependencies of this application.
+
+## 5. Features and integrations
+
+### Contact and booking
+
+[src/components/Contact.jsx](src/components/Contact.jsx) validates required fields, supports enquiry subjects and booking templates, prevents duplicate sends while pending, and posts JSON to `/api/contact` with a 20-second client timeout. Fields are locked while a send is pending so a successful response cannot discard newly typed edits. Failed sends preserve the draft and expose a mail-client fallback. Booking choices open a configured scheduling URL or prefill a request; a request does not itself reserve a calendar event.
+
+[api/contact.js](api/contact.js) checks an exact origin allowlist, accepts JSON only, caps the body at 32 KiB, bounds individual fields, validates email, ignores honeypot submissions, escapes HTML, strips subject line breaks, and times out provider requests after eight seconds. It hashes the request address for an in-memory rate limit of five submissions per ten minutes, with at most 1,000 tracked addresses per function instance. This is a per-instance backstop, not a distributed rate limiter or authentication mechanism.
+
+Delivery requires `RESEND_API_KEY`; sender and recipient are configured in the function. Vite dev/preview does not run this Vercel function and has no contact API proxy. Local frontend rendering alone cannot verify email delivery. Automated API tests mock provider calls; do not use real contact submissions as a routine QA step.
+
+### Recorded and live voice
+
+The recorded gallery includes eight accents and seven multilingual conversations. MP3s are imported from `src/assets/audio/` and emitted with hashed filenames. Playback uses static files rather than live generation. Waveforms are derived from recordings; scripts/transcripts are stored alongside the content data. The gallery identifies AI-generated voices and fictional conversations.
+
+[src/components/LiveAgentPanel.jsx](src/components/LiveAgentPanel.jsx) enables live controls only when a nonempty `VITE_ELEVENLABS_AGENT_ID` is present. The session module is lazy-loaded, checks microphone permission, and provides connection, mute, end, retry, and elapsed-time controls. A cancellation gate prevents a delayed microphone grant from starting a connection after the visitor closes the session or requests a newer start. Its audio worklets are emitted as same-origin assets. The UI ends a connected session at 180 seconds, but enforceable usage and domain limits depend on external agent configuration. No signed-session API or server-side voice quota endpoint exists in this repository. Provider settings and actual live-agent availability were not inspected.
+
+### Local portfolio assistant
+
+`PortfolioAssistant` opens a lazy `AssistantPanel`. [src/lib/assistantAnswers.js](src/lib/assistantAnswers.js) matches questions against local portfolio and voice data, with contact-oriented fallbacks. Text answers do not call an LLM API. Three guided modes in the existing panel add project recommendations, recruiter comparisons, and brief preparation through [src/lib/assistantWorkflows.js](src/lib/assistantWorkflows.js):
+
+- **Find projects** ranks case-study evidence by matching topics, technologies, and project names; each result shows Charlie's contribution, status, and a real case-study link. Unmatched requests receive an honest fallback.
+- **Check role fit** accepts multiline requirements, up to 4,000 characters and 30 compared clauses. Whole-term matching keeps similar technology names separate. Results distinguish documented mentions, partly documented requirements, and requirements needing confirmation. Planned-only stack entries remain unverified; years, proficiency, certifications, and other qualifiers are not inferred from a skill mention. This local comparison is not a hiring verdict.
+- **Prepare a brief** asks four questions (idea, users/problem, required features/integrations, timing/budget), retains the visitor's wording, and exposes an editable review limited to 4,500 characters before contact handoff.
+
+Mode inputs, conversation, brief progress, and edited briefs stay in React state throughout the current visit, including closing and reopening the panel. Hidden panels do not handle Escape or move focus, and any live voice session is unmounted on close. On short landscape screens, the sheet scrolls while close/send controls remain accessible. [src/lib/contactIntent.js](src/lib/contactIntent.js) stages an assistant enquiry in memory until the contact section mounts, including navigation from nested routes. It does not persist visitor text or submit requests. Existing contact messages are kept; a separate prepared-enquiry field supports manual merging. The visitor must still complete and submit the existing contact form.
+
+The optional voice action uses the separate live-agent path above. The greeting remembers a prior visit locally and does not automatically open the microphone.
+
+### Arcade, storage, and Supabase
+
+The nine games are Dungeon Crawler, Space Shooter, Code Racer, Block Blast, Racing, Flappy Dev, Snake, Whack-a-Bug, and Neon Circuit. The lobby and individual games use dynamic imports. Local saves, player preferences, avatar choices, and best scores use browser storage.
+
+[src/lib/supabase.js](src/lib/supabase.js) validates optional public configuration before creating a client. Leaderboard reads/writes fall back to localStorage, and a network-level failure disables repeat remote attempts for the session. SQL permits public leaderboard reads/inserts, so scores are client-supplied and unsuitable as verified competitive results. [src/lib/gameStorage.js](src/lib/gameStorage.js) handles dungeon preferences and saves with storage-error guards.
+
+`Tutorials.jsx` can read published Supabase tutorial records but is not mounted by the current `App`. Cloud saves are not active: `saveGameCloud()` has no callers, and the consolidated schema plus the latest migration revoke client access to `game_saves`. Apply migrations in order; the initial historical migration predates the saves lockdown. No database migration was applied during this review.
+
+[src/components/game/AudioManager.jsx](src/components/game/AudioManager.jsx) primarily uses [src/lib/synthAudio.js](src/lib/synthAudio.js). Its `AVAILABLE_AUDIO` set is empty, so excluded placeholder files under `public/audio/` are not requested. The previous document's claim that this necessarily causes production 404s or silence was incorrect.
+
+### Themes, performance, and offline behavior
+
+- `public/theme-init.js` applies a saved/system theme before React paints; `ThemeToggle` persists visitor choices and reacts to system changes.
+- Heavy route pages, games, music, live voice, and optional graphics use dynamic imports. `prefetch.js` warms selected features on intent. The build names React, Three.js, and React Three Fiber vendor groups separately.
+- Reduced-motion styles, focus handling, semantic controls, a skip link, and menu/dialog behavior are implemented; these are not a complete accessibility certification.
+- The production service worker registers after window load. It uses network-first navigation/resume retrieval, cache-first bundled assets/fonts, and background refresh for stable media. APIs, cross-origin requests, and non-GET requests bypass caching. Updates wait for visitor acceptance through `UpdateBanner`.
+- `vercel.json` configures CSP, HSTS, MIME sniffing protection, framing restrictions, microphone permission for the site's own origin, immutable asset caching, HTML revalidation, and no-store API responses. Local preview does not automatically apply Vercel headers.
+
+## 6. Local setup and commands
+
+```bash
+npm ci --ignore-scripts
+npm run dev
+```
+
+Dependency lifecycle scripts were disabled for the review install. The current project has no install/prepare hooks. Run commands from the repository root.
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Vite development server, default port 5173 |
+| `npm test` | All Node tests, then Python resume tests |
+| `npm run build` | Build to `dist/`, copy the resume, generate route metadata/sitemap |
+| `npm run preview` | Serve the built site, default port 4173 |
+| `npx playwright install chromium` | Install Chromium required by browser checks |
+| `npx playwright test --project=chromium` | All development browser specs, server on 127.0.0.1:5175 |
+| `npm run test:e2e -- --project=chromium` | All development browser specs using the configured browsers |
+| `npm run test:production` | Rebuild, then run Chromium specs against local production preview |
+| `node scripts/build-voice-peaks.mjs` | Regenerate waveform data; requires ffmpeg |
+| `python3 scripts/generate_resume.py` | Copy the approved resume to the default export path |
+| `npm run deploy` | Deploy through a remote Vercel production build using configured environment values; changes the live site |
+
+The development Playwright configuration declares Chromium, Firefox, and WebKit. Install the other browser engines before running all projects. Production browser checks target local preview, despite the script's name. Deployment is listed for reference and was not run in this review.
+
+### Environment configuration
+
+| Variable | Location | Needed for |
+| --- | --- | --- |
+| `VITE_SUPABASE_URL` | Client build | Optional remote leaderboard/tutorial integration |
+| `VITE_SUPABASE_ANON_KEY` | Client build | Public Supabase client key; relies on correct RLS |
+| `VITE_ELEVENLABS_AGENT_ID` | Client build | Optional public live-agent controls |
+| `RESEND_API_KEY` | Server runtime | Contact email delivery |
+| `VERCEL_URL`, `VERCEL_BRANCH_URL`, `VERCEL` | Hosting runtime | Deployment origin checks and trusted address handling |
+
+Use `.env.local` for local values. `.env*` is ignored except `.env.example`, which documents the optional voice/Supabase configuration and server-only email key. `VITE_` variables are public build inputs; server secrets belong outside that prefix. The portfolio frontend can render without optional integrations.
+
+## 7. Review findings
+
+### Resolved — removed the unused crypto project
+
+The Web3 & Crypto project entry, its public demo link, and the unused Web3 category were removed at the owner's request. Since project metadata is derived from the featured project collection, the removed entry no longer generates a static project document or sitemap URL. The current inventory contains 18 featured projects, 20 case studies, and 23 metadata routes. Direct client navigation to an unknown project now receives the existing noindex fallback metadata.
+
+### Resolved — release usability and tooling
+
+- Closing Alex preserves local drafts and edited briefs for the visit; hidden panels release focus, Escape handling, and live voice sessions.
+- Greeting booking actions navigate correctly from project routes.
+- Short-height layouts retain access to Close and Send.
+- Shared qualifiers such as “5 years of React and Python” remain attached to the full requirement.
+- Contact inputs are protected during a pending submission.
+- A late microphone permission grant cannot start voice after session closure.
+- Rolldown uses the supported `codeSplitting` option while retaining separate vendor groups.
+- `test:e2e` runs the complete browser suite. Credential and multilingual assertions track the actual published content.
+- Setup documentation reflects all supported environment names, twenty case studies, current greeting behavior, and the existing microphone policy.
+
+### Low — unused cloud-save helper conflicts with the database access model
+
+`saveGameCloud()` still attempts a client insert into `game_saves`, but it is unused and the current schema/migration revoke client access. Keep local saves as the documented behavior. Before enabling cloud saves, introduce authenticated ownership and matching policies; do not restore broad public access to make this helper work.
+
+### Operational limits to retain
+
+Contact throttling is instance-local, leaderboard scores are untrusted browser submissions, and the live voice timer is a client-side convenience. External enforcement and service configuration were not verified. These are limits of the present architecture, not evidence that a remote service is misconfigured.
+
+## 8. Verification performed
+
+Environment: Node **24.14.1**, npm **11.11.0**, Python 3; fresh dependencies installed from the lockfile.
+
+| Check | Result on November 26, 2026 |
+| --- | --- |
+| `npm ci --ignore-scripts --no-audit --no-fund` | Passed; 149 packages installed |
+| `npm test` | Passed: 65 JavaScript tests and 2 Python tests |
+| `npm run build` | Passed; emitted metadata for 23 routes; deprecated chunk-option warning removed |
+| `npm audit --omit=dev --json` | 0 reported production dependency vulnerabilities |
+| Metadata vs. case-study inventory | All 20 project metadata routes have matching case studies |
+| Production-preview Chromium suite | Passed: all 15 tests; final performance checks rerun after voice cancellation change |
+| Complete development Chromium suite | Passed: all 137 development browser tests |
+| Focused assistant suite | Passed: 13 each in Chromium, Firefox, and WebKit (39 checks total) |
+| Crypto removal check | Passed: project/category removed; metadata and sitemap exclude the route; old built page absent; all 20 project metadata routes match case studies |
+
+The Node run also logged an HMR WebSocket port collision (`24678`) between Vite test servers; all tests completed successfully. Treat it as test-harness noise to address if it becomes disruptive.
+
+The security regression tests check tracked editor execution files, disguised loader names, package scripts, hidden whitespace payloads, and ignore rules. Passing these targeted checks and an npm advisory audit does not establish a comprehensive malware/security audit. Earlier claims about historical commits and remote branches were not revalidated here.
+
+The new workflow tests exercise CRM/mobile recommendations, named and unmatched projects, technology boundaries (including React versus React Native evidence), mixed/qualified recruiter requirements, planned-only evidence, and brief text preservation. Browser checks exercise recommendation cards, role evidence, edited brief transfer from a nested route, mode-draft retention on a 320px viewport, preservation of existing contact text, mobile case-study navigation, and the absence of provider requests or automatic email submission. The complete development Chromium suite is included in release validation. Firefox and WebKit coverage is focused on the assistant; physical-device acceptance is separate.
+
+GitHub access and the existing Vercel project target were verified for release. Source verification and public deployment acceptance are separate checks. No real email delivery, microphone session, remote database inspection, or physical-device acceptance was performed. The local changes include the crypto removal, Alex workflows, release fixes, corresponding tests, and documentation; generated installation/build/test artifacts remain local.
+
+## 9. Maintenance guidance
+
+1. Keep editable content in `src/data/` and update related case studies/metadata together.
+2. Preserve the boundary between the local text assistant, prerecorded audio, and billable live voice.
+3. Retain lazy loading for games, music, optional graphics, and live sessions.
+4. Keep authentic screenshots, concept media, private systems, and unverified outcomes labelled accurately.
+5. Preserve environment/editor ignore rules and the existing security regression checks.
+6. Run the unit suite and build after relevant changes; select browser checks for the affected interactions.
+7. Verify deployed headers, service settings, and real-device behavior separately when release work is authorized.
+
+For deeper context, see [README.md](README.md), [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), [docs/portfolio-upgrade-report.md](docs/portfolio-upgrade-report.md), and [docs/live-voice-agent-production.md](docs/live-voice-agent-production.md). Historical plans describe intent and prior work; current source and fresh checks take precedence when they disagree.

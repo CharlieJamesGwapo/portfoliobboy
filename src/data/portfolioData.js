@@ -635,24 +635,6 @@ const originalFeaturedProjects = [
     private: true,
   },
   {
-    id: 'web3-crypto',
-    categories: ['Web3', 'Fintech', 'Full Stack', 'API'],
-    title: 'Web3 & Crypto Projects',
-    eyebrow: '2022 – Present · Project-based · Confidential client work + public demo',
-    overview: 'Crypto trading bots, trading dashboards, dApp front ends, and a crypto lending platform, built for clients on a project-by-project basis.',
-    context: 'This work was done in company-owned GitHub accounts and private client repositories, so the original code and client names stay confidential. A separate public demo shows the same concepts.',
-    implementation: 'Bots connect to exchange APIs for market data and order execution. React front ends connect wallets through ethers.js and web3.js and display positions and bot status.',
-    architecture: ['React dApp front ends', 'MetaMask / WalletConnect', 'ethers.js + web3.js', 'Solidity contracts', 'Exchange REST + WebSocket APIs', 'Bot dashboards'],
-    features: ['Automated and strategy-based trading', 'Arbitrage and sniping bots', 'Price alerts and signals', 'Position and P&L dashboards', 'Wallet connection', 'Collateralized lending workflows'],
-    engineering: 'Public demo (illustrative, simulated data): a paper-trading bot with moving-average signals, stop-loss, fees, and drawdown tracking; read-only wallet connection with ethers.js v6; and loan-to-value, health-factor, and liquidation-price math, with unit tests.',
-    delivered: 'Client projects delivered privately. The public demo is a representative implementation, not a client deliverable.',
-    stack: ['React', 'ethers.js', 'web3.js', 'Solidity', 'Exchange APIs', 'WebSockets'],
-    url: 'https://web3-trading-demo.vercel.app/',
-    linkLabel: 'Public demo',
-    private: true,
-    status: 'Confidential client repositories · Public demo available',
-  },
-  {
     id: 'moist-alumni',
     categories: ['SaaS', 'Full Stack'],
     title: 'MOIST Alumni Tracking System',
@@ -834,7 +816,7 @@ export const projectArchive = [
   { title: 'Shopify & Cloudflare anti-bot development', type: 'E-commerce security', categories: ['Security', 'Full Stack'], description: 'Custom Shopify solutions and Cloudflare-based anti-bot protections for e-commerce storefronts.', stack: ['Shopify', 'Cloudflare', 'Anti-bot'], period: 'May–Jul 2026', personal: true, status: 'Personal project · May–Jul 2026' },
 ]
 
-export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'Desktop', 'API', 'Fintech', 'Web3', 'CRM', 'Security', 'Developer Tools']
+export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 'Mobile', 'Desktop', 'API', 'Fintech', 'CRM', 'Security', 'Developer Tools']
 
 export const skillGroups = [
   {

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { certifications } from '../../src/data/portfolioData.js'
 
 test('accent preview loads playable audio and a matching transcript', async ({ page }) => {
   await page.goto('/#voice-demo')
@@ -81,9 +82,10 @@ test('archive and credentials expand and collapse on desktop', async ({ page }) 
   await expect(page.locator('.archive-project')).toHaveCount(3)
   await page.locator('#education').scrollIntoViewIfNeeded()
   const panel = page.locator('.credential-panel').first()
+  const totalRecords = await panel.locator('.credential-record').count()
   await expect(panel.locator('.credential-record:visible')).toHaveCount(4)
-  await panel.getByRole('button', { name: 'Show all 11 records', exact: true }).click()
-  await expect(panel.locator('.credential-record:visible')).toHaveCount(11)
+  await panel.getByRole('button', { name: `Show all ${totalRecords} records`, exact: true }).click()
+  await expect(panel.locator('.credential-record:visible')).toHaveCount(totalRecords)
   await panel.getByRole('button', { name: 'Show fewer records', exact: true }).click()
   await expect(panel.locator('.credential-record:visible')).toHaveCount(4)
 })
@@ -93,10 +95,10 @@ test('credentials can be searched and filtered by category', async ({ page }) =>
   const section = page.locator('#education')
   const search = section.getByRole('searchbox', { name: 'Search credentials' })
   const count = section.locator('.credential-result-count')
-  await expect(count).toHaveText('Showing 23 of 23 records')
+  await expect(count).toHaveText(`Showing ${certifications.length} of ${certifications.length} records`)
 
   await search.fill('claude code')
-  await expect(count).not.toHaveText('Showing 23 of 23 records')
+  await expect(count).not.toHaveText(`Showing ${certifications.length} of ${certifications.length} records`)
   const records = section.locator('.credential-panel .credential-record strong')
   await expect(records.first()).toBeVisible()
   for (const title of await records.allTextContents()) {
@@ -113,7 +115,7 @@ test('credentials can be searched and filtered by category', async ({ page }) =>
   await search.fill('zzzz-no-such-credential')
   await expect(section.getByText('No credentials match')).toBeVisible()
   await section.getByRole('button', { name: 'Clear filters', exact: true }).click()
-  await expect(count).toHaveText('Showing 23 of 23 records')
+  await expect(count).toHaveText(`Showing ${certifications.length} of ${certifications.length} records`)
   await expect(search).toHaveValue('')
   await expect(section.locator('.credential-panel')).toHaveCount(2)
 })

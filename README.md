@@ -47,7 +47,7 @@ The full project collection lives inside the collapsed `#full-project-archive` d
 
 - `/` — refreshed homepage, authentic prominent portrait, manual six-project carousel, AI/voice engineering, and five independent products.
 - `/projects` — complete project explorer with URL-persisted search/category/technology filters.
-- `/projects/:slug` — fifteen case studies with architecture, engineering challenges, contribution, outcomes, and clearly labelled authentic or concept media.
+- `/projects/:slug` — twenty case studies with architecture, engineering challenges, contribution, outcomes, and clearly labelled authentic or concept media.
 - `/lab` — all nine original games behind an explicit launch control.
 - `/charlie-james-abejo-resume.pdf` — the supplied updated resume, copied without rewriting it.
 
@@ -105,11 +105,21 @@ The custom player uses the `<audio>` element as its source of truth: play/pause 
 
 ## Alex, the portfolio assistant
 
-A floating assistant in the bottom-left corner greets first-time visitors once (remembered in `localStorage`), never plays audio, and never asks for the microphone. Its chat panel answers from `src/data/portfolioData.js` through a local answer engine in `src/lib/assistantAnswers.js`: no model, no network request, and no credits. Unknown questions get an honest fallback that points to contact. The panel is lazy-loaded, sits below the navbar, and hides inside the Voice Studio and during games. "Talk to Alex" (voice) stays disabled until the live agent above is configured.
+A floating assistant in the bottom-left corner welcomes visitors once per page load. Its optional recorded welcome plays only after a visitor presses “Hear welcome”; text chat never opens the microphone. Its chat panel answers from `src/data/portfolioData.js` through a local answer engine in `src/lib/assistantAnswers.js`: no model, no network request, and no credits. Unknown questions get an honest fallback that points to contact. The panel is lazy-loaded, sits below the navbar, and its launcher hides inside the Voice Studio and during games. Closing and reopening the panel preserves its chat, mode inputs, and edited brief for the current page visit; any live voice session ends when the panel closes. "Talk to Alex" (voice) stays disabled until the live agent above is configured.
+
+### Guided project and hiring help
+
+Alex also offers three local workflows inside the same panel:
+
+- **Find projects:** describe a goal to see up to three related case studies, Charlie's documented contribution, evidence status, and a project enquiry action. A project request in general chat can also open recommendations.
+- **Check role fit:** paste job requirements, preferably one per line, to compare them with public skills and case-study evidence. Results distinguish documented mentions, partial evidence, and requirements needing confirmation. Years, certifications, eligibility, and tools listed only in planned work are not treated as established experience.
+- **Prepare a brief:** answer four questions about the idea, users, features, and delivery constraints, then edit the assembled brief before moving it to the contact form.
+
+These workflows use deterministic matching in `src/lib/assistantWorkflows.js`; they make no model/API requests. Each mode keeps its unsent input through mode switches and closing/reopening the panel during the current page visit. Prepared enquiries reach the contact section after navigation from project pages without browser storage. An existing contact message is preserved, with the prepared text shown separately for copying or merging. Only the visitor's explicit contact-form submission can send email. Role comparisons are a starting point for a conversation, not an automated hiring decision.
 
 ## Verification
 
-Run `npm test`, `npx playwright test --project=chromium`, and `npm run test:production`. Browser checks need `npx playwright install chromium` once. The Python checks use the standard library and verify that resume exports preserve the supplied PDF. Contact browser tests intercept requests so they do not send real email.
+Run `npm test`, `npm run test:e2e -- --project=chromium` (the complete development browser suite), and `npm run test:production`. Browser checks need `npx playwright install chromium` once. The Python checks use the standard library and verify that resume exports preserve the supplied PDF. Contact browser tests intercept requests so they do not send real email.
 
 ## Recommended next content
 

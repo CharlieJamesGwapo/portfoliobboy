@@ -3,6 +3,7 @@ import { ConversationProvider, useConversation } from '@elevenlabs/react'
 import { Mic, MicOff, PhoneOff, RotateCcw } from 'lucide-react'
 import rawAudioProcessor from '@elevenlabs/client/worklets/rawAudioProcessor.js?url'
 import audioConcatProcessor from '@elevenlabs/client/worklets/audioConcatProcessor.js?url'
+import { createVoiceSessionStarter } from '../lib/voiceSessionStart'
 
 // The SDK otherwise loads its audio worklets from blob: URLs, which the site's
 // CSP (script-src 'self') rightly refuses. Served as same-origin build assets
@@ -41,34 +42,40 @@ const Session = ({ onClose, limitSeconds }) => {
   const conversation = useConversation()
   const { status, isSpeaking, isMuted } = conversation
   const endedForLimit = useRef(false)
+  const starter = useRef(null)
+  if (!starter.current) starter.current = createVoiceSessionStarter(checkMicrophone)
 
   const start = async () => {
     setError('')
     setElapsed(0)
     endedForLimit.current = false
     setChecking(true)
-    const micProblem = await checkMicrophone()
-    setChecking(false)
-    if (micProblem) {
-      setError(micProblem)
-      return
-    }
-    conversation.startSession({
-      workletPaths: WORKLET_PATHS,
-      // SDK messages are written for developers and name the provider; the
-      // visitor gets one plain sentence, the detail goes to the console.
-      onError: (message) => {
-        console.warn('[voice]', message)
-        setError('The voice assistant is unavailable right now. Please try again, or use the chat.')
-      },
+    const result = await starter.current.start(() => {
+      setChecking(false)
+      return conversation.startSession({
+        workletPaths: WORKLET_PATHS,
+        // Provider diagnostics stay in the console; visitors see plain copy.
+        onError: (message) => {
+          console.warn('[voice]', message)
+          setError('The voice assistant is unavailable right now. Please try again, or use the chat.')
+        },
+      })
     })
+    if (result.status === 'cancelled') return
+    setChecking(false)
+    if (result.status === 'denied') setError(result.message)
+    if (result.status === 'error') {
+      console.warn('[voice] connection failed:', result.error?.message)
+      setError('The voice assistant is unavailable right now. Please try again, or use the chat.')
+    }
   }
 
   // Start on mount: the visitor already clicked "Start a live conversation".
-  // ConversationProvider ends any session when it unmounts (including React
-  // StrictMode's simulated unmount in development), so no cleanup is needed.
+  // Provider teardown ends existing connections; the gate also cancels a
+  // microphone prompt which has not resolved yet (including StrictMode replay).
   useEffect(() => {
     start()
+    return () => starter.current.cancel()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -122,7 +129,7 @@ const Session = ({ onClose, limitSeconds }) => {
             <button type="button" className="button button-secondary" onClick={onClose}>Close</button>
           </>
         ) : (
-          <button type="button" className="button button-secondary live-agent-end" onClick={() => { conversation.endSession(); onClose() }}>
+          <button type="button" className="button button-secondary live-agent-end" onClick={() => { starter.current.cancel(); conversation.endSession(); onClose() }}>
             <PhoneOff size={16} aria-hidden="true" /> End conversation
           </button>
         )}

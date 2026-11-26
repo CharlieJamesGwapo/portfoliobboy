@@ -1,11 +1,23 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { ArrowUpRight, AudioLines, Loader2, Mic, Send, Sparkles, X } from 'lucide-react'
 import { answerQuestion, answerSuggestion, suggestedQuestions } from '../../lib/assistantAnswers'
+import { assessRole, briefQuestions, buildProjectBrief, recommendProjects } from '../../lib/assistantWorkflows'
+import { stageAssistantEnquiry } from '../../lib/contactIntent'
+import { navigatePortfolio } from '../../lib/portfolioRoute'
 import { AGENT_ID, LIVE_SESSION_LIMIT_SECONDS, LiveAgentSession, hasLiveAgent, warmSession } from '../LiveAgentPanel'
+import WorkflowResults from './WorkflowResults'
+import BriefReview from './BriefReview'
+
+const MODES = [
+  { id: 'general', label: 'General questions', field: 'Ask Alex a question', hint: 'Ask about Charlie’s projects, skills, experience, or contact details.', placeholder: 'Ask about projects, skills, contact…' },
+  { id: 'projects', label: 'Find projects', field: 'Describe your project', hint: 'Describe what you need. I’ll find related case studies and show Charlie’s contribution.', placeholder: 'What should your project do?' },
+  { id: 'role', label: 'Check role fit', field: 'Paste job requirements', hint: 'Paste requirements, one per line. I’ll show documented skills and what needs confirmation.', placeholder: 'React\nPython\n5 years of experience…' },
+  { id: 'brief', label: 'Prepare a brief', field: 'Your answer', placeholder: 'Share a few details, or say “To discuss”…' },
+]
 
 const WELCOME = {
   role: 'alex',
-  text: "Welcome to Charlie James Abejo's portfolio! 👋 I'm Alex, his AI assistant. Ask me about his projects, AI work and skills, or how to book a free call.",
+  text: "Welcome to Charlie James Abejo's portfolio! 👋 I'm Alex, his portfolio assistant. I can find relevant projects, compare role requirements, or help you prepare a project brief.",
 }
 
 const prefersReducedMotion = () => {
@@ -14,12 +26,16 @@ const prefersReducedMotion = () => {
 
 let nextId = 1
 
-export default function AssistantPanel({ onClose, startWithVoice = false }) {
+export default function AssistantPanel({ onClose, startWithVoice = false, isOpen = true }) {
   const [messages, setMessages] = useState([{ id: 0, ...WELCOME }])
   // The live call runs inside the panel, so "Talk to Alex" starts talking
   // straight away; the agent's opening line is the spoken welcome.
   const [voiceOpen, setVoiceOpen] = useState(startWithVoice && hasLiveAgent)
-  const [draft, setDraft] = useState('')
+  const [mode, setMode] = useState('general')
+  const [drafts, setDrafts] = useState({})
+  const [briefAnswers, setBriefAnswers] = useState({})
+  const [briefStep, setBriefStep] = useState(0)
+  const [briefReview, setBriefReview] = useState(null)
   const [typing, setTyping] = useState(false)
   const [asked, setAsked] = useState(() => new Set())
   const listRef = useRef(null)
@@ -27,21 +43,35 @@ export default function AssistantPanel({ onClose, startWithVoice = false }) {
   const panelRef = useRef(null)
   const timerRef = useRef(null)
   const chipsRef = useRef(null)
+  const activeMode = MODES.find(item => item.id === mode)
+  const draft = drafts[mode] || ''
+  const reviewingBrief = mode === 'brief' && briefReview !== null
+  const setDraft = value => setDrafts(current => ({ ...current, [mode]: value }))
 
   useEffect(() => {
-    if (!startWithVoice) inputRef.current?.focus({ preventScroll: true })
+    // Retain local text work while hidden, but end microphone use immediately.
+    setVoiceOpen(isOpen && startWithVoice && hasLiveAgent)
+  }, [isOpen, startWithVoice])
+
+  useEffect(() => {
+    if (!isOpen) return undefined
     const onKey = (event) => { if (event.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      window.clearTimeout(timerRef.current)
-    }
-  }, [onClose])
+    return () => document.removeEventListener('keydown', onKey)
+  }, [isOpen, onClose])
+
+  useEffect(() => () => window.clearTimeout(timerRef.current), [])
 
   useEffect(() => {
     const list = listRef.current
     if (list) list.scrollTo({ top: list.scrollHeight, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
-  }, [messages, typing])
+  }, [messages, typing, briefReview !== null, mode])
+
+  useEffect(() => {
+    if (!isOpen || voiceOpen) return
+    if (reviewingBrief) document.getElementById('alex-brief')?.focus({ preventScroll: true })
+    else inputRef.current?.focus({ preventScroll: true })
+  }, [isOpen, voiceOpen, mode, reviewingBrief, typing])
 
   const reply = (question, answer) => {
     setMessages((current) => [...current, { id: nextId++, role: 'visitor', text: question }])
@@ -60,7 +90,35 @@ export default function AssistantPanel({ onClose, startWithVoice = false }) {
     const question = draft.trim()
     if (!question || typing) return
     setDraft('')
-    reply(question, answerQuestion(question))
+    if (mode === 'projects') reply(question, recommendProjects(question))
+    else if (mode === 'role') reply(question, assessRole(question))
+    else if (mode === 'brief') {
+      const answers = { ...briefAnswers, [briefQuestions[briefStep].key]: question }
+      setBriefAnswers(answers)
+      if (briefStep < briefQuestions.length - 1) {
+        setBriefStep(briefStep + 1)
+        reply(question, { text: briefQuestions[briefStep + 1].question })
+      } else {
+        setBriefReview(buildProjectBrief(answers).message)
+        reply(question, { text: 'Your brief is ready to review. Edit it below before opening the contact form.' })
+      }
+    } else {
+      const recommendation = /\b(recommend|i need|we need|i want|we want)\b/i.test(question) ? recommendProjects(question) : null
+      reply(question, recommendation?.projects.length ? recommendation : answerQuestion(question))
+    }
+  }
+
+  const startEnquiry = enquiry => {
+    stageAssistantEnquiry(enquiry.subject, enquiry.message)
+    navigatePortfolio('/#contact')
+    onClose(false)
+  }
+
+  const restartBrief = () => {
+    setBriefAnswers({})
+    setBriefStep(0)
+    setBriefReview(null)
+    setDrafts(current => ({ ...current, brief: '' }))
   }
 
   const askSuggestion = (suggestion) => {
@@ -74,7 +132,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false }) {
   // In-page links close the panel on small screens so the section is visible.
   const onAction = (action) => {
     if (action.external) return
-    if (window.matchMedia('(max-width: 640px)').matches) onClose()
+    if (window.matchMedia('(max-width: 640px)').matches) onClose(false)
   }
 
   const remaining = suggestedQuestions.filter((item) => !asked.has(item.id))
@@ -94,7 +152,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false }) {
 
       <div className={`alex-voice ${voiceOpen ? 'is-live' : ''}`}>
         {hasLiveAgent ? (
-          voiceOpen ? (
+          voiceOpen && isOpen ? (
             <Suspense fallback={<p className="live-agent-status" role="status"><Loader2 className="spin" size={16} aria-hidden="true" /> Starting voice…</p>}>
               <LiveAgentSession agentId={AGENT_ID} limitSeconds={LIVE_SESSION_LIMIT_SECONDS} onClose={() => setVoiceOpen(false)} />
             </Suspense>
@@ -116,10 +174,22 @@ export default function AssistantPanel({ onClose, startWithVoice = false }) {
         )}
       </div>
 
+      <div className="alex-modes" role="group" aria-label="How Alex can help">
+        {MODES.map(item => (
+          <button key={item.id} type="button" aria-pressed={mode === item.id} onClick={() => setMode(item.id)} disabled={typing}>
+            {item.label}
+          </button>
+        ))}
+      </div>
+      <p className="alex-mode-help" id="alex-mode-help" aria-live="polite">
+        {mode === 'brief' ? (reviewingBrief ? 'Review your draft below. Nothing is sent until you submit the contact form.' : `Step ${briefStep + 1} of 4 · ${briefQuestions[briefStep].question}`) : activeMode.hint}
+      </p>
+
       <ol ref={listRef} className="alex-messages" aria-live="polite" aria-label="Conversation with Alex">
         {messages.map((message) => (
-          <li key={message.id} className={`alex-msg alex-msg-${message.role}`}>
+          <li key={message.id} className={`alex-msg alex-msg-${message.role}${message.projects || message.requirements ? ' alex-msg-workflow' : ''}`}>
             <p>{message.text}</p>
+            <WorkflowResults result={message} onEnquiry={startEnquiry} onNavigate={() => onAction({})} />
             {message.actions?.length > 0 && (
               <div className="alex-actions">
                 {message.actions.map((action) => (
@@ -142,9 +212,14 @@ export default function AssistantPanel({ onClose, startWithVoice = false }) {
             <span /><span /><span />
           </li>
         )}
+        {reviewingBrief && !typing && (
+          <li className="alex-msg alex-msg-alex alex-msg-workflow">
+            <BriefReview value={briefReview} onChange={setBriefReview} onUse={() => startEnquiry({ ...buildProjectBrief(briefAnswers), message: briefReview.trim() })} onRestart={restartBrief} />
+          </li>
+        )}
       </ol>
 
-      {remaining.length > 0 && (
+      {mode === 'general' && remaining.length > 0 && (
         <div ref={chipsRef} className="alex-suggestions" role="group" aria-label="Suggested questions">
           {remaining.map((suggestion) => (
             <button key={suggestion.id} type="button" onClick={() => askSuggestion(suggestion)} disabled={typing}>
@@ -154,26 +229,41 @@ export default function AssistantPanel({ onClose, startWithVoice = false }) {
         </div>
       )}
 
-      <form className="alex-input" onSubmit={ask}>
-        <label htmlFor="alex-question" className="sr-only">Ask Alex a question</label>
-        <input
+      {!reviewingBrief && <form className="alex-input" onSubmit={ask}>
+        <label htmlFor="alex-question" className="sr-only">{activeMode.field}</label>
+        {mode === 'general' ? <input
           ref={inputRef}
           id="alex-question"
           type="text"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder="Ask about projects, skills, contact…"
+          placeholder={activeMode.placeholder}
           autoComplete="off"
           maxLength={200}
-        />
+        /> : <textarea
+          ref={inputRef}
+          id="alex-question"
+          value={draft}
+          onChange={event => setDraft(event.target.value)}
+          placeholder={activeMode.placeholder}
+          aria-describedby="alex-mode-help"
+          rows={mode === 'role' ? 3 : 2}
+          maxLength={mode === 'role' ? 4000 : 1000}
+          onKeyDown={event => {
+            if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+              event.preventDefault()
+              event.currentTarget.form.requestSubmit()
+            }
+          }}
+        />}
         <button type="submit" className="alex-send" disabled={!draft.trim() || typing} aria-label="Send question">
           <Send size={16} aria-hidden="true" />
         </button>
-      </form>
+      </form>}
       <p id="alex-note" className="alex-note">
         {hasLiveAgent
           ? 'Chat answers come instantly from this portfolio. Voice is a live AI that uses your microphone only during a call.'
-          : <>Instant answers from Charlie&apos;s portfolio. No AI model or data collection.</>}
+          : <>Local portfolio guide. Your input stays in this page until you choose to submit the contact form.</>}
       </p>
     </section>
   )

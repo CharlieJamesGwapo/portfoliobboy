@@ -36,3 +36,25 @@ test('booking cards stack without horizontal scroll on a phone', async ({ page }
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
   expect(overflow).toBeLessThanOrEqual(0)
 })
+
+test('contact fields are protected during a slow send and recover without losing the draft', async ({ page }) => {
+  let release
+  const pending = new Promise(resolve => { release = resolve })
+  await page.route('**/api/contact', async route => {
+    await pending
+    await route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"Test failure"}' })
+  })
+  await page.goto('/#contact')
+  await page.locator('#contact-name').fill('Portfolio review')
+  await page.locator('#contact-email').fill('preview@example.com')
+  await page.locator('#contact-subject').fill('Project enquiry')
+  await page.locator('#contact-message').fill('Please keep this draft if the send fails.')
+  await page.getByRole('button', { name: 'Send message', exact: true }).click()
+  try {
+    for (const id of ['contact-name', 'contact-email', 'contact-subject', 'contact-message']) {
+      await expect(page.locator(`#${id}`)).toBeDisabled()
+    }
+  } finally { release() }
+  await expect(page.locator('#contact-message')).toBeEnabled()
+  await expect(page.locator('#contact-message')).toHaveValue('Please keep this draft if the send fails.')
+})
