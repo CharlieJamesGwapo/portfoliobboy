@@ -16,6 +16,11 @@ agent needs the owner's separate approval because it spends money per minute.
   - shows connecting, listening and speaking states, with mute and end
     controls;
   - shows a session clock.
+  - explicitly uses the SDK's WebSocket audio transport. On 2026-11-26 the
+    deployed agent's WebRTC room disconnected before its greeting; the same
+    agent delivered its greeting over WebSocket under the production CSP;
+  - handles provider disconnect callbacks as well as startup errors, so a
+    dropped connection or a hangup before the greeting offers a clear retry.
 - `LIVE_SESSION_LIMIT_SECONDS` (180) is a **display and courtesy limit only**.
   The real limits must be enforced by ElevenLabs on the agent (see below).
 - No API key is used in the browser. Never put an ElevenLabs API key in a

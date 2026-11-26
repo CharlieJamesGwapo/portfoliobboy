@@ -30,3 +30,26 @@ test('only the latest explicit start may continue, and a denied microphone never
   assert.equal((await third).status, 'started')
   assert.equal(starts, 1)
 })
+
+test('callbacks from a prior connection cannot affect a retry while microphone permission is pending', async () => {
+  const checks = []
+  const starter = createVoiceSessionStarter(() => new Promise(resolve => checks.push(resolve)))
+  let oldDisconnect
+  let errors = 0
+  const first = starter.start(isCurrent => {
+    oldDisconnect = () => { if (isCurrent()) errors++ }
+  })
+  checks[0]('')
+  await first
+  oldDisconnect()
+  assert.equal(errors, 1)
+
+  const retry = starter.start(() => {})
+  oldDisconnect()
+  assert.equal(errors, 1, 'late teardown callback must be ignored before the retry connects')
+  checks[1]('')
+  await retry
+  starter.cancel()
+  oldDisconnect()
+  assert.equal(errors, 1)
+})

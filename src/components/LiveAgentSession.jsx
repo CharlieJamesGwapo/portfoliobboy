@@ -38,10 +38,11 @@ async function checkMicrophone() {
 const Session = ({ onClose, limitSeconds }) => {
   const [error, setError] = useState('')
   const [elapsed, setElapsed] = useState(0)
-  const [checking, setChecking] = useState(false)
+  const [checking, setChecking] = useState(true)
   const conversation = useConversation()
   const { status, isSpeaking, isMuted } = conversation
   const endedForLimit = useRef(false)
+  const heardAssistant = useRef(false)
   const starter = useRef(null)
   if (!starter.current) starter.current = createVoiceSessionStarter(checkMicrophone)
 
@@ -49,13 +50,30 @@ const Session = ({ onClose, limitSeconds }) => {
     setError('')
     setElapsed(0)
     endedForLimit.current = false
+    heardAssistant.current = false
     setChecking(true)
-    const result = await starter.current.start(() => {
+    const result = await starter.current.start((isCurrent) => {
       setChecking(false)
       return conversation.startSession({
+        // The agent's WebRTC room disconnects before its first response.
+        // WebSocket carries both audio directions over the supported API host.
+        connectionType: 'websocket',
         workletPaths: WORKLET_PATHS,
+        onModeChange: ({ mode }) => {
+          if (isCurrent() && mode === 'speaking') heardAssistant.current = true
+        },
+        onDisconnect: (details) => {
+          if (!isCurrent() || details.reason === 'user' || endedForLimit.current) return
+          console.warn('[voice] disconnected:', details)
+          if (details.reason === 'error') {
+            setError('The voice connection was interrupted. Please start again, or use the chat.')
+          } else if (!heardAssistant.current) {
+            setError('The voice assistant ended before it could respond. Please start again, or use the chat.')
+          }
+        },
         // Provider diagnostics stay in the console; visitors see plain copy.
         onError: (message) => {
+          if (!isCurrent()) return
           console.warn('[voice]', message)
           setError('The voice assistant is unavailable right now. Please try again, or use the chat.')
         },
@@ -98,11 +116,13 @@ const Session = ({ onClose, limitSeconds }) => {
 
   const label = checking
     ? 'Waiting for microphone permission…'
-    : connected
-      ? (isSpeaking ? 'Assistant is speaking' : 'Listening… go ahead')
-      : endedForLimit.current && status === 'disconnected'
-        ? 'Time limit reached. Thanks for trying it!'
-        : STATUS_TEXT[status] ?? status
+    : error
+      ? STATUS_TEXT.error
+      : connected
+        ? (isSpeaking ? 'Assistant is speaking' : 'Listening… go ahead')
+        : endedForLimit.current && status === 'disconnected'
+          ? 'Time limit reached. Thanks for trying it!'
+          : STATUS_TEXT[status] ?? status
 
   const finished = !checking && (status === 'disconnected' || status === 'error' || Boolean(error))
 

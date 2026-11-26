@@ -10,7 +10,9 @@ export function createVoiceSessionStarter(checkMicrophone) {
       if (attempt !== generation) return { status: 'cancelled' }
       if (problem) return { status: 'denied', message: problem }
       try {
-        await connect()
+        // Invalidate SDK callbacks as soon as a retry begins, even while its
+        // microphone check is pending and the old SDK session is tearing down.
+        await connect(() => attempt === generation)
         return { status: attempt === generation ? 'started' : 'cancelled' }
       } catch (error) {
         return attempt === generation ? { status: 'error', error } : { status: 'cancelled' }

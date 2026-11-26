@@ -1,0 +1,107 @@
+import { test, expect } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+
+const config = JSON.parse(readFileSync(new URL('../../vercel.json', import.meta.url), 'utf8'))
+const csp = config.headers.find(rule => rule.source === '/(.*)').headers.find(h => h.key === 'Content-Security-Policy').value
+
+test.use({
+  serviceWorkers: 'block',
+  permissions: ['microphone'],
+  launchOptions: { args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] },
+})
+
+async function prepare(page, onSocket) {
+  // Exercise the real built SDK with generated audio and local signalling;
+  // no request may create a provider conversation or use a real microphone.
+  await page.addInitScript(() => {
+    window.__voiceTracks = []
+    const getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices)
+    navigator.mediaDevices.getUserMedia = async (...args) => {
+      const stream = await getUserMedia(...args)
+      window.__voiceTracks.push(...stream.getTracks())
+      return stream
+    }
+  })
+  await page.route('https://api.elevenlabs.io/**', route => route.abort())
+  await page.routeWebSocket('wss://livekit.rtc.elevenlabs.io/**', socket => socket.close())
+  await page.routeWebSocket('wss://api.elevenlabs.io/**', onSocket)
+  await page.route('http://127.0.0.1:4173/', async route => {
+    const response = await route.fetch()
+    await route.fulfill({ response, headers: { ...response.headers(), 'content-security-policy': csp } })
+  })
+  await page.goto('/#live-agent')
+  test.skip(await page.locator('#live-agent').count() === 0, 'Optional live voice is not configured in this build')
+  await page.getByRole('button', { name: 'Start a live conversation', exact: true }).click()
+}
+
+function startVoice(socket) {
+  socket.send(JSON.stringify({
+    type: 'conversation_initiation_metadata',
+    conversation_initiation_metadata_event: {
+      conversation_id: 'test-voice', agent_output_audio_format: 'pcm_48000', user_input_audio_format: 'pcm_48000',
+    },
+  }))
+}
+
+test('voice reaches the greeting over WebSocket under production CSP and closes cleanly', async ({ page }) => {
+  const errors = []
+  page.on('pageerror', error => errors.push(error.message))
+  let sentAudio = false
+  let closed = false
+  await prepare(page, socket => {
+    socket.onClose(() => { closed = true })
+    socket.onMessage(message => {
+      const event = JSON.parse(String(message))
+      if (event.type === 'conversation_initiation_client_data') startVoice(socket)
+      if (event.user_audio_chunk && !sentAudio) {
+        sentAudio = true
+        const pcm = Buffer.alloc(48000 * 2)
+        for (let i = 0; i < 48000; i++) pcm.writeInt16LE(Math.round(Math.sin(i * 2 * Math.PI * 440 / 48000) * 1200), i * 2)
+        socket.send(JSON.stringify({ type: 'audio', audio_event: { audio_base_64: pcm.toString('base64'), event_id: 1 } }))
+      }
+    })
+  })
+  await expect(page.locator('.live-agent-status')).toHaveText('Assistant is speaking')
+  expect(sentAudio).toBe(true)
+  await page.locator('#live-agent').getByRole('button', { name: 'Mute', exact: true }).click()
+  await expect(page.locator('#live-agent').getByRole('button', { name: 'Unmute', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await page.locator('#live-agent').getByRole('button', { name: 'End conversation', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Start a live conversation', exact: true })).toBeVisible()
+  await expect.poll(() => closed).toBe(true)
+  await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
+  expect(errors).toEqual([])
+})
+
+test('a server hangup before the greeting is a failed start rather than a completed conversation', async ({ page }) => {
+  await prepare(page, socket => {
+    socket.onMessage(message => {
+      const event = JSON.parse(String(message))
+      if (event.type === 'conversation_initiation_client_data') startVoice(socket)
+      if (event.user_audio_chunk) socket.close({ code: 1000, reason: 'Agent disconnected' })
+    })
+  })
+  await expect(page.locator('#live-agent [role="alert"]')).toContainText('ended before it could respond')
+  await expect(page.locator('.live-agent-status')).toHaveText('Could not connect')
+  await expect.poll(() => page.evaluate(() => window.__voiceTracks.every(track => track.readyState === 'ended'))).toBe(true)
+  await page.locator('#live-agent').getByRole('button', { name: 'Close', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Start a live conversation', exact: true })).toBeVisible()
+})
+
+test('an unexpected provider disconnect is explained and a visitor can retry', async ({ page }) => {
+  let attempts = 0
+  await prepare(page, socket => {
+    attempts++
+    socket.onMessage(message => {
+      const event = JSON.parse(String(message))
+      if (event.type === 'conversation_initiation_client_data') startVoice(socket)
+      if (event.user_audio_chunk && attempts === 1) socket.close({ code: 1011, reason: 'Voice service unavailable' })
+    })
+  })
+  await expect(page.locator('#live-agent [role="alert"]')).toContainText('voice connection was interrupted')
+  await expect(page.locator('.live-agent-status')).toHaveText('Could not connect')
+  await page.getByRole('button', { name: 'Start again', exact: true }).click()
+  await expect(page.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+  await expect(page.locator('#live-agent [role="alert"]')).toHaveCount(0)
+  expect(attempts).toBe(2)
+  await page.locator('#live-agent').getByRole('button', { name: 'End conversation', exact: true }).click()
+})
