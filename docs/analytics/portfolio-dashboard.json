@@ -1,6 +1,6 @@
 {
-  "status": "Awaiting owner selection of the analytics project; not provisioned",
-  "governance": "Local proposed event-count definitions, not catalog-approved business metrics",
+  "status": "Provisioned in the personal workspace; production capture configured",
+  "governance": "Five proposed catalog count definitions linked to saved insights; no human approval claimed",
   "dashboard": {
     "name": "Portfolio Enquiry Outcomes",
     "description": "Aggregate portfolio actions and accepted contact submissions. Repeated actions count; totals do not identify visitors or attribute enquiries to individual conversations."
@@ -45,6 +45,11 @@
         "y": 2,
         "w": 4,
         "h": 3
+      },
+      "posthog": {
+        "id": 14685198,
+        "shortId": "mHHwPc0S",
+        "tileId": 16315151
       }
     },
     {
@@ -77,6 +82,11 @@
         "y": 2,
         "w": 4,
         "h": 3
+      },
+      "posthog": {
+        "id": 14685199,
+        "shortId": "8v7tMYcB",
+        "tileId": 16315152
       }
     },
     {
@@ -109,6 +119,11 @@
         "y": 2,
         "w": 4,
         "h": 3
+      },
+      "posthog": {
+        "id": 14685201,
+        "shortId": "0NFtvi1s",
+        "tileId": 16315154
       }
     },
     {
@@ -141,6 +156,11 @@
         "y": 5,
         "w": 6,
         "h": 3
+      },
+      "posthog": {
+        "id": 14685203,
+        "shortId": "YVyc4gNM",
+        "tileId": 16315156
       }
     },
     {
@@ -173,6 +193,11 @@
         "y": 5,
         "w": 6,
         "h": 3
+      },
+      "posthog": {
+        "id": 14685206,
+        "shortId": "YXmqtjKi",
+        "tileId": 16315158
       }
     },
     {
@@ -218,7 +243,8 @@
           },
           "interval": "day",
           "trendsFilter": {
-            "display": "ActionsLineGraph"
+            "display": "ActionsLineGraph",
+            "showLegend": true
           }
         }
       },
@@ -227,6 +253,11 @@
         "y": 8,
         "w": 12,
         "h": 4
+      },
+      "posthog": {
+        "id": 14685208,
+        "shortId": "puYiXEqm",
+        "tileId": 16315160
       }
     },
     {
@@ -266,6 +297,11 @@
         "y": 12,
         "w": 6,
         "h": 4
+      },
+      "posthog": {
+        "id": 14685210,
+        "shortId": "TpXL7Y81",
+        "tileId": 16315162
       }
     },
     {
@@ -305,7 +341,21 @@
         "y": 12,
         "w": 6,
         "h": 4
+      },
+      "posthog": {
+        "id": 14685211,
+        "shortId": "kskBG01L",
+        "tileId": 16315163
       }
     }
-  ]
+  ],
+  "posthog": {
+    "organization": "Charlie Abejo Portfolio",
+    "organizationId": "01a217ed-ccb1-0000-9dea-166ddfafbd6f",
+    "projectId": 769787,
+    "dashboardId": 2416983,
+    "dashboardUrl": "https://us.posthog.com/project/769787/dashboard/2416983",
+    "private": true,
+    "projectTimezone": "UTC"
+  }
 }

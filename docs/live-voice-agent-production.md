@@ -179,7 +179,7 @@ portfolio answer engine, with no voice-provider requests. Try voice again is
 explicit. Draft review and existing-contact-text protection continue to work.
 
 Optional outcome counts are described in [analytics setup](analytics/README.md).
-They are disabled pending the owner's destination project selection. No voice
+They are configured for the owner's separate Charlie Abejo Portfolio project. No voice
 content, conversation ID, enquiry fields or visitor identity is included in
 analytics. The browser enable flag and server ingestion configuration must be
 set for the selected project before deployment/rebuild.

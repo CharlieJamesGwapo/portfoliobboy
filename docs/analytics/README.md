@@ -2,9 +2,13 @@
 
 ## Current activation state
 
-The collector and browser hooks are implemented. **Live project configuration and dashboard provisioning are pending the owner's PostHog project selection.** The connected organization observed during setup was `zalio`, with one allowed non-demo project named `Default project`. No portfolio events were sent there and no dashboards, insights, settings or subscriptions were changed.
+Personal workspace: **Charlie Abejo Portfolio**, project **769787** (Default project).
 
-The portable [dashboard definition](portfolio-dashboard.json) contains five outcome totals, daily action trends, and project/starter breakdowns. It is a definition ready for the selected project, not a screenshot of collected data or an already provisioned dashboard.
+[Open the private Portfolio Enquiry Outcomes dashboard](https://us.posthog.com/project/769787/dashboard/2416983).
+
+The eight prepared insights are saved in this personal project, with private sharing and a 30-day default range. Its project reporting timezone remains UTC. Production is configured with the personal ingestion key (server-only Secret), regional ingestion host and browser enable flag. A deployment rebuild applies these values; the earlier Zalio project remains unchanged.
+
+The [dashboard definition](portfolio-dashboard.json) records actual insight/tile IDs and the private dashboard URL. Five catalog count definitions are proposed and linked to their saved insights; they are not claimed as human-approved business metrics. New collection does not backfill earlier visits. Initial action counts include controlled setup verification; no test contact email is submitted.
 
 ## What is counted
 
@@ -28,9 +32,9 @@ The public analytics endpoint cannot report contact success. Validation failures
 - Capture is best effort, with a 1.5-second server timeout; missing configuration or errors never block portfolio actions or turn an accepted email into an error.
 - Counts include repeated actions and may undercount because of privacy preferences, blockers or outages. Do not call these unique visitors, attributed enquiries, or a conversion funnel. All dashboard queries use total event counts.
 
-## Activation after project selection
+## Configuration and maintenance
 
-1. Confirm the destination project belongs to the owner and is suitable for portfolio data. Read its `api_token` and regional `api_host` from PostHog's project settings; never use a personal/admin key for ingestion.
+1. Use only the personal project above unless the owner explicitly changes the destination. Read its `api_token` and regional `api_host` from PostHog's project settings; never use a personal/admin key for ingestion.
 2. Configure Vercel production environment values `POSTHOG_PROJECT_KEY` and `POSTHOG_API_HOST`. The host must be `https://us.i.posthog.com` or `https://eu.i.posthog.com`. Then set `VITE_PORTFOLIO_ANALYTICS_ENABLED=true` and rebuild. Keeping the browser flag false and server ingestion values unset leaves collection off.
 3. In the selected project, inspect existing dashboards and approved catalog definitions before creating duplicates. The local definitions are proposed action counts, not catalog-approved business metrics. Consult relevant native dashboard templates.
 4. Run each typed Trends query from the definition, save its native query under an InsightVizNode, and add it to the owner dashboard. Use its provided 12-column layouts; hide repeated tile descriptions. Do not enable public sharing or expose a data-query/admin credential in the website.
