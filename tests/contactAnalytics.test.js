@@ -2,6 +2,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import contact from '../api/contact.js'
 
+// Provider tests use explicit local development; hosted BotID paths have separate coverage.
+process.env.NODE_ENV = 'development'
+
 const request = headers => ({ method: 'POST', headers: { origin: 'https://portfoliobboy.vercel.app', 'content-type': 'application/json', ...headers }, body: { name: 'Private Name', email: 'private@example.com', subject: 'Private subject', message: 'Private project details for a clinic.' }, socket: { remoteAddress: '192.0.2.44' } })
 const response = () => ({ headers: {}, code: 0, setHeader(key, value) { this.headers[key] = value }, status(code) { this.code = code; return this }, json(body) { this.body = body; return this }, end() { return this } })
 

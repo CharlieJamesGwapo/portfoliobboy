@@ -89,7 +89,7 @@ const categoryCounts = Object.fromEntries(
   ]),
 )
 
-function ProjectCardPreview({ project }) {
+function ProjectCardPreview({ project, mediaEnabled }) {
   const isOneRide = project.id === oneRidePreview.projectId
   const media = isOneRide ? oneRidePreview.screenshots[0] : project.media?.[0]
 
@@ -105,7 +105,7 @@ function ProjectCardPreview({ project }) {
     return (
       <div className={`project-card-preview${project.mediaLayout === 'portrait' || isOneRide ? ' is-portrait' : ''}`}>
         <span className="project-card-preview-fallback" aria-hidden="true">Preview unavailable</span>
-        <img
+        {mediaEnabled && <img
           src={media.src}
           alt={media.alt}
           width={media.width}
@@ -113,7 +113,7 @@ function ProjectCardPreview({ project }) {
           loading="lazy"
           decoding="async"
           onError={(event) => event.currentTarget.closest('.project-card-preview')?.classList.add('is-failed')}
-        />
+        />}
         <span className="project-card-preview-label">
           {isOneRide ? 'Official Google Play preview' : media.label || 'Project preview'}
         </span>
@@ -130,14 +130,14 @@ function ProjectCardPreview({ project }) {
   )
 }
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project, index, mediaEnabled }) {
   const caseStudySlug = caseStudySlugByProjectId[project.id]
   const caseStudyUrl = caseStudySlug ? `/projects/${caseStudySlug}` : null
   const technologies = project.stack || []
 
   return (
     <article className="project-discovery-card" aria-labelledby={`project-card-title-${project.id}`}>
-      <ProjectCardPreview project={project} />
+      <ProjectCardPreview project={project} mediaEnabled={mediaEnabled} />
       <div className="project-card-content">
         <div className="project-card-copy">
           <p className="project-card-eyebrow">{project.eyebrow || project.categories?.join(' · ') || 'Product case study'}</p>
@@ -169,7 +169,7 @@ function ProjectCard({ project, index }) {
   )
 }
 
-const Projects = () => {
+const Projects = ({ mediaEnabled = true }) => {
   const [initialFilters] = useState(readProjectFilters)
   const [query, setQuery] = useState(initialFilters.query)
   const [archiveOpen, setArchiveOpen] = useState(false)
@@ -273,7 +273,7 @@ const Projects = () => {
 
         {visibleFeatured.length > 0 && (
           <section className="project-discovery-grid" aria-label="Featured project case studies">
-            {visibleFeatured.map((item, index) => <ProjectCard key={item.id} project={item} index={index} />)}
+            {visibleFeatured.map((item, index) => <ProjectCard key={item.id} project={item} index={index} mediaEnabled={mediaEnabled} />)}
           </section>
         )}
 

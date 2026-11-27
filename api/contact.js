@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { capturePortfolioEvent } from '../server/portfolioAnalytics.js'
 import { isAllowedPortfolioOrigin } from '../server/requestSecurity.js'
+import { verifyContactBot } from '../server/contactBotVerification.js'
 
 const LIMITS = { name: 120, email: 254, subject: 200, message: 5000 }
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
@@ -80,6 +81,11 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Email sent successfully' })
     }
 
+    const verification = await verifyContactBot(req)
+    if (!verification.allowed) {
+      return res.status(verification.status).json({ error: 'Verification could not complete. Please use the email option.', code: verification.code })
+    }
+
     if (!name || !email || !subject || !message) {
       return res.status(400).json({ error: 'All fields are required' })
     }
@@ -95,6 +101,14 @@ export default async function handler(req, res) {
     if (!EMAIL_PATTERN.test(email)) {
       return res.status(400).json({ error: 'A valid email address is required' })
     }
+
+    const submissionId = body.submissionId
+    if (submissionId !== undefined && (typeof submissionId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(submissionId))) {
+      return res.status(400).json({ error: 'Invalid submission identity' })
+    }
+    // Resend keeps this key for 24 hours. Retrying the same draft after an
+    // ambiguous network failure cannot deliver it twice, even across instances.
+    const idempotencyKey = submissionId ? 'contact/' + createHash('sha256').update(JSON.stringify([submissionId, name, email, subject, message])).digest('hex') : null
 
     // Check environment variables
     if (!process.env.RESEND_API_KEY) {
@@ -134,10 +148,11 @@ export default async function handler(req, res) {
 
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(6000),
       headers: {
         Authorization: 'Bearer ' + process.env.RESEND_API_KEY,
         'Content-Type': 'application/json',
+        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
       },
       body: JSON.stringify({
         from: 'Portfolio Contact <onboarding@resend.dev>',

@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test'
+import { mockContactBotChallenge } from '../helpers/contactBotClientFixture.js'
+
+// These UI tests intercept API/challenge requests. A controlling service worker
+// would bypass page.route; offline/cache behavior has dedicated browser tests.
+test.use({ serviceWorkers: 'block' })
+test.beforeEach(async ({ page }) => { await mockContactBotChallenge(page) })
 import { certifications } from '../../src/data/portfolioData.js'
 
 test('accent preview loads playable audio and a matching transcript', async ({ page }) => {
@@ -138,7 +144,7 @@ test('accent preview identifies the AI assistant and plays', async ({ page }) =>
   await demo.getByText('Read the conversation', { exact: true }).click()
   await expect(demo.locator('.vs-transcript')).toContainText('AI Assistant')
   const audio = demo.locator('audio')
-  await expect(audio).toHaveAttribute('src', /accents\/[a-z-]+-english(?:-[\w-]+)?\.mp3$/)
+  await expect(audio).toHaveAttribute('src', /(?:accents|assets)\/[a-z-]+-english(?:-[\w-]+)?\.mp3$/)
   await demo.getByRole('button', { name: 'Play American English preview' }).click()
   await expect.poll(() => audio.evaluate((element) => element.currentTime)).toBeGreaterThan(0)
   expect(await audio.evaluate((element) => element.duration)).toBeGreaterThan(5)

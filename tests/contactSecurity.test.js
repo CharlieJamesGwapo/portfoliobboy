@@ -2,6 +2,9 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import handler from '../api/contact.js'
 
+// These provider tests exercise explicit local development; hosted BotID paths have separate coverage.
+process.env.NODE_ENV = 'development'
+
 const validBody = { name: 'Portfolio visitor', email: 'visitor@example.com', subject: 'Project enquiry', message: 'I would like to discuss a project.' }
 function response() {
   return { headers: {}, statusCode: 200, setHeader(key, value) { this.headers[key] = value }, status(code) { this.statusCode = code; return this }, json(body) { this.body = body; return this }, end() { return this } }

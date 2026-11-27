@@ -4,6 +4,9 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "functions": {
+    "api/contact.js": {
+      "maxDuration": 20
+    },
     "api/*.js": {
       "maxDuration": 10
     }

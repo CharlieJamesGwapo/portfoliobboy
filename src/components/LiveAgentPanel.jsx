@@ -13,9 +13,9 @@ import './voice-demo.css'
 export const AGENT_ID = (import.meta.env.VITE_ELEVENLABS_AGENT_ID ?? '').trim()
 export const hasLiveAgent = AGENT_ID.length > 0
 
-// Must match (or be below) the agent's server-side maximum duration. The UI
-// timer only informs the visitor; the provider is what actually ends the call.
-export const LIVE_SESSION_LIMIT_SECONDS = 120
+// The session closes browser audio at this deadline. A matching provider-side
+// maximum is a separate safeguard for calls made outside this website.
+export const LIVE_SESSION_LIMIT_SECONDS = 60
 
 const loadSession = () => import('./LiveAgentSession')
 export const LiveAgentSession = lazy(loadSession)
@@ -33,7 +33,7 @@ const LiveAgentPanel = () => {
         <p>
           Ask Alex about my full-stack projects, AI agents, automations, or working together.
         </p>
-        <p className="live-agent-guidance">Conversations are limited to {Math.round(LIVE_SESSION_LIMIT_SECONDS / 60)} minutes. Say “goodbye” to end your call at any time.</p>
+        <p className="live-agent-guidance">Conversations are limited to 1 minute. Say “goodbye” to end your call at any time.</p>
       </div>
       <div className="live-agent-action">
         {open ? (

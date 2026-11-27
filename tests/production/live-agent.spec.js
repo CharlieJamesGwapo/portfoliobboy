@@ -63,7 +63,7 @@ test('voice reaches the greeting over WebSocket under production CSP and closes 
     })
   })
   await expect(page.locator('.live-agent-status')).toHaveText('Assistant is speaking')
-  await expect(page.locator('#live-agent')).toContainText('limited to 2 minutes')
+  await expect(page.locator('#live-agent')).toContainText('limited to 1 minute')
   await expect(page.locator('.live-agent-clock')).toContainText('Time left')
   for (const theme of ['light', 'dark']) {
     await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
@@ -130,7 +130,7 @@ test('a visitor farewell ends the call immediately, while mentioning goodbye kee
   await expect(page.getByRole('button', { name: 'Start again', exact: true })).toBeVisible()
 })
 
-test('the two-minute deadline ends audio even when timer updates were throttled', async ({ page }) => {
+test('the one-minute deadline ends audio even when timer updates were throttled', async ({ page }) => {
   await page.clock.install()
   let closed = false
   let connection
@@ -144,7 +144,7 @@ test('the two-minute deadline ends audio even when timer updates were throttled'
   await expect(page.locator('.live-agent-status')).toHaveText('Listening… go ahead')
   connection.send(JSON.stringify({ type: 'user_transcript', user_transcription_event: { user_transcript: 'I need automated CRM reminders.', event_id: 1 } }))
   await expect(page.getByRole('log', { name: /transcript/i })).toContainText('I need automated CRM reminders.')
-  await page.clock.fastForward(119_000)
+  await page.clock.fastForward(59_000)
   await expect(page.locator('.live-agent-clock')).toContainText('0:01')
   expect(closed).toBe(false)
   await page.clock.runFor(1000)

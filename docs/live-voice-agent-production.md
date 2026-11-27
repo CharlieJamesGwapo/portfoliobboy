@@ -25,10 +25,12 @@ agent needs the owner's separate approval because it spends money per minute.
     agent delivered its greeting over WebSocket under the production CSP;
   - handles provider disconnect callbacks as well as startup errors, so a
     dropped connection or a hangup before the greeting offers a clear retry.
-- `LIVE_SESSION_LIMIT_SECONDS` (120) is a **display and courtesy limit only**.
-  A monotonic clock and a deadline stop the browser's call at two minutes,
+- `LIVE_SESSION_LIMIT_SECONDS` (60) is the **website's voice deadline**.
+  A monotonic clock and a deadline stop the browser's call at one minute,
   including delayed timer updates. Account-wide limits must be enforced by
   ElevenLabs on the agent (see below).
+  The owner requested website-only work for the November 27 update, so this
+  release does not change or verify the provider's separate usage settings.
 - No API key is used in the browser. Never put an ElevenLabs API key in a
   `VITE_` variable: Vite bundles every `VITE_` value into public JavaScript.
 
@@ -105,7 +107,7 @@ Set these on the agent before going public, then verify each one by testing:
 
 | Limit | Recommended launch value | Why |
 | --- | --- | --- |
-| Maximum conversation duration | 120 s | Matches the on-site clock; caps each call's cost |
+| Maximum conversation duration | 60 s | Matches the on-site clock; caps each call's cost |
 | Concurrency limit | 1–2 | Prevents a traffic spike from multiplying cost |
 | Daily call limit | 10–20 | Hard daily ceiling on spend |
 
@@ -144,7 +146,7 @@ previews cost nothing to replay: they are static files.
 5. Test on desktop and phone:
    - microphone granted and denied;
    - connect, mute and end;
-   - the 2-minute cut-off;
+   - the 1-minute cut-off;
    - disconnect handling;
    - a blocked origin.
 6. Watch the first week's usage in the ElevenLabs dashboard and set an alert.

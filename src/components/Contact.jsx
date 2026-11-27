@@ -5,6 +5,7 @@ import './contact-booking.css'
 import { bookingOptions, profile, resumeUrl } from '../data/portfolioData'
 import { CONTACT_INTENT_EVENT, requestContact, takeAssistantEnquiry } from '../lib/contactIntent'
 import { trackBookingClick } from '../lib/portfolioAnalytics'
+import { sendContactEnquiry } from '../lib/contactSubmission'
 
 const bookingRequest = (option) => ({
   subject: `Book a ${option.minutes}-min ${option.title.toLowerCase()} (Google Meet)`,
@@ -108,6 +109,10 @@ const Contact = () => {
   const [sendFailed, setSendFailed] = useState(false)
   const [preparedEnquiry, setPreparedEnquiry] = useState('')
   const [preparedSubject, setPreparedSubject] = useState('')
+  // Keep the same identity for retries of an unchanged draft. The provider
+  // deduplicates delivery when a previous response was lost or timed out.
+  const submission = useRef(null)
+  const sending = useRef(false)
   const latestForm = useRef({ form, status })
   useEffect(() => { latestForm.current = { form, status } }, [form, status])
 
@@ -169,7 +174,7 @@ const Contact = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (status === 'sending') return
+    if (sending.current) return
     const nextErrors = validate(form)
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors)
@@ -180,34 +185,32 @@ const Contact = () => {
       return
     }
 
+    sending.current = true
     setStatus('sending')
     setMessage('')
     setSendFailed(false)
 
-    // A hung connection would otherwise leave the button on "Sending…" forever.
-    const controller = new AbortController()
-    const timeout = window.setTimeout(() => controller.abort(), 20000)
-
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-        signal: controller.signal,
-      })
-
-      if (!response.ok) throw new Error('Request failed')
+      const draft = JSON.stringify(form)
+      if (submission.current?.draft !== draft) {
+        submission.current = { draft, id: crypto.randomUUID() }
+      }
+      await sendContactEnquiry({ ...form, submissionId: submission.current.id })
+      submission.current = null
       setForm(initialForm)
       setErrors({})
       setStatus('success')
       setMessage('Thanks — your message is on its way. I’ll reply as soon as I can.')
-    } catch {
+    } catch (error) {
       // The form is deliberately left as typed.
       setSendFailed(true)
       setStatus('error')
-      setMessage(`The form could not send right now. Please email me directly at ${profile.email}.`)
+      const verificationFailed = error.code === 'BOT_VERIFICATION_FAILED' || error.code === 'BOT_VERIFICATION_UNAVAILABLE'
+      setMessage(verificationFailed
+        ? `Verification could not complete. Your message is still in the form; please use the email option below.`
+        : `The form could not confirm delivery right now. Your message is still in the form. Please email me directly at ${profile.email} or retry this draft.`)
     } finally {
-      window.clearTimeout(timeout)
+      sending.current = false
     }
   }
 

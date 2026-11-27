@@ -59,6 +59,17 @@ test('resume requests prefer fresh bytes while retaining an offline copy', async
   assert.equal(w.writes, 1)
 })
 
+test('the resume falls back to identical cached PDF bytes when the network rejects', async () => {
+  const bytes = new Uint8Array([37, 80, 68, 70, 45, 0, 255])
+  const w = worker({ cached: new Response(bytes, { headers: { 'Content-Type': 'application/pdf' } }), fetch: async () => { throw new TypeError('network unavailable') } })
+  const event = w.send(new Request('https://portfolio.example/charlie-james-abejo-resume.pdf'))
+  const response = await event.result
+  assert.equal(response.status, 200)
+  assert.equal(response.headers.get('Content-Type'), 'application/pdf')
+  assert.deepEqual(new Uint8Array(await response.arrayBuffer()), bytes)
+  assert.equal(w.writes, 0)
+})
+
 test('navigation eviction preserves the permanent offline fallback documents', async () => {
   const fixed = ['/', '/offline.html', '/manifest.json', '/favicon.png']
   const runtime = Array.from({ length: 11 }, (_, index) => `/projects/project-${index}`)

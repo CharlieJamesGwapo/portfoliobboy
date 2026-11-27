@@ -1,3 +1,4 @@
+import { initBotId } from 'botid/client/core'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
@@ -32,6 +33,16 @@ function armEntranceAnimations() {
   syncMotion()
   preference.addEventListener('change', syncMotion)
   document.addEventListener('visibilitychange', syncMotion)
+}
+
+// Only contact POSTs request the free Basic challenge. Vite development is
+// bypassed by the SDK; production failures are handled by the form fallback.
+try {
+  initBotId({ protect: [{ path: '/api/contact', method: 'POST', advancedOptions: { checkLevel: 'basic' } }] })
+} catch {
+  // Rendering the form still gives a blocked visitor the direct email option.
+  // The server always verifies, including when initialization fails here.
+  console.warn('Contact verification could not initialize.')
 }
 
 armEntranceAnimations()

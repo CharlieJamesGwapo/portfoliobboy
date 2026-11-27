@@ -27,7 +27,7 @@ const useIsMobile = () => {
   return isMobile
 }
 
-export const MomentumSystems = () => {
+export const MomentumSystems = ({ mediaEnabled = true }) => {
   const [activeFilter, setActiveFilter] = useState(filters[0])
   const [showAll, setShowAll] = useState(false)
   const isMobile = useIsMobile()
@@ -60,7 +60,7 @@ export const MomentumSystems = () => {
           <article key={system.id} className={`momentum-card ${system.image ? 'has-image' : 'is-engineering'}`}>
             {system.image ? (
               <a className="momentum-preview" href={system.url} target="_blank" rel="noreferrer" aria-label={`Explore live — ${system.title} (opens in a new tab)`}>
-                <img src={system.image} alt={system.imageAlt} width="1440" height="900" loading="lazy" decoding="async" />
+                {mediaEnabled && <img src={system.image} alt={system.imageAlt} width="1440" height="900" loading="lazy" decoding="async" />}
                 <span><ArrowUpRight size={18} aria-hidden="true" /> Explore live</span>
               </a>
             ) : (
