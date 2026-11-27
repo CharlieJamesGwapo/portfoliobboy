@@ -33,7 +33,7 @@
 - [x] Add pinned security CI, dependency update configuration and reusable live header/origin audit.
 - [x] Prepare and inspect firewall observation draft; verify GitHub security settings.
 - [x] Run unit, build, production/browser checks, with independent review; live acceptance follows deployment.
-- [ ] Commit, push and verify production; request firewall publication approval separately.
+- [x] Commit, push and verify production; obtain separate firewall publication approval and verify active configuration.
 
 ## Baseline evidence
 
@@ -53,3 +53,5 @@
 - GitHub vulnerability alerts and Dependabot security fixes enabled and verified; existing secret scanning and push protection remain enabled. New scheduled/push/PR CI uses pinned official actions, no persisted checkout credential, read-only permissions and no production secrets.
 - Firewall draft contains exactly two observation changes: POST /api/contact logging and managed Bot Protection log mode. Legacy 5/IP/minute rule is unchanged. Publishing awaits specific user approval; log mode does not block bots or replace distributed rate limiting. The Hobby one-rate-limit constraint and direct ElevenLabs provider controls remain documented limits.
 - Built-in firewall/request metrics and existing sanitized outcome analytics are retained; no paid custom-metric or observability upgrade was added.
+- Release accepted: source commit 1d8dc787eb5eed92157cb8b1a2ed1c8b231d2558 deployed READY, GitHub Security checks run 45920155237 succeeded, all 16 live header/cache/origin checks passed and versioned live fonts returned HTTP 200.
+- The user explicitly approved publishing both monitoring settings. Rechecked that the draft still contained exactly the reviewed changes, published firewall version 3, verified contact POST logging and managed Bot Protection log mode active, preserved the original rate-limit action/conditions and confirmed no remaining draft. All 16 live checks passed again after publication.
