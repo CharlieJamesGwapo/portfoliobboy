@@ -12,6 +12,7 @@ import VoiceConversation from './voice/VoiceConversation'
 import { answerQuestion } from '../lib/assistantAnswers'
 import { buildVoiceEvidenceContext } from '../lib/voiceEvidence'
 import { trackPortfolioEvent } from '../lib/portfolioAnalytics'
+import { createVoiceHealthAttempt } from '../lib/healthReporting'
 
 // The SDK otherwise loads its audio worklets from blob: URLs, which the site's
 // CSP (script-src 'self') rightly refuses. Served as same-origin build assets
@@ -61,9 +62,13 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
   const starterNumber = useRef(0)
   const activeCheck = useRef(() => false)
   const starter = useRef(null)
+  const healthAttempt = useRef(null)
   if (!starter.current) starter.current = createVoiceSessionStarter(checkMicrophone)
 
   const start = async () => {
+    healthAttempt.current?.end()
+    const attemptHealth = createVoiceHealthAttempt({ surface })
+    healthAttempt.current = attemptHealth
     setTextMode(false)
     setError('')
     setStarterError('')
@@ -83,8 +88,10 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
         workletPaths: WORKLET_PATHS,
         onConnect: () => {
           if (!isCurrent()) return
+          attemptHealth.connected()
           trackPortfolioEvent('portfolio_voice_started', { surface })
           try { conversation.sendContextualUpdate(buildVoiceEvidenceContext()) } catch {
+            attemptHealth.fail('send')
             // Public context is optional; keep call controls usable if the
             // transport closes between connection and context delivery.
           }
@@ -94,6 +101,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
           setMessages(previous => mergeVoiceTranscript(previous, event, sessionId))
           if (event.source !== 'user' || !isVoiceFarewell(event.message)) return
           endedForGoodbye.current = true
+          attemptHealth.end()
           starter.current.cancel()
           conversation.endSession()
         },
@@ -109,27 +117,39 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
         onDisconnect: (details) => {
           if (!isCurrent()) return
           starter.current.cancel()
+          // The SDK labels the provider's duration cap as an error. It is the
+          // expected end of a limited demo; inspect only its fixed type enum.
+          if (details.context?.type === 'max_duration_exceeded') {
+            attemptHealth.end()
+            endedForLimit.current = true
+            setElapsed(limitSeconds)
+            return
+          }
           if (details.reason === 'user' || endedForLimit.current) return
-          console.warn('[voice] disconnected:', details)
           if (details.reason === 'error') {
+            attemptHealth.fail('provider')
             setError('The voice connection was interrupted. Please start again, or use the chat.')
           } else if (!heardAssistant.current) {
             setError('The voice assistant ended before it could respond. Please start again, or use the chat.')
           }
         },
-        // Provider diagnostics stay in the console; visitors see plain copy.
-        onError: (message) => {
+        // Provider diagnostics may include private content. Only the standard
+        // input exception name can suppress a false service alert.
+        onError: (_message, diagnostic) => {
           if (!isCurrent()) return
-          console.warn('[voice]', message)
+          attemptHealth.fail('provider', diagnostic?.name)
           setError('The voice assistant is unavailable right now. Please try again, or use the chat.')
         },
       })
     })
     if (result.status === 'cancelled') return
     setChecking(false)
-    if (result.status === 'denied') setError(result.message)
+    if (result.status === 'denied') {
+      attemptHealth.end()
+      setError(result.message)
+    }
     if (result.status === 'error') {
-      console.warn('[voice] connection failed:', result.error?.message)
+      attemptHealth.fail('provider', result.error?.name)
       setError('The voice assistant is unavailable right now. Please try again, or use the chat.')
     }
   }
@@ -139,7 +159,10 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
   // microphone prompt which has not resolved yet (including StrictMode replay).
   useEffect(() => {
     start()
-    return () => starter.current.cancel()
+    return () => {
+      healthAttempt.current?.end()
+      starter.current.cancel()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -147,6 +170,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
   const projects = useMemo(() => getVoiceProjects(messages), [messages])
 
   const stopCall = () => {
+    healthAttempt.current?.end()
     starter.current.cancel()
     setChecking(false)
     endSession()
@@ -168,6 +192,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
         source: 'user', message: prompt, event_id: `starter-${++starterNumber.current}`, local: true,
       }, sessionNumber.current))
     } catch {
+      healthAttempt.current?.fail('send')
       setStarterError('That question could not be sent. Please try speaking it instead.')
     }
   }
@@ -229,6 +254,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
     const finishForLimit = () => {
       if (endedForLimit.current || endedForGoodbye.current) return
       endedForLimit.current = true
+      healthAttempt.current?.end()
       setElapsed(limitSeconds)
       starter.current.cancel()
       endSession()

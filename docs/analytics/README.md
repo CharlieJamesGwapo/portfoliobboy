@@ -8,7 +8,9 @@ Personal workspace: **Charlie Abejo Portfolio**, project **769787** (Default pro
 
 The eleven prepared insights are saved in this personal project, with private sharing and a 30-day default range. Its project reporting timezone remains UTC. Production is configured with the personal ingestion key (server-only Secret), regional ingestion host and browser enable flag. A deployment rebuild applies these values; the earlier Zalio project remains unchanged.
 
-The [dashboard definition](portfolio-dashboard.json) records actual insight/tile IDs and the private dashboard URL. Eight catalog count definitions are proposed and linked to their saved insights; they are not claimed as human-approved business metrics. New collection does not backfill earlier visits. Initial action counts include controlled setup verification; no test contact email is submitted.
+The [dashboard definition](portfolio-dashboard.json) records actual insight/tile IDs and the private dashboard URL. Eight catalog count definitions are proposed and linked to their saved insights; they are not claimed as human-approved business metrics. New collection does not backfill earlier visits. Initial action counts include controlled setup verification, including one labelled contact enquiry on November 27 that the owner confirmed receiving.
+
+The separate private [Portfolio Health dashboard](../health/README.md) adds fixed operational-error categories and independent synthetic uptime results to the same personal project. The eight product-action events below retain their original contract. Operational reports contain no enquiry or voice content; their email alerts go only to the owner-selected inbox.
 
 ## What is counted
 

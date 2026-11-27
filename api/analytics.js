@@ -1,5 +1,6 @@
 import { createHmac, randomBytes } from 'node:crypto'
 import { normalizeAnalyticsEvent } from '../shared/portfolioAnalytics.js'
+import { normalizeHealthEvent } from '../shared/healthTelemetry.js'
 import { capturePortfolioEvent } from '../server/portfolioAnalytics.js'
 import { isAllowedPortfolioOrigin } from '../server/requestSecurity.js'
 const MAX_BODY_BYTES = 1024
@@ -65,7 +66,7 @@ export default async function handler(req, res) {
       || !Object.hasOwn(body, 'event') || !Object.hasOwn(body, 'properties')) {
       return res.status(400).json({ error: 'Invalid analytics event' })
     }
-    normalized = normalizeAnalyticsEvent(body.event, body.properties)
+    normalized = normalizeAnalyticsEvent(body.event, body.properties) || normalizeHealthEvent(body.event, body.properties)
     if (!normalized) return res.status(400).json({ error: 'Invalid analytics event' })
   } catch {
     return res.status(400).json({ error: 'Invalid analytics event' })

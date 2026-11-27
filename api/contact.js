@@ -8,6 +8,17 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const MAX_BODY_BYTES = 32768
 const WINDOW_MS = 10 * 60 * 1000
 const submissions = new Map()
+const failureReports = new Map()
+
+async function reportContactFailure(req, code) {
+  if (req.headers.dnt === '1' || req.headers['sec-gpc'] === '1') return
+  // Fixed category keys only (five possible codes), no visitor state. Outage
+  // paths run before the mail-submission limiter, so independently bound them.
+  const now = Date.now()
+  if ((failureReports.get(code) || 0) > now) return
+  failureReports.set(code, now + 60000)
+  await capturePortfolioEvent('portfolio_health_error', { surface: 'contact', code })
+}
 
 // A bounded, per-instance abuse backstop. Distributed enforcement belongs in
 // the Vercel Firewall; this is deliberately not described as a global limit.
@@ -83,6 +94,7 @@ export default async function handler(req, res) {
 
     const verification = await verifyContactBot(req)
     if (!verification.allowed) {
+      if (verification.code === 'BOT_VERIFICATION_UNAVAILABLE') await reportContactFailure(req, 'contact_verification_unavailable')
       return res.status(verification.status).json({ error: 'Verification could not complete. Please use the email option.', code: verification.code })
     }
 
@@ -112,7 +124,8 @@ export default async function handler(req, res) {
 
     // Check environment variables
     if (!process.env.RESEND_API_KEY) {
-      console.error('Missing RESEND_API_KEY environment variable')
+      console.error('Contact delivery configuration unavailable')
+      await reportContactFailure(req, 'contact_config_missing')
       return res.status(500).json({ error: 'Server configuration error' })
     }
 
@@ -166,7 +179,8 @@ export default async function handler(req, res) {
     })
 
     if (!response.ok) {
-      console.error('Resend API error:', response.status)
+      console.error('Contact email provider rejected delivery')
+      await reportContactFailure(req, 'contact_mail_rejected')
       return res.status(500).json({ error: 'Failed to send email' })
     }
 
@@ -175,8 +189,9 @@ export default async function handler(req, res) {
     }
     return res.status(200).json({ success: true, message: 'Email sent successfully' })
   } catch (error) {
-    // Log the detail server-side; don't hand internals back to the caller.
-    console.error('Contact form error:', error.message, error.stack)
+    // Fixed categories only: provider errors may contain private message data.
+    console.error('Contact delivery failed')
+    await reportContactFailure(req, error?.name === 'TimeoutError' || error?.name === 'AbortError' ? 'contact_mail_timeout' : 'contact_mail_failed')
     return res.status(500).json({ error: 'Failed to send email' })
   }
 }

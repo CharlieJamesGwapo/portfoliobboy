@@ -3,6 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import { registerServiceWorker } from './lib/registerServiceWorker'
+import { installHealthReporting } from './lib/healthReporting'
 import './index.css'
 import './components/studio-polish.css'
 // Audit refinements load last so their narrow fixes win ties.
@@ -44,6 +45,9 @@ try {
   // The server always verifies, including when initialization fails here.
   console.warn('Contact verification could not initialize.')
 }
+
+// Telemetry is optional and may never become a prerequisite for rendering.
+try { installHealthReporting() } catch { /* Best effort only. */ }
 
 armEntranceAnimations()
 

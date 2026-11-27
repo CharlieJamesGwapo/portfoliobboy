@@ -80,6 +80,7 @@ test('capture sends only sanitized enums with a fresh unlinked ID and privacy fl
   for (const [url, options] of outbound) {
     assert.equal(url, 'https://us.i.posthog.com/i/v0/e/')
     assert.equal(options.method, 'POST')
+    assert.equal(options.redirect, 'error')
     assert.ok(options.signal instanceof AbortSignal)
     assert.deepEqual(options.headers, { 'Content-Type': 'application/json' })
     const body = JSON.parse(options.body)

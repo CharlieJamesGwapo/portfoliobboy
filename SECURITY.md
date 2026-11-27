@@ -23,6 +23,14 @@ Contact POSTs use BotID Basic verification before accepting a message. Hosted ve
 
 Browser profiles, offline storage, API origins and CDN caching are separate layers. API/private responses never enter the portfolio's service-worker caches. Hashed bundles cache permanently; stable fonts/media refresh in the background; the stable resume and HTML prefer fresh network data. Service-worker upgrades wait for the visitor's update action to preserve drafts.
 
+## Health monitoring and private alerts
+
+[Portfolio Health](docs/health/README.md) documents the separate private dashboard, independent five-minute GitHub probes and owner-approved email delivery to `capstonee2@gmail.com`. Technical-error thresholds are checked hourly. The monitor sends synthetic results directly to the personal PostHog project so website failure does not prevent recording an outage. Scheduling remains best effort; missing samples mean unknown coverage.
+
+Operational events accept only fixed categories and timing/status buckets. No raw exception, stack trace, visitor identity, message, transcript, form content or URL is reported. Public callers cannot claim server-contact failures or synthetic uptime results. Browser reports honor DNT/GPC, are bounded/deduplicated, and remain untrusted observations. Contact error reports are independently limited to one fixed category per minute per function instance, including failure paths before submission throttling. The uncached `/api/health` route exposes configuration readiness only and performs no billable provider or email calls.
+
+Alert emails use fixed bodies and the approved owner address. A separate Resend sending-only key is encrypted in GitHub and the PostHog destination; the original contact key is unchanged. Repeated outage emails share a UTC-hour idempotency key. The native destination overrides the template's event/person payload and disables debug logging; a mocked invocation verified private canaries did not reach its request. No paid observability plan, session replay or exception SDK was enabled.
+
 ## Verified scope and remaining browser limitations
 
 The November 27 stability update passed 159 Node checks, 2 Python checks, 56 targeted security checks and all 60 production-preview Chromium checks, including the one-minute voice deadline. All 51 contact/layout/audio checks passed across Chromium, Firefox and WebKit. Full npm audit reported no known advisories. These automated voice tests mock provider traffic and microphone input; they do not spend call credits. This records the checks performed, not a comprehensive penetration test.

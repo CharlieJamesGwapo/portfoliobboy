@@ -36,14 +36,16 @@ test('contact success is counted only after delivery, without contact contents',
     res = response()
     await contact(request(), res)
     assert.equal(res.code, 500)
-    assert.equal(events.length, 1)
+    assert.equal(events.length, 2)
+    assert.equal(events[1].event, 'portfolio_health_error')
+    assert.equal(events[1].properties.code, 'contact_mail_rejected')
     deliveryOk = true
     for (const headers of [{ dnt: '1' }, { 'sec-gpc': '1' }]) {
       res = response()
       await contact(request(headers), res)
       assert.equal(res.code, 200)
     }
-    assert.equal(events.length, 1)
+    assert.equal(events.length, 2)
     analyticsOffline = true
     res = response()
     await contact(request(), res)

@@ -1,0 +1,53 @@
+name: Portfolio health
+
+on:
+  schedule:
+    # GitHub scheduling is best effort; offset from the busy top of the hour.
+    - cron: '2-59/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      test_email:
+        description: Send one clearly labelled email setup test
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Check fixed public portfolio and record independent results
+        id: monitor
+        continue-on-error: true
+        run: node scripts/monitor_portfolio_health.mjs
+        env:
+          POSTHOG_PROJECT_KEY: ${{ secrets.PORTFOLIO_MONITOR_POSTHOG_KEY }}
+          POSTHOG_API_HOST: https://us.i.posthog.com
+      - name: Email fixed recipient when availability monitoring needs attention
+        if: steps.monitor.outcome == 'failure'
+        run: node scripts/send_portfolio_health_alert.mjs
+        env:
+          PORTFOLIO_MONITOR_RESEND_KEY: ${{ secrets.PORTFOLIO_MONITOR_RESEND_KEY }}
+      - name: Send explicitly requested email setup test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_email
+        run: node scripts/send_portfolio_health_alert.mjs --setup
+        env:
+          PORTFOLIO_MONITOR_RESEND_KEY: ${{ secrets.PORTFOLIO_MONITOR_RESEND_KEY }}
+      - name: Preserve failed availability monitor status
+        if: always() && steps.monitor.outcome == 'failure'
+        run: exit 1

@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { auditSiteSecurity } from '../scripts/audit_site_security.mjs'
 
-function deployment({ badFont = false, exposedOrigin = false, badCors = false } = {}) {
+function deployment({ badFont = false, exposedOrigin = false, badCors = false, badHealth = false } = {}) {
   const calls = []
   const fetcher = async (url, options) => {
     calls.push({ path: url.pathname, method: options.method })
@@ -20,7 +20,7 @@ function deployment({ badFont = false, exposedOrigin = false, badCors = false } 
         : url.pathname.startsWith('/fonts/') ? `public, max-age=86400${badFont ? ', immutable' : ''}`
           : url.pathname.endsWith('.webp') ? 'public, max-age=3600' : 'public, max-age=0, must-revalidate'
     return new Response(options.method === 'GET' ? '<script type="module" src="/assets/index-12345678.js"></script>' : null, {
-      status: api ? 403 : 200,
+      status: url.pathname === '/api/health' ? badHealth ? 503 : 200 : api ? 403 : 200,
       headers: { 'Cache-Control': cache, 'CDN-Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex',
         'X-Content-Type-Options': 'nosniff', 'Strict-Transport-Security': 'max-age=63072000',
         'Content-Security-Policy': "script-src-attr 'none'; object-src 'none'; frame-ancestors 'self'" },
@@ -33,12 +33,13 @@ test('live security audit verifies headers and origins without sending visitor d
   const { fetcher, calls } = deployment()
   const report = await auditSiteSecurity('https://portfoliobboy.vercel.app', fetcher)
   assert.equal(report.passed, true)
-  assert.equal(report.checks.length, 16)
+  assert.equal(report.checks.length, 17)
+  assert.ok(report.checks.some(check => check.path === '/api/health' && check.status === 200))
   assert.ok(calls.every(call => ['GET', 'HEAD', 'OPTIONS'].includes(call.method)))
 })
 
 test('live security audit detects stale immutable fonts and permissive preflights', async () => {
-  for (const options of [{ badFont: true }, { exposedOrigin: true }, { badCors: true }]) {
+  for (const options of [{ badFont: true }, { exposedOrigin: true }, { badCors: true }, { badHealth: true }]) {
     const report = await auditSiteSecurity('https://portfoliobboy.vercel.app', deployment(options).fetcher)
     assert.equal(report.passed, false)
   }

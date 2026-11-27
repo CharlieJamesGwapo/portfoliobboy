@@ -21,7 +21,7 @@ export async function auditSiteSecurity(origin = DEFAULT_ORIGIN, fetcher = fetch
     ['/', 'document'], ['/projects', 'document'], ['/projects/oneride', 'document'],
     ['/sw.js', 'document'], ['/charlie-james-abejo-resume.pdf', 'document'],
     ['/fonts/geist-sans-variable.woff2', 'font'], ['/profile-2026.webp', 'media'],
-    [asset, 'bundle'], ['/api/contact', 'api'], ['/api/analytics', 'api'],
+    [asset, 'bundle'], ['/api/contact', 'api'], ['/api/analytics', 'api'], ['/api/health', 'health'],
   ]
   const results = await Promise.all(checks.map(async ([path, kind]) => {
     const response = await request(path)
@@ -38,7 +38,7 @@ export async function auditSiteSecurity(origin = DEFAULT_ORIGIN, fetcher = fetch
     if (kind === 'bundle' && !/max-age=31536000, immutable/.test(cache)) errors.push('Bundle is not immutable')
     if (kind === 'font' && (/immutable/.test(cache) || !/max-age=86400(?:,|$)/.test(cache))) errors.push('Stable font has stale-cache risk')
     if (kind === 'media' && !/max-age=3600(?:,|$)/.test(cache)) errors.push('Stable media freshness differs')
-    if (kind === 'api') {
+    if (kind === 'api' || kind === 'health') {
       if (!/private/.test(cache) || !/no-store/.test(cache) || !/no-store/.test(header('cdn-cache-control'))) errors.push('API may be cached')
       if (!/noindex/.test(header('x-robots-tag'))) errors.push('API indexing is not disabled')
     }

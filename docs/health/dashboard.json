@@ -1,0 +1,539 @@
+{
+  "projectId": 769787,
+  "dashboardId": 2419841,
+  "url": "https://us.posthog.com/project/769787/dashboard/2419841",
+  "private": true,
+  "timezone": "UTC",
+  "defaultRange": "-24h",
+  "observational": true,
+  "metricsApproved": false,
+  "insights": [
+    {
+      "id": 14710399,
+      "shortId": "UnvSGwAg",
+      "name": "Observed homepage availability",
+      "layout": {
+        "x": 0,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      },
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "dateRange": {
+            "date_from": "-24h",
+            "excludeIncompletePeriods": false,
+            "explicitDate": false
+          },
+          "filterTestAccounts": false,
+          "interval": "hour",
+          "kind": "TrendsQuery",
+          "properties": [],
+          "series": [
+            {
+              "event": "portfolio_uptime_checked",
+              "kind": "EventsNode",
+              "math": "total",
+              "properties": [
+                {
+                  "key": "target",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "homepage"
+                  ]
+                },
+                {
+                  "key": "status",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "up"
+                  ]
+                }
+              ]
+            },
+            {
+              "event": "portfolio_uptime_checked",
+              "kind": "EventsNode",
+              "math": "total",
+              "properties": [
+                {
+                  "key": "target",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "homepage"
+                  ]
+                }
+              ]
+            }
+          ],
+          "trendsFilter": {
+            "aggregationAxisFormat": "percentage_scaled",
+            "display": "Metric",
+            "excludeBoxPlotOutliers": true,
+            "formulaNodes": [
+              {
+                "custom_name": "Observed homepage availability",
+                "formula": "A/B"
+              }
+            ],
+            "hideWeekends": false,
+            "legendPosition": "bottom",
+            "metricColorByDirection": false,
+            "metricShowChange": false,
+            "metricSummary": "total",
+            "resultCustomizationBy": "value",
+            "showAlertThresholdLines": false,
+            "showAnnotations": true,
+            "showLegend": false,
+            "showMultipleYAxes": false,
+            "showPercentStackView": false,
+            "showValuesOnSeries": false,
+            "smoothingIntervals": 1,
+            "stackBreakdownValues": false,
+            "yAxisScaleType": "linear",
+            "yAxisStartAtZero": true
+          },
+          "version": 4
+        }
+      }
+    },
+    {
+      "id": 14710401,
+      "shortId": "43CP9pdn",
+      "name": "Homepage checks received",
+      "layout": {
+        "x": 3,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      },
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "dateRange": {
+            "date_from": "-24h",
+            "excludeIncompletePeriods": false,
+            "explicitDate": false
+          },
+          "filterTestAccounts": false,
+          "interval": "hour",
+          "kind": "TrendsQuery",
+          "properties": [],
+          "series": [
+            {
+              "event": "portfolio_uptime_checked",
+              "kind": "EventsNode",
+              "math": "total",
+              "properties": [
+                {
+                  "key": "target",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "homepage"
+                  ]
+                }
+              ]
+            }
+          ],
+          "trendsFilter": {
+            "aggregationAxisFormat": "numeric",
+            "display": "Metric",
+            "excludeBoxPlotOutliers": true,
+            "hideWeekends": false,
+            "legendPosition": "bottom",
+            "metricColorByDirection": false,
+            "metricShowChange": false,
+            "metricSummary": "total",
+            "resultCustomizationBy": "value",
+            "showAlertThresholdLines": false,
+            "showAnnotations": true,
+            "showLegend": false,
+            "showMultipleYAxes": false,
+            "showPercentStackView": false,
+            "showValuesOnSeries": false,
+            "smoothingIntervals": 1,
+            "stackBreakdownValues": false,
+            "yAxisScaleType": "linear",
+            "yAxisStartAtZero": true
+          },
+          "version": 4
+        }
+      }
+    },
+    {
+      "id": 14710421,
+      "shortId": "4xSArqDb",
+      "name": "Failed availability checks",
+      "layout": {
+        "x": 6,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      },
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "dateRange": {
+            "date_from": "-24h",
+            "excludeIncompletePeriods": false,
+            "explicitDate": false
+          },
+          "filterTestAccounts": false,
+          "interval": "hour",
+          "kind": "TrendsQuery",
+          "properties": [],
+          "series": [
+            {
+              "event": "portfolio_uptime_checked",
+              "kind": "EventsNode",
+              "math": "total",
+              "properties": [
+                {
+                  "key": "status",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "down"
+                  ]
+                }
+              ]
+            }
+          ],
+          "trendsFilter": {
+            "aggregationAxisFormat": "numeric",
+            "display": "Metric",
+            "excludeBoxPlotOutliers": true,
+            "hideWeekends": false,
+            "legendPosition": "bottom",
+            "metricColorByDirection": false,
+            "metricShowChange": false,
+            "metricSummary": "total",
+            "resultCustomizationBy": "value",
+            "showAlertThresholdLines": false,
+            "showAnnotations": true,
+            "showLegend": false,
+            "showMultipleYAxes": false,
+            "showPercentStackView": false,
+            "showValuesOnSeries": false,
+            "smoothingIntervals": 1,
+            "stackBreakdownValues": false,
+            "yAxisScaleType": "linear",
+            "yAxisStartAtZero": true
+          },
+          "version": 4
+        }
+      }
+    },
+    {
+      "id": 14710422,
+      "shortId": "laovJVD3",
+      "name": "Reported technical errors",
+      "layout": {
+        "x": 9,
+        "y": 2,
+        "w": 3,
+        "h": 3
+      },
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "dateRange": {
+            "date_from": "-24h",
+            "excludeIncompletePeriods": false,
+            "explicitDate": false
+          },
+          "filterTestAccounts": false,
+          "interval": "hour",
+          "kind": "TrendsQuery",
+          "properties": [],
+          "series": [
+            {
+              "event": "portfolio_health_error",
+              "kind": "EventsNode",
+              "math": "total"
+            }
+          ],
+          "trendsFilter": {
+            "aggregationAxisFormat": "numeric",
+            "display": "Metric",
+            "excludeBoxPlotOutliers": true,
+            "hideWeekends": false,
+            "legendPosition": "bottom",
+            "metricColorByDirection": false,
+            "metricShowChange": false,
+            "metricSummary": "total",
+            "resultCustomizationBy": "value",
+            "showAlertThresholdLines": false,
+            "showAnnotations": true,
+            "showLegend": false,
+            "showMultipleYAxes": false,
+            "showPercentStackView": false,
+            "showValuesOnSeries": false,
+            "smoothingIntervals": 1,
+            "stackBreakdownValues": false,
+            "yAxisScaleType": "linear",
+            "yAxisStartAtZero": true
+          },
+          "version": 4
+        }
+      }
+    },
+    {
+      "id": 14710424,
+      "shortId": "8ydNUmcG",
+      "name": "Check results by service",
+      "layout": {
+        "x": 0,
+        "y": 5,
+        "w": 8,
+        "h": 4
+      },
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "breakdownFilter": {
+            "breakdown_limit": 5,
+            "breakdown_type": "event",
+            "breakdowns": [
+              {
+                "property": "target",
+                "type": "event"
+              }
+            ]
+          },
+          "dateRange": {
+            "date_from": "-24h",
+            "excludeIncompletePeriods": false,
+            "explicitDate": false
+          },
+          "filterTestAccounts": false,
+          "interval": "hour",
+          "kind": "TrendsQuery",
+          "properties": [],
+          "series": [
+            {
+              "custom_name": "Up",
+              "event": "portfolio_uptime_checked",
+              "kind": "EventsNode",
+              "math": "total",
+              "properties": [
+                {
+                  "key": "status",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "up"
+                  ]
+                }
+              ]
+            },
+            {
+              "custom_name": "Down",
+              "event": "portfolio_uptime_checked",
+              "kind": "EventsNode",
+              "math": "total",
+              "properties": [
+                {
+                  "key": "status",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "down"
+                  ]
+                }
+              ]
+            }
+          ],
+          "trendsFilter": {
+            "aggregationAxisFormat": "numeric",
+            "display": "ActionsTable",
+            "excludeBoxPlotOutliers": true,
+            "hideWeekends": false,
+            "legendPosition": "bottom",
+            "metricColorByDirection": false,
+            "metricShowChange": true,
+            "metricSummary": "total",
+            "resultCustomizationBy": "value",
+            "showAlertThresholdLines": false,
+            "showAnnotations": true,
+            "showLegend": true,
+            "showMultipleYAxes": false,
+            "showPercentStackView": false,
+            "showValuesOnSeries": false,
+            "smoothingIntervals": 1,
+            "stackBreakdownValues": false,
+            "yAxisScaleType": "linear",
+            "yAxisStartAtZero": true
+          },
+          "version": 4
+        }
+      }
+    },
+    {
+      "id": 14710425,
+      "shortId": "HpxQlmfh",
+      "name": "Error categories",
+      "layout": {
+        "x": 0,
+        "y": 9,
+        "w": 6,
+        "h": 4
+      },
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "breakdownFilter": {
+            "breakdown_limit": 11,
+            "breakdown_type": "event",
+            "breakdowns": [
+              {
+                "property": "code",
+                "type": "event"
+              }
+            ]
+          },
+          "dateRange": {
+            "date_from": "-24h",
+            "excludeIncompletePeriods": false,
+            "explicitDate": false
+          },
+          "filterTestAccounts": false,
+          "interval": "hour",
+          "kind": "TrendsQuery",
+          "properties": [],
+          "series": [
+            {
+              "event": "portfolio_health_error",
+              "kind": "EventsNode",
+              "math": "total"
+            }
+          ],
+          "trendsFilter": {
+            "aggregationAxisFormat": "numeric",
+            "display": "ActionsBarValue",
+            "excludeBoxPlotOutliers": true,
+            "hideWeekends": false,
+            "legendPosition": "bottom",
+            "metricColorByDirection": false,
+            "metricShowChange": true,
+            "metricSummary": "total",
+            "resultCustomizationBy": "value",
+            "showAlertThresholdLines": false,
+            "showAnnotations": true,
+            "showLegend": true,
+            "showMultipleYAxes": false,
+            "showPercentStackView": false,
+            "showValuesOnSeries": false,
+            "smoothingIntervals": 1,
+            "stackBreakdownValues": false,
+            "yAxisScaleType": "linear",
+            "yAxisStartAtZero": true
+          },
+          "version": 4
+        }
+      }
+    },
+    {
+      "id": 14710426,
+      "shortId": "0Q4oq8ZV",
+      "name": "Operational signals over time",
+      "layout": {
+        "x": 6,
+        "y": 9,
+        "w": 6,
+        "h": 4
+      },
+      "query": {
+        "kind": "InsightVizNode",
+        "source": {
+          "dateRange": {
+            "date_from": "-24h",
+            "excludeIncompletePeriods": false,
+            "explicitDate": false
+          },
+          "filterTestAccounts": false,
+          "interval": "hour",
+          "kind": "TrendsQuery",
+          "properties": [],
+          "series": [
+            {
+              "custom_name": "Technical error reports",
+              "event": "portfolio_health_error",
+              "kind": "EventsNode",
+              "math": "total"
+            },
+            {
+              "custom_name": "Failed checks",
+              "event": "portfolio_uptime_checked",
+              "kind": "EventsNode",
+              "math": "total",
+              "properties": [
+                {
+                  "key": "status",
+                  "operator": "exact",
+                  "type": "event",
+                  "value": [
+                    "down"
+                  ]
+                }
+              ]
+            }
+          ],
+          "trendsFilter": {
+            "aggregationAxisFormat": "numeric",
+            "display": "ActionsLineGraph",
+            "excludeBoxPlotOutliers": true,
+            "hideWeekends": false,
+            "legendPosition": "bottom",
+            "metricColorByDirection": false,
+            "metricShowChange": true,
+            "metricSummary": "total",
+            "resultCustomizationBy": "value",
+            "showAlertThresholdLines": false,
+            "showAnnotations": true,
+            "showLegend": true,
+            "showMultipleYAxes": false,
+            "showPercentStackView": false,
+            "showValuesOnSeries": false,
+            "smoothingIntervals": 1,
+            "stackBreakdownValues": false,
+            "yAxisScaleType": "linear",
+            "yAxisStartAtZero": true
+          },
+          "version": 4
+        }
+      }
+    }
+  ],
+  "reusedAcceptedContacts": {
+    "id": 14685206,
+    "shortId": "YXmqtjKi",
+    "existingDashboardId": 2416983,
+    "tileId": 16352748,
+    "layout": {
+      "x": 8,
+      "y": 5,
+      "w": 4,
+      "h": 4
+    }
+  },
+  "alerts": {
+    "destination": "capstonee2@gmail.com",
+    "technicalErrorAlertId": "01a21b39-2ec1-7f69-bdf4-c9f0c4ad247f",
+    "enabled": true,
+    "cadence": "hourly",
+    "destinationId": "01a21b3b-4ef8-0000-0959-e9212f430584"
+  },
+  "privacy": {
+    "freeText": false,
+    "sessionReplay": false,
+    "personProfiles": false,
+    "visitorIdentity": false,
+    "rawExceptions": false
+  }
+}

@@ -191,6 +191,12 @@ Once connected, voice sends a bounded public evidence update built by [src/lib/v
 
 Microphone denial and provider failures expose Continue in text. This stops audio and keeps the transcript/draft in the same workspace, using local portfolio answers and existing project/enquiry tools. Try voice again requires an explicit click; it never restarts the microphone from a text question.
 
+### Operational health monitoring
+
+The private [Portfolio Health dashboard](docs/health/README.md) in the existing personal PostHog project shows observed availability, monitoring coverage, fixed error categories and accepted enquiries. `shared/healthTelemetry.js` keeps its event contracts separate from the eight product-action events. The public analytics endpoint accepts only client error categories; server-contact failures and synthetic uptime are privileged. Browser health reporting is bounded, respects DNT/GPC, excludes normal voice endings and never sends raw exceptions or private text. Contact reports are independently deduplicated per fixed category/minute/function instance.
+
+`api/health.js` provides uncached configuration readiness without reading provider state or sending mail. The five-minute GitHub workflow checks only canonical safe routes and reports directly to PostHog independently of the portfolio host. Fixed owner-email alerts use a separate sending-only key, UTC-hour outage idempotency and hourly native PostHog error thresholds. Native configuration/limitations are recorded in `docs/health/`; no new public admin dashboard or query credential is exposed. The live security audit includes this route for 17 safe checks.
+
 ### Local portfolio assistant
 
 `PortfolioAssistant` opens a lazy `AssistantPanel`. [src/lib/assistantAnswers.js](src/lib/assistantAnswers.js) matches questions against local portfolio and voice data, with contact-oriented fallbacks. Text answers do not call an LLM API. Three guided modes in the existing panel add project recommendations, recruiter comparisons, and brief preparation through [src/lib/assistantWorkflows.js](src/lib/assistantWorkflows.js):
