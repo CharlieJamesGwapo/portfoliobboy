@@ -70,3 +70,37 @@ test('navigation eviction preserves the permanent offline fallback documents', a
   assert.equal(w.deleted.length, 1)
   assert.ok(w.deleted.every(key => !fixed.includes(new URL(key.url).pathname)))
 })
+
+test('stable font cache hits refresh bytes without disrupting the current render', async () => {
+  let requestedCacheMode
+  const w = worker({ cached: new Response('old font'), fetch: async request => {
+    requestedCacheMode = request.cache
+    return new Response('updated font')
+  } })
+  const event = w.send(new Request('https://portfolio.example/fonts/geist-sans-variable.woff2'))
+  assert.equal(await (await event.result).text(), 'old font')
+  await Promise.all(event.lifetime)
+  assert.equal(requestedCacheMode, 'no-cache')
+  assert.equal(w.writes, 1)
+})
+
+test('private responses never enter the offline media cache', async () => {
+  const w = worker({ fetch: async () => new Response('private image', { headers: { 'Cache-Control': 'private, max-age=60' } }) })
+  const event = w.send(new Request('https://portfolio.example/private-image.png'))
+  assert.equal(await (await event.result).text(), 'private image')
+  await Promise.all(event.lifetime)
+  assert.equal(w.writes, 0)
+})
+
+test('hashed bundle cache hits avoid the network and APIs stay outside offline caches', async () => {
+  let requests = 0
+  const w = worker({ cached: new Response('hashed bundle'), fetch: async () => { requests++; return new Response('network') } })
+  const bundle = w.send(new Request('https://portfolio.example/assets/index-a1b2c3d4.js'))
+  assert.equal(await (await bundle.result).text(), 'hashed bundle')
+  assert.equal(requests, 0)
+  for (const path of ['/api/contact', '/api/analytics?asset=fake.woff2']) {
+    const event = w.send(new Request(`https://portfolio.example${path}`))
+    assert.equal(event.result, undefined)
+    assert.equal(event.lifetime.length, 0)
+  }
+})

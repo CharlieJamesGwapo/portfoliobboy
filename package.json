@@ -10,6 +10,7 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender_routes.mjs",
     "test": "node --test && python3 -m unittest discover -s tests -p 'test_*.py'",
+    "audit:site-security": "node scripts/audit_site_security.mjs",
     "test:e2e": "playwright test",
     "preview": "vite preview",
     "deploy": "npx vercel deploy --prod",

@@ -1,26 +1,13 @@
 import { createHmac, randomBytes } from 'node:crypto'
 import { normalizeAnalyticsEvent } from '../shared/portfolioAnalytics.js'
 import { capturePortfolioEvent } from '../server/portfolioAnalytics.js'
-
-const ALLOWED_ORIGINS = new Set([
-  'https://portfoliobboy.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:4173',
-  'http://127.0.0.1:5175',
-])
+import { isAllowedPortfolioOrigin } from '../server/requestSecurity.js'
 const MAX_BODY_BYTES = 1024
 const WINDOW_MS = 10 * 60 * 1000
 const MAX_EVENTS = 60
 const MAX_COUNTERS = 1000
 const counters = new Map()
 const counterSalt = randomBytes(32)
-
-function isAllowedOrigin(origin) {
-  if (typeof origin !== 'string') return false
-  if (ALLOWED_ORIGINS.has(origin)) return true
-  return [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
-    .some((host) => host && origin === `https://${host}`)
-}
 
 // An ephemeral, bounded per-instance backstop, not a distributed rate limit.
 // IP addresses are salted before entering memory and never sent to PostHog.
@@ -49,7 +36,7 @@ export default async function handler(req, res) {
   res.setHeader('CDN-Cache-Control', 'no-store')
   res.setHeader('Vercel-CDN-Cache-Control', 'no-store')
   const origin = req.headers.origin
-  if (!isAllowedOrigin(origin)) return res.status(403).json({ error: 'Forbidden' })
+  if (!isAllowedPortfolioOrigin(origin)) return res.status(403).json({ error: 'Forbidden' })
   res.setHeader('Access-Control-Allow-Origin', origin)
   res.setHeader('Vary', 'Origin')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')

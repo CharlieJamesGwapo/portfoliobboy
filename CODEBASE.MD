@@ -221,6 +221,8 @@ The nine games are Dungeon Crawler, Space Shooter, Code Racer, Block Blast, Raci
 
 ### Themes, performance, and offline behavior
 
+- `server/requestSecurity.js` shares exact origin validation across contact and analytics; hosted deployments reject loopback origins. `scripts/audit_site_security.mjs` verifies live headers, cache policies and origin preflights without submitting visitor data.
+- Stable fonts/media refresh rather than using immutable browser caches. Private responses are excluded from offline caches. `SECURITY.md` records traffic/provider limits, and `.github/workflows/security.yml` plus Dependabot maintain repeatable security/dependency checks.
 - `components/motion.css` supplies staggered hero entrances, layered client-study reveals, directional featured-project transitions and optional desktop scroll-timeline image depth. The primary headline remains readable during its entrance. Project switching remains manual.
 - `main.jsx` responds to reduced-motion changes during a visit. `sectionNavigation.js` exposes focused/linked content immediately; section links use native smooth scrolling while cold links and browser history settle immediately. Focus alone does not open a disclosure.
 - `public/theme-init.js` applies a saved/system theme before React paints; `ThemeToggle` persists visitor choices and reacts to system changes.

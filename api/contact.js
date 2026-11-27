@@ -1,20 +1,6 @@
 import { createHash } from 'node:crypto'
 import { capturePortfolioEvent } from '../server/portfolioAnalytics.js'
-
-// Exact origins only: accepting arbitrary *.vercel.app also accepts attackers.
-const ALLOWED_ORIGINS = new Set([
-  'https://portfoliobboy.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:4173',
-  'http://127.0.0.1:5175',
-])
-
-const isAllowedOrigin = (origin) => {
-  if (typeof origin !== 'string') return false
-  if (ALLOWED_ORIGINS.has(origin)) return true
-  return [process.env.VERCEL_URL, process.env.VERCEL_BRANCH_URL]
-    .some((host) => host && origin === `https://${host}`)
-}
+import { isAllowedPortfolioOrigin } from '../server/requestSecurity.js'
 
 const LIMITS = { name: 120, email: 254, subject: 200, message: 5000 }
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
@@ -50,7 +36,7 @@ export default async function handler(req, res) {
   res.setHeader('Vercel-CDN-Cache-Control', 'no-store')
   const origin = req.headers.origin
 
-  if (!isAllowedOrigin(origin)) {
+  if (!isAllowedPortfolioOrigin(origin)) {
     return res.status(403).json({ error: 'Forbidden' })
   }
 

@@ -1,0 +1,20 @@
+# Security
+
+Report a portfolio vulnerability privately to **capstonee2@gmail.com** or use this repository's private vulnerability reporting when available. Include the affected URL, a description and safe reproduction steps. Do not post credentials, visitor messages or exploitable details in a public issue.
+
+The supported website is https://portfoliobboy.vercel.app and the current `main` branch. Security fixes are released to that branch and deployed through Vercel.
+
+## Maintainer checks
+
+- `npm audit --omit=dev` checks published dependency advisories.
+- `npm test` exercises repository protections, API validation, privacy, caching and portfolio behavior.
+- `npm run audit:site-security` checks live headers, cache policy and origin preflights without sending mail or recording events.
+- GitHub's security workflow repeats targeted tests and dependency auditing on pushes, pull requests and weekly. Dependabot proposes dependency/action updates for review; updates are not automatically merged.
+
+## Traffic and provider limits
+
+Vercel supplies CDN delivery and automatic DDoS mitigation. Contact and analytics handlers have bounded per-instance rate-limit backstops; these are not distributed counters. Inspect and approve project firewall changes separately. The Hobby plan allows one rate-limit rule per project, so preserve existing rules and inspect their scope before modifying them.
+
+The two-minute voice deadline in the browser is a UX limit, not a provider-side spending control. Keep the ElevenLabs agent's allowed domains, maximum conversation duration, concurrency and account budget configured in ElevenLabs. Those provider settings were not changed by this repository release.
+
+Browser profiles, offline storage, API origins and CDN caching are separate layers. API/private responses never enter the portfolio's service-worker caches. Hashed bundles cache permanently; stable fonts/media refresh in the background; the stable resume and HTML prefer fresh network data. Service-worker upgrades wait for the visitor's update action to preserve drafts.

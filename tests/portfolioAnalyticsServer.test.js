@@ -6,6 +6,18 @@ const contract = () => import('../shared/portfolioAnalytics.js')
 const capture = () => import('../server/portfolioAnalytics.js')
 const endpoint = () => import('../api/analytics.js')
 const validBody = { event: 'portfolio_voice_started', properties: { surface: 'voice_home' } }
+
+test('hosted analytics rejects development origins before recording events', async (t) => {
+  configure(t, { VERCEL: '1', VERCEL_ENV: 'preview' })
+  t.mock.method(globalThis, 'fetch', async () => { throw new Error('Provider must not be called') })
+  const { default: handler } = await endpoint()
+  for (const origin of ['http://localhost:5173', 'http://127.0.0.1:5175']) {
+    const res = response()
+    await handler(request({ method: 'OPTIONS', headers: { origin } }), res)
+    assert.equal(res.statusCode, 403)
+  }
+  assert.equal(fetch.mock.callCount(), 0)
+})
 function response() {
   return { headers: {}, statusCode: 200, setHeader(key, value) { this.headers[key] = value }, status(code) { this.statusCode = code; return this }, json(body) { this.body = body; return this }, end() { return this } }
 }

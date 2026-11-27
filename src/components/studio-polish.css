@@ -1,6 +1,6 @@
 /* Shared studio scale: semantic colors, readable measures, restrained motion. */
-@font-face { font-family: 'Geist Sans'; src: url('/fonts/geist-sans-variable.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Geist Mono'; src: url('/fonts/geist-mono-variable.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Geist Sans'; src: url('/fonts/geist-sans-variable.woff2?v=19f9c92546aa') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Geist Mono'; src: url('/fonts/geist-mono-variable.woff2?v=684ad5b531f8') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
 :root { --studio-width: 1400px; --studio-gutter: clamp(20px, 4vw, 64px); --duration-fast: 160ms; --duration-base: 280ms; --reveal-duration: 500ms; }
 html body { font-family: 'Geist Sans', ui-sans-serif, sans-serif; font-size: 17px; line-height: 1.65; }
 body .page-container, body .case-study-container { width: min(var(--studio-width), calc(100% - var(--studio-gutter) * 2)); margin-inline: auto; }

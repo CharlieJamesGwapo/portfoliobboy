@@ -28,11 +28,11 @@
   ],
   "headers": [
     {
-      "source": "/(.*).(png|webp|jpg|jpeg|svg|ico|pdf|woff2)",
+      "source": "/(.*)\\.(png|webp|jpg|jpeg|svg|ico|pdf|woff2)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
         }
       ]
     },
@@ -81,7 +81,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
+          "value": "public, max-age=86400, stale-while-revalidate=86400"
         }
       ]
     },
@@ -90,7 +90,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
         }
       ]
     },
@@ -99,7 +99,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=2592000, stale-while-revalidate=86400"
+          "value": "public, max-age=3600, stale-while-revalidate=86400"
         }
       ]
     },
@@ -144,6 +144,10 @@
     {
       "source": "/api/(.*)",
       "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, nosnippet"
+        },
         {
           "key": "Cache-Control",
           "value": "private, no-store"

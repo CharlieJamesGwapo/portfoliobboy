@@ -1,0 +1,33 @@
+name: Security checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '19 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm audit --audit-level=moderate
+      - name: Verify API boundaries, cache safety and repository protections
+        run: node --test tests/repoSecurity.test.js tests/hostingSecurity.test.js tests/contactSecurity.test.js tests/contactAnalytics.test.js tests/apiOriginPolicy.test.js tests/portfolioAnalyticsServer.test.js tests/serviceWorkerCaching.test.js tests/siteSecurityAudit.test.js

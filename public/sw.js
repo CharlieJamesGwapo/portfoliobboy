@@ -1,8 +1,8 @@
 /* eslint-env serviceworker */
-// Hashed bundles/fonts are cache-first; stable media refreshes in the
+// Hashed bundles are cache-first; stable media and fonts refresh in the
 // background. HTML and the stable resume route prefer fresh network bytes.
 // APIs, cross-origin requests and non-GET requests never enter these caches.
-const CACHE_VERSION = 'v5'
+const CACHE_VERSION = 'v6'
 const SHELL_CACHE = `portfolio-shell-${CACHE_VERSION}`
 const ASSET_CACHE = `portfolio-assets-${CACHE_VERSION}`
 const MEDIA_CACHE = `portfolio-media-${CACHE_VERSION}`
@@ -35,7 +35,8 @@ self.addEventListener('message', (event) => {
 // Cache failures must not turn a successful HTTP response into a failed load.
 // Limit entries to keep repeated deployments/media browsing from filling disk.
 async function store(cache, request, response, limit, preserveShell = false) {
-  if (!response || response.status !== 200 || !response.ok || response.headers.get('Cache-Control')?.includes('no-store')) return
+  if (!response || response.status !== 200 || !response.ok
+    || /(?:^|,)\s*(?:private|no-store)(?:\s*(?:=|,|$))/i.test(response.headers.get('Cache-Control') || '')) return
   try {
     await cache.put(request, response.clone())
     const keys = await cache.keys()
@@ -98,9 +99,9 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(networkFirst(request, event, MEDIA_CACHE, request).catch(() => fetch(request)))
   } else if (request.mode === 'navigate') {
     event.respondWith(networkFirst(request, event, SHELL_CACHE, url.pathname, event.preloadResponse).catch(() => fetch(request)))
-  } else if (url.pathname.startsWith('/assets/') || FONT_PATTERN.test(url.pathname)) {
+  } else if (url.pathname.startsWith('/assets/')) {
     event.respondWith(cacheFirst(request, ASSET_CACHE, event).catch(() => fetch(request)))
-  } else if (MEDIA_PATTERN.test(url.pathname)) {
+  } else if (MEDIA_PATTERN.test(url.pathname) || FONT_PATTERN.test(url.pathname)) {
     event.respondWith(staleWhileRevalidate(request, event).catch(() => fetch(request)))
   }
 })

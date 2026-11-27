@@ -60,3 +60,18 @@ test('only accepts the exact deployment origin supplied by trusted configuration
     if (previous === undefined) delete process.env.VERCEL_URL; else process.env.VERCEL_URL = previous
   }
 })
+
+test('hosted contact rejects loopback origins without contacting providers', async (t) => {
+  for (const [key, value] of Object.entries({ VERCEL: '1', VERCEL_ENV: 'production' })) {
+    const previous = process.env[key]
+    process.env[key] = value
+    t.after(() => { if (previous === undefined) delete process.env[key]; else process.env[key] = previous })
+  }
+  t.mock.method(globalThis, 'fetch', async () => { throw new Error('Provider must not be called') })
+  for (const origin of ['http://localhost:5173', 'http://localhost:4173', 'http://127.0.0.1:5175']) {
+    const res = response()
+    await handler(request({ method: 'OPTIONS', headers: { origin } }), res)
+    assert.equal(res.statusCode, 403)
+  }
+  assert.equal(fetch.mock.callCount(), 0)
+})
