@@ -46,19 +46,19 @@ test('selects official OneRide screenshots and exposes a recoverable image fallb
 })
 
 test('falls back to another official OneRide screenshot when a selected image fails', async ({ page }) => {
-  await page.route('**/projects/oneride/official-screen-03.png', (route) => route.abort())
+  await page.route('**/projects/oneride/official-screen-03.webp', (route) => route.abort())
   await page.goto('/#home')
   const preview = page.locator('[data-testid="oneride-preview"]')
   const image = preview.locator('img[data-testid="oneride-screen"]')
   await preview.getByRole('button', { name: /Show OneRide screenshot/i }).nth(2).click()
   await expect(preview.getByRole('status')).toContainText(/another verified official screenshot/i)
-  await expect(image).toHaveAttribute('src', /official-screen-01\.png/)
+  await expect(image).toHaveAttribute('src', /official-screen-01\.webp/)
   await expect(preview.getByRole('button', { name: /Show OneRide screenshot 1: Home/i })).toHaveAttribute('aria-pressed', 'true')
   await expect(preview.getByRole('button', { name: /Show OneRide screenshot 3: Orders/i })).toHaveAttribute('aria-pressed', 'false')
 })
 
 test('shows an honest official-listing state when every OneRide screenshot fails', async ({ page }) => {
-  await page.route('**/projects/oneride/official-screen-*.png', (route) => route.abort())
+  await page.route('**/projects/oneride/official-screen-*.webp', (route) => route.abort())
   await page.goto('/#home')
   const preview = page.locator('[data-testid="oneride-preview"]')
   await expect(preview.getByRole('status')).toContainText(/Official preview unavailable/i)
@@ -71,7 +71,7 @@ test('retries a failed OneRide screenshot after a deliberate selection', async (
   let imageAvailable = false
   // The same image also appears in the case-study gallery. Keep it unavailable
   // until the preview has exercised its fallback, regardless of request order.
-  await page.route('**/projects/oneride/official-screen-03.png', (route) => (
+  await page.route('**/projects/oneride/official-screen-03.webp', (route) => (
     imageAvailable ? route.continue() : route.abort()
   ))
   await page.goto('/#home')
@@ -86,10 +86,11 @@ test('retries a failed OneRide screenshot after a deliberate selection', async (
 })
 
 test('recovers the compact OneRide screenshot card without inventing fallback imagery', async ({ page }) => {
-  await page.route('**/projects/oneride/official-screen-02.png', (route) => route.abort())
+  await page.route('**/projects/oneride/official-screen-02.webp', (route) => route.abort())
   await page.goto('/#product-studio-preview')
   const card = page.locator('#case-oneride .case-study-image')
-  await expect(card.locator('img')).toHaveAttribute('src', /official-screen-01\.png/)
+  await card.scrollIntoViewIfNeeded()
+  await expect(card.locator('img')).toHaveAttribute('src', /official-screen-01\.webp/)
   await expect(card.locator('img')).not.toHaveAttribute('src', /zalio|gymfactories|hasti/i)
 })
 

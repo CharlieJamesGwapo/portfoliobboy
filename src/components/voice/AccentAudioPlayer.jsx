@@ -85,8 +85,11 @@ export default function AccentAudioPlayer({ src, title, peaks = [], knownDuratio
 
   const seek = (value) => {
     const audio = audioRef.current
-    if (!audio || !Number.isFinite(audio.duration)) return
-    audio.currentTime = Math.min(audio.duration, Math.max(0, value))
+    const limit = Number.isFinite(audio?.duration) ? audio.duration : knownDuration
+    if (!audio || !Number.isFinite(limit)) return
+    // Before metadata loads, currentTime sets the browser's default playback
+    // start position. Seeking remains usable without prefetching every clip.
+    audio.currentTime = Math.min(limit, Math.max(0, value))
     setCurrent(audio.currentTime)
     if (status === 'ended') setStatus('ready')
   }
@@ -109,7 +112,7 @@ export default function AccentAudioPlayer({ src, title, peaks = [], knownDuratio
         key={audioSrc}
         ref={audioRef}
         src={audioSrc}
-        preload="metadata"
+        preload="none"
         muted={muted}
         onLoadedMetadata={(event) => { setDuration(event.currentTarget.duration); setStatus((value) => (value === 'error' ? value : value === 'loading' ? value : 'ready')) }}
         onDurationChange={(event) => Number.isFinite(event.currentTarget.duration) && setDuration(event.currentTarget.duration)}

@@ -50,7 +50,7 @@ for (const width of [320, 1440]) {
 }
 
 test('failed OneRide screenshots leave the narrative and public evidence available', async ({ page }) => {
-  await page.route('**/projects/oneride/official-screen-03.png', route => route.abort())
+  await page.route('**/projects/oneride/official-screen-03.webp', route => route.abort())
   await page.goto('/projects/oneride#oneride-walkthrough')
   const story = page.locator('.oneride-story')
   await story.getByRole('button', { name: /Orders/ }).click()

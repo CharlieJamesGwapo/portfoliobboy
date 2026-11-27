@@ -26,6 +26,7 @@ import {
   Sparkles,
   User,
   Wrench,
+  X,
   Zap,
 } from 'lucide-react'
 import { featuredProjects, navigation, profile, resumeUrl } from '../data/portfolioData'
@@ -84,7 +85,11 @@ export default function CommandPalette({ open, onClose }) {
   const [copied, setCopied] = useState(false)
   const inputRef = useRef(null)
   const listRef = useRef(null)
+  const backdropRef = useRef(null)
+  const dialogRef = useRef(null)
+  const closeRef = useRef(null)
   const returnFocusRef = useRef(null)
+  const releaseBackgroundRef = useRef(null)
 
   const goTo = useCallback((hash) => {
     if (hash === '#lab') { navigatePortfolio('/lab'); return }
@@ -218,17 +223,36 @@ export default function CommandPalette({ open, onClose }) {
     setQuery('')
     setActive(0)
     document.body.classList.add('palette-open')
+    const dialog = dialogRef.current
+    // Isolate every sibling branch, including floating launchers and the
+    // header. Preserve inert attributes owned by an already-open disclosure.
+    const isolated = []
+    for (let branch = backdropRef.current; branch && branch !== document.body; branch = branch.parentElement) {
+      for (const sibling of branch.parentElement?.children || []) {
+        if (sibling === branch || sibling.inert || ['SCRIPT', 'STYLE', 'LINK'].includes(sibling.tagName)) continue
+        sibling.inert = true
+        isolated.push(sibling)
+      }
+    }
+    const releaseBackground = () => {
+      isolated.splice(0).forEach((element) => { element.inert = false })
+    }
+    releaseBackgroundRef.current = releaseBackground
     const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 30)
 
     return () => {
       window.clearTimeout(focusTimer)
       document.body.classList.remove('palette-open')
+      releaseBackground()
+      releaseBackgroundRef.current = null
       // Returning focus to whatever opened the palette is what makes ⌘K
       // usable twice in a row without touching the mouse. But if a command
       // already moved focus on purpose (jumping to a section), leave it there
       // instead of snatching it back to the opener.
       const current = document.activeElement
-      if (!current || current === document.body) returnFocusRef.current?.focus?.({ preventScroll: true })
+      if (!current || current === document.body || dialog?.contains(current)) {
+        returnFocusRef.current?.focus?.({ preventScroll: true })
+      }
     }
   }, [open])
 
@@ -254,7 +278,12 @@ export default function CommandPalette({ open, onClose }) {
 
   const runCommand = (command) => {
     if (!command) return
-    if (!command.keepOpen) onClose()
+    if (!command.keepOpen) {
+      // Section commands move focus immediately; make their target available
+      // before React commits the dialog's removal and runs effect cleanup.
+      releaseBackgroundRef.current?.()
+      onClose()
+    }
     command.run()
   }
 
@@ -264,12 +293,19 @@ export default function CommandPalette({ open, onClose }) {
       onClose()
       return
     }
-    if (event.key === 'ArrowDown' || (event.key === 'Tab' && !event.shiftKey)) {
+    if (event.key === 'Tab') {
+      event.preventDefault()
+      if (document.activeElement === inputRef.current) closeRef.current?.focus()
+      else inputRef.current?.focus()
+      return
+    }
+    if (event.target !== inputRef.current) return
+    if (event.key === 'ArrowDown') {
       event.preventDefault()
       setActive((index) => (results.length ? (index + 1) % results.length : 0))
       return
     }
-    if (event.key === 'ArrowUp' || (event.key === 'Tab' && event.shiftKey)) {
+    if (event.key === 'ArrowUp') {
       event.preventDefault()
       setActive((index) => (results.length ? (index - 1 + results.length) % results.length : 0))
       return
@@ -281,10 +317,11 @@ export default function CommandPalette({ open, onClose }) {
   }
 
   return (
-    <div className="palette-backdrop" onMouseDown={onClose}>
+    <div ref={backdropRef} className="palette-backdrop" onMouseDown={onClose}>
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <div
         className="palette"
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
@@ -310,7 +347,9 @@ export default function CommandPalette({ open, onClose }) {
             autoComplete="off"
             spellCheck="false"
           />
-          <kbd>Esc</kbd>
+          <button ref={closeRef} type="button" className="palette-close" aria-label="Close command palette" onClick={onClose}>
+            <X size={18} aria-hidden="true" />
+          </button>
         </div>
 
         <ul className="palette-results" id="palette-results" role="listbox" ref={listRef} aria-label="Results">
@@ -332,8 +371,8 @@ export default function CommandPalette({ open, onClose }) {
               </li>
             )
           })}
-          {results.length === 0 && <li className="palette-empty">No matches for “{query}”.</li>}
         </ul>
+        {results.length === 0 && <p className="palette-empty" role="status">No matches for “{query}”.</p>}
 
         <div className="palette-footer">
           <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>

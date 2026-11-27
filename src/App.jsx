@@ -172,10 +172,17 @@ function App() {
     const frame = window.requestAnimationFrame(jump)
     const settle = window.setTimeout(jump, 400)
 
-    return () => {
+    // A delayed correction is only for the arrival layout. Once the visitor
+    // interacts or navigates again, it must not override their next move.
+    const interruptEvents = ['pointerdown', 'keydown', 'wheel', 'touchstart', 'popstate', 'hashchange']
+    const stopSettling = () => {
       window.cancelAnimationFrame(frame)
       window.clearTimeout(settle)
+      interruptEvents.forEach((name) => window.removeEventListener(name, stopSettling, true))
     }
+    interruptEvents.forEach((name) => window.addEventListener(name, stopSettling, { capture: true, passive: true }))
+
+    return stopSettling
   }, [route.pathname])
 
   useEffect(() => {
@@ -298,7 +305,7 @@ function App() {
       <button
         type="button"
         className={`back-to-top ${showTop ? 'is-visible' : ''}`}
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
         aria-label="Back to top"
         aria-hidden={showTop ? undefined : 'true'}
         tabIndex={showTop ? 0 : -1}

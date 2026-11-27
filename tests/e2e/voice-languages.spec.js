@@ -22,6 +22,7 @@ test('a preview can retry after a failed load without reloading the page', async
   await page.route(/american-english[^/]*\.mp3/, (route) => available || route.request().resourceType() === 'script' ? route.continue() : route.abort())
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo .vs-accent-gallery')
+  await demo.getByRole('button', { name: 'Play American English preview' }).click()
   await expect(demo.getByRole('status')).toContainText("This preview couldn't load")
   available = true
   await demo.getByRole('button', { name: 'Try again', exact: true }).click()
@@ -65,6 +66,7 @@ test('a failed accent preview can recover by choosing another accent', async ({ 
   await page.goto('/#voice-demo')
   const demo = page.locator('#voice-demo .vs-accent-gallery')
   await accentButton(demo, 'Australian').click()
+  await demo.getByRole('button', { name: 'Play Australian English preview' }).click()
   await expect(demo.getByRole('status')).toContainText("This preview couldn't load")
   await accentButton(demo, 'British').click()
   await expect(demo.getByRole('status')).toHaveCount(0)

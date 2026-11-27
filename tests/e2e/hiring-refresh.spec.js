@@ -71,8 +71,8 @@ test('an in-page link reopens the archive even when the fragment has not changed
 })
 
 for (const [id, image, href] of [
-  ['zalio-crm', 'zalio.png', 'https://zalio.ai/'],
-  ['alex-hasti', 'hasti.png', 'https://hasti.com.au/'],
+  ['zalio-crm', 'zalio.webp', 'https://zalio.ai/'],
+  ['alex-hasti', 'hasti.webp', 'https://hasti.com.au/'],
 ]) {
   test(`${id} retains its public link when the preview image fails`, async ({ page }) => {
     await page.route(`**/projects/${image}`, route => route.abort())
@@ -92,7 +92,9 @@ for (const width of [320, 390, 768, 1440]) {
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
     for (const control of await page.locator('.selected-case-study a, .selected-case-study summary, #full-project-archive > summary').all()) {
       const bounds = await control.boundingBox()
-      expect(bounds.height).toBeGreaterThanOrEqual(44)
+      // Firefox can round a translated 44px control to 43.99988px when
+      // subtracting large page coordinates. Keep subpixel precision tolerance.
+      expect(bounds.height).toBeGreaterThanOrEqual(43.99)
       expect(bounds.x).toBeGreaterThanOrEqual(0)
       expect(bounds.x + bounds.width).toBeLessThanOrEqual(width)
     }

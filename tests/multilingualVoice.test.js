@@ -48,9 +48,8 @@ test('Voice Studio keeps eight accents and adds an honest multilingual section',
     for (const name of ['Mexican Spanish', 'Filipino / Taglish', 'Japanese', 'French', 'Brazilian Portuguese', 'Hindi', 'Gulf Arabic']) {
       assert.match(html, new RegExp(`>${name.replace('/', '\\/')}<`))
     }
-    // The recorded Spanish call gets the studio player (lazy, no autoplay);
-    // the unrecorded Taglish card is labelled and renders no player.
-    assert.match(html, /<audio src="[^"]*\/conversations\/es-mx[^"]*\.mp3" preload="metadata">/)
+    // Recordings remain on demand with labelled players and no autoplay.
+    assert.match(html, /<audio src="[^"]*\/conversations\/es-mx[^"]*\.mp3" preload="none">/)
     assert.match(html, /aria-label="Play Mexican Spanish conversation"/)
     // Cards without audio say so and render no player.
     const recorded = (html.match(/aria-label="Play [^"]+ conversation"/g) ?? []).length

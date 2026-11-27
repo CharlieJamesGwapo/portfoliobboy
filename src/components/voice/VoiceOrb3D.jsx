@@ -4,11 +4,19 @@ import { getVoiceLevel } from '../../lib/voiceActivity'
 // The CSS orb paints immediately and stays as the fallback. A three.js
 // particle sphere replaces its core once the orb is on screen and the browser
 // is idle, and only when motion is welcome and the connection can afford it.
-function canUpgrade() {
+function motionAllowed() {
+  // Touch screens keep the lightweight CSS visual. A decorative renderer must
+  // not compete with scrolling, media playback, or the visitor's voice session.
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return false
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
   if (connection?.saveData) return false
   if (connection?.effectiveType && connection.effectiveType !== '4g') return false
+  return true
+}
+
+function canUpgrade() {
+  if (!motionAllowed()) return false
   try {
     const probe = document.createElement('canvas')
     return Boolean(probe.getContext('webgl2') || probe.getContext('webgl'))
@@ -44,7 +52,7 @@ export default function VoiceOrb3D() {
 
     const sync = () => {
       if (!orb) return
-      if (onScreen && document.visibilityState === 'visible') orb.start()
+      if (onScreen && document.visibilityState === 'visible' && motionAllowed()) orb.start()
       else orb.stop()
     }
 
@@ -52,9 +60,11 @@ export default function VoiceOrb3D() {
       if (requested || !canUpgrade()) return
       requested = true
       cancelIdle = scheduleIdle(() => {
+        if (disposed || !onScreen || !motionAllowed()) { requested = false; return }
         import('../../lib/voiceOrbWebgl')
           .then(({ createVoiceOrb }) => {
             if (disposed) return
+            if (!onScreen || !motionAllowed()) { requested = false; return }
             orb = createVoiceOrb(canvas, {
               getLevel: getVoiceLevel,
               compact: window.matchMedia('(max-width: 640px)').matches,
@@ -88,6 +98,11 @@ export default function VoiceOrb3D() {
     }
     window.addEventListener('pointermove', onPointer, { passive: true })
     document.addEventListener('visibilitychange', sync)
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const pointerPreference = window.matchMedia('(hover: hover) and (pointer: fine)')
+    const onCapabilityChange = () => { if (onScreen) upgrade(); sync() }
+    motionPreference.addEventListener('change', onCapabilityChange)
+    pointerPreference.addEventListener('change', onCapabilityChange)
 
     return () => {
       disposed = true
@@ -96,6 +111,8 @@ export default function VoiceOrb3D() {
       resizeObserver.disconnect()
       window.removeEventListener('pointermove', onPointer)
       document.removeEventListener('visibilitychange', sync)
+      motionPreference.removeEventListener('change', onCapabilityChange)
+      pointerPreference.removeEventListener('change', onCapabilityChange)
       orb?.dispose()
     }
   }, [])

@@ -1,0 +1,39 @@
+/* Focused navigation and command-palette audit corrections. */
+.nav-search {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.palette-close {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border: 1px solid var(--theme-line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--theme-text);
+  cursor: pointer;
+}
+
+.palette-close:hover {
+  background: var(--theme-surface-raised);
+}
+
+html[data-theme] .palette-search input::placeholder,
+html[data-theme] .palette-results li small,
+html[data-theme] .palette-footer {
+  color: var(--theme-muted);
+  opacity: 1;
+}
+
+.palette-search input:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.palette-empty {
+  margin: 0;
+}

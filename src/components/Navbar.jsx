@@ -310,7 +310,12 @@ const Navbar = () => {
           <button
             type="button"
             className="nav-search"
-            onClick={openPalette}
+            onClick={(event) => {
+              // Safari does not focus buttons on pointer activation. Give the
+              // dialog a concrete return point on every supported browser.
+              event.currentTarget.focus({ preventScroll: true })
+              openPalette()
+            }}
             aria-label="Open command palette to search sections and actions"
           >
             <Search size={15} aria-hidden="true" />
@@ -340,7 +345,13 @@ const Navbar = () => {
           <div className="mobile-menu-actions">
             <a className="mobile-contact" href={resolveHref('#contact')} onClick={closeMenu}>Start a conversation</a>
             <ThemeToggle className="mobile-theme-toggle" />
-            <button type="button" className="mobile-music" onClick={() => { closeMenu(); openPalette() }}>
+            <button type="button" className="mobile-music" onClick={() => {
+              // The search trigger disappears with the menu. Save the visible
+              // menu toggle as the palette's return point before opening it.
+              toggleRef.current?.focus({ preventScroll: true })
+              closeMenu()
+              openPalette()
+            }}>
               Search sections and actions
             </button>
             <button

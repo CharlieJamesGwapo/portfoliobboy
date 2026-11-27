@@ -62,6 +62,9 @@
   transform: none;
   will-change: auto;
 }
+/* Avoid persistent compositor hints for offscreen sections. The browser can
+   promote the short opacity/transform transition when it actually starts. */
+.motion-ready .reveal:not(.is-visible) { will-change: auto; }
 .reveal-showcase .case-study-media,
 .reveal-showcase .case-study-copy > * {
   transition: opacity 640ms var(--motion-reveal), transform 720ms var(--motion-reveal);
@@ -144,6 +147,23 @@
     transform: translate3d(0, 16px, 0) scale(0.99);
   }
 }
+/* On phones and touch screens, finish the entrance before a quick swipe
+   carries the evidence away. Desktop keeps its existing layered cadence. */
+@media (max-width: 767px), (pointer: coarse) {
+  .reveal {
+    transition-duration: min(var(--reveal-duration, 640ms), 360ms);
+    transition-delay: 0ms;
+  }
+  .reveal .section-heading > :nth-child(n),
+  .reveal-showcase .case-study-media,
+  .reveal-showcase .case-study-copy > :nth-child(n),
+  .motion-ready .vc-reveal .vc-arrow,
+  .motion-ready .vc-reveal .vc-label,
+  .motion-ready .vc-reveal .vc-detail {
+    transition-duration: 360ms;
+    transition-delay: 0ms;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root),
   ::view-transition-new(root),
@@ -153,6 +173,15 @@
   .hero-project-media,
   .hero-project-copy,
   .case-study-image img { animation: none !important; transform: none !important; }
+
+  /* A near-zero duration still honors a stagger delay. Switching the OS
+     preference must expose evidence immediately, even mid-entrance. */
+  .reveal,
+  .reveal *,
+  .reveal::before,
+  .reveal::after,
+  .reveal *::before,
+  .reveal *::after { transition: none !important; }
 
   .motion-ready .reveal:not(.is-visible),
   .motion-ready .reveal:not(.is-visible) .section-heading > *,

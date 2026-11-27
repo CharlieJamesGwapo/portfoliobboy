@@ -10,6 +10,7 @@ import './components/studio-polish.css'
 import './components/refinements.css'
 // Motion only changes presentation and follows the final layout refinements.
 import './components/motion.css'
+import './components/accessibility.css'
 
 // Entrance animations are opt-in. The stylesheet only hides content behind an
 // animation when <html> carries `motion-ready`, so a JS failure, a blocked

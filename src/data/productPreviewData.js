@@ -10,19 +10,19 @@ export const oneRidePreview = {
     {
       id: 'home',
       label: 'Home',
-      src: '/projects/oneride/official-screen-01.png',
+      src: '/projects/oneride/official-screen-01.webp',
       alt: 'OneRide official Google Play screenshot 1 showing the customer home screen',
     },
     {
       id: 'stores',
       label: 'Stores',
-      src: '/projects/oneride/official-screen-02.png',
+      src: '/projects/oneride/official-screen-02.webp',
       alt: 'OneRide official Google Play screenshot 2 showing the stores screen',
     },
     {
       id: 'orders',
       label: 'Orders',
-      src: '/projects/oneride/official-screen-03.png',
+      src: '/projects/oneride/official-screen-03.webp',
       alt: 'OneRide official Google Play screenshot 3 showing the orders screen',
     },
   ],

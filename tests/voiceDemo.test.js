@@ -11,8 +11,8 @@ test('voice studio offers eight inline accent previews and discloses AI voices',
   try {
     const { default: VoiceAgentDemo } = await server.ssrLoadModule('/src/components/VoiceAgentDemo.jsx')
     const html = renderToStaticMarkup(createElement(VoiceAgentDemo))
-    // Inline listening: a local recording, metadata-only preload, no autoplay, a labelled play control.
-    assert.match(html, /<audio src="[^"]*\/accents\/american-english\.mp3" preload="metadata">/)
+    // Inline listening: a local recording, no preload or autoplay, a labelled play control.
+    assert.match(html, /<audio src="[^"]*\/accents\/american-english\.mp3" preload="none">/)
     assert.doesNotMatch(html, /autoplay/i)
     assert.match(html, /aria-label="Play American English preview"/)
     assert.equal((html.match(/class="vs-accent[ "]/g) ?? []).length, 8)
