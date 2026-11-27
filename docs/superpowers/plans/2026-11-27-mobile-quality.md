@@ -21,4 +21,4 @@ Preserve working privacy, contact, Alex, downloads, booking, one-minute voice li
 - [x] Improve mobile/reduced-motion scrolling and transitions with regression coverage.
 - [x] Reduce measured mobile loading cost while keeping optional flows discoverable and functional.
 - [x] Integrate and inspect changes, obtain a fresh review, run full tests/build and representative browser suites, and record evidence.
-- [ ] Commit, push, confirm CI/Vercel readiness, and verify the live portfolio and security checks.
+- [x] Commit, push, confirm CI/Vercel readiness, and verify the live portfolio and security checks.
