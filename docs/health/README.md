@@ -22,7 +22,7 @@ Native configuration:
 
 - Error insight: `14710422` / `laovJVD3`.
 - Hourly alert: `01a21b39-2ec1-7f69-bdf4-c9f0c4ad247f`.
-- Fixed email destination: `01a21b3b-4ef8-0000-0959-e9212f430584`.
+- [Fixed email destination settings](https://us.posthog.com/project/769787/functions/01a21b3b-4ef8-0000-0959-e9212f430584).
 - [Dashboard definition and layouts](dashboard.json).
 
 ## Privacy and trust
@@ -38,3 +38,16 @@ Email bodies are constant summaries with private-dashboard and workflow links. T
 Run `npm test`, `npm run build`, production browser suites, and `npm run audit:site-security`. The audit now includes the uncached health endpoint (17 safe checks total). Monitor and email tests use fake networks and never send real mail. Test real delivery only with the explicit setup-test input; do not manufacture a production outage or ingest fake visitor errors.
 
 Inspect the Actions workflow and the latest dashboard samples after deployment. Keep `POSTHOG_API_HOST` on its existing regional allowlist and both monitor credentials as repository secrets. A failing monitor job remains failed even when its notification email is accepted. Email-provider acceptance does not prove inbox placement; confirm any live setup email separately.
+
+### Release verification — 27 November 2026
+
+Application release: `f9cd08dad11d125dd26e37a6a33d862448743955`, pushed to `main` and deployed READY at [the public portfolio](https://portfoliobboy.vercel.app/).
+
+- All 197 Node tests and two Python tests passed. The production Chromium suite passed 75 cases with one optional scheduler case skipped; that remaining case then passed separately with the configured public scheduling link.
+- The production build, dependency audit (zero vulnerabilities), and all 17 safe live security checks passed. [Release CI](https://github.com/CharlieJamesGwapo/portfoliobboy/actions/runs/45940110819) succeeded.
+- The first [independent cloud monitor run](https://github.com/CharlieJamesGwapo/portfoliobboy/actions/runs/45940158609) succeeded. All five actual probes reported `up` / `fast`, and the private dashboard queries received these results without warnings. This is an initial observation, not evidence of a full day of uptime.
+- The live readiness endpoint returned HTTP 200 and fixed `configured` states for contact, analytics and voice. No actual voice session or contact submission was required by these probes.
+- Resend reported the labelled setup email **Delivered** to the selected inbox. The PostHog destination also completed a real setup transport invocation successfully, using the same fixed setup body and daily idempotency key to avoid an extra message. The saved production destination retained its technical-error summary.
+- The hourly alert was enabled with no other account-email subscribers and was **Not firing** when checked. Its mock privacy test excluded private canaries from the outgoing request. No outage or visitor error was fabricated in production.
+
+The sending-only key creation and encrypted GitHub/PostHog storage were explicitly approved by the owner. Delivery status above is the provider's confirmation; the owner has not yet confirmed reading this new setup message.

@@ -4,9 +4,9 @@
 
 **Goal:** Add privacy-safe uptime/error monitoring and a private health dashboard, then test, push and deploy.
 
-**Architecture:** Strict event enums feed the existing personal PostHog project. GitHub runs independent safe availability probes; Codex notifications are the default pending the owner's preference. No private content enters telemetry.
+**Architecture:** Strict event enums feed the existing personal PostHog project. GitHub runs independent safe availability probes. The owner selected email to capstonee2@gmail.com, with hourly PostHog technical-error checks and a dedicated sending-only Resend key. No private content enters telemetry.
 
-**Tech Stack:** Node 24, React, Vercel Functions, GitHub Actions, PostHog, Codex automations.
+**Tech Stack:** Node 24, React, Vercel Functions, GitHub Actions, PostHog, Resend.
 
 **Spec:** `docs/superpowers/specs/2026-11-27-portfolio-health-design.md`
 
@@ -36,7 +36,7 @@ Browser agent owns `src/lib/healthReporting.js`, `src/main.jsx`, `src/components
 
 ### Task 4: Private dashboard and alerts
 
-Root inspects existing templates/catalog/insights, provisions a private health dashboard with verified native queries, configures the monitor's ingestion secret without exposing it, and creates the requested recurring notification check. Record actual IDs, cadence and limitations in `docs/health/`. Verify an actual safe monitor run and dashboard data; exercise alert decisions against isolated fixtures without producing fake live incidents.
+Root inspects existing templates/catalog/insights, provisions a private health dashboard with verified native queries, configures encrypted monitor credentials without exposing them, and enables the selected hourly error alert and fixed email destination. Record actual IDs, cadence and limitations in `docs/health/`. Verify an actual safe monitor run and dashboard data; exercise alert decisions against isolated fixtures and labelled setup email tests without producing fake live incidents.
 
 ### Task 5: Review, release and live verification
 
