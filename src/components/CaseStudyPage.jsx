@@ -4,6 +4,7 @@ import { caseStudies, getCaseStudyBySlug } from '../data/caseStudies.js'
 import { ProductMedia } from './IndependentProducts.jsx'
 import './case-study-page.css'
 import OneRideStory from './OneRideStory'
+import ShortlistButton from './ShortlistButton'
 
 const toList = (value) => (Array.isArray(value) ? value : value ? [value] : [])
 
@@ -183,6 +184,7 @@ export default function CaseStudyPage({ slug, study: providedStudy }) {
               <a className="case-study-button case-study-button-primary" href={study.story ? '#oneride-walkthrough' : '/projects'}>{study.story ? 'Explore the customer app' : 'Explore my work'} <ArrowRight size={16} aria-hidden="true" /></a>
               <a className="case-study-button case-study-button-secondary" href="/#contact">Discuss a similar project</a>
             </div>
+            <ShortlistButton slug={study.slug} />
           </div>
           <CaseStudyVisual study={study} />
         </header>

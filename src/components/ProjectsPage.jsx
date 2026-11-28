@@ -10,8 +10,9 @@ export default function ProjectsPage() {
         <p className="eyebrow">The complete collection</p>
         <h1>Built with purpose.<br />Explored in detail.</h1>
         <p>Client platforms, independent tools, and experiments across AI, web, mobile, desktop, and backend engineering.</p>
+        <a className="text-link" href="#project-shortlist">Shortlist &amp; compare projects</a>
       </header>
-      <Projects />
+      <Projects comparisonEnabled />
     </div>
   )
 }

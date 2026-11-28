@@ -81,6 +81,11 @@ const answers = {
     actions: [{ label: 'Live GitHub activity', href: '/#github' }, { label: 'GitHub profile', href: profile.github, external: true }],
   }),
 
+  shortlist: () => ({
+    text: 'Save up to three case studies to your project shortlist, then compare Charlie’s role, contributions, stack, delivery and project status. You can share the public project selection, download the comparison or prepare an editable enquiry draft. Review the draft before submitting; nothing is sent automatically.',
+    actions: [{ label: 'Shortlist & compare projects', href: '/projects#project-shortlist' }],
+  }),
+
   ai: () => ({
     text: `Charlie builds ${list(aiSystemCapabilities.slice(0, 4).map((item) => lowerFirst(item.title)))}. ${voiceIdentity}`,
     actions: [{ label: 'AI systems', href: '/#ai-systems' }, { label: 'Voice Studio', href: '/#voice-demo' }],
@@ -253,6 +258,7 @@ export function answerQuestion(input) {
     || (/\d/.test(text) && /\b(revenue|growth|conversion|metrics?|roi|percent)\b/.test(text))) return answers.unconfirmed()
 
   if (/\b(talk to alex|elevenlabs|portfolio alex)\b/.test(text)) return answers.voice()
+  if (/\b(shortlists?|shortlisted|project comparison|compare projects|compare case studies|saved projects)\b/.test(text)) return answers.shortlist()
 
   const asksAboutUs = /\b(are you|who are you|your name|you a bot)\b/.test(text)
   if (!asksAboutUs) {

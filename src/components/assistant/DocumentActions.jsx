@@ -18,7 +18,7 @@ export default function DocumentActions({ document, noun, onSave, onExport }) {
     try {
       if (!navigator.clipboard?.writeText) throw new Error('clipboard-unavailable')
       await navigator.clipboard.writeText(formatDocument(document))
-      if (current === revision.current) setStatus(`${noun === 'brief' ? 'Brief' : 'Summary'} copied. Nothing has been sent.`)
+      if (current === revision.current) setStatus(`${noun.charAt(0).toUpperCase() + noun.slice(1)} copied. Nothing has been sent.`)
     } catch {
       if (current === revision.current) setStatus(`Copy is unavailable. Download the text file, or select and copy the ${noun} above.`)
     } finally { if (current === revision.current) setCopying(false) }

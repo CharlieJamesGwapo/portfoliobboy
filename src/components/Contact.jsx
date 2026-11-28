@@ -6,6 +6,7 @@ import { bookingOptions, profile, resumeUrl } from '../data/portfolioData'
 import { CONTACT_INTENT_EVENT, requestContact, takeAssistantEnquiry } from '../lib/contactIntent'
 import { trackBookingClick } from '../lib/portfolioAnalytics'
 import { sendContactEnquiry } from '../lib/contactSubmission'
+import { beginContactDraftSubmission, readContactDraft, restoreFailedContactDraft, saveContactDraft } from '../lib/contactDraft'
 
 const bookingRequest = (option) => ({
   subject: `Book a ${option.minutes}-min ${option.title.toLowerCase()} (Google Meet)`,
@@ -100,7 +101,7 @@ const buildMailto = (form) => {
 }
 
 const Contact = () => {
-  const [form, setForm] = useState(initialForm)
+  const [form, setForm] = useState(readContactDraft)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
   const [errors, setErrors] = useState({})
@@ -116,9 +117,18 @@ const Contact = () => {
   const latestForm = useRef({ form, status })
   useEffect(() => { latestForm.current = { form, status } }, [form, status])
 
+  // Only visitor-driven edits update the navigation draft. Async completion
+  // from an older, unmounted form must never overwrite a newer form's text.
+  const updateDraft = (update) => {
+    const next = update(latestForm.current.form)
+    latestForm.current = { ...latestForm.current, form: next }
+    if (!sending.current) saveContactDraft(next)
+    setForm(next)
+  }
+
   const updateField = (event) => {
     const { name, value } = event.target
-    setForm((current) => ({ ...current, [name]: value }))
+    updateDraft((current) => ({ ...current, [name]: value }))
     setErrors((current) => ({ ...current, [name]: '' }))
     // Never reset while a request is in flight: that would flip `status` back
     // to idle, re-enable the submit button and allow a duplicate send.
@@ -130,7 +140,7 @@ const Contact = () => {
 
   const chooseContactPath = (subject) => {
     if (status === 'sending') return
-    setForm((current) => ({ ...current, subject }))
+    updateDraft((current) => ({ ...current, subject }))
     setErrors((current) => ({ ...current, subject: '' }))
     if (status === 'error' || status === 'success') {
       setStatus('idle')
@@ -156,10 +166,10 @@ const Contact = () => {
           field?.focus({ preventScroll: true })
         })
       }
-      if (latestForm.current.status === 'sending') return
+      if (sending.current) return
       // Page booking cards retain their explicit subject selection. Alex
       // booking preserves an existing subject and offers the request separately.
-      setForm((current) => ({
+      updateDraft((current) => ({
         ...current,
         subject: intent.preserveSubject && current.subject.trim() ? current.subject : template || !current.subject.trim() ? subject : current.subject,
         message: template && !current.message.trim() ? template : current.message,
@@ -189,6 +199,8 @@ const Contact = () => {
     setStatus('sending')
     setMessage('')
     setSendFailed(false)
+    // A remounted form starts empty while this draft is already in flight.
+    const draftVersion = beginContactDraftSubmission()
 
     try {
       const draft = JSON.stringify(form)
@@ -203,6 +215,8 @@ const Contact = () => {
       setMessage('Thanks — your message is on its way. I’ll reply as soon as I can.')
     } catch (error) {
       // The form is deliberately left as typed.
+      // Restore its navigation copy only if no newer draft has replaced it.
+      restoreFailedContactDraft(form, draftVersion)
       setSendFailed(true)
       setStatus('error')
       const verificationFailed = error.code === 'BOT_VERIFICATION_FAILED' || error.code === 'BOT_VERIFICATION_UNAVAILABLE'
@@ -274,7 +288,7 @@ const Contact = () => {
             {(preparedEnquiry || preparedSubject) && <aside className="contact-prepared-enquiry" aria-label="Prepared enquiry">
               {preparedSubject && <>
                 <p role="status">Your existing subject was kept.</p>
-                <label htmlFor="contact-prepared-subject">Prepared call-request subject to copy</label>
+                <label htmlFor="contact-prepared-subject">Prepared enquiry subject to copy</label>
                 <input id="contact-prepared-subject" readOnly value={preparedSubject} />
               </>}
               {preparedEnquiry && <>

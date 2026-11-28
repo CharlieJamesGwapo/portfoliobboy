@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Archive, ArrowUpRight, FolderGit2, LockKeyhole, Search, X } from 'lucide-react'
 import ScrollReveal from './ScrollReveal'
 import SectionHeading from './SectionHeading'
@@ -6,6 +6,9 @@ import { AgentArchitectureDiagram } from './IndependentProducts'
 import { oneRidePreview } from '../data/productPreviewData'
 import './project-discovery.css'
 import { featuredProjects, projectArchive, projectCategories } from '../data/portfolioData'
+import ShortlistButton from './ShortlistButton'
+
+const ProjectShortlist = lazy(() => import('./ProjectShortlist'))
 
 const allProjects = [...featuredProjects, ...projectArchive]
 const technologyOptions = [...new Set(allProjects.flatMap((item) => item.stack || []))].sort((a, b) => a.localeCompare(b))
@@ -163,13 +166,14 @@ function ProjectCard({ project, index, mediaEnabled }) {
             </a>
           )}
         </div>
+        {caseStudySlug && <ShortlistButton slug={caseStudySlug} />}
         <span className="sr-only">Featured project {String(index + 1).padStart(2, '0')} of {featuredProjects.length}</span>
       </div>
     </article>
   )
 }
 
-const Projects = ({ mediaEnabled = true }) => {
+const Projects = ({ mediaEnabled = true, comparisonEnabled = false }) => {
   const [initialFilters] = useState(readProjectFilters)
   const [query, setQuery] = useState(initialFilters.query)
   const [archiveOpen, setArchiveOpen] = useState(false)
@@ -219,6 +223,12 @@ const Projects = ({ mediaEnabled = true }) => {
             light
           />
         </ScrollReveal>
+
+        {comparisonEnabled && <div id="project-shortlist" tabIndex={-1}>
+          <Suspense fallback={<p role="status">Loading project comparison…</p>}>
+            <ProjectShortlist embedded />
+          </Suspense>
+        </div>}
 
         <div className="project-search-row">
           <label className="project-search">

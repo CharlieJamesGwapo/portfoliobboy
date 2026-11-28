@@ -283,7 +283,7 @@ export default function ProductStudioPreview() {
         <ScrollReveal>
           <div className="studio-heading selected-work-heading">
             <div><p className="eyebrow">Selected client work · ownership &amp; delivery</p><h2 id="product-studio-title">Client work.<br />A closer look.</h2></div>
-            <p>Three evidence-backed client studies showing what I built, how the systems work, and what was delivered. Then explore the full archive.</p>
+            <p>Three evidence-backed client studies showing what I built, how the systems work, and what was delivered. Then explore the full archive. <a className="text-link" href="/projects#project-shortlist">Shortlist &amp; compare projects <ArrowUpRight size={15} aria-hidden="true" /></a></p>
           </div>
         </ScrollReveal>
         <div className="selected-case-list">
