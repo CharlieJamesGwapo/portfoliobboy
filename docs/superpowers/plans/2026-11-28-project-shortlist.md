@@ -8,6 +8,6 @@
 - [x] Interface — `src/lib/useProjectShortlist.js`, `src/components/ProjectShortlist.jsx`, `src/components/ShortlistButton.jsx`, `src/project-shortlist.css`, `tests/e2e/project-shortlist.spec.js`: shared session state with safe fallback, inline comparison, copy fallback, exports, enquiry staging, mobile/theme/keyboard behavior and action announcements. Test failure modes and stable focus.
 - [x] Integration — Projects card controls and comparison, case-study controls, Alex and command search actions. Preserve existing project filtering/history, contact drafts and route loading. Add integration regressions and a built-bundle acceptance case.
 - [x] Verification/review — full unit suite, configured build, new cross-browser scenarios and affected production regressions; independent review/fix loop. Record concrete results in CODEBASE.MD and quality notes.
-- [ ] Publication — commit and push, confirm security CI and matching READY Vercel alias, exercise the public comparison/enquiry preparation without submission, record release evidence and verify clean/pushed/live state.
+- [x] Publication — commit and push, confirm security CI and matching READY Vercel alias, exercise the public comparison/enquiry preparation without submission, record release evidence and verify clean/pushed/live state.
 
 Review focus: shared links cannot contain private input; selections cannot smuggle arbitrary links or HTML; old contact drafts are retained; the three-project limit is consistent across tabs/routes; unavailable storage/clipboard must remain usable.

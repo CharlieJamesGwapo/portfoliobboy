@@ -20,4 +20,10 @@
 
 ## Publication
 
-Production commit, CI and public verification will be recorded after the source release.
+- Source **3c1b7f56717689275b94c59db73960af2b10eee2** pushed to `origin/main`.
+- [Security CI 46091943167](https://github.com/CharlieJamesGwapo/portfoliobboy/actions/runs/46091943167) passed, including the new public-sharing/private-draft boundary gate.
+- Matching production deployment **portfoliobboy-5yriz5abl-charlie-james-projects.vercel.app** reached **READY**. Deployment metadata matched the exact source SHA; inspection of `portfoliobboy.vercel.app` resolved to that deployment and confirmed the alias.
+- Live `/projects?compare=alex-hasti,zalio-crm,oneride` document, entry bundle and lazy comparison chunk returned **200**. A normal browser displayed all three projects and exercised remove/add back to a complete selection. The comparison was left open for the owner.
+- In a separate temporary public tab, **Prepare an enquiry** opened the editable contact message containing Zalio CRM and its canonical case link within the 5,000-character limit. **Send message was never clicked**; the temporary tab was closed afterward, discarding that generated draft.
+- The live read-only security audit passed **17/17** checks. Only root-owned local dev/preview servers were stopped. No real enquiry, booking, voice call, alert email, credentials or private repository data was needed.
+- Staged repository/header/sharing/private-cache checks also passed **25/25** before the source commit.
