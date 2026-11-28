@@ -1,0 +1,10 @@
+# Portfolio functional completion
+
+The owner requests an autonomous improvement and functionality pass. Build on the current portfolio, including its shortlist, live GitHub section, Alex workflows, booking and private enquiry handling. Choose focused additions that finish existing journeys, plus fixes demonstrated by the audit, rather than inventing new products or claims.
+
+1. Alex's text and voice recommendations can save validated published case studies to the existing maximum-three shortlist. View-shortlist navigation closes the small-screen assistant and ends an active call before leaving. Invalid/foreign project URLs do not become save controls. Public selections stay separate from private text.
+2. Every Alex enquiry handoff preserves existing subject and message fields, using the same prepared-draft/manual-merge behavior as shortlist and booking.
+3. An explicit New chat control clears Alex's local messages, mode drafts, brief edits, suggested-question state and pending simulated replies, ends any open voice session, and returns focus to a fresh text conversation. It leaves the separate contact form and public shortlist intact. No content is sent or persisted to browser storage. Clear feedback is accessible; no account or provider changes.
+4. Arcade racing leaderboards rank lower valid lap times first, format lap times for visitors, and retain descending ranking for score-based games. Malformed local storage and failed remote reads resolve to safe local/empty UI rather than indefinite loading. Remove developer environment setup instructions from visitor-facing fallback copy. No database/schema/credential change or remote score submission during verification.
+
+Keep the existing React/Vite stack, themes, 44px controls, reduced-motion behavior, lazy game/voice loads, security headers, privacy-safe analytics, one-minute voice limit and real project status caveats. Do not invent missing bookings, testimonials, metrics or features for in-development projects. Test failure cases, late callbacks and mobile navigation with fixtures; confirm public production delivery separately from local checks.

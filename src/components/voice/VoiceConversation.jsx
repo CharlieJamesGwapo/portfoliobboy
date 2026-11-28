@@ -3,6 +3,8 @@ import { buildVoiceEnquiry, VOICE_TRANSCRIPT_LIMIT, voiceStarters } from '../../
 import './voice-conversation.css'
 import BriefActions from '../assistant/BriefActions'
 import AlexBooking from '../assistant/AlexBooking'
+import ShortlistButton from '../ShortlistButton'
+import { shortlistSlugFromHref } from '../../lib/shortlistProjectLink'
 
 const EMPTY_ITEMS = []
 
@@ -24,6 +26,7 @@ export default function VoiceConversation({
   onDraftChange,
   onReviewEnquiry,
   onOpenProject,
+  onViewShortlist,
   onBookCall,
   onSchedule,
   surface = 'voice_home',
@@ -127,10 +130,12 @@ export default function VoiceConversation({
                 </div>
                 {project.contribution && <p>{project.contribution}</p>}
                 {project.reason && <p className="voice-workspace-project-reason">{project.reason}</p>}
-                <a href={project.href} target="_blank" rel="noopener noreferrer" onClick={onOpenProject}>
+                <a href={project.href} target="_blank" rel="noopener noreferrer" onClick={onOpenProject}
+                  onAuxClick={event => { if (event.button === 1) onOpenProject?.(event) }}>
                   View case study<span aria-hidden="true">↗</span>
                   <span className="voice-workspace-link-note">Opens a new tab · ends the call</span>
                 </a>
+                <ShortlistButton slug={shortlistSlugFromHref(project.href)} onNavigate={onViewShortlist} />
               </article>
             ))}
           </div>

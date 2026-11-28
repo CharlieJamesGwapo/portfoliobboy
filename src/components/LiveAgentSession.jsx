@@ -228,12 +228,17 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
     setDraft(enquiry)
   }
 
+  const viewShortlist = () => {
+    stopCall()
+    onEnquiry?.()
+  }
+
   const reviewEnquiry = () => {
     const subject = draft?.subject?.trim()
     const message = draft?.message?.trim()
     if (!subject || subject.length > 120 || !message || message.length < 10 || message.length > 4500) return
     stopCall()
-    stageAssistantEnquiry(subject, message)
+    stageAssistantEnquiry(subject, message, { preserveSubject: true })
     trackPortfolioEvent('portfolio_enquiry_reviewed', { surface: textMode ? 'text_guide' : surface })
     navigatePortfolio('/#contact')
     onEnquiry?.()
@@ -320,7 +325,7 @@ const Session = ({ onClose, onEnquiry, limitSeconds, surface }) => {
       </div>
       <VoiceConversation messages={messages} projects={projects} connected={connected && !checking} textMode={textMode} onAskLocal={askLocal}
         draft={draft} onAsk={askStarter} onPrepareDraft={prepareDraft} onDraftChange={setDraft}
-        onReviewEnquiry={reviewEnquiry} onOpenProject={openProject} onBookCall={bookCall} onSchedule={stopCall} surface={textMode ? 'text_guide' : surface} />
+        onReviewEnquiry={reviewEnquiry} onOpenProject={openProject} onViewShortlist={viewShortlist} onBookCall={bookCall} onSchedule={stopCall} surface={textMode ? 'text_guide' : surface} />
     </div>
   )
 }

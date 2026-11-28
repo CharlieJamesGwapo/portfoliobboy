@@ -43,6 +43,7 @@
 }
 .voice-workspace button > span[aria-hidden] { flex: 0 0 auto; font-size: 1rem; }
 .voice-workspace button:hover:not(:disabled) { border-color: var(--voice-workspace-mint); background: #234b49; }
+.voice-workspace .shortlist-save-button[aria-pressed='true'], .voice-workspace .shortlist-review-link { color: var(--voice-workspace-mint); border-color: var(--voice-workspace-line); }
 .voice-workspace button:disabled { color: #a6bbb5; border-color: #375652; background: #163231; cursor: not-allowed; }
 .voice-workspace button:focus-visible,
 .voice-workspace a:focus-visible,

@@ -217,6 +217,14 @@ The skills explorer groups 135 listed tools/practices into ten searchable catego
 
 `contactDraft.js` retains bounded unsent contact fields in page memory across internal route changes. Reloading clears this private draft; it is never written to browser storage, URLs or telemetry. Submission start clears its navigation copy so remounting cannot prefill an already-sending message. Version checks prevent stale failures from overwriting newer edits; an old successful request never clears a newer draft. Prepared shortlist enquiries use the existing manual-merge flow and preserve existing subject/message fields. Browser regressions cover both late success and failure after navigation.
 
+### Completed Alex workflows and arcade recovery
+
+Alex's text and voice recommendations reuse the same `ShortlistButton` and public selection store. `shortlistProjectLink.js` allows controls only for exact published case-study routes. Saving a project keeps the current call active; following **View shortlist** closes the mobile panel and ends voice before navigation. Voice evidence also ends audio on middle-click, while right-click leaves the call running. Text and voice enquiry reviews preserve existing subject and message fields through the prepared-draft/manual-merge flow.
+
+**New chat** in the Alex header clears panel messages, per-mode text, brief answers/review and used suggestions, cancels pending local replies, unmounts voice and returns focus to a fresh text conversation. It does not clear the independent contact draft or public shortlist. Cleared chat contents are never sent to telemetry or stored in browser storage. The existing one-minute browser voice limit is unchanged.
+
+`leaderboardData.js` validates and bounds local score data, ranks Pixel Racer by the lowest completed lap time and other games by descending points, retains scores per game and formats lap milliseconds as readable times. `supabase.js` bounds remote scoreboard reads/submissions to eight seconds and falls back to local/session scores on malformed JSON, denied/quota-limited storage, remote errors or timeouts. Leaderboards recover to an empty usable state instead of spinning indefinitely and show visitor-facing local-score copy. No database, schema, credential or provider change is involved.
+
 `PortfolioAssistant` opens a lazy `AssistantPanel`. [src/lib/assistantAnswers.js](src/lib/assistantAnswers.js) matches questions against local portfolio and voice data, with contact-oriented fallbacks. Text answers do not call an LLM API. Three guided modes in the existing panel add project recommendations, recruiter comparisons, and brief preparation through [src/lib/assistantWorkflows.js](src/lib/assistantWorkflows.js):
 
 - **Find projects** ranks case-study evidence by matching topics, technologies, and project names; each result shows Charlie's contribution, status, and a real case-study link. Unmatched requests receive an honest fallback.

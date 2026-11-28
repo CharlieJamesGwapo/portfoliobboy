@@ -35,3 +35,5 @@ jobs:
         run: node --test tests/githubActivity.test.js tests/githubCalendar.test.js
       - name: Verify public comparison sharing and private draft memory boundaries
         run: node --test tests/projectShortlist.test.js tests/contactDraft.test.js
+      - name: Verify recommendation allowlists and scoreboard recovery
+        run: node --test tests/shortlistProjectLink.test.js tests/leaderboardData.test.js

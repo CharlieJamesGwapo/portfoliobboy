@@ -1,6 +1,8 @@
 import { trackPortfolioEvent } from '../../lib/portfolioAnalytics'
 import { buildRecruiterSummary, roleStatusLabels } from '../../lib/recruiterSummary'
 import DocumentActions from './DocumentActions'
+import ShortlistButton from '../ShortlistButton'
+import { shortlistSlugFromHref } from '../../lib/shortlistProjectLink'
 
 const statusLabels = roleStatusLabels
 
@@ -19,6 +21,7 @@ export default function WorkflowResults({ result, onEnquiry, onNavigate }) {
               if (projectId) trackPortfolioEvent('portfolio_project_opened', { surface: 'text_guide', project_id: projectId })
               onNavigate?.(event)
             }}>Read case study <span className="sr-only">for {project.title}</span></a>
+            <ShortlistButton slug={shortlistSlugFromHref(project.href)} onNavigate={onNavigate} />
           </article>
         ))}
         <button className="alex-workflow-cta" type="button" onClick={() => onEnquiry(result.enquiry)}>

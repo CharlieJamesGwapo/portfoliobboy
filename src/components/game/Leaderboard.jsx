@@ -4,7 +4,8 @@
 // ============================================================================
 import { useEffect, useState } from 'react'
 import { Trophy, Crown, Loader2 } from 'lucide-react'
-import { fetchLeaderboard, isRemoteLeaderboardAvailable, isSupabaseConfigured } from '../../lib/supabase'
+import { fetchLeaderboard, isRemoteLeaderboardAvailable } from '../../lib/supabase'
+import { formatLeaderboardScore } from '../../lib/leaderboardData.js'
 
 function fmtTime(s) {
   if (!s && s !== 0) return '—'
@@ -13,9 +14,9 @@ function fmtTime(s) {
   return `${m}:${String(sec).padStart(2, '0')}`
 }
 
-export default function Leaderboard({ limit = 10, refreshSignal = 0, highlightName = '', game = null, metric = 'score' }) {
+export default function Leaderboard({ limit = 10, refreshSignal = 0, highlightName = '', game = null }) {
   const [rows, setRows] = useState(null)
-  const [isLocal, setIsLocal] = useState(false)
+  const [isLocal, setIsLocal] = useState(!isRemoteLeaderboardAvailable())
 
   useEffect(() => {
     let active = true
@@ -23,8 +24,12 @@ export default function Leaderboard({ limit = 10, refreshSignal = 0, highlightNa
     fetchLeaderboard(limit, game).then((data) => {
       if (!active) return
       // Read after the fetch: a network failure inside it is what flips this.
-      setIsLocal(isSupabaseConfigured && !isRemoteLeaderboardAvailable())
+      setIsLocal(!isRemoteLeaderboardAvailable())
       setRows(data || [])
+    }).catch(() => {
+      if (!active) return
+      setIsLocal(true)
+      setRows([])
     })
     return () => { active = false }
   }, [limit, refreshSignal, game])
@@ -33,17 +38,11 @@ export default function Leaderboard({ limit = 10, refreshSignal = 0, highlightNa
     <div className="w-full">
       <div className="flex items-center justify-center gap-2 mb-3">
         <Trophy size={18} className="text-amber-400" />
-        <h4 className="text-lg font-bold text-white">Top {limit}</h4>
+        <h4 className="text-lg font-bold text-white">Top {limit}{game === 'racing' ? ' · Best laps' : ''}</h4>
       </div>
 
-      {!isSupabaseConfigured && (
-        <p className="text-center text-[11px] text-gray-500 mb-2">
-          Supabase not configured — showing local scores. Add VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY to .env.local.
-        </p>
-      )}
-
       {isLocal && (
-        <p className="text-center text-[11px] text-gray-500 mb-2">Showing scores saved on this device</p>
+        <p className="text-center text-xs text-gray-400 mb-2" role="status">Scores stay on this device. If browser storage is unavailable, they last for this session.</p>
       )}
 
       {rows === null ? (
@@ -70,9 +69,9 @@ export default function Leaderboard({ limit = 10, refreshSignal = 0, highlightNa
                   {r.player_name}
                   {r.boss_defeated && <span className="ml-1.5 text-[10px] text-red-300">👑</span>}
                 </span>
-                <span className="text-gray-400 tabular-nums text-xs">{fmtTime(r.time_seconds)}</span>
+                {game !== 'racing' && <span className="text-gray-400 tabular-nums text-xs">{fmtTime(r.time_seconds)}</span>}
                 <span className="w-16 text-right font-bold text-amber-300 tabular-nums">
-                  {Number(r.score).toLocaleString()}
+                  {formatLeaderboardScore(r.score, game)}
                 </span>
               </li>
             )

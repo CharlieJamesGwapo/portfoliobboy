@@ -126,6 +126,7 @@ test('a pending local reply cannot steal focus after Alex closes', async ({ page
 
 test('an assistant enquiry preserves an existing contact draft for manual merging', async ({ page }) => {
   await page.goto('/#contact')
+  await page.locator('#contact-subject').fill('Keep my existing project subject')
   await page.locator('#contact-message').fill('Keep my existing project details.')
   await page.getByRole('button', { name: 'Open Alex, AI Portfolio Assistant' }).click()
   const panel = page.getByRole('dialog', { name: 'Alex', exact: true })
@@ -134,6 +135,8 @@ test('an assistant enquiry preserves an existing contact draft for manual mergin
   await panel.getByRole('button', { name: 'Send question' }).click()
   await panel.getByRole('button', { name: 'Start a project enquiry', exact: true }).click()
   await expect(page.locator('#contact-message')).toHaveValue('Keep my existing project details.')
+  await expect(page.locator('#contact-subject')).toHaveValue('Keep my existing project subject')
+  await expect(page.locator('#contact-prepared-subject')).toHaveValue('Project enquiry from the portfolio')
   await expect(page.locator('#contact-message')).toBeFocused()
   await expect(page.getByText('Your existing message was kept.', { exact: true })).toBeVisible()
   await expect(page.getByRole('textbox', { name: 'Prepared enquiry to copy' })).toHaveValue(/CRM with automated follow-ups/)

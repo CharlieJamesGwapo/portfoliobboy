@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
-import { ArrowUpRight, AudioLines, CalendarClock, Loader2, Mic, Send, Sparkles, X } from 'lucide-react'
+import { ArrowUpRight, AudioLines, CalendarClock, Loader2, Mic, RotateCcw, Send, Sparkles, X } from 'lucide-react'
 import { answerQuestion, answerSuggestion, suggestedQuestions } from '../../lib/assistantAnswers'
 import { assessRole, briefQuestions, buildProjectBrief, recommendProjects } from '../../lib/assistantWorkflows'
 import { stageAssistantEnquiry } from '../../lib/contactIntent'
@@ -41,11 +41,13 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
   const [briefReview, setBriefReview] = useState(null)
   const [typing, setTyping] = useState(false)
   const [asked, setAsked] = useState(() => new Set())
+  const [resetMessage, setResetMessage] = useState('')
   const listRef = useRef(null)
   const inputRef = useRef(null)
   const panelRef = useRef(null)
   const timerRef = useRef(null)
   const chipsRef = useRef(null)
+  const resetFocusRef = useRef(null)
   const activeMode = MODES.find(item => item.id === mode) || { hint: 'Choose a call type. A call request is confirmed directly with Charlie.' }
   const draft = drafts[mode] || ''
   const reviewingBrief = mode === 'brief' && briefReview !== null
@@ -64,7 +66,10 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
     return () => document.removeEventListener('keydown', onKey)
   }, [isOpen, onClose])
 
-  useEffect(() => () => window.clearTimeout(timerRef.current), [])
+  useEffect(() => () => {
+    window.clearTimeout(timerRef.current)
+    window.cancelAnimationFrame(resetFocusRef.current)
+  }, [])
 
   useEffect(() => {
     const list = listRef.current
@@ -114,7 +119,7 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
   }
 
   const startEnquiry = enquiry => {
-    stageAssistantEnquiry(enquiry.subject, enquiry.message)
+    stageAssistantEnquiry(enquiry.subject, enquiry.message, { preserveSubject: true })
     trackPortfolioEvent('portfolio_enquiry_reviewed', { surface: 'text_guide' })
     navigatePortfolio('/#contact')
     onClose(false)
@@ -131,6 +136,26 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
     setBriefStep(0)
     setBriefReview(null)
     setDrafts(current => ({ ...current, brief: '' }))
+  }
+
+  const startNewChat = () => {
+    window.clearTimeout(timerRef.current)
+    timerRef.current = null
+    // Unmounting the voice session cancels pending permission and releases audio.
+    setVoiceOpen(false)
+    setTyping(false)
+    setMessages([{ id: nextId++, ...WELCOME }])
+    setMode('general')
+    setDrafts({})
+    setBriefAnswers({})
+    setBriefStep(0)
+    setBriefReview(null)
+    setAsked(new Set())
+    setResetMessage('New chat started. Earlier Alex messages and drafts were cleared.')
+    window.cancelAnimationFrame(resetFocusRef.current)
+    resetFocusRef.current = window.requestAnimationFrame(() => {
+      if (panelRef.current?.getClientRects().length) inputRef.current?.focus({ preventScroll: true })
+    })
   }
 
   const askSuggestion = (suggestion) => {
@@ -157,10 +182,14 @@ export default function AssistantPanel({ onClose, startWithVoice = false, isOpen
           <h2 id="alex-title">Alex</h2>
           <p><span className="alex-online" aria-hidden="true" /> Portfolio assistant · instant answers</p>
         </div>
+        <button type="button" className="alex-reset-button" onClick={startNewChat} aria-label="Start a new chat" title="Start a new chat">
+          <RotateCcw size={16} aria-hidden="true" /><span>New chat</span>
+        </button>
         <button type="button" className="alex-icon-button" onClick={onClose} aria-label="Close Alex">
           <X size={18} aria-hidden="true" />
         </button>
       </header>
+      {resetMessage && <p className="alex-reset-status" role="status">{resetMessage}</p>}
 
       <div className={`alex-voice ${voiceOpen ? 'is-live' : ''}`}>
         {hasLiveAgent ? (

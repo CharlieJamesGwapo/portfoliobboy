@@ -92,6 +92,15 @@
 .alex-icon-button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; border-radius: 50%; background: transparent; color: var(--alex-muted); cursor: pointer; }
 .alex-icon-button:hover { background: rgba(255, 255, 255, 0.08); color: var(--paper); }
 .alex-icon-button:focus-visible { outline: 2px solid var(--mint); }
+.alex-reset-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; min-width: 44px; min-height: 44px; padding: 8px 10px; border: 1px solid var(--alex-line); border-radius: 8px; background: transparent; color: var(--alex-muted); font: inherit; font-size: .72rem; cursor: pointer; }
+.alex-reset-button:hover { background: rgba(255,255,255,.08); color: var(--paper); }
+.alex-reset-button:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+.alex-reset-status { flex-shrink: 0; margin: 0; padding: 8px 16px; color: var(--alex-muted); font-size: .7rem; line-height: 1.5; border-bottom: 1px solid var(--alex-line); }
+.alex-project-card .shortlist-save { margin-top: 10px; }
+.alex-project-card .shortlist-save-button { color: var(--paper); border-color: var(--alex-line); }
+.alex-project-card .shortlist-save-button[aria-pressed='true'], .alex-project-card .shortlist-save-button:hover, .alex-project-card .shortlist-review-link { color: var(--mint); border-color: var(--alex-line); }
+.alex-project-card .shortlist-save-status { color: var(--alex-muted); font-size: .72rem; }
+@media (max-width: 480px) { .alex-reset-button span { display: none; } }
 
 .alex-voice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid var(--alex-line); }
 .alex-voice-button { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 14px; border: 1px solid rgba(103, 224, 193, 0.35); border-radius: 999px; background: rgba(103, 224, 193, 0.1); color: var(--mint); font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer; }

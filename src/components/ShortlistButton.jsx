@@ -4,7 +4,7 @@ import { shortlistProjectTitles } from '../lib/projectShortlistSelection.js'
 import { useProjectShortlist } from '../lib/useProjectShortlist.js'
 import '../project-shortlist.css'
 
-export default function ShortlistButton({ slug }) {
+export default function ShortlistButton({ slug, onNavigate }) {
   const { slugs, toggle } = useProjectShortlist()
   const [announcement, setAnnouncement] = useState('')
   const title = shortlistProjectTitles[slug]
@@ -21,7 +21,8 @@ export default function ShortlistButton({ slug }) {
         {selected ? <Check size={16} aria-hidden="true" /> : <Bookmark size={16} aria-hidden="true" />}
         {selected ? 'Shortlisted' : 'Shortlist'}
       </button>
-      {selected && <a className="shortlist-review-link" href={typeof window !== 'undefined' && /^\/projects\/?$/.test(window.location.pathname) ? '#project-shortlist' : '/projects#project-shortlist'}>View shortlist</a>}
+      {selected && <a className="shortlist-review-link" href={typeof window !== 'undefined' && /^\/projects\/?$/.test(window.location.pathname) ? '#project-shortlist' : '/projects#project-shortlist'}
+        onClick={onNavigate} onAuxClick={event => { if (event.button === 1) onNavigate?.(event) }}>View shortlist</a>}
     </div>
     <p className="shortlist-save-status" role="status" aria-live="polite">{announcement}</p>
   </div>

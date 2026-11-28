@@ -198,15 +198,74 @@ test('opening an evidence card ends audio and retains the transcript in the orig
 
 test('reviewing a voice enquiry preserves an existing contact draft for manual merging', async ({ page }) => {
   const { panel, send, posts } = await openVoice(page)
+  await page.locator('#contact-subject').fill('Keep my existing subject')
   await page.locator('#contact-message').fill('Keep my existing project notes.')
   send('user', 'I need appointment reminders for my clinic CRM.', 1)
   await expect(panel.getByRole('log', { name: /transcript/i })).toContainText('clinic CRM')
   await panel.getByRole('button', { name: /Prepare.*enquiry/i }).click()
+  await panel.getByRole('textbox', { name: 'Voice enquiry subject', exact: true }).fill('Prepared clinic CRM enquiry')
   await panel.getByRole('textbox', { name: 'Voice enquiry draft', exact: true }).fill('Prepared voice notes about appointment reminders and data migration.')
   await panel.getByRole('button', { name: 'Review in contact form', exact: true }).click()
+  await expect(page.locator('#contact-subject')).toHaveValue('Keep my existing subject')
+  await expect(page.locator('#contact-prepared-subject')).toHaveValue('Prepared clinic CRM enquiry')
   await expect(page.locator('#contact-message')).toHaveValue('Keep my existing project notes.')
   await expect(page.locator('#contact-prepared-message')).toHaveValue('Prepared voice notes about appointment reminders and data migration.')
   await micReleased(page)
+  expect(posts).toEqual([])
+})
+
+for (const path of ['/#live-agent', '/projects/zalio-crm']) {
+  test(`saving voice evidence keeps audio active until shortlist navigation from ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    const { panel, send, posts } = await openVoice(page, path)
+    send('user', 'Private clinic needs Zalio CRM automated follow-ups.', 1)
+    const card = panel.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Zalio CRM', exact: true }) })
+    await card.getByRole('button', { name: 'Add Zalio CRM to shortlist', exact: true }).click()
+    await expect(card.getByRole('button', { name: 'Remove Zalio CRM from shortlist', exact: true })).toHaveAttribute('aria-pressed', 'true')
+    await expect(panel.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+    expect(await page.evaluate(() => window.__voiceTracks.some(track => track.readyState === 'live'))).toBe(true)
+    await card.getByRole('link', { name: 'View shortlist', exact: true }).click()
+    await expect(page).toHaveURL(/\/projects#project-shortlist$/)
+    await micReleased(page)
+    await expect(page.getByRole('dialog', { name: 'Alex', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'Your project shortlist' })).toContainText('Zalio CRM')
+    await expect(page.getByRole('heading', { name: 'Your project shortlist', exact: true })).toBeInViewport()
+    expect(JSON.stringify(await page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage } })))).not.toContain('Private clinic')
+    expect(posts).toEqual([])
+  })
+}
+
+test('middle-clicking voice evidence ends audio, leaves the transcript, and ignores right-click', async ({ page }) => {
+  const { panel, send, posts } = await openVoice(page)
+  send('user', 'Show me Zalio CRM and automated follow-ups.', 1)
+  const card = panel.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Zalio CRM', exact: true }) })
+  const link = card.getByRole('link', { name: /^View case study/ })
+  await link.dispatchEvent('auxclick', { button: 2 })
+  await expect(panel.locator('.live-agent-status')).toHaveText('Listening… go ahead')
+  // A middle-click creates a background tab without an opener in Chromium.
+  // Observe the context rather than requiring a parent-page popup event.
+  const popupEvent = page.context().waitForEvent('page')
+  await expect(link).toHaveAttribute('href', '/projects/zalio-crm')
+  await link.click({ button: 'middle' })
+  const popup = await popupEvent
+  await micReleased(page)
+  await expect(panel.getByRole('log', { name: /transcript/i })).toContainText('Show me Zalio CRM')
+  await expect(panel.getByRole('button', { name: 'Start again', exact: true })).toBeVisible()
+  expect(posts).toEqual([])
+  await popup.close()
+})
+
+test('New chat cancels a pending microphone request and clears the voice workspace', async ({ page }) => {
+  const { panel, sockets, posts } = await openVoice(page, '/projects', { pendingMicrophone: true })
+  await panel.getByRole('button', { name: 'Start a new chat', exact: true }).click()
+  await expect(panel.getByRole('textbox', { name: 'Ask Alex a question' })).toBeFocused()
+  await expect(panel.getByRole('textbox', { name: 'Ask Alex a question' })).toHaveValue('')
+  await expect(panel.getByRole('list', { name: 'Conversation with Alex' })).toContainText('Welcome to Charlie James Abejo')
+  await expect(panel.getByRole('log', { name: /transcript/i })).toHaveCount(0)
+  await page.evaluate(() => window.__grantVoiceMicrophone())
+  await expect.poll(() => page.evaluate(() => window.__voiceTracks.length)).toBeGreaterThan(0)
+  await micReleased(page)
+  expect(sockets).toHaveLength(0)
   expect(posts).toEqual([])
 })
 
