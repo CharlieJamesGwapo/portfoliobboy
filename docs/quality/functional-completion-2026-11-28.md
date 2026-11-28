@@ -26,4 +26,9 @@ Voice SDK and Supabase scenarios used isolated mocks, fake microphone tracks and
 
 ## Publication
 
-Source commit, CI, deployment and read-only live verification will be appended after release.
+- Source **f7db80cf43c57b252a1a929cba55779fa1aa87a0** pushed to `origin/main`.
+- [Security CI 46099109633](https://github.com/CharlieJamesGwapo/portfoliobboy/actions/runs/46099109633) passed, including the new recommendation allowlist/scoreboard recovery gate. Staged repository/header/affected mock tests passed **20/20** before commit.
+- Matching deployment **portfoliobboy-gd8o9qpx8-charlie-james-projects.vercel.app** reached **READY**. The exact source SHA appeared in deployment metadata; public-alias inspection resolved `portfoliobboy.vercel.app` to this production deployment.
+- Normal-browser public verification showed New chat clearing fresh test conversation state and focusing the general input, then Find projects rendering CRM recommendations with shared shortlist saved/add controls and View shortlist links. Alex was left open for the owner. No user-entered private history was cleared: the live test began after a fresh page reload with a public test prompt.
+- Read-only live security audit passed **17/17**. Voice/Supabase service behavior remains covered by mocks rather than a production provider transaction; no real enquiry, call, remote score or booking was sent.
+- Only root-owned dev/preview servers were stopped; temporary verification tabs were closed. No source/personal files, credentials, browser history or databases were deleted.
