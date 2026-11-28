@@ -5,6 +5,7 @@ import { ProductMedia } from './IndependentProducts.jsx'
 import './case-study-page.css'
 import OneRideStory from './OneRideStory'
 import ShortlistButton from './ShortlistButton'
+import ProjectCover from './ProjectCover'
 
 const toList = (value) => (Array.isArray(value) ? value : value ? [value] : [])
 
@@ -57,6 +58,19 @@ function ScreenshotGallery({ study }) {
 
 function ProjectImage({ study }) {
   const [failed, setFailed] = useState(false)
+
+  if (study.slug === 'zalio-crm') {
+    return (
+      <figure className="case-study-image-figure case-study-image-figure--project-cover">
+        <ProjectCover projectId="zalio-crm">
+          {failed ? (
+            <div className="case-study-image-fallback" role="status"><strong>Preview image unavailable</strong><span>Project details, architecture, and links remain available.</span></div>
+          ) : <img src={study.image} alt={study.imageAlt} loading="lazy" decoding="async" onError={() => setFailed(true)} />}
+        </ProjectCover>
+        <figcaption>{study.mediaCaption}</figcaption>
+      </figure>
+    )
+  }
 
   if (failed) {
     return (

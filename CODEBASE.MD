@@ -253,6 +253,9 @@ The nine games are Dungeon Crawler, Space Shooter, Code Racer, Block Blast, Raci
 
 ### Themes, performance, and offline behavior
 
+- `Hero.jsx`, `HeroWorkflowSignature.jsx` and `hero-editorial.css` provide the editorial introduction and an explicitly illustrative AI/API/CRM workflow. The native disclosure works with keyboard and touch; entrance motion is finite and disabled for reduced motion. These styles stay inside the hero copy column.
+- `ProjectCover.jsx` and `project-cover.css` frame BBOY, EasyAppy, AgentForge and Zalio media by explicit project ID. Existing gallery/error handling remains with its original component. Concept previews, architecture illustrations and public-website imagery remain labeled. OneRide does not use this wrapper.
+
 - `server/requestSecurity.js` shares exact origin validation across contact and analytics; hosted deployments reject loopback origins. `scripts/audit_site_security.mjs` verifies live headers, cache policies and origin preflights without submitting visitor data.
 - Stable fonts/media refresh rather than using immutable browser caches. Private responses are excluded from offline caches. `SECURITY.md` records traffic/provider limits, and `.github/workflows/security.yml` plus Dependabot maintain repeatable security/dependency checks.
 - `components/motion.css` supplies staggered hero entrances, layered client-study reveals, directional featured-project transitions and optional desktop scroll-timeline image depth. The primary headline remains readable during its entrance. Project switching remains manual.

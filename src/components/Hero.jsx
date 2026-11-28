@@ -2,6 +2,8 @@ import { ArrowDown, ArrowUpRight, CalendarClock, FileText, Headphones, Github, L
 import { aiCapabilityRibbon, profile, proofPoints, resumeUrl } from '../data/portfolioData'
 import AnimatedStat from './AnimatedStat'
 import HeroProjectCarousel from './HeroProjectCarousel'
+import HeroWorkflowSignature from './HeroWorkflowSignature'
+import './hero-editorial.css'
 
 const Hero = () => (
   <section id="home" className="hero-section">
@@ -10,7 +12,7 @@ const Hero = () => (
     <div className="hero-orbit hero-orbit-two" aria-hidden="true" />
 
     <div className="page-container hero-layout">
-      <div className="hero-copy">
+      <div className="hero-copy hero-editorial">
         <div className="availability-pill hero-enter hero-enter-1">
           <span className="status-dot" aria-hidden="true" />
           Available for remote AI, full-stack, and backend opportunities
@@ -34,15 +36,15 @@ const Hero = () => (
               <p className="hero-kicker">Charlie James Z. Abejo</p>
               <span>Cebu City, Philippines · Working globally</span>
             </div>
-            <h1>
-              <span className="hero-line hero-line-primary">Lead</span>{' '}
-              <span className="hero-line hero-line-primary">Full-Stack</span>{' '}
-              <span className="hero-line hero-line-accent">Developer</span>{' '}
-              <span className="sr-only">— </span>
-              <span className="hero-line hero-line-note">AI, Web &amp; Mobile.</span>
-            </h1>
           </div>
         </div>
+
+        <h1 className="hero-editorial-title">
+          <span className="hero-line hero-line-primary">Lead Full-Stack</span>{' '}
+          <span className="hero-line hero-line-accent">Developer</span>{' '}
+          <span className="sr-only">— </span>
+          <span className="hero-line hero-line-note">AI, Web &amp; Mobile.</span>
+        </h1>
 
         <p className="hero-intro hero-enter hero-enter-5">
           I build AI systems, CRM workflows, mobile apps, and APIs that move products from idea to reliable operation.
@@ -76,6 +78,8 @@ const Hero = () => (
           <a href={`mailto:${profile.email}`} aria-label={`Email ${profile.shortName}`}><Mail size={18} /></a>
           <span><MapPin size={16} aria-hidden="true" /> {profile.location}</span>
         </div>
+
+        <HeroWorkflowSignature />
       </div>
 
       <div className="hero-visual hero-enter hero-enter-visual">

@@ -6,6 +6,7 @@ import { oneRidePreview } from '../data/productPreviewData'
 import { selectedCaseStudies } from '../data/selectedCaseStudies'
 import IndependentProducts from './IndependentProducts'
 import ProjectCollection from './ProjectCollection'
+import ProjectCover from './ProjectCover'
 import './studio-preview.css'
 import './selected-work.css'
 
@@ -234,6 +235,20 @@ function SystemsViewDisclosure() {
 
 function CaseStudyMedia({ study }) {
   const [failed, setFailed] = useState(false)
+  if (study.id === 'zalio-crm') {
+    return (
+      <figure className="case-study-media case-study-media--project-cover">
+        <div className="case-study-image">
+          <ProjectCover projectId={study.id}>
+            {failed ? (
+              <div className="case-study-image-fallback" role="status"><strong>Website preview unavailable.</strong><span>Use the public product link to explore the work.</span></div>
+            ) : <img src={study.image} alt={study.imageAlt} width="960" height="600" loading="lazy" decoding="async" onError={() => setFailed(true)} />}
+          </ProjectCover>
+        </div>
+        <figcaption>{study.caption}</figcaption>
+      </figure>
+    )
+  }
   return (
     <figure className={`case-study-media ${study.media === 'oneride' ? 'is-mobile-app' : ''}`}>
       <div className="case-study-image">

@@ -7,6 +7,7 @@ import { oneRidePreview } from '../data/productPreviewData'
 import './project-discovery.css'
 import { featuredProjects, projectArchive, projectCategories } from '../data/portfolioData'
 import ShortlistButton from './ShortlistButton'
+import ProjectCover, { hasProjectCover } from './ProjectCover'
 
 const ProjectShortlist = lazy(() => import('./ProjectShortlist'))
 
@@ -95,6 +96,25 @@ const categoryCounts = Object.fromEntries(
 function ProjectCardPreview({ project, mediaEnabled }) {
   const isOneRide = project.id === oneRidePreview.projectId
   const media = isOneRide ? oneRidePreview.screenshots[0] : project.media?.[0]
+
+  if (hasProjectCover(project.id)) {
+    return (
+      <div className="project-card-preview project-card-preview--cover">
+        <ProjectCover projectId={project.id} compact>
+          <span className="project-card-preview-fallback" aria-hidden="true">Preview unavailable</span>
+          {mediaEnabled && media && <img
+            src={media.src}
+            alt={media.alt}
+            width={media.width}
+            height={media.height}
+            loading="lazy"
+            decoding="async"
+            onError={(event) => event.currentTarget.closest('.project-card-preview')?.classList.add('is-failed')}
+          />}
+        </ProjectCover>
+      </div>
+    )
+  }
 
   if (project.visual === 'agent-architecture') {
     return (

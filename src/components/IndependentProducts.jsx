@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { independentProducts } from '../data/independentProducts'
 import { caseStudySlug } from '../data/routeMetadata'
+import ProjectCover, { hasProjectCover } from './ProjectCover'
 import './independent-products.css'
 
 export function AgentArchitectureDiagram({ compact = false }) {
@@ -51,10 +52,7 @@ export function ProductMedia({ product, variant = 'showcase' }) {
 
   const selectMedia = (item) => setSelectedMediaId(item.id)
 
-  return (
-    <figure className={`product-media product-media--${variant} product-media--${product.mediaLayout || 'diagram'}`}>
-      <div className="product-media-stage">
-        {product.visual === 'agent-architecture' ? (
+  const preview = product.visual === 'agent-architecture' ? (
           <AgentArchitectureDiagram compact={variant === 'project'} />
         ) : imageFailed ? (
           <div className="product-media-fallback" role="status">
@@ -79,7 +77,12 @@ export function ProductMedia({ product, variant = 'showcase' }) {
             <span>Product overview</span>
             <strong>{product.title}</strong>
           </div>
-        )}
+        )
+
+  return (
+    <figure className={`product-media product-media--${variant} product-media--${product.mediaLayout || 'diagram'}`}>
+      <div className="product-media-stage">
+        {hasProjectCover(product.id) ? <ProjectCover projectId={product.id}>{preview}</ProjectCover> : preview}
       </div>
 
       {media.length > 1 && (
