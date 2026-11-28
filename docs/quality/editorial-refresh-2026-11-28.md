@@ -19,4 +19,10 @@ Final caption markup: configured production rebuild passed (23 routes), followed
 
 ## Release
 
-Source is ready for commit and publication. GitHub CI, matching READY production deployment and live alias evidence will be recorded after publication.
+- Source commit: `19e30add3494f1d21308e02b2574fe80dacd087e`, pushed to `origin/main`.
+- GitHub Security checks run `46110320815`: completed successfully.
+- Matching production deployment: `portfoliobboy-qeqlabmfd-charlie-james-projects.vercel.app`, READY. Vercel metadata matches the full source commit; `portfoliobboy.vercel.app` resolves to that deployment.
+- Post-release read-only security audit: 17/17 checks passed.
+- Normal-browser production check: updated hero/workflow rendered, BBOY architecture cover rendered, and returning to the OneRide tab restored its official Stores screenshot. No microphone or enquiry submission was used.
+
+This report is a documentation follow-up to that verified source release.
