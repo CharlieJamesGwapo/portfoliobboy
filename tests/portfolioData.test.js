@@ -92,12 +92,12 @@ test('keeps the original featured and archived projects while prepending indepen
 
 test('shows current independent work and role count in the page consumers', async () => {
   const { hero: heroMarkup, about: aboutMarkup, experience: experienceMarkup } = await renderConsumers()
-  const productProof = proofPoints.find((item) => item.label === 'Genuine products and client builds')
+  const productProof = proofPoints.find((item) => item.label === 'Custom builds')
   const experienceProof = proofPoints.find((item) => item.label === 'Development')
   assert.deepEqual(productProof, {
-    value: '22+',
-    label: 'Genuine products and client builds',
-    numericValue: 22,
+    value: '70+',
+    label: 'Custom builds',
+    numericValue: 70,
     suffix: '+',
   })
   assert.deepEqual(experienceProof, {

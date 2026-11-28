@@ -76,6 +76,11 @@ const answers = {
     actions: [{ label: 'Selected work', href: '/#product-studio-preview' }, { label: 'Systems & demos', href: '/#momentum-work' }, { label: 'All projects', href: '/projects' }],
   }),
 
+  github: () => ({
+    text: `The GitHub activity section shows Charlie's published contribution calendar and public repository count, refreshed about hourly. Choose a year or inspect a day for details. Contributions and repositories are separate from the portfolio's custom-build count; GitHub controls when published activity appears.`,
+    actions: [{ label: 'Live GitHub activity', href: '/#github' }, { label: 'GitHub profile', href: profile.github, external: true }],
+  }),
+
   ai: () => ({
     text: `Charlie builds ${list(aiSystemCapabilities.slice(0, 4).map((item) => lowerFirst(item.title)))}. ${voiceIdentity}`,
     actions: [{ label: 'AI systems', href: '/#ai-systems' }, { label: 'Voice Studio', href: '/#voice-demo' }],
@@ -258,8 +263,9 @@ export function answerQuestion(input) {
       text: `${study.title}: ${study.overview} Role: ${study.role}. ${[].concat(study.responsibilities).join(' ')} Status: ${study.status}.`,
       actions: [{ label: 'Read the case study', href: `/projects/${study.slug}` }],
     }
-    if (/\b(aws|devops|cloud|docker|ci cd|gitlab ci|jenkins|deployment pipelines?|continuous integration)\b/.test(text)) return answers.cloud()
+    if (/\b(aws|devops|cloud|docker|ci cd|github actions|gitlab ci|jenkins|deployment pipelines?|continuous integration)\b/.test(text)) return answers.cloud()
     if (/\b(custom bots?|telegram bots?|discord bots?|slack bots?|chat bots?)\b/.test(text)) return answers.bots()
+    if (/\b(github|contributions?|contribution calendar|heatmap)\b/.test(text)) return answers.github()
     const specific = findSystem(text) ?? (/(know|use|work with|experience with|familiar)/.test(text) ? findSkill(text) : null)
     if (specific) return specific
   }

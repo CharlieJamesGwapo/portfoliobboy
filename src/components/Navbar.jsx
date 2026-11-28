@@ -17,6 +17,7 @@ const primaryNavigation = [
 ]
 
 const moreNavigation = [
+  { label: 'GitHub activity', href: '#github', activeId: 'github' },
   { label: 'About', href: '#about', activeId: 'about' },
   { label: 'Skills', href: '#skills', activeId: 'skills' },
   { label: 'Credentials', href: '#education', activeId: 'education' },
@@ -33,7 +34,7 @@ const mobileNavigation = [
   { label: 'Home', href: '/', activeId: 'home', route: true },
   ...['Voice demo'].map(byLabel),
   { label: 'Services', href: '#services', activeId: 'services' },
-  ...['Featured work', 'Projects', 'About', 'Experience', 'AI & Automation', 'Automations', 'Skills', 'Credentials', 'Interactive Lab', 'Contact', 'Resume PDF'].map(byLabel),
+  ...['Featured work', 'Projects', 'GitHub activity', 'About', 'Experience', 'AI & Automation', 'Automations', 'Skills', 'Credentials', 'Interactive Lab', 'Contact', 'Resume PDF'].map(byLabel),
 ]
 
 const navigationTargets = [...primaryNavigation, ...moreNavigation]

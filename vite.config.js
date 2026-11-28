@@ -68,11 +68,42 @@ function verifiedAssetPlugin() {
   }
 }
 
+// Vercel serves this public function in production. Mirror only this exact
+// read-only route in local previews; private contact/analytics APIs stay remote.
+function githubActivityPreviewPlugin() {
+  const serveActivity = async (request, response, next) => {
+    if (request.url?.split('?')[0] !== '/api/github-activity') return next()
+    try {
+      const { default: handler } = await import('./api/github-activity.js')
+      const adapter = {
+        setHeader: (name, value) => response.setHeader(name, value),
+        status(code) { response.statusCode = code; return this },
+        json(value) {
+          response.setHeader('Content-Type', 'application/json; charset=utf-8')
+          response.end(JSON.stringify(value))
+        },
+        end: () => response.end(),
+      }
+      await handler(request, adapter)
+    } catch {
+      response.statusCode = 503
+      response.setHeader('Cache-Control', 'no-store')
+      response.setHeader('Content-Type', 'application/json; charset=utf-8')
+      response.end(JSON.stringify({ error: 'GitHub activity is temporarily unavailable' }))
+    }
+  }
+  return {
+    name: 'public-github-activity-preview',
+    configureServer: server => { server.middlewares.use(serveActivity) },
+    configurePreviewServer: server => { server.middlewares.use(serveActivity) },
+  }
+}
+
 export default defineConfig(({ mode }) => ({
   define: {
     __PORTFOLIO_BOOKING_URL__: JSON.stringify(resolveBookingConfiguration(loadEnv(mode, process.cwd(), 'PORTFOLIO_BOOKING_URL').PORTFOLIO_BOOKING_URL)),
   },
-  plugins: [react(), verifiedAssetPlugin()],
+  plugins: [react(), verifiedAssetPlugin(), githubActivityPreviewPlugin()],
   build: {
     target: 'es2020',
     cssCodeSplit: true,

@@ -31,3 +31,5 @@ jobs:
       - run: npm audit --audit-level=moderate
       - name: Verify API boundaries, cache safety and repository protections
         run: node --test tests/repoSecurity.test.js tests/hostingSecurity.test.js tests/contactSecurity.test.js tests/contactAnalytics.test.js tests/apiOriginPolicy.test.js tests/portfolioAnalyticsServer.test.js tests/serviceWorkerCaching.test.js tests/siteSecurityAudit.test.js tests/contactBotProtection.test.js tests/contactSubmission.test.js tests/contactVerificationDeadline.test.js tests/projectMedia.test.js tests/healthTelemetry.test.js tests/healthReadiness.test.js tests/healthReporting.test.js tests/contactHealth.test.js tests/healthMonitor.test.js tests/healthAlertEmail.test.js
+      - name: Verify public GitHub feed parsing and cache boundaries
+        run: node --test tests/githubActivity.test.js tests/githubCalendar.test.js

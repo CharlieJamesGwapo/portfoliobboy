@@ -83,11 +83,12 @@ test('voice context includes bounded cloud evidence while retaining every public
   assert.match(context, /\/projects\/zero-to-hero-dev/)
 })
 
-test('hero introduces cloud delivery and custom bots without inventing a larger project count', async () => {
+test('hero introduces cloud delivery and custom bots with the owner-supplied build count', async () => {
   const { default: Hero } = await server.ssrLoadModule('/src/components/Hero.jsx')
   const markup = renderToStaticMarkup(createElement(Hero))
   assert.match(markup, /AWS &amp; DevOps/)
   assert.match(markup, /Custom bots/)
-  assert.match(markup, /22\+/)
+  assert.match(markup, /70\+/)
+  assert.match(markup, /Custom builds/)
   assert.doesNotMatch(markup, /150\+/)
 })

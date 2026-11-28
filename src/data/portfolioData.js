@@ -67,6 +67,7 @@ export const navigation = [
   { label: 'Experience', href: '#experience' },
   { label: 'Live', href: '#live-projects' },
   { label: 'Projects', href: '#projects' },
+  { label: 'GitHub activity', href: '#github' },
   { label: 'Skills', href: '#skills' },
   { label: 'Credentials', href: '#education' },
   { label: 'Interactive Lab', href: '#lab' },
@@ -74,7 +75,8 @@ export const navigation = [
 ]
 
 export const proofPoints = [
-  { value: '22+', label: 'Genuine products and client builds', numericValue: 22, suffix: '+' },
+  // Owner-supplied inventory; public GitHub activity is a separate live measure.
+  { value: '70+', label: 'Custom builds', numericValue: 70, suffix: '+' },
   { value: 'Hands-on', label: 'Development' },
   { value: '31', label: 'Credentials and recognitions', numericValue: 31, suffix: '' },
   { value: '9', label: 'Playable creative-code experiments', numericValue: 9, suffix: '' },

@@ -38,6 +38,7 @@ const SECTION_ICONS = {
   '#about': User,
   '#experience': Briefcase,
   '#projects': Layers,
+  '#github': Github,
   '#skills': Wrench,
   '#education': Award,
   '#lab': Gamepad2,

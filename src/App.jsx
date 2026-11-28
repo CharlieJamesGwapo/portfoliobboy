@@ -11,6 +11,7 @@ import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Services from './components/Services'
 import ProductStudioPreview from './components/ProductStudioPreview'
+import GitHubActivity from './components/GitHubActivity'
 import About from './components/About'
 import Experience from './components/Experience'
 import AISystems from './components/AISystems'
@@ -280,6 +281,7 @@ function App() {
         <VoiceAgentDemo />
         <Services />
         <ProductStudioPreview />
+        <GitHubActivity />
         <About />
         <Experience />
         <AISystems />
