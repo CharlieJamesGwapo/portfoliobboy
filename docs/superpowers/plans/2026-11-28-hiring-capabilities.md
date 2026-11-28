@@ -20,7 +20,7 @@ Do not fabricate project counts, credentials or unsupported experience. No real 
 - [x] Expand the automation catalogue with detailed service patterns, clear status, filters/search, initial six-card limit, disclosure, reset and editable enquiry actions.
 - [x] Update Services/Alex to reflect the new catalogue and cloud/bot scope without inventing delivery claims; retain 22+ documented builds pending a confirmed larger count.
 - [x] Review content/trust boundaries and links; run full tests/build, relevant browser suites and a fresh review; document results.
-- [ ] Commit/push, verify CI and production deployment, run live security checks and inspect the updated sections.
+- [x] Commit/push, verify CI and production deployment, run live security checks and inspect the updated sections.
 
 ## Review focus
 

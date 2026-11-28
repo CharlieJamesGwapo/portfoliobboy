@@ -26,4 +26,10 @@ The final production build emits 23 route documents. No dependencies, provider s
 - Dependency audit: **zero vulnerabilities**.
 - The fresh review also checked every unfiltered Skills panel at 320px in actual light/dark themes with no horizontal overflow. Physical-device and full screen-reader certification are outside these browser checks.
 
-Live-release results are recorded after deployment. Automated enquiries and voice tests use isolated local transports; this update does not require real email, microphone or booking actions.
+Automated enquiries and voice tests use isolated local transports; this update does not require real email, microphone or booking actions.
+
+## Production release
+
+Application commit [`996c1b4`](https://github.com/CharlieJamesGwapo/portfoliobboy/commit/996c1b45f89b659d0e57d1012f43fef03f611967) was pushed to `main`. [GitHub security CI](https://github.com/CharlieJamesGwapo/portfoliobboy/actions/runs/46088489346) succeeded. Vercel confirmed the matching production build READY and assigned [portfoliobboy.vercel.app](https://portfoliobboy.vercel.app/) to it.
+
+All **17 live security checks passed**; `/api/health` returned HTTP 200 with fixed configured states. In the normal browser, the live Skills section showed 135 entries/ten groups and linked AWS Lambda to the fintech case study. The live Custom Bots filter showed four of four matching service patterns, and the expanded Discord example exposed its use case, implementation approach and safeguards. The public automation page was left open for the owner. No enquiry, account integration, bot permission, booking or real voice session was created during this verification.
