@@ -341,6 +341,8 @@ test('adds evidence-backed AI, automation, voice, CRM, and integration positioni
     'Custom CRM',
     'n8n',
     'GoHighLevel',
+    'Custom bots',
+    'AWS & DevOps',
   ])
 
   assert.deepEqual(

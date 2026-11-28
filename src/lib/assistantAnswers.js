@@ -15,7 +15,7 @@ import {
   skillGroups,
 } from '../data/portfolioData.js'
 import { caseStudies } from '../data/caseStudies.js'
-import { automationToolbox } from '../data/automationsData.js'
+import { automationToolbox, automationWorkflows } from '../data/automationsData.js'
 import { voiceAccents } from '../data/voiceAccents.js'
 import { voiceConversations } from '../data/voiceConversations.js'
 
@@ -91,8 +91,18 @@ const answers = {
   }),
 
   automations: () => ({
-    text: `He builds automations with ${list(automationToolbox.slice(0, 4))}, plus AI agents that qualify leads, book appointments, and follow up, with retries, logging, and a human handoff.`,
+    text: `Explore ${automationWorkflows.length} automation solution patterns using ${list(automationToolbox.slice(0, 4))}, plus AI agents, custom bots and cloud workflows. Each example explains the trigger, process, integrations and safeguards. These are service examples to scope with Charlie, not a count of completed client deployments.`,
     actions: [{ label: 'Automation workflows', href: '/#automations' }],
+  }),
+
+  cloud: () => ({
+    text: 'Published cloud and DevOps work includes AWS Lambda integrations in the fintech project, Docker and Docker Compose deployments, Linux VPS operations, and GitLab/Buddy CI/CD. This portfolio also uses GitHub Actions for checks and monitoring. These examples establish specific work, not an AWS certification or expertise in every AWS service. Confirm additional services, infrastructure scope and depth with Charlie.',
+    actions: [{ label: 'AWS project evidence', href: '/projects/fintech-lending' }, { label: 'Container deployment', href: '/projects/omji-billing' }, { label: 'Cloud and delivery skills', href: '/#skills' }],
+  }),
+
+  bots: () => ({
+    text: 'Charlie can discuss custom bots for website support, knowledge search, CRM operations and team notifications. Telegram, Discord and other channels are solution patterns to scope around the platform APIs, permissions and human handoff. The catalogue is not a list of completed bot deployments; confirm the integrations and project scope directly with Charlie.',
+    actions: [{ label: 'Custom bot solution patterns', href: '/#automations' }, { label: 'Discuss a bot', href: '/#contact' }],
   }),
 
   services: () => ({
@@ -106,7 +116,7 @@ const answers = {
   }),
 
   skills: () => ({
-    text: skillGroups.slice(0, 4).map((group) => `${group.title}: ${group.skills.slice(0, 5).join(', ')}`).join('. ') + '.',
+    text: [...skillGroups.slice(0, 4), ...skillGroups.filter(group => /AWS|DevOps/.test(group.title))].map((group) => `${group.title}: ${group.skills.slice(0, 5).join(', ')}`).join('. ') + '. Project links and toolkit notes explain the scope; confirm depth directly.',
     actions: [{ label: 'All skills', href: '/#skills' }],
   }),
 
@@ -170,6 +180,7 @@ const intents = [
   ['contact', ['contact', 'email', 'reach', 'hire', 'phone', 'call him', 'linkedin', 'github', 'touch', 'message him', 'get in touch']],
   ['resume', ['resume', 'résumé', 'cv', 'curriculum']],
   ['voice', ['voice', 'accent', 'elevenlabs', 'voices', 'audio', 'speak', 'listen', 'studio', 'talk to alex', 'multilingual', 'bilingual', 'spanish', 'español', 'tagalog', 'taglish']],
+  ['bots', ['custom bot', 'telegram bot', 'discord bot', 'slack bot', 'chat bot']],
   ['automations', ['automation', 'automate', 'n8n', 'zapier', 'make.com', 'gohighlevel', 'ghl', 'workflow']],
   ['ai', ['ai', 'agent', 'llm', 'gpt', 'claude', 'openai', 'mcp', 'machine learning', 'chatbot', 'alex']],
   ['services', ['service', 'offer', 'build for me', 'help me', 'can he build', 'freelance', 'available', 'availability']],
@@ -185,7 +196,7 @@ const intents = [
 
 const normalize = (text) => ` ${String(text).toLowerCase().replace(/[^a-z0-9é.\s']/g, ' ').replace(/\s+/g, ' ').trim()} `
 
-const allSkills = skillGroups.flatMap((group) => group.skills.map((skill) => ({ skill, group: group.title })))
+const allSkills = skillGroups.flatMap((group) => group.skills.map((skill) => ({ skill, group: group.title, offeredOnly: group.offeredSkills?.includes(skill) === true })))
 
 // "Tell me about Zalio": a named system gets its own answer, from its own copy.
 const findSystem = (text) => {
@@ -218,7 +229,9 @@ const findSkill = (text) => {
     .sort((a, b) => Number(text.includes(` ${b.skill.toLowerCase()} `)) - Number(text.includes(` ${a.skill.toLowerCase()} `)) || a.skill.length - b.skill.length)[0]
   if (!hit) return null
   return {
-    text: `Yes: ${hit.skill} is part of Charlie's ${hit.group.toLowerCase()} toolkit. The Skills section lists the rest.`,
+    text: hit.offeredOnly
+      ? `${hit.skill} is listed as part of Charlie's offered automation toolkit. The linked projects do not establish deployed workflows on this platform; confirm scope and experience directly with Charlie.`
+      : `Yes: ${hit.skill} is part of Charlie's ${hit.group.toLowerCase()} toolkit. The Skills section lists the rest.`,
     actions: [{ label: 'All skills', href: '/#skills' }],
   }
 }
@@ -245,6 +258,8 @@ export function answerQuestion(input) {
       text: `${study.title}: ${study.overview} Role: ${study.role}. ${[].concat(study.responsibilities).join(' ')} Status: ${study.status}.`,
       actions: [{ label: 'Read the case study', href: `/projects/${study.slug}` }],
     }
+    if (/\b(aws|devops|cloud|docker|ci cd|gitlab ci|jenkins|deployment pipelines?|continuous integration)\b/.test(text)) return answers.cloud()
+    if (/\b(custom bots?|telegram bots?|discord bots?|slack bots?|chat bots?)\b/.test(text)) return answers.bots()
     const specific = findSystem(text) ?? (/(know|use|work with|experience with|familiar)/.test(text) ? findSkill(text) : null)
     if (specific) return specific
   }

@@ -46,7 +46,7 @@ for (const group of skillGroups) {
     for (const skill of entry.split(/\s*\/\s*/)) {
       const label = skill.replace(/\s+\d+(?:\.\d+)*$/, '').trim()
       const key = label.toLowerCase()
-      const item = catalog.get(key) || { label, group: group.title, href: '/#skills', aliases: new Set() }
+      const item = catalog.get(key) || { label, group: group.title, href: '/#skills', offeredOnly: group.offeredSkills?.includes(entry) === true, aliases: new Set() }
       for (const alias of [skill, label, ...(extraAliases[key] || [])]) item.aliases.add(alias)
       catalog.set(key, item)
     }
@@ -58,7 +58,7 @@ for (const { study } of projectIndex) {
   for (const skill of study.stack.flatMap(entry => entry.split(/\s*\/\s*/))) {
     const key = skill.toLowerCase()
     const existing = catalog.get(key)
-    if (!existing || (existing.plannedOnly && !isPlannedStudy(study))) {
+    if (!existing || ((existing.plannedOnly || existing.offeredOnly) && !isPlannedStudy(study))) {
       catalog.set(key, { label: skill, group: 'Project stack', href: `/projects/${study.slug}`, plannedOnly: isPlannedStudy(study), aliases: new Set([skill]) })
     }
   }
@@ -128,6 +128,7 @@ export function recommendProjects(input) {
 }
 
 function evidenceFor(item) {
+  if (item.offeredOnly) return [{ text: `${item.label} is listed as part of the offered automation toolkit; deployed experience is not established by the linked projects. Confirm scope directly.`, href: item.href }]
   if (item.plannedOnly) return [{ text: `${item.label} appears only in a planned or in-development project stack; delivered experience is not established.`, href: item.href }]
   const evidence = [{ text: `${item.label} — listed in ${item.group}.`, href: item.href }]
   for (const { study } of projectIndex) {
@@ -154,7 +155,7 @@ export function assessRole(input) {
       .replace(/\b(experience|experienced|with|in|using|knowledge|of|skills?|proficiency|proficient|required|requirements?|preferred|development|developer|engineering|engineer|strong|the|a|an|to|and)\b/g, ' ')
       .replace(/[^\p{L}\p{M}\p{N}]/gu, '').trim()
     const negated = /\b(no|not|without|excluding|except|hindi|walang)\b|不要|不需要|无需|不用|不使用|不要求/iu.test(requirement)
-    const establishedItems = items.filter(item => !item.plannedOnly)
+    const establishedItems = items.filter(item => !item.plannedOnly && !item.offeredOnly)
     const status = negated || establishedItems.length === 0 ? 'unverified'
       : unexplained || establishedItems.length !== items.length ? 'partial' : 'documented'
     return {

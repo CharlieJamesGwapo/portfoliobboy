@@ -22,6 +22,7 @@ export function buildVoiceEvidenceContext() {
     `FEATURED ROLE (${ /present/i.test(featured.period) ? 'ongoing' : 'ended; do not describe as current' }): ${featured.role}, ${featured.company}, ${featured.period}.`,
     ...ongoing.map(role => `ONGOING PUBLISHED ROLE: ${role.role}, ${role.company}, ${role.period}.`),
     `CALL OPTIONS: ${bookingOptions.map(option => `${option.minutes}-minute ${option.title}: ${option.price}`).join('; ')}. ${bookingOptions.every(option => !option.url) ? 'Published options use a contact request; Charlie confirms scheduling.' : 'Use the published booking links where available.'}`,
+    'CLOUD & DELIVERY: AWS Lambda integrations are documented in /projects/fintech-lending; Docker Compose in /projects/omji-billing; Linux VPS, GitLab/Buddy CI/CD and GitHub Actions in the published work. Additional AWS services, certifications and depth need confirmation. Automation and custom-bot solution patterns are service examples, not a count of completed deployments.',
     'SELECTED PRIORITIES: CRM, voice AI and automation. Personal contributions:',
     ...selectedCaseStudies.map(study => `${study.title}: ${clip(study.contribution, 300)}`),
     'PROJECT INDEX (public portfolio routes; external URLs are published links, not a live uptime check):',

@@ -128,6 +128,8 @@ export const aiCapabilityRibbon = [
   'Custom CRM',
   'n8n',
   'GoHighLevel',
+  'Custom bots',
+  'AWS & DevOps',
 ]
 
 export const aiSystemCapabilities = [
@@ -821,31 +823,107 @@ export const projectCategories = ['All', 'AI', 'SaaS', 'Backend', 'Full Stack', 
 export const skillGroups = [
   {
     title: 'AI & automation',
-    skills: ['Claude Code', 'OpenAI API', 'Claude API', 'LLM tool calling', 'Streaming', 'Structured output', 'Prompt & agent instruction design', 'Custom agents', 'Skills', 'MCP servers'],
+    summary: 'Voice agents, custom bots, and bounded AI workflows that connect useful actions with human review.',
+    useCases: ['Voice intake and CRM handoff', 'Custom assistants and agent tools', 'Business workflow automation'],
+    skills: ['Claude Code', 'OpenAI API', 'Claude API', 'LLM tool calling', 'Streaming', 'Structured output', 'Prompt & agent instruction design', 'Custom agents', 'Skills', 'MCP servers', 'LiveKit Agents', 'n8n', 'GoHighLevel (GHL)', 'Make', 'Zapier', 'Insighto.ai', 'Twilio', 'JSON Schema'],
+    toolkitNote: 'Make, Zapier, and Insighto.ai are part of my offered automation toolkit. The linked projects do not establish deployed workflows on those platforms. Optional model adapters in AgentForge remain in development.',
+    offeredSkills: ['Make', 'Zapier', 'Insighto.ai'],
+    evidence: [
+      { label: 'Alex / Hasti voice workflow', href: '/projects/alex-hasti', status: 'Public callback demo · Private runtime and integrations' },
+      { label: 'AgentForge agent toolkit', href: '/projects/agentforge', status: 'Public source · Development version; live adapters untested' },
+      { label: 'Scale With Accounting CRM workflow', href: '/projects/scale-with-accounting', status: 'Live client website · GoHighLevel integration documented' },
+    ],
   },
   {
     title: 'Backend & APIs',
-    skills: ['Python', 'FastAPI', 'Django', 'Flask', 'Celery', 'Node.js / Express', 'C# / .NET', 'Go', 'PHP / Laravel', 'REST', 'GraphQL', 'JSON-RPC', 'OpenAPI', 'WebSockets', 'Webhooks'],
+    summary: 'Service boundaries, typed contracts, and background work for web, mobile, and integration-heavy products.',
+    useCases: ['Product APIs', 'Partner integrations', 'Background processing'],
+    skills: ['Python', 'FastAPI', 'Pydantic', 'Django', 'Flask', 'Celery', 'Node.js / Express', 'C# / .NET', 'Go', 'Gin', 'PHP / Laravel', 'REST', 'GraphQL', 'JSON-RPC', 'OpenAPI', 'WebSockets', 'Webhooks'],
+    evidence: [
+      { label: 'OneRide API and mobile platform', href: '/projects/oneride', status: 'Live Google Play app · Private client source' },
+      { label: 'Fintech service modernization', href: '/projects/fintech-lending', status: 'Australian client project · Private source' },
+    ],
   },
   {
     title: 'Frontend',
-    skills: ['React 19', 'Next.js 16', 'TypeScript', 'TanStack Query', 'Zustand', 'Tailwind CSS', 'shadcn/ui', 'Vue.js', 'Angular'],
+    summary: 'Product interfaces that make complex workflows understandable across desktop and phone screens.',
+    useCases: ['Customer websites', 'Operational dashboards', 'Accessible responsive interfaces'],
+    skills: ['HTML', 'CSS', 'JavaScript', 'React 19', 'Next.js 16', 'TypeScript', 'Vite', 'TanStack Query', 'TanStack Start', 'Zustand', 'Tailwind CSS', 'shadcn/ui', 'Base UI', 'Vue.js', 'Angular', 'Three.js'],
+    evidence: [
+      { label: 'Scale With Accounting website', href: '/projects/scale-with-accounting', status: 'Live client website · Next.js and React' },
+      { label: 'EasyAppy desktop interface', href: '/projects/easyappy', status: 'Independent product · Public download not linked' },
+    ],
   },
   {
     title: 'Mobile & real time',
+    summary: 'Customer and operator mobile workflows with live trip states, notifications, and device-aware persistence.',
+    useCases: ['Ride and delivery apps', 'Live tracking', 'Booking and attendance tools'],
     skills: ['React Native', 'Expo', 'Expo Router', 'NativeWind', 'Reanimated', 'Expo SQLite', 'Android', 'Java', 'Kotlin', 'Firebase Auth', 'Firebase real-time data', 'Push notifications', 'Offline-tolerant sync'],
+    evidence: [
+      { label: 'OneRide customer and rider workflows', href: '/projects/oneride', status: 'Customer app live on Google Play · Client source private' },
+      { label: 'Mobile booking engagements', href: '/projects/mobile-booking', status: 'Completed projects · Source link not provided' },
+    ],
   },
   {
     title: 'Desktop & macOS',
-    skills: ['Electron', 'Swift', 'AppKit', 'WebKit', 'macOS Keychain', 'Gmail OAuth', 'GitHub Actions'],
+    summary: 'Local desktop tools with explicit boundaries between the interface, runtime, credentials, and device data.',
+    useCases: ['Native macOS assistants', 'Local-first workspaces', 'Developer tooling'],
+    skills: ['Electron', 'Swift', 'AppKit', 'WebKit', 'macOS Keychain', 'Gmail OAuth', 'Electron safeStorage', 'Guarded IPC', 'Rust', 'WebAssembly', 'whisper.cpp', 'Apple Speech'],
+    evidence: [
+      { label: 'BBOY native macOS assistant', href: '/projects/bboy', status: 'Personal macOS app · Private source' },
+      { label: 'ContextPilot local tooling', href: '/projects/contextpilot', status: 'Current context tools · Voice experience proposed' },
+    ],
   },
   {
-    title: 'Data & infrastructure',
-    skills: ['PostgreSQL', 'Supabase', 'Neon', 'MySQL', 'Firebase', 'Redis', 'Docker', 'Linux VPS', 'AWS Lambda', 'GitLab CI', 'Buddy CI/CD', 'Jenkins', 'Vercel'],
+    title: 'Data & persistence',
+    summary: 'Relational records, local storage, and durable jobs that keep product data useful and recoverable.',
+    useCases: ['Operational records', 'Local-first persistence', 'Sync and reconciliation'],
+    skills: ['PostgreSQL', 'Supabase', 'Neon', 'MySQL', 'Firebase', 'Redis', 'SQLite', 'IndexedDB', 'GORM', 'SQL migrations', 'Durable job queues', 'Payment reconciliation'],
+    evidence: [
+      { label: 'Fitness CRM sync and reconciliation', href: '/projects/fitness-crm', status: 'Private client platform · Source private' },
+      { label: 'ContextPilot browser and native storage', href: '/projects/contextpilot', status: 'Local-first toolkit · Browser IndexedDB and native SQLite' },
+    ],
+  },
+  {
+    title: 'AWS & cloud',
+    summary: 'AWS Lambda integrations and pragmatic managed hosting, selected around the product and its operating constraints.',
+    useCases: ['Event-driven partner workflows', 'Serverless integrations', 'Managed application hosting'],
+    skills: ['AWS Lambda', 'Vercel', 'Vercel Cron', 'Railway', 'Cloudflare Pages', 'Serverless workflows', 'Event-driven integrations'],
+    evidence: [
+      { label: 'Fintech AWS Lambda integrations', href: '/projects/fintech-lending', status: 'Australian client project · Source private' },
+      { label: 'Scale With Accounting scheduled CRM retries', href: '/projects/scale-with-accounting', status: 'Live client website · Vercel Cron documented' },
+    ],
+  },
+  {
+    title: 'DevOps & delivery',
+    summary: 'Repeatable environments, CI/CD checks, and staged delivery that make changes easier to review and operate.',
+    useCases: ['Containerized deployment', 'CI quality gates', 'Staged releases and rollback'],
+    skills: ['Docker', 'Docker Compose', 'Linux VPS', 'Git', 'GitHub Actions', 'GitLab CI', 'Buddy CI/CD', 'Bitbucket', 'Jenkins', 'CI/CD pipelines', 'Preview deployments', 'Staged deployments', 'Rollback support', 'Logging & error handling'],
+    evidence: [
+      { label: 'OMJI billing deployment', href: '/projects/omji-billing', status: 'Client platform · Docker Compose documented' },
+      { label: 'AgentForge cross-platform CI', href: '/projects/agentforge', status: 'Public development source · Platform coverage varies' },
+    ],
+  },
+  {
+    title: 'Testing & security',
+    summary: 'Checks and access boundaries applied to the risks of each workflow, from browser journeys to protected records.',
+    useCases: ['Browser and API verification', 'Role-aware access', 'Consent and auditability'],
+    skills: ['Playwright', 'Vitest', 'pytest', 'Unit & integration tests', 'JWT', 'RBAC', 'Row-level security', 'OTP / 2FA', 'OAuth 2.0', 'Audit trails', 'Consent-aware intake', 'Rate limiting', 'Idempotency', 'Human approval controls'],
+    evidence: [
+      { label: 'Scale With Accounting test stack', href: '/projects/scale-with-accounting', status: 'Live client website · Vitest and Playwright documented' },
+      { label: 'MOIST alumni access and verification', href: '/projects/moist-alumni', status: 'Client project · Private source' },
+      { label: 'Alex / Hasti consent-aware intake', href: '/projects/alex-hasti', status: 'Public demo · Verification, consent, and rate limits' },
+    ],
   },
   {
     title: 'Systems & integrations',
-    skills: ['CRM REST APIs', 'CRM webhook sync', 'Twilio Voice', 'Bidirectional sync', 'Durable job queues', 'Payment reconciliation', 'RBAC', 'Audit trails', 'OTP / 2FA', 'Row-level security'],
+    summary: 'Connect customer operations, communication channels, and financial records without losing ownership of the workflow.',
+    useCases: ['CRM and calendar workflows', 'Voice and messaging integration', 'Network and billing operations'],
+    skills: ['CRM REST APIs', 'CRM webhook sync', 'Twilio Voice', 'Twilio SIP', 'Bidirectional sync', 'Google Calendar API', 'Gmail API', 'MikroTik RouterOS API', 'WireGuard', 'SMTP / Brevo', 'Replay-safe webhooks', 'Retries & leases'],
+    evidence: [
+      { label: 'Zalio CRM conversations and booking', href: '/projects/zalio-crm', status: 'Private product module · Public product tour' },
+      { label: 'OMJI network and billing integration', href: '/projects/omji-billing', status: 'Client platform · Public website' },
+    ],
   },
 ]
 

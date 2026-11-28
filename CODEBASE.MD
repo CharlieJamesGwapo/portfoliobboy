@@ -199,6 +199,10 @@ The private [Portfolio Health dashboard](docs/health/README.md) in the existing 
 
 ### Local portfolio assistant
 
+The skills explorer groups 135 listed tools/practices into ten searchable categories, including dedicated AWS/cloud and DevOps/delivery panels. Group summaries, use cases and 22 public case-study links expose the evidence and project status. Offered-toolkit entries have structured `offeredSkills` metadata: Alex and role comparisons preserve their deployment caveat instead of treating a platform mention as delivered experience.
+
+`automationsData.js` defines 24 service patterns across six categories and an 18-platform integration strip. `Automations.jsx` initially mounts six cards, supports combined search/category filters, progressive disclosure and keyboard focus after loading more. Each example includes trigger, steps, intended outcome, use case, implementation and safeguards. Enquiry links stage an editable subject and retain existing drafts; they do not create workflows or send messages. The catalogue count is separate from the unchanged 22+ documented products/client builds.
+
 `PortfolioAssistant` opens a lazy `AssistantPanel`. [src/lib/assistantAnswers.js](src/lib/assistantAnswers.js) matches questions against local portfolio and voice data, with contact-oriented fallbacks. Text answers do not call an LLM API. Three guided modes in the existing panel add project recommendations, recruiter comparisons, and brief preparation through [src/lib/assistantWorkflows.js](src/lib/assistantWorkflows.js):
 
 - **Find projects** ranks case-study evidence by matching topics, technologies, and project names; each result shows Charlie's contribution, status, and a real case-study link. Unmatched requests receive an honest fallback.

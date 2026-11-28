@@ -2,6 +2,7 @@ import { ArrowRight, ArrowUpRight, Bot, Database, MonitorSmartphone, Workflow } 
 import { requestContact } from '../lib/contactIntent'
 import ScrollReveal from './ScrollReveal'
 import './services.css'
+import { automationWorkflows } from '../data/automationsData'
 
 // "What can I build for you?" translates the skills list into outcomes a
 // client can hire for. Every card points at real, published evidence on this
@@ -12,7 +13,7 @@ export const services = [
     icon: Bot,
     title: 'AI Agents',
     summary: 'Intelligent assistants and voice experiences.',
-    detail: 'Voice receptionists, callback flows, tool-calling agents, and human handoff.',
+    detail: 'Voice receptionists, custom bots, tool-calling agents, and human handoff.',
     evidence: { label: 'Hear the voice demos', href: '#voice-demo' },
     subject: 'AI agent project enquiry',
   },
@@ -22,7 +23,7 @@ export const services = [
     title: 'Automation',
     summary: 'Business workflows and API integrations.',
     detail: 'n8n, GoHighLevel, Make, and Zapier workflows with retries, logging, and a human in the loop.',
-    evidence: { label: 'See eight workflows', href: '#automations' },
+    evidence: { label: `Explore ${automationWorkflows.length} automation patterns`, href: '#automations' },
     subject: 'AI automation project enquiry',
   },
   {
@@ -39,7 +40,7 @@ export const services = [
     icon: Database,
     title: 'Backend Systems',
     summary: 'APIs, databases, cloud infrastructure and integrations.',
-    detail: 'Multi-tenant APIs, PostgreSQL, webhooks, queues, and secure access control.',
+    detail: 'Multi-tenant APIs, AWS Lambda integrations, Docker deployments, webhooks, queues, and secure access control.',
     evidence: { label: 'Read the case studies', href: '/projects' },
     subject: 'Backend system enquiry',
   },
