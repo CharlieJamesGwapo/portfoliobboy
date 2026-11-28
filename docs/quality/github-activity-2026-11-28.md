@@ -23,4 +23,11 @@ GitHub's public contribution HTML is an upstream dependency. Markup changes/outa
 
 ## Publication
 
-Post-publication verification will be appended after the source commit is pushed and its matching Vercel production deployment is READY.
+- Source commit **5bf00ea07d47753571e3dddc77ee7d7b562963be** pushed to `origin/main`.
+- [Security CI 46090502239](https://github.com/CharlieJamesGwapo/portfoliobboy/actions/runs/46090502239) completed successfully, including the new feed/helper gate.
+- Matching Git deployment **portfoliobboy-10equz5md-charlie-james-projects.vercel.app** reached **READY** with the public `portfoliobboy.vercel.app` alias. Metadata listed the exact source SHA; deployment inspection confirmed the production target and aliases.
+- The public feed returned **10,318 / 365 days for 2026** and **75 / 365 for 2025**, with **70 public repositories**, at **2026-11-28 00:56 UTC**. The changed 2026 count demonstrates an upstream refresh rather than a hard-coded screenshot. Both totals matched their daily sums and the response contained only the documented aggregate fields.
+- Repeat public-feed GET was an actual **Vercel CDN HIT**. Successful cache headers override the global no-store defaults only on this function. Extra query keys returned **400/no-store** and POST returned **405/no-store**.
+- `npm run audit:site-security` passed **17/17** read-only live checks, including the unchanged private contact/analytics/health cache boundaries and origin restrictions.
+- Normal-browser production verification showed the **70+ Custom builds** hero, **10,318** current-year calendar and **75** prior-year calendar. Year switching was exercised and the public calendar was left open at `https://portfoliobboy.vercel.app/#github`.
+- Only the root-owned local dev/preview servers were stopped. No real visitor enquiry, booking, microphone session, alert email or private repository access was needed for these release checks.
